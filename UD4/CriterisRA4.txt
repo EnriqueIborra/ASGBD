@@ -1,0 +1,8 @@
+a) S'ha reconegut la importància d'automatitzar tasques administratives.
+b) S'han descrit els diferents mètodes d'execució de guions.
+c) S'han identificat les eines disponibles per redactar guions.
+d) S'han definit i utilitzat guions per automatitzar tasques.
+e) S'han identificat els esdeveniments susceptibles d’activar disparadors.
+f) S'han definit disparadors.
+g) S'han fet servir estructures de control de flux.
+h) S'han adoptat mesures per mantenir la integritat i la consistència de la informació.
