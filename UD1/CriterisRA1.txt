@@ -1,0 +1,10 @@
+a) S'ha reconegut la utilitat i la funció de cadascun dels elements d'un sistema gestor de bases de dades.
+b) S’han analitzat les característiques dels principals sistemes gestors de bases de dades.
+c) S'ha seleccionat el sistema gestor de bases de dades.
+d) S'ha identificat el programari necessari per dur a terme la instal·lació.
+e) S'ha verificat el compliment dels requisits de maquinari.
+f) S'han instal·lat sistemes gestors de bases de dades.
+g) S'ha documentat el procés d'instal·lació.
+h) S'ha interpretat la informació subministrada pels missatges d'error i els fitxers de registre.
+i) S'han resolt les incidències de la instal·lació.
+j) S'ha verificat el funcionament del sistema gestor de bases de dades.
