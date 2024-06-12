@@ -1,0 +1,7 @@
+a) S'ha reconegut la utilitat de les bases de dades distribuïdes.
+b) S'han descrit les diverses polítiques de fragmentació de la informació.
+c) S'ha implantat una base de dades distribuïda homogènia.
+d) S'ha creat una base de dades distribuïda mitjançant la integració d'un conjunt de bases de dades preexistents.
+e) S'ha configurat un node mestre i diversos esclaus per dur a terme la replicació del primer.
+f) S'ha configurat un sistema de replicació en cadena.
+g) S'ha comprovat l'efecte de la parada de determinats nodes sobre els sistemes distribuïts i els replicats.
