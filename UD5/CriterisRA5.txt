@@ -1,0 +1,8 @@
+a) S'han identificat les eines de monitoratge disponibles per al sistema gestor.
+b) S'han descrit els avantatges i inconvenients de la creació d'índexs.
+c) S'han creat índexs en taules i vistes.
+d) S'ha optimitzat l'estructura de la base de dades.
+e) S'han optimitzat els recursos del sistema gestor.
+f) S'ha obtingut informació sobre el rendiment de les consultes per a la seua optimització.
+g) S'han programat alertes de rendiment.
+h) S'han realitzat modificacions en la configuració del sistema operatiu per a millorar el rendiment del gestor.
