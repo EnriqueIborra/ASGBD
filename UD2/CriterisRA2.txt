@@ -1,0 +1,8 @@
+a) S'han descrit les condicions d'inici i aturada del SGBD.
+b) S'ha seleccionat el motor de la base de dades.
+c) S'han assegurat els comptes d'administració.
+d) S'han configurat les eines i el programari client del sistema gestor.
+e) S'ha configurat la connectivitat en xarxa del sistema gestor.
+f) S'han definit les característiques per defecte de les bases de dades.
+g) S'han definit els paràmetres relatius a les connexions (temps d'espera, nombre màxim de connexions, entre d'altres).
+h) S'ha documentat el procés de configuració
