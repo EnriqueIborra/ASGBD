@@ -1,0 +1,8 @@
+a) S'han creat vistes personalitzades per a cada usuari.
+b) S'han creat sinònims de taules i de vistes.
+c) S'han definit i eliminat els comptes d'usuari.
+d) S'han identificat els privilegis sobre les bases de dades i els elements.
+e) S'han agrupat i desagrupat privilegis.
+f) S'han assignat i eliminat privilegis a usuaris.
+g) S'han assignat i eliminat grups de privilegis a usuaris.
+h) S'ha garantit el compliment dels requisits de seguretat.
