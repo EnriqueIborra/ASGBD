@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title> Disponibilitat Oracle</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+</head>
+<body>
+
+<header>
+    
+<a href="index.html">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo">
+</a>
+  <h1>ASGBD   -    Disponibilitat d'un SGBD</h1>
+</header>
+
+<nav>
+  <h2>Índex</h2>
+  <a href="#nuvol">Nuvol</a>
+  <a href="#cluster">Cluster</a>
+  <a href="#sgbdd">SGBD Distribuït</a>
+  <a href="#date">Regles de DATE</a>  
+  <a href="#fragmentacio">Fragmentació</a>  
+  <a href="#replicacio">Replicació</a>  
+</nav>
+
+<main>
+
+ 
+    <section id="nuvol">
+        <h2>☁️ Bases de dades al núvol</h2>
+      
+        <h3>📘 Què és el núvol en el context de l’SGBD?</h3>
+        <p>
+          El <strong>núvol</strong> representa una de les tecnologies actuals més utilitzades per garantir la <strong>disponibilitat</strong>, 
+          l’<strong>escalabilitat</strong> i el <strong>rendiment</strong> dels Sistemes Gestors de Bases de Dades (SGBD). 
+          Permet utilitzar infraestructures virtuals que poden ser:
+        </p>
+        <ul>
+          <li> Maquinari dedicat (HW dedicat)</li>
+          <li> Serveis gestionats per tercers (ex: Oracle Cloud, AWS, Azure)</li>
+        </ul>
+      
+        <h3> Avantatges de l’ús del núvol</h3>
+        <ul>
+          <li> <strong>Cost més eficient</strong>: pagament per ús, sense invertir en infraestructures pròpies.</li>
+          <li> <strong>Alt rendiment i escalabilitat</strong>: adaptació automàtica a pics de càrrega.</li>
+          <li> <strong>Alta disponibilitat</strong>: sistemes redundants i amb tolerància a errors.</li>
+          <li> <strong>Alt nivell de seguretat</strong>: xifratge, còpies de seguretat, control d’accés.</li>
+          <li> <strong>Administració completa</strong>: manteniment, actualitzacions i gestió integrades.</li>
+          <li> <strong>Compatibilitat</strong> amb els SGBD tradicionals (Oracle, MySQL, PostgreSQL…)</li>
+          <li> <strong>Ideal per teletreball</strong>: accés remot des de qualsevol lloc i dispositiu.</li>
+        </ul>
+      
+        <h3>⚠️ Inconvenients o riscos</h3>
+        <ul>
+          <li> <strong>Dependència d’un tercer</strong>: cal confiar en el proveïdor del servei.</li>
+          <li> <strong>Caiguda de la connexió a internet</strong>: pot deixar la BD inoperativa temporalment.</li>
+          <li> <strong>Riscos de seguretat</strong>: tot i estar protegits, hi ha vulnerabilitats potencials.</li>
+          <li> <strong>Manca de control total</strong>: l’usuari no gestiona directament el hardware ni el sistema complet.</li>
+        </ul>
+      
+        <h3>☁️ Principals proveïdors de núvol per a SGBD</h3>
+        <ul>
+          <li> <strong>Oracle Cloud</strong>: plataforma pròpia amb suport per a multitenant, PDBs i Oracle Autonomous Database.</li>
+          <li> <strong>AWS</strong> (Amazon Web Services): amb serveis com RDS, Aurora, suport per a Oracle, PostgreSQL, MySQL, etc.</li>
+          <li> <strong>Azure</strong> (Microsoft): amb bases de dades SQL gestionades, integració amb sistemes híbrids.</li>
+        </ul>
+      
+        <p>
+          Aquestes plataformes ofereixen <strong>monitoratge en temps real</strong>, còpies automàtiques, sistemes de recuperació davant desastres i integració amb eines DevOps.
+        </p>
+      
+        <h3>💬 Resum</h3>
+        <p>
+          Treballar amb un SGBD al núvol ofereix molts avantatges a nivell de rendiment, flexibilitat i manteniment. 
+          Tot i això, cal tenir en compte la dependència d’internet i la confiança dipositada en el proveïdor. És una <strong>solució recomanable</strong> per entorns amb teletreball, projectes dinàmics i empreses que busquen escalabilitat sense gran inversió inicial.
+        </p>
+      </section>
+      
+
+      <section id="cluster">
+        <h2> Clúster en sistemes de bases de dades</h2>
+      
+        <h3>📘 Què és un clúster?</h3>
+        <p>
+          Un <strong>clúster</strong> és un conjunt de servidors interconnectats que funcionen com una <strong>única unitat</strong> per oferir serveis, com ara una base de dades, de manera més robusta i fiable.
+          Això permet aconseguir <strong>alta disponibilitat</strong> i <strong>tolerància a fallades</strong>.
+        </p>
+      
+        <h4>🎯 Objectiu principal</h4>
+        <ul>
+          <li> <strong>Evitar interrupcions</strong> del servei davant una fallada d’un dels servidors.</li>
+          <li> <strong>Repartir la càrrega</strong> de treball (balanç de càrrega) entre diferents nodes.</li>
+        </ul>
+      
+        <h3> Funcionament bàsic</h3>
+        <p>
+          Tots els nodes del clúster comparteixen accés a la mateixa base de dades o disc. Quan un node falla, un altre pot assumir automàticament el seu rol, evitant talls de servei.
+        </p>
+      
+        <p>Exemples típics:</p>
+        <ul>
+          <li> Oracle RAC (Real Application Clusters)</li>
+          <li> MySQL Cluster</li>
+          <li> Microsoft SQL Server amb AlwaysOn o Failover Cluster</li>
+        </ul>
+      
+        <h3> Components típics d’un clúster</h3>
+        <ul>
+          <li> <strong>Nodes</strong>: màquines físiques o virtuals que formen part del clúster.</li>
+          <li> <strong>Interconnexió</strong>: xarxa ràpida per sincronització i control d’estat.</li>
+          <li> <strong>Emmagatzematge compartit</strong>: discos accessibles per tots els nodes.</li>
+          <li> <strong>Software de clúster</strong>: gestiona el monitoratge, failover i recursos compartits.</li>
+        </ul>
+      
+        <h3> Beneficis del clúster</h3>
+        <ul>
+          <li> Alta disponibilitat (HA)</li>
+          <li> Tolerància a fallades</li>
+          <li> Escalabilitat horitzontal (afegir nous nodes)</li>
+          <li> Continuïtat de negoci</li>
+        </ul>
+      
+        <h3> Consideracions</h3>
+        <ul>
+          <li> Implementació més complexa</li>
+          <li> Pot implicar més cost d’infraestructura</li>
+          <li> Cal tenir control d’accés i seguretat entre nodes</li>
+        </ul>
+      
+        <h3> Exemple gràfic (conceptual)</h3>
+        <p>🖥️ Node 1 (actiu) + 🖥️ Node 2 (en espera) → Base de dades comuna</p>
+        <p>Si el Node 1 falla, el Node 2 s’activa automàticament (failover).</p>
+      
+        <h3> Conclusió</h3>
+        <p>
+          Els clústers són una <strong>solució professional</strong> per entorns crítics que requereixen disponibilitat 24/7. Són àmpliament usats en entorns corporatius i serveis en línia amb gran demanda.
+        </p>
+      </section>
+      
+
+
+</main>
+
+</body>
+</html>

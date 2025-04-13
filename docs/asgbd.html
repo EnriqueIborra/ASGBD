@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>📝 Automatització Oracle</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+  
+</head>
+<body>
+
+<header>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo">
+  <h1>ASGBD   -    Automatització de tasques en Oracle</h1>
+</header>
+
+<nav>
+  <h2>Índex</h2>
+  <a href="#blocs">Blocs anònims</a>
+  <a href="#editor-bloc-anonim">Blocs anònims</a>
+  <a href="#estructures">Estructures de programació</a>
+  <a href="#proc-func">Procediments-funcions</a>
+  <a href="#procs">Procediments en ORACLE</a>
+  <a href="#funcions">Funcions en ORACLE</a>
+  <a href="#disparadors">Disparadors en ORACLE</a>
+  <a href="#seq">Seqüències</a>
+  <a href="#cursors">Cursors</a>
+  <a href="#excepcions">Excepcions</a>
+  <a href="#tasques">Tasques automatitzables</a>
+</nav>
+
+<main>
+
+  <section id="blocs">
+    <h2>🧾 Bloc Anònim en PL/SQL</h2>
+  
+    <h3> Què és un bloc anònim?</h3>
+    <p>
+      Un <strong>bloc anònim</strong> és una unitat de codi en PL/SQL que:
+    </p>
+    <ul>
+      <li> No té nom ni es guarda a la base de dades.</li>
+      <li> S’executa una sola vegada i després desapareix.</li>
+      <li> És ideal per a proves o per a executar operacions puntuals.</li>
+      <li> Pot incloure sentències SQL, declaracions de variables, control de flux, i gestió d’excepcions.</li>
+    </ul>
+  
+    <h3> Estructura bàsica d’un bloc anònim</h3>
+    <pre>
+  SET SERVEROUTPUT ON;
+  
+  DECLARE
+     vNom VARCHAR2(20) := '&nom';
+  BEGIN
+     DBMS_OUTPUT.PUT_LINE('Hola ' || vNom);
+     DBMS_OUTPUT.PUT_LINE('Benvingut a la programació en PL/SQL');
+  END;
+  .  -- Només en SQL*Plus!
+    </pre>
+  
+    <p>
+      ⚠️ En <strong>SQL*Plus</strong> s’ha de posar un punt (<code>.</code>) al final per enviar-lo al buffer i després executar-lo amb <code>RUN</code>.  
+      En <strong>SQL Developer</strong>, s’executa amb <kbd>F5</kbd> i <strong>no cal posar el punt</strong>.
+    </p>
+  
+    <h3>💬 Explicació pas a pas</h3>
+    <ul>
+      <li><code>DECLARE</code>: bloc opcional per declarar variables.</li>
+      <li><code>BEGIN</code>: bloc obligatori per executar codi.</li>
+      <li><code>DBMS_OUTPUT.PUT_LINE</code>: mostra text a pantalla (cal tenir activat <code>SET SERVEROUTPUT ON</code>).</li>
+      <li><code>END;</code>: finalitza el bloc.</li>
+      <li><code>.</code>: (només en SQL*Plus) envia el bloc al buffer per executar-lo.</li>
+    </ul>
+  
+    <h3> Exemple senzill</h3>
+    <pre>
+  SET SERVEROUTPUT ON;
+  
+  DECLARE
+     vData DATE := SYSDATE;
+  BEGIN
+     DBMS_OUTPUT.PUT_LINE('La data actual és: ' || TO_CHAR(vData, 'DD/MM/YYYY'));
+  END;
+    </pre>
+  
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Documenta el codi amb comentaris (<code>--</code> per una línia, <code>/* */</code> per múltiples).</li>
+      <li> Fes servir blocs anònims per provar procediments o funcions abans de guardar-los.</li>
+      <li> Prova condicions, bucles i excepcions dins blocs anònims abans d'incorporar-ho a rutines emmagatzemades.</li>
+    </ul>
+  
+    <h3> Altres comandos útils en SQL*Plus</h3>
+    <ul>
+      <li><code>EDIT</code> → edita l’script actual</li>
+      <li><code>LIST</code> → mostra el contingut del buffer</li>
+      <li><code>RUN</code> → executa el bloc en el buffer</li>
+      <li><code>SAVE fitxer.sql</code> → desa l’script</li>
+      <li><code>@fitxer.sql</code> → executa un fitxer</li>
+    </ul>
+  
+    <h3> Diferència amb procediments</h3>
+    <p>Els blocs anònims no es poden reutilitzar directament, ja que no tenen nom. Per a reutilització, millor usar procediments o funcions.</p>
+  
+    <h3>🧪 Prova-ho!</h3>
+    <p>
+      Prova aquest bloc en <strong>SQL Developer</strong>:
+    </p>
+    <pre>
+  DECLARE
+     vNom VARCHAR2(20) := 'Ada';
+  BEGIN
+     DBMS_OUTPUT.PUT_LINE('Hola ' || vNom || '! Bon dia!');
+  END;
+    </pre>
+  </section>
+  
+  
+  <section id="editor-bloc-anonim">
+    <h2>🧪 Pràctica interactiva: Bloc Anònim</h2>
+    <p>
+      Prova aquí mateix la sintaxi d’un bloc anònim PL/SQL. Es la pàgina oficial de ORACLE.
+    </p>
+
+    <a href="https://livesql.oracle.com/landing/">Simulador de codi de ORACLE</a>
+
+  </section>
+
+
+  
+  <section id="estructures">
+    <h2>🔁 Estructures de control en PL/SQL</h2>
+  
+    <p>Les estructures de control són fonamentals per controlar el flux d'execució d’un bloc de codi PL/SQL. Oracle suporta múltiples tipus:</p>
+  
+    <h3> Condicionals</h3>
+  
+    <h4> Estructura IF</h4>
+    <pre>
+  IF condicio THEN
+     instruccions;
+  ELSIF altra_condicio THEN
+     instruccions;
+  ELSE
+     instruccions;
+  END IF;
+    </pre>
+  
+    <h4> Exemple IF</h4>
+    <pre>
+  DECLARE
+     edat NUMBER := 20;
+  BEGIN
+     IF edat >= 18 THEN
+        DBMS_OUTPUT.PUT_LINE('Ets major d''edat');
+     ELSE
+        DBMS_OUTPUT.PUT_LINE('Ets menor');
+     END IF;
+  END;
+    </pre>
+  
+    <h4>🔹 Estructura CASE</h4>
+    <pre>
+  CASE expressio
+     WHEN valor1 THEN instruccions;
+     WHEN valor2 THEN instruccions;
+     ELSE instruccions;
+  END CASE;
+    </pre>
+  
+    <h4> Exemple CASE</h4>
+    <pre>
+  DECLARE
+     nota NUMBER := 7;
+  BEGIN
+     CASE
+        WHEN nota >= 9 THEN DBMS_OUTPUT.PUT_LINE('Excel·lent');
+        WHEN nota >= 5 THEN DBMS_OUTPUT.PUT_LINE('Aprovat');
+        ELSE DBMS_OUTPUT.PUT_LINE('Suspès');
+     END CASE;
+  END;
+    </pre>
+  
+    <h3>🔁 Bucles</h3>
+  
+    <h4>🔄 LOOP bàsic (amb sortida manual)</h4>
+    <pre>
+  LOOP
+     instruccions;
+     EXIT WHEN condicio;
+  END LOOP;
+    </pre>
+  
+    <h4> Exemple LOOP</h4>
+    <pre>
+  DECLARE
+     i NUMBER := 1;
+  BEGIN
+     LOOP
+        DBMS_OUTPUT.PUT_LINE('Iteració: ' || i);
+        i := i + 1;
+        EXIT WHEN i > 5;
+     END LOOP;
+  END;
+    </pre>
+  
+    <h4> WHILE LOOP</h4>
+    <pre>
+  WHILE condicio LOOP
+     instruccions;
+  END LOOP;
+    </pre>
+  
+    <h4> Exemple WHILE</h4>
+    <pre>
+  DECLARE
+     i NUMBER := 1;
+  BEGIN
+     WHILE i <= 3 LOOP
+        DBMS_OUTPUT.PUT_LINE('Valor: ' || i);
+        i := i + 1;
+     END LOOP;
+  END;
+    </pre>
+  
+    <h4> FOR LOOP</h4>
+    <pre>
+  FOR variable IN inici..final LOOP
+     instruccions;
+  END LOOP;
+    </pre>
+  
+    <h4> Exemple FOR</h4>
+    <pre>
+  BEGIN
+     FOR i IN 1..4 LOOP
+        DBMS_OUTPUT.PUT_LINE('Posició: ' || i);
+     END LOOP;
+  END;
+    </pre>
+  
+    <h3> Notes addicionals</h3>
+    <ul>
+      <li><strong>EXIT WHEN</strong> → surt d’un bucle en una condició</li>
+      <li><strong>CONTINUE</strong> → salta a la següent iteració (a partir de Oracle 11g)</li>
+      <li>Els bucles poden ser <strong>anidats</strong> i combinen amb IF o CASE</li>
+    </ul>
+  
+    <h3> Bon ús d’estructures</h3>
+    <ul>
+      <li> Usa `FOR` si saps quantes vegades vols repetir</li>
+      <li> Usa `WHILE` si depens d’una condició externa</li>
+      <li> Usa `IF` per bifurcar el comportament del codi</li>
+      <li>⚠️ Evita bucles infinits, assegura sempre una condició de sortida</li>
+    </ul>
+  </section>
+  
+
+  <section id="proc-func">
+    <h2>⚙️ Procediments, Funcions i Triggers</h2>
+  
+    <h3> Definicions ràpides</h3>
+    <ul>
+      <li><strong>Procediment:</strong> bloc PL/SQL que realitza una acció, pot tenir paràmetres però no retorna valor directament.</li>
+      <li><strong>Funció:</strong> com un procediment, però <strong>retorna un valor</strong> mitjançant <code>RETURN</code>.</li>
+      <li><strong>Trigger:</strong> bloc de codi que s'executa automàticament <strong>quan es produeix un esdeveniment</strong> sobre una taula (INSERT, UPDATE, DELETE).</li>
+    </ul>
+  
+    <hr>
+  
+    <h3> PROCEDURE – Procediment</h3>
+    <pre>
+  CREATE OR REPLACE PROCEDURE mostrar_salutacio (nom IN VARCHAR2) IS
+  BEGIN
+    DBMS_OUTPUT.PUT_LINE('Hola ' || nom || '!');
+  END;
+    </pre>
+  
+    <p>Per executar-lo:</p>
+    <pre>
+  BEGIN
+    mostrar_salutacio('Ada');
+  END;
+    </pre>
+  
+    <h4> Notes:</h4>
+    <ul>
+      <li><code>IN</code> → paràmetre d'entrada</li>
+      <li><code>OUT</code> → paràmetre de sortida</li>
+      <li><code>IN OUT</code> → entrada i sortida</li>
+    </ul>
+  
+    <hr>
+  
+    <h3> FUNCTION – Funció</h3>
+    <pre>
+  CREATE OR REPLACE FUNCTION quadrat (x IN NUMBER)
+  RETURN NUMBER IS
+  BEGIN
+    RETURN x * x;
+  END;
+    </pre>
+  
+    <p>Per utilitzar-la:</p>
+    <pre>
+  BEGIN
+    DBMS_OUTPUT.PUT_LINE('El quadrat de 4 és: ' || quadrat(4));
+  END;
+    </pre>
+  
+    <h4> Diferència clau:</h4>
+    <p>Les funcions <strong>retornen un valor</strong> i poden ser cridades dins SELECT o expressions.</p>
+  
+    <hr>
+  
+    <h3> TRIGGER – Disparador</h3>
+    <pre>
+  CREATE OR REPLACE TRIGGER avis_insert
+  AFTER INSERT ON alumnes
+  FOR EACH ROW
+  BEGIN
+    DBMS_OUTPUT.PUT_LINE('Nou alumne afegit: ' || :NEW.nom);
+  END;
+    </pre>
+  
+    <h4> Tipus de triggers:</h4>
+    <ul>
+      <li><strong>AFTER</strong> → després d’una acció</li>
+      <li><strong>BEFORE</strong> → abans d’una acció</li>
+      <li><strong>INSTEAD OF</strong> → per a vistes</li>
+    </ul>
+  
+    <p><code>:NEW</code> i <code>:OLD</code> representen els valors nous i antics respectivament per a cada fila.</p>
+  
+    <h3>🔍 Consultes útils</h3>
+    <pre>
+  -- Veure procediments i funcions de l'usuari
+  SELECT object_name, object_type
+  FROM user_objects
+  WHERE object_type IN ('PROCEDURE', 'FUNCTION');
+  
+  -- Veure triggers
+  SELECT trigger_name, table_name, triggering_event
+  FROM user_triggers;
+    </pre>
+  
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Declara sempre el tipus de paràmetre (IN, OUT, IN OUT)</li>
+      <li> Evita posar lògica complexa dins d’un trigger</li>
+      <li> Posa nom clar i descriptiu a procediments i funcions</li>
+      <li> Documenta els paràmetres i el que retorna la funció</li>
+    </ul>
+  </section>
+    
+
+
+<section id="procediments">
+  <h2>⚙️ Procediments en PL/SQL</h2>
+
+  <h3> Què és un procediment?</h3>
+  <p>
+    Un <strong>procediment</strong> és un bloc de codi PL/SQL <strong>emmagatzemat</strong> que es pot cridar per executar una acció. 
+    Pot rebre paràmetres i fer servir sentències SQL, estructures de control, bucles, excepcions, etc.
+  </p>
+
+  <h3> Estructura bàsica</h3>
+  <pre>
+CREATE [OR REPLACE] PROCEDURE nom_proc (
+    param1 [IN | OUT | IN OUT] tipus,
+    ...
+) IS
+BEGIN
+   -- Codi del procediment
+END nom_proc;
+  </pre>
+
+  <h4> Tipus de paràmetres:</h4>
+  <ul>
+    <li><code>IN</code>: entrada (per defecte)</li>
+    <li><code>OUT</code>: sortida</li>
+    <li><code>IN OUT</code>: entrada i sortida</li>
+  </ul>
+
+  <h3> Exemple senzill</h3>
+  <pre>
+CREATE OR REPLACE PROCEDURE saluda (nom IN VARCHAR2) IS
+BEGIN
+   DBMS_OUTPUT.PUT_LINE('Hola, ' || nom || '!');
+END;
+  </pre>
+
+  <p><strong>Execució:</strong></p>
+  <pre>
+BEGIN
+   saluda('Joan');
+END;
+  </pre>
+
+  <h3>🧪 Exemple amb paràmetre OUT</h3>
+  <pre>
+CREATE OR REPLACE PROCEDURE calcula_doble (
+   valor IN NUMBER,
+   resultat OUT NUMBER
+) IS
+BEGIN
+   resultat := valor * 2;
+END;
+  </pre>
+
+  <p><strong>Execució (des de SQL*Plus o bloc anònim):</strong></p>
+  <pre>
+DECLARE
+   res NUMBER;
+BEGIN
+   calcula_doble(5, res);
+   DBMS_OUTPUT.PUT_LINE('El doble és: ' || res);
+END;
+  </pre>
+
+  <h3>🔍 Consultar procediments</h3>
+  <ul>
+    <li> Llistar procediments de l’usuari:</li>
+    <pre>
+SELECT object_name FROM user_objects WHERE object_type = 'PROCEDURE';
+    </pre>
+
+    <li>👀 Consultar paràmetres d’un procediment:</li>
+    <pre>
+SELECT argument_name, in_out, data_type
+FROM user_arguments
+WHERE object_name = 'CALCULA_DOBLE';
+    </pre>
+  </ul>
+
+  <h3> Desar en fitxer i executar</h3>
+  <p>Pots escriure un procediment en un fitxer <code>.sql</code> i executar-lo amb:</p>
+  <pre>@proc_saluda.sql</pre>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Dona noms clars i significatius</li>
+    <li> Documenta el comportament i els paràmetres</li>
+    <li> Gestiona excepcions amb <code>EXCEPTION</code> per capturar errors</li>
+    <li>⚠️ Evita fer massa coses dins d’un sol procediment → separa funcionalitats</li>
+  </ul>
+
+  <h3> Exemple complet amb control d’errors</h3>
+  <pre>
+CREATE OR REPLACE PROCEDURE insereix_alumne (
+   nom IN VARCHAR2,
+   edat IN NUMBER
+) IS
+BEGIN
+   INSERT INTO alumnes(nom, edat) VALUES (nom, edat);
+   DBMS_OUTPUT.PUT_LINE('Alumne inserit correctament.');
+EXCEPTION
+   WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;
+  </pre>
+</section>
+
+
+<section id="funcions">
+  <h2> Funcions en PL/SQL</h2>
+
+  <h3>📘 Què és una funció?</h3>
+  <p>
+    Una <strong>funció</strong> és un bloc de codi PL/SQL que <strong>rep zero o més paràmetres</strong> i <strong>retorna un valor</strong>.
+    A diferència dels procediments, les funcions es poden cridar dins sentències SQL i expressions.
+  </p>
+
+  <h3> Estructura bàsica</h3>
+  <pre>
+CREATE [OR REPLACE] FUNCTION nom_func (
+    paràmetres
+) RETURN tipus IS
+BEGIN
+    -- codi
+    RETURN valor;
+END nom_func;
+  </pre>
+
+  <h3> Exemple simple</h3>
+  <pre>
+CREATE OR REPLACE FUNCTION suma (
+    a IN NUMBER,
+    b IN NUMBER
+) RETURN NUMBER IS
+BEGIN
+   RETURN a + b;
+END;
+  </pre>
+
+  <p><strong>Crida dins d’un bloc:</strong></p>
+  <pre>
+DECLARE
+   resultat NUMBER;
+BEGIN
+   resultat := suma(4, 5);
+   DBMS_OUTPUT.PUT_LINE('Resultat: ' || resultat);
+END;
+  </pre>
+
+  <h3> Exemple dins SELECT</h3>
+  <pre>
+SELECT suma(10, 20) FROM dual;
+  </pre>
+
+  <h3> Exemple real: calcular salari amb plus</h3>
+  <pre>
+CREATE OR REPLACE FUNCTION salari_total (
+   base IN NUMBER,
+   plus IN NUMBER DEFAULT 0
+) RETURN NUMBER IS
+BEGIN
+   RETURN base + plus;
+END;
+  </pre>
+
+  <p>Crida:</p>
+  <pre>
+SELECT salari_total(1500, 200) FROM dual;
+  </pre>
+
+  <h3> Tipus de paràmetres</h3>
+  <ul>
+    <li><code>IN</code>: entrada (per defecte)</li>
+    <li><code>OUT</code> i <code>IN OUT</code> no es poden fer servir a funcions que es cridin dins SQL</li>
+  </ul>
+
+  <h3>⚠️ Limitacions</h3>
+  <ul>
+    <li>Les funcions que es cridin des de SQL <strong>no poden modificar dades</strong> (no poden fer INSERT, UPDATE o DELETE)</li>
+    <li>Han de ser deterministes: el resultat ha de dependre només dels valors d’entrada</li>
+  </ul>
+
+  <h3>📥 Consulta de funcions</h3>
+  <pre>
+-- Funcions de l’usuari
+SELECT object_name FROM user_objects WHERE object_type = 'FUNCTION';
+
+-- Arguments d’una funció
+SELECT argument_name, data_type, in_out
+FROM user_arguments
+WHERE object_name = 'SUMA';
+  </pre>
+
+  <h3>🧪 Exemple amb condició</h3>
+  <pre>
+CREATE OR REPLACE FUNCTION es_parell (n IN NUMBER)
+RETURN VARCHAR2 IS
+BEGIN
+   IF MOD(n, 2) = 0 THEN
+      RETURN 'Sí';
+   ELSE
+      RETURN 'No';
+   END IF;
+END;
+  </pre>
+
+  <p>Crida:</p>
+  <pre>SELECT es_parell(8) FROM dual;</pre>
+
+  <h3> Com cridar funcions:</h3>
+  <ul>
+    <li>✔️ Dins <code>SELECT</code>, <code>WHERE</code>, <code>ORDER BY</code></li>
+    <li>✔️ Assignant a una variable dins un bloc</li>
+    <li>❌ No es poden fer servir dins DML (si tenen codi que modifica dades)</li>
+  </ul>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Utilitza noms clars i descriptius</li>
+    <li> Fes servir <code>RETURN</code> només una vegada si és possible</li>
+    <li> Documenta què fa la funció i què retorna</li>
+    <li>⚠️ Evita fer INSERT/UPDATE dins funcions si s’han de cridar des de SQL</li>
+  </ul>
+
+  <h3>🔍 Bona pràctica combinada</h3>
+  <p>Calcular l’IRPF aplicat a un salari i retornar-lo:</p>
+  <pre>
+CREATE OR REPLACE FUNCTION calcula_irpf (
+   salari IN NUMBER
+) RETURN NUMBER IS
+BEGIN
+   RETURN salari * 0.15;
+END;
+  </pre>
+
+  <p>
+    Aquesta funció es pot cridar dins un SELECT per veure quants impostos es retenen:
+  </p>
+  <pre>
+SELECT nom, calcula_irpf(salari) AS irpf
+FROM empleats;
+  </pre>
+</section>
+
+
+
+
+<section id="disparadors">
+  <h2>🚨 Disparadors (Triggers) en Oracle</h2>
+
+  <h3>📘 Què és un trigger?</h3>
+  <p>
+    Un <strong>trigger</strong> és un bloc de codi PL/SQL que s’executa automàticament quan es produeix un <strong>esdeveniment</strong> 
+    (com un INSERT, UPDATE o DELETE) sobre una taula o vista.
+  </p>
+
+  <h3> Tipus de triggers</h3>
+  <ul>
+    <li><strong>BEFORE</strong>: abans de l’esdeveniment</li>
+    <li><strong>AFTER</strong>: després de l’esdeveniment</li>
+    <li><strong>INSTEAD OF</strong>: per a vistes, substitueix l’acció</li>
+  </ul>
+
+  <h3> Nivells d’actuació</h3>
+  <ul>
+    <li> <strong>Fila a fila</strong> → actua per cada fila afectada (FOR EACH ROW)</li>
+    <li> <strong>Per esdeveniment</strong> → actua una sola vegada per operació</li>
+  </ul>
+
+  <h3> Sintaxi bàsica (fila a fila)</h3>
+  <pre>
+CREATE OR REPLACE TRIGGER nom_trigger
+BEFORE INSERT OR UPDATE OR DELETE
+ON nom_taula
+FOR EACH ROW
+BEGIN
+   -- accions amb :NEW i :OLD
+END;
+  </pre>
+
+  <h3>🧪 Exemple: trigger de control INSERT</h3>
+  <pre>
+CREATE OR REPLACE TRIGGER log_insercio
+AFTER INSERT ON alumnes
+FOR EACH ROW
+BEGIN
+   DBMS_OUTPUT.PUT_LINE('Nou registre afegit: ' || :NEW.nom);
+END;
+  </pre>
+
+  <h3> Exemple: impedir valors negatius</h3>
+  <pre>
+CREATE OR REPLACE TRIGGER evitar_negatius
+BEFORE INSERT OR UPDATE ON productes
+FOR EACH ROW
+BEGIN
+   IF :NEW.preu < 0 THEN
+      RAISE_APPLICATION_ERROR(-20001, 'El preu no pot ser negatiu');
+   END IF;
+END;
+  </pre>
+
+  <h3> Exemple: trigger d’auditoria</h3>
+  <p>Crear una taula d’auditoria:</p>
+  <pre>
+CREATE TABLE aud_alumnes (
+   usuari   VARCHAR2(30),
+   data_op  DATE,
+   accio    VARCHAR2(10)
+);
+  </pre>
+
+  <p>Trigger que afegeix registre:</p>
+  <pre>
+CREATE OR REPLACE TRIGGER audita_alumnes
+AFTER INSERT OR DELETE ON alumnes
+FOR EACH ROW
+BEGIN
+   INSERT INTO aud_alumnes VALUES (
+      USER,
+      SYSDATE,
+      CASE
+         WHEN INSERTING THEN 'INSERT'
+         WHEN DELETING THEN 'DELETE'
+      END
+   );
+END;
+  </pre>
+
+  <h3> INSTEAD OF (per a vistes)</h3>
+  <p>Només aplicable a <strong>vistes</strong> (ja que no poden modificar-se directament):</p>
+  <pre>
+CREATE OR REPLACE TRIGGER modificar_vista
+INSTEAD OF UPDATE ON vista_empleats
+FOR EACH ROW
+BEGIN
+   UPDATE empleats
+   SET salari = :NEW.salari
+   WHERE id = :OLD.id;
+END;
+  </pre>
+
+  <h3>🔎 Consultes útils</h3>
+  <pre>
+-- Veure triggers de l’usuari actual
+SELECT trigger_name, table_name, triggering_event, status
+FROM user_triggers;
+
+-- Consultar codi
+SELECT trigger_body FROM user_triggers WHERE trigger_name = 'LOG_INSERCIO';
+  </pre>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Usa noms clars i descripció funcional</li>
+    <li> Documenta el comportament del trigger</li>
+    <li> Evita codi complex o accions que modifiquin altres taules si no és necessari</li>
+    <li> Controla el rendiment: massa triggers poden degradar l’eficiència</li>
+    <li> Si cal registrar accions, fes servir una taula d’auditoria</li>
+  </ul>
+
+  <h3>🛠️ Activació i desactivació de triggers</h3>
+  <pre>
+-- Desactivar
+ALTER TRIGGER log_insercio DISABLE;
+
+-- Activar
+ALTER TRIGGER log_insercio ENABLE;
+
+-- Eliminar
+DROP TRIGGER log_insercio;
+  </pre>
+</section>
+
+
+
+
+<section id="seq">
+  <h2> Seqüències en Oracle</h2>
+
+  <h3>📘 Què és una seqüència?</h3>
+  <p>
+    Una <strong>seqüència</strong> és un objecte de base de dades que genera una sèrie de valors numèrics consecutius, normalment 
+    usats per a claus primàries, codis únics o control d’identificadors.  
+    És l’equivalent a un <em>autoincrement</em> en altres SGBD.
+  </p>
+
+  <h3> Crear una seqüència</h3>
+  <pre>
+CREATE SEQUENCE seq_alumnes
+START WITH 1
+INCREMENT BY 1
+MINVALUE 1
+MAXVALUE 99999
+NOCACHE
+NOCYCLE;
+  </pre>
+
+  <ul>
+    <li><code>START WITH</code>: valor inicial</li>
+    <li><code>INCREMENT BY</code>: salt entre valors</li>
+    <li><code>NOCACHE</code>: no guarda valors en memòria (menys eficient però més segur)</li>
+    <li><code>NOCYCLE</code>: no torna a començar quan arriba al màxim</li>
+  </ul>
+
+  <h3> Ús de la seqüència</h3>
+  <p>Per obtenir el següent valor (es pot fer servir a INSERTs):</p>
+  <pre>
+seq_alumnes.NEXTVAL
+  </pre>
+
+  <p>Per consultar el valor actual (després d'haver fet NEXTVAL com a mínim una vegada):</p>
+  <pre>
+seq_alumnes.CURRVAL
+  </pre>
+
+  <h4> Exemple d’ús en una inserció</h4>
+  <pre>
+INSERT INTO alumnes (id, nom, edat)
+VALUES (seq_alumnes.NEXTVAL, 'Laia', 21);
+  </pre>
+
+  <h3>🔍 Consultar seqüències existents</h3>
+  <pre>
+-- Seqüències de l’usuari
+SELECT sequence_name, min_value, max_value, increment_by
+FROM user_sequences;
+  </pre>
+
+  <h3>⚙️ Modificar una seqüència</h3>
+  <pre>
+ALTER SEQUENCE seq_alumnes
+INCREMENT BY 5
+MAXVALUE 999999;
+  </pre>
+
+  <h3>🗑️ Eliminar una seqüència</h3>
+  <pre>
+DROP SEQUENCE seq_alumnes;
+  </pre>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Usa <code>NOCYCLE</code> per evitar duplicats si no vols que torni a començar</li>
+    <li> Usa <code>CACHE</code> per millor rendiment en entorns grans (ex: <code>CACHE 20</code>)</li>
+    <li> No facis servir <code>CURRVAL</code> abans d’haver cridat <code>NEXTVAL</code> en la sessió</li>
+    <li> Dona noms clars i relacionats amb la taula (ex: <code>SEQ_FACTURES</code>)</li>
+  </ul>
+
+  <h3> Exemple complet</h3>
+  <pre>
+CREATE SEQUENCE seq_factura
+START WITH 1000
+INCREMENT BY 10
+CACHE 5;
+
+-- Inserció amb NEXTVAL
+INSERT INTO factures (id, data_emissio)
+VALUES (seq_factura.NEXTVAL, SYSDATE);
+  </pre>
+</section>
+
+
+
+
+
+<section id="cursors">
+  <h2> Cursors en PL/SQL</h2>
+
+  <h3>📘 Què és un cursor?</h3>
+  <p>
+    Un <strong>cursor</strong> és un mecanisme de PL/SQL que permet <strong>recórrer múltiples files</strong> retornades per una consulta <code>SELECT</code>.
+  </p>
+  <p>Serveix per treballar fila a fila amb el conjunt de resultats, com un bucle sobre una taula.</p>
+
+  <h3> Tipus de cursors</h3>
+  <ul>
+    <li><strong>Implícits:</strong> creats automàticament per Oracle per a sentències DML (INSERT, UPDATE...)</li>
+    <li><strong>Explícits:</strong> definits manualment per l’usuari per tractar SELECTs que tornen múltiples files</li>
+    <li><strong>FOR cursors:</strong> simplificació de l’ús explícit</li>
+  </ul>
+
+  <hr>
+
+  <h3> Ús d’un cursor explícit</h3>
+  <p><strong>Passos:</strong></p>
+  <ol>
+    <li>Declarar el cursor</li>
+    <li>Obrir-lo</li>
+    <li>Llegir fila a fila</li>
+    <li>Tancar-lo</li>
+  </ol>
+
+  <h4> Exemple complet</h4>
+  <pre>
+DECLARE
+   CURSOR c_alumnes IS
+     SELECT nom, edat FROM alumnes;
+   
+   v_nom alumnes.nom%TYPE;
+   v_edat alumnes.edat%TYPE;
+BEGIN
+   OPEN c_alumnes;
+   LOOP
+      FETCH c_alumnes INTO v_nom, v_edat;
+      EXIT WHEN c_alumnes%NOTFOUND;
+      DBMS_OUTPUT.PUT_LINE('Nom: ' || v_nom || ' - Edat: ' || v_edat);
+   END LOOP;
+   CLOSE c_alumnes;
+END;
+  </pre>
+
+  <hr>
+
+  <h3> Cursor FOR – simplificat</h3>
+  <p>Oracle gestiona automàticament l’obertura, lectura i tancament.</p>
+  <pre>
+BEGIN
+   FOR reg IN (SELECT nom, edat FROM alumnes) LOOP
+      DBMS_OUTPUT.PUT_LINE('Nom: ' || reg.nom || ', Edat: ' || reg.edat);
+   END LOOP;
+END;
+  </pre>
+
+  <h3> Cursors amb paràmetres</h3>
+  <pre>
+DECLARE
+   CURSOR c_per_edat(min_edat NUMBER) IS
+     SELECT nom FROM alumnes WHERE edat > min_edat;
+
+   v_nom alumnes.nom%TYPE;
+BEGIN
+   OPEN c_per_edat(18);
+   LOOP
+      FETCH c_per_edat INTO v_nom;
+      EXIT WHEN c_per_edat%NOTFOUND;
+      DBMS_OUTPUT.PUT_LINE('Major de 18: ' || v_nom);
+   END LOOP;
+   CLOSE c_per_edat;
+END;
+  </pre>
+
+  <hr>
+
+  <h3> Cursors implícits</h3>
+  <p>S’utilitzen automàticament per Oracle en operacions DML:</p>
+  <pre>
+BEGIN
+   UPDATE alumnes SET edat = edat + 1 WHERE edat < 18;
+   DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' files modificades');
+END;
+  </pre>
+
+  <h3> Atributs útils</h3>
+  <ul>
+    <li><code>%FOUND</code> → si s’ha trobat almenys una fila</li>
+    <li><code>%NOTFOUND</code> → si no s’ha trobat cap fila</li>
+    <li><code>%ROWCOUNT</code> → nombre de files tractades</li>
+    <li><code>%ISOPEN</code> → indica si el cursor està obert</li>
+  </ul>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Sempre tanca els cursors després d’usar-los</li>
+    <li> Utilitza <strong>FOR cursors</strong> si només necessites llegir</li>
+    <li> Evita FETCHs sense <code>EXIT WHEN %NOTFOUND</code></li>
+    <li> Reutilitza variables amb tipus %TYPE o %ROWTYPE</li>
+  </ul>
+
+  <h3>📘 Consulta de cursors actius</h3>
+  <p>(per sessions de treball, administradors)</p>
+  <pre>
+SELECT * FROM v$open_cursor
+WHERE user_name = 'NOM_USUARI';
+  </pre>
+</section>
+
+
+
+<section id="excepcions">
+  <h2>Gestió d’Excepcions en PL/SQL</h2>
+
+  <h3>📘 Què és una excepció?</h3>
+  <p>
+    Una <strong>excepció</strong> és una situació d’error que es produeix durant l’execució d’un bloc PL/SQL.
+    Oracle permet capturar aquestes situacions per gestionar-les de manera controlada i evitar que el bloc falli de manera abrupta.
+  </p>
+
+  <h3> Estructura general amb excepcions</h3>
+  <pre>
+BEGIN
+   -- codi normal
+EXCEPTION
+   WHEN tipus_excepcio THEN
+      -- codi d'error
+END;
+  </pre>
+
+  <h3> Tipus d’excepcions</h3>
+
+  <h4> Excepcions predefinides</h4>
+  <p>Oracle les reconeix automàticament. Exemple:</p>
+  <ul>
+    <li><code>NO_DATA_FOUND</code> → no hi ha resultats</li>
+    <li><code>TOO_MANY_ROWS</code> → SELECT retorna més d’una fila</li>
+    <li><code>ZERO_DIVIDE</code> → divisió per zero</li>
+  </ul>
+
+  <h4> Exemple</h4>
+  <pre>
+DECLARE
+   v_nom alumnes.nom%TYPE;
+BEGIN
+   SELECT nom INTO v_nom FROM alumnes WHERE id = 999;
+   DBMS_OUTPUT.PUT_LINE(v_nom);
+EXCEPTION
+   WHEN NO_DATA_FOUND THEN
+      DBMS_OUTPUT.PUT_LINE('Cap alumne amb aquest ID');
+END;
+  </pre>
+
+  <h4> Excepcions no predefinides</h4>
+  <p>Oracle les pot capturar amb <code>SQLCODE</code> i <code>SQLERRM</code>:</p>
+  <pre>
+BEGIN
+   -- operació que pot fallar
+EXCEPTION
+   WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Error ' || SQLCODE || ': ' || SQLERRM);
+END;
+  </pre>
+
+  <h4>🔧 Excepcions personalitzades</h4>
+  <p>Es poden declarar amb <code>EXCEPTION</code> i cridar amb <code>RAISE</code>:</p>
+  <pre>
+DECLARE
+   ex_preu_invalid EXCEPTION;
+   v_preu NUMBER := -5;
+BEGIN
+   IF v_preu < 0 THEN
+      RAISE ex_preu_invalid;
+   END IF;
+EXCEPTION
+   WHEN ex_preu_invalid THEN
+      DBMS_OUTPUT.PUT_LINE('Error: preu negatiu no vàlid');
+END;
+  </pre>
+
+  <h3> Claus d’ús</h3>
+  <ul>
+    <li><code>RAISE</code> → provoca una excepció</li>
+    <li><code>WHEN ... THEN</code> → captura una excepció</li>
+    <li><code>WHEN OTHERS THEN</code> → captura qualsevol error no gestionat abans</li>
+    <li><code>SQLERRM</code> → mostra el missatge d’error</li>
+    <li><code>SQLCODE</code> → mostra el codi numèric de l’error</li>
+  </ul>
+
+  <h3>🧠 Exemple final combinat</h3>
+  <pre>
+DECLARE
+   v_total NUMBER := 0;
+BEGIN
+   v_total := 100 / 0;
+EXCEPTION
+   WHEN ZERO_DIVIDE THEN
+      DBMS_OUTPUT.PUT_LINE('No es pot dividir per zero!');
+   WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Error inesperat: ' || SQLERRM);
+END;
+  </pre>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Captura errors específics abans de fer servir <code>OTHERS</code></li>
+    <li> Informa l’usuari o registra l’error</li>
+    <li> No capturis <code>OTHERS</code> sense mostrar cap missatge (silenciar errors és perillós)</li>
+    <li> Fes servir excepcions personalitzades quan tinguis validacions pròpies</li>
+  </ul>
+</section>
+
+
+
+
+
+<section id="tasques">
+  <h2> Tasques automatitzables en Oracle</h2>
+
+  <h3> Què podem automatitzar?</h3>
+  <p>En un entorn Oracle, és habitual automatitzar tasques per millorar la gestió i el rendiment del sistema. Algunes de les tasques més comunes són:</p>
+  <ul>
+    <li> Exportacions i còpies de seguretat</li>
+    <li> Importacions de dades</li>
+    <li> Execució d'informes</li>
+    <li> Neteja de logs i arxius antics</li>
+    <li> Tasques de manteniment periòdic</li>
+  </ul>
+
+  <h3>📄 Scripts SQL i .bat</h3>
+  <p>Pots crear scripts `.sql` amb comandes Oracle i executar-los des de scripts `.bat` o `.sh` mitjançant <code>sqlplus</code>.</p>
+
+  <h4> Exemple: script SQL</h4>
+  <pre>
+-- arxiu: informe.sql
+SET ECHO OFF
+SET FEEDBACK OFF
+SPOOL informe_resultats.txt
+
+SELECT * FROM alumnes;
+
+SPOOL OFF
+EXIT;
+  </pre>
+
+  <h4> Script .bat (Windows)</h4>
+  <pre>
+-- arxiu: llança_informe.bat
+sqlplus usuari/contrasenya@XE @informe.sql
+pause
+  </pre>
+
+  <h4>🐧 Script .sh (Linux)</h4>
+  <pre>
+#!/bin/bash
+sqlplus usuari/contrasenya@XE @informe.sql
+  </pre>
+
+  <h3>📆 Oracle SCHEDULER  -  JOBS </h3>
+  <p>
+    Oracle incorpora un sistema per programar tasques directament des de la base de dades: <strong>DBMS_SCHEDULER</strong>.
+  </p>
+
+  <h4> Crear una tasca programada</h4>
+  <pre>
+BEGIN
+  DBMS_SCHEDULER.CREATE_JOB (
+    job_name        => 'JOB_INFORME',
+    job_type        => 'PLSQL_BLOCK',
+    job_action      => 'BEGIN informe_alumnes(); END;',
+    start_date      => SYSTIMESTAMP,
+    repeat_interval => 'FREQ=DAILY; BYHOUR=8',
+    enabled         => TRUE
+  );
+END;
+  </pre>
+
+  <h4>🔍 Consultar jobs</h4>
+  <pre>
+SELECT job_name, state FROM user_scheduler_jobs;
+  </pre>
+
+  <h4> Aturar o eliminar un job</h4>
+  <pre>
+BEGIN
+  DBMS_SCHEDULER.DISABLE('JOB_INFORME');
+  DBMS_SCHEDULER.DROP_JOB('JOB_INFORME');
+END;
+  </pre>
+
+  <h3> Triggers de sistema (a nivell de sessió)</h3>
+  <p>També pots utilitzar <strong>triggers de sistema</strong> per executar codi quan es produeixen accions específiques:</p>
+  <pre>
+CREATE OR REPLACE TRIGGER t_inici_sessio
+AFTER LOGON ON DATABASE
+BEGIN
+  INSERT INTO log_sessio(usuario, data)
+  VALUES (USER, SYSDATE);
+END;
+  </pre>
+
+  <h3> Exemple complet d’automatització</h3>
+  <ul>
+    <li> <code>informe.sql</code>: genera un informe amb SELECTs</li>
+    <li> <code>informe.bat</code>: l’executa des del sistema</li>
+    <li> <strong>DBMS_SCHEDULER</strong>: programa la seva execució cada dia a les 8h</li>
+  </ul>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Guarda scripts en carpetes versionades (ex: GIT)</li>
+    <li> Documenta les tasques automatitzades</li>
+    <li> Revisa els permisos dels usuaris que executen les tasques</li>
+    <li>⚠️ Evita duplicar jobs o crear-ne de recurrents sense control</li>
+  </ul>
+</section>
+
+
+
+</body>
+</html>
