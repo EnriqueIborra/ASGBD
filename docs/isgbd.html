@@ -71,6 +71,7 @@
       <li><strong>Standalone</strong> – Instal·lació simple en un sol host (més comuna)</li>
       <li><strong>Grid Infrastructure</strong> – Per suport a Oracle ASM i RAC</li>
       <li><strong>Oracle RAC (Real Application Cluster)</strong> – Per entorns de clúster amb alta disponibilitat</li>
+      <li><strong>Oracle Autonomous Database</strong> – BD al núvol d'Oracle que utilitza intel·ligència artificial i aprenentatge automàtic per autogestionar-se</li>
     </ul>
   
     <h3> Recomanacions pràctiques</h3>
@@ -122,16 +123,8 @@
       <li><strong>Grid Infrastructure</strong> – Per suport a RAC (Real Application Cluster)</li>
       <li><strong>RAC</strong> – Clúster de múltiples nodes per alta disponibilitat i escalabilitat</li>
     </ul>
-  
-    <h3>☁️ Versions en Cloud</h3>
-    <p>Oracle ofereix serveis gestionats al núvol (Oracle Cloud Infrastructure):</p>
-    <ul>
-      <li><strong>Cloud Service SE / EE</strong></li>
-      <li><strong>EE-High Performance</strong></li>
-      <li><strong>EE-Extreme Performance</strong></li>
-      <li><strong>Exadata Cloud Service</strong></li>
-    </ul>
-  
+ 
+   
     <h3>⚠️ Consideracions importants</h3>
     <ul>
       <li> A partir d’Oracle <strong>21c</strong>, només es permet el model multitenant (CDB/PDB)</li>
@@ -217,8 +210,8 @@
   
     <h3> Resum final</h3>
     <ul>
-      <li>✅ Els requisits oficials són suficients per provar, però no recomanables per producció</li>
-      <li>✅ És essencial tenir els components bàsics preparats abans de la instal·lació</li>
+      <li> Els requisits oficials són suficients per provar, però no recomanables per producció</li>
+      <li> És essencial tenir els components bàsics preparats abans de la instal·lació</li>
       <li>⚠️ La manca de swap o permisos d’admin pot impedir una instal·lació exitosa</li>
     </ul>
   </section>
@@ -292,6 +285,7 @@
     <h2>Arquitectura d’Oracle</h2>
   
     <h3> Arquitectura tradicional (non-CDB)</h3>
+    <img src="imgs/bdnoncdb.png" class="imatge-esquerra"  alt="BD non cdb" style="width: 8%">
     <p>
       Abans de la versió 12c, Oracle utilitzava una arquitectura tradicional on una instància del SGBD controlava una única base de dades (una sola estructura de fitxers).
     </p>
@@ -302,6 +296,7 @@
     </ul>
   
     <h3> Arquitectura multitenant (CDB/PDB)</h3>
+    <img src="imgs/bdmultit.png" class="imatge-esquerra"  alt="BD non cdb" style="width: 18%">
     <p>A partir d’Oracle 12c, es va introduir l’<strong>arquitectura multitenant</strong>:</p>
     <ul>
       <li><strong>CDB</strong> (Container Database): base de dades contenedora</li>
@@ -315,6 +310,14 @@
   PDB1, PDB2...  → Pluggable Databases (útils per treballar)
     </pre>
   
+    <h3>Arquitectura multitenant (en un SGBD)</h3>
+    <img src="imgs/variosmultit.png" class="imatge-dreta"  alt="BD non cdb" style="width: 40%">
+    <ul>
+      <li>Un SGBD d’ORACLE pot gestionar diversos contenidors (CDBs)</li>
+      <li>Cada contenidor es una BBDD / <strong>Instància</strong> diferent</li>
+      <li>Cada contenidor pot tindre dins diferents PDBs</li>
+    </ul>
+
     <h3> Notes importants sobre multitenant</h3>
     <ul>
       <li> Es poden tindre diverses PDBs funcionant en paral·lel dins d’una mateixa CDB</li>
@@ -433,6 +436,7 @@
     <p>Instal·lar un SGBD Oracle i crear una BBDD (CDB + PDB) són processos diferents, encara que el mateix assistent pot fer-ho tot alhora.</p>
   
     <h3>Des de Windows</h3>
+    <img src="imgs/icosetup.png" class="imatge-esquerra"  alt="BD non cdb" style="width: 10%">
     <ul>
       <li>Es fa servir un <strong>executable (setup.exe)</strong> que guia la instal·lació del software.</li>
       <li>Abans d’executar <code>setup.exe</code>, cal <strong>crear usuaris al sistema operatiu</strong>:</li>
@@ -488,6 +492,7 @@
       <li>Executar <code>setup.exe</code> amb usuari <code>oracle</code></li>
       <li>Seleccionar “Només instal·lació del software”</li>
       <li>Després, crear la CDB i PDB amb <code>dbca</code></li>
+      <li>Després, crear noves PDB amb <code>dbca</code>, i també esborrar</li>
     </ul>
   </section>
   
@@ -496,7 +501,7 @@
   <section id="acces">
     <h2>Accés a Oracle</h2>
   
-    <h3>🪟 Des de Windows (sqlplus)</h3>
+    <h3> Des de Windows (sqlplus)</h3>
     <p>Obrir una finestra de CMD com a <strong>usuari instal·lador</strong> i executar:</p>
     <pre>C:\Users\oracle> sqlplus / as SYSDBA</pre>
   
