@@ -447,5 +447,27 @@
 
 </main>
 
+
+<script>
+
+  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+      //  <div class="pre-container">
+      //    <button class="copy-button">Copia Codi !</button>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+</script>
+
 </body>
 </html>

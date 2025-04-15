@@ -84,14 +84,6 @@
     margin-bottom: 10px;
   }
 
-  pre {
-    background: #f7f9fc;
-    padding: 15px;
-    border-radius: 8px;
-    overflow-x: auto;
-    font-family: 'Courier New', monospace;
-  }
-
   ul {
     padding-left: 20px;
   }
@@ -118,4 +110,44 @@
   float: left;
   margin-right: 15px;
   margin-bottom: 10px;
+}
+
+.pre-container {
+  position: relative;
+}
+
+.copy-button  {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #5e9762;
+  border: none;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.copy-button:hover {
+  background-color: #ddd;
+}
+
+
+/* Estils per als elements de codi */
+pre {
+  background: #f7f9fc;
+  padding: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+}
+
+pre {
+  background-color: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  overflow-x: auto;
 }

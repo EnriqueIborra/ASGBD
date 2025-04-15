@@ -26,7 +26,7 @@
   <a href="#acces">Accés a Oracle</a>
   <a href="#pdb">Creació de PDB manualment</a>
   <a href="#conclusions">Conclusions</a>
-  <a href="#prova">Prova</a>
+  <a href="#altres-recursos">Altres Recursos</a>
 </nav>
 
 <main>
@@ -457,11 +457,11 @@
     <p>Durant l’execució de <code>setup.exe</code> es poden escollir diferents opcions:</p>
     <ul>
       <li><strong>Instal·lació només del software:</strong> és l'opció recomanada. Es fa servir després <code>dbca</code> per crear la base de dades.</li>
-      <li><strong>Instal·lació amb creació de CDB + PDB automàtica:</strong> no és l’opció que utilitzarem.</li>
+      <li><strong>Instal·lació del software amb creació de CDB + PDB :</strong> no és l’opció que utilitzarem.</li>
     </ul>
     <p><strong>⚠️ No executar <code>setup.exe</code> més d’una vegada!</strong></p>
   
-    <h3>Creació de la base de dades (CDB)</h3>
+    <h3>Creació de la base de dades (CDB)</h3> 
     <ul>
       <li>Es fa amb l’eina <code>dbca</code> (Database Configuration Assistant).</li>
       <li>Executar des de CMD amb permisos d’administrador:
@@ -471,7 +471,7 @@
       <li>Al final del procés, es mostra la <strong>ruta del fitxer de log</strong> de la instal·lació.</li>
     </ul>
   
-    <h3>Creació de la PDB</h3>
+    <h3>Creació de més  PDB</h3>
     <p>També es fa amb <code>dbca</code>:</p>
     <ul>
       <li>CMD amb permisos d’administrador:</li>
@@ -487,6 +487,19 @@
     <h3>Primera instal·lació</h3>
     <p>Una vegada es tenen tots els requisits preparats, es realitza la primera instal·lació d’Oracle amb l’usuari <code>oracle</code>.</p>
   
+    <h3>Instal·lació / creacio del LISTENER</h3>
+    <p>Una vegada instal·lat el SW i la BBDD , s'ha d'instal·lar el LISTENER.</p>
+    <pre>C:\Windows\system32> netca</pre>
+      <ul>
+        <li>⚠️ El LISTENER S'ha d'instal·lar amb permisos d'<strong>administrador</strong></li>
+        <li>Primer, agregar un listener</li>
+        <li>Després, configurar els mètodes de nomenclatura </li>
+        <ul>
+          <li>nomenclatura local</li>
+          <li>nomenclatura de connexió senzilla</li>
+        </ul>
+      </ul>
+
     <p><strong>Resum:</strong></p>
     <ul>
       <li>Crear usuaris S.O.</li>
@@ -507,16 +520,21 @@
     <pre>C:\Users\oracle> sqlplus / as SYSDBA</pre>
   
     <p>Una vegada dins de SQL*Plus, es poden utilitzar comandes útils:</p>
-    <pre>
-  SQL> show user;
-  SQL> show con_name;             -- Nom del contenidor actiu
-  SQL> select name from v$database;
-  SQL> show pdbs;                -- Mostra les PDB disponibles
-  SQL> conn system                -- Connecta com SYSTEM
-  SQL> show sga;
-  SQL> disc;                      -- Desconnecta
-  SQL> exit;
-    </pre>
+    <div class="pre-container">
+      <button class="copy-button">Copia Codi !</button>
+      <pre>
+        SQL> show user;
+        SQL> show con_name;             -- Nom del contenidor actiu
+        SQL> select name from v$database;
+        SQL> show pdbs;                -- Mostra les PDB disponibles
+        SQL> conn system                -- Connecta com SYSTEM
+        SQL> show sga;
+        SQL> disc;                      -- Desconnecta
+        SQL> exit;
+     </pre>
+  </div>
+
+    
   
     <h3>🔁 Connexió directa a una PDB</h3>
     <pre>
@@ -582,10 +600,22 @@
   SQL> help index
   SQL> help show
     </pre>
+
+    <h3> Altres maneres d'accedir a la instància:</h3>
+    <ul>
+      <li> Utilitzant SQL Developer</li>
+      <li> Utilitzant SQLcl</li>
+      <li> Utilitzant  Visual Studio Code + Extensió SQL Developer</li>
+      <li> Utilitzant ORDS</li>
+      <li> Utilitzant DBeaver ( multi-SGBD sw lliure)</li>
+      <li> Utilitzant TOAD  (multi-SGBD propietari)</li>
+    </ul>
+    <p>En cada solució, es posible que les connexions es preparen de forma diferent</p>
+    <p>En SQL Developer, cal afegir primer una connexió, configurar-la, guardar-la, 
+      i després, queda gravada. Cuan es vol connectar, sols es fa doble-click a sobre, i s'inicia la connexió</p>
+      <p>En VSCode, DBaver, TOAD, funciona igual</p>  
   </section>
   
-
-
 
   <section id="pdb">
     <h2>Creació de PDB manualment</h2>
@@ -600,13 +630,16 @@
   
     <h3> Creació manual d’una PDB en Windows</h3>
     <p>Des d’una sessió SQL*Plus amb l’usuari <code>SYS</code> dins la CDB:</p>
-    <pre>
-  SQL> CREATE PLUGGABLE DATABASE nom_pdb 
-  ADMIN USER pdbadmin1 IDENTIFIED BY 1234 
-  ROLES = (dba)
-  DEFAULT TABLESPACE users;
-    </pre>
-  
+    <div class="pre-container">
+      <button class="copy-button">Copia Codi !</button>
+      <pre>
+        SQL> CREATE PLUGGABLE DATABASE nom_pdb 
+        ADMIN USER pdbadmin1 IDENTIFIED BY 1234 
+        ROLES = (dba)
+        DEFAULT TABLESPACE users;
+     </pre>
+  </div>    
+      
     <p>⚠️ Si no s’indica <code>DEFAULT TABLESPACE</code>, la PDB no tindrà un espai per defecte per als usuaris.</p>
   
     <h4>🗑️ Esborrar una PDB (Windows):</h4>
@@ -718,7 +751,8 @@
   </section>
   
 
-  <section id="prova">
+  <section id="altres-recursos">
+    <h1>CDB i PDBs</h1>
           <a href="https://github.com/EnriqueIborra/ASGBD/blob/03132b3f2c7c697f70e54ab7f9495aac08c0d610/UD1/ASGBD-UD1.2%20DB-CDB%20i%20PDB_v2.pdf" target="_blank">Abrir PDF</a> 
 
           
@@ -726,6 +760,27 @@
 
 
 </main>
+
+<script>
+
+  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+      //  <div class="pre-container">
+      //    <button class="copy-button">Copia Codi !</button>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+</script>
 
 </body>
 </html>
