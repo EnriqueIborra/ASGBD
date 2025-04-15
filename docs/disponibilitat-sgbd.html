@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title> Disponibilitat Oracle</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+</head>
+<body>
+
+<header>
+    
+<a href="index.html">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo">
+</a>
+  <h1>ASGBD   -    Disponibilitat d'un SGBD</h1>
+</header>
+
+<nav>
+  <h2>Índex</h2>
+  <a href="#nuvol">Nuvol</a>
+  <a href="#cluster">Cluster</a>
+  <a href="#sgbdd">SGBD Distribuït</a>
+  <a href="#date">Regles de DATE</a>  
+  <a href="#sgbdd2">SGBD Distribuïts. Exemples</a>
+  <a href="#fragmentacio">Fragmentació</a>  
+  <a href="#replicacio">Replicació</a>  
+  <a href="#cluster-o">Cluster d'ORACLE</a>  
+</nav>
+
+<main>
+
+ 
+    <section id="nuvol">
+        <h2>☁️ Bases de dades al núvol</h2>
+      
+        <h3>📘 Què és el núvol en el context de l’SGBD?</h3>
+        <p>
+          El <strong>núvol</strong> representa una de les tecnologies actuals més utilitzades per garantir la <strong>disponibilitat</strong>, 
+          l’<strong>escalabilitat</strong> i el <strong>rendiment</strong> dels Sistemes Gestors de Bases de Dades (SGBD). 
+          Permet utilitzar infraestructures virtuals que poden ser:
+        </p>
+        <ul>
+          <li> Maquinari dedicat (HW dedicat)</li>
+          <li> Serveis gestionats per tercers (ex: Oracle Cloud, AWS, Azure)</li>
+        </ul>
+      
+        <h3> Avantatges de l’ús del núvol</h3>
+        <ul>
+          <li> <strong>Cost més eficient</strong>: pagament per ús, sense invertir en infraestructures pròpies.</li>
+          <li> <strong>Alt rendiment i escalabilitat</strong>: adaptació automàtica a pics de càrrega.</li>
+          <li> <strong>Alta disponibilitat</strong>: sistemes redundants i amb tolerància a errors.</li>
+          <li> <strong>Alt nivell de seguretat</strong>: xifratge, còpies de seguretat, control d’accés.</li>
+          <li> <strong>Administració completa</strong>: manteniment, actualitzacions i gestió integrades.</li>
+          <li> <strong>Compatibilitat</strong> amb els SGBD tradicionals (Oracle, MySQL, PostgreSQL…)</li>
+          <li> <strong>Ideal per teletreball</strong>: accés remot des de qualsevol lloc i dispositiu.</li>
+        </ul>
+      
+        <h3>⚠️ Inconvenients o riscos</h3>
+        <ul>
+          <li> <strong>Dependència d’un tercer</strong>: cal confiar en el proveïdor del servei.</li>
+          <li> <strong>Caiguda de la connexió a internet</strong>: pot deixar la BD inoperativa temporalment.</li>
+          <li> <strong>Riscos de seguretat</strong>: tot i estar protegits, hi ha vulnerabilitats potencials.</li>
+          <li> <strong>Manca de control total</strong>: l’usuari no gestiona directament el hardware ni el sistema complet.</li>
+        </ul>
+      
+        <h3>☁️ Principals proveïdors de núvol per a SGBD</h3>
+        <ul>
+          <li> <strong>Oracle Cloud</strong>: plataforma pròpia amb suport per a multitenant, PDBs i Oracle Autonomous Database.</li>
+          <li> <strong>AWS</strong> (Amazon Web Services): amb serveis com RDS, Aurora, suport per a Oracle, PostgreSQL, MySQL, etc.</li>
+          <li> <strong>Azure</strong> (Microsoft): amb bases de dades SQL gestionades, integració amb sistemes híbrids.</li>
+        </ul>
+      
+        <p>
+          Aquestes plataformes ofereixen <strong>monitoratge en temps real</strong>, còpies automàtiques, sistemes de recuperació davant desastres i integració amb eines DevOps.
+        </p>
+      
+        <h3>💬 Resum</h3>
+        <p>
+          Treballar amb un SGBD al núvol ofereix molts avantatges a nivell de rendiment, flexibilitat i manteniment. 
+          Tot i això, cal tenir en compte la dependència d’internet i la confiança dipositada en el proveïdor. És una <strong>solució recomanable</strong> per entorns amb teletreball, projectes dinàmics i empreses que busquen escalabilitat sense gran inversió inicial.
+        </p>
+      </section>
+      
+
+      <section id="cluster">
+        <h2> Clúster en sistemes de bases de dades</h2>
+      
+        <h3>📘 Què és un clúster?</h3>
+        <p>
+          Un <strong>clúster</strong> és un conjunt de servidors interconnectats que funcionen com una <strong>única unitat</strong> per oferir serveis, com ara una base de dades, de manera més robusta i fiable.
+          Això permet aconseguir <strong>alta disponibilitat</strong> i <strong>tolerància a fallades</strong>.
+        </p>
+      
+        <h4>🎯 Objectiu principal</h4>
+        <ul>
+          <li> <strong>Evitar interrupcions</strong> del servei davant una fallada d’un dels servidors.</li>
+          <li> <strong>Repartir la càrrega</strong> de treball (balanç de càrrega) entre diferents nodes.</li>
+        </ul>
+      
+        <h3> Funcionament bàsic</h3>
+        <p>
+          Tots els nodes del clúster comparteixen accés a la mateixa base de dades o disc. Quan un node falla, un altre pot assumir automàticament el seu rol, evitant talls de servei.
+        </p>
+      
+        <p>Exemples típics:</p>
+        <ul>
+          <li> Oracle RAC (Real Application Clusters)</li>
+          <li> MySQL Cluster</li>
+          <li> Microsoft SQL Server amb AlwaysOn o Failover Cluster</li>
+        </ul>
+      
+        <h3> Components típics d’un clúster</h3>
+        <ul>
+          <li> <strong>Nodes</strong>: màquines físiques o virtuals que formen part del clúster.</li>
+          <li> <strong>Interconnexió</strong>: xarxa ràpida per sincronització i control d’estat.</li>
+          <li> <strong>Emmagatzematge compartit</strong>: discos accessibles per tots els nodes.</li>
+          <li> <strong>Software de clúster</strong>: gestiona el monitoratge, failover i recursos compartits.</li>
+        </ul>
+      
+        <h3> Beneficis del clúster</h3>
+        <ul>
+          <li> Alta disponibilitat (HA)</li>
+          <li> Tolerància a fallades</li>
+          <li> Escalabilitat horitzontal (afegir nous nodes)</li>
+          <li> Continuïtat de negoci</li>
+        </ul>
+      
+        <h3> Consideracions</h3>
+        <ul>
+          <li> Implementació més complexa</li>
+          <li> Pot implicar més cost d’infraestructura</li>
+          <li> Cal tenir control d’accés i seguretat entre nodes</li>
+        </ul>
+      
+        <h3> Exemple gràfic (conceptual)</h3>
+        <p>🖥️ Node 1 (actiu) + 🖥️ Node 2 (en espera) → Base de dades comuna</p>
+        <p>Si el Node 1 falla, el Node 2 s’activa automàticament (failover).</p>
+      
+        <h3> Conclusió</h3>
+        <p>
+          Els clústers són una <strong>solució professional</strong> per entorns crítics que requereixen disponibilitat 24/7. Són àmpliament usats en entorns corporatius i serveis en línia amb gran demanda.
+        </p>
+      </section>
+      
+
+      <section id="sgbdd">
+        <h2> SGBDD – Sistemes Gestors de Bases de Dades Distribuïdes</h2>
+      
+        <h3>📘 Què és un SGBDD?</h3>
+        <p>
+          Un <strong>Sistema Gestor de Bases de Dades Distribuïdes (SGBDD)</strong> és un tipus d’SGBD que permet gestionar una base de dades que 
+          no es troba emmagatzemada en un únic lloc, sinó que està <strong>repartida entre diversos ordinadors o nodes</strong> interconnectats.
+        </p>
+      
+        <p>
+          Cada node pot estar en una <strong>ubicació geogràfica diferent</strong>, però es presenta a l’usuari com si fos una base de dades única i coherent.
+        </p>
+      
+        <h3>🎯 Objectius d’un SGBDD</h3>
+        <ul>
+          <li> Oferir una <strong>visió unificada</strong> de la informació</li>
+          <li> Garantir <strong>consistència</strong> i <strong>integritat</strong> entre dades repartides</li>
+          <li> Permetre la <strong>disponibilitat contínua</strong> en cas de fallada d’un node</li>
+          <li> Optimitzar l’accés mitjançant <strong>localització de dades</strong></li>
+        </ul>
+      
+        <h3> Funcionament bàsic</h3>
+        <p>
+          El SGBDD controla com i on es fan les consultes, actualitzacions i sincronitzacions entre nodes. 
+          Pot fer rèpliques de les dades per garantir tolerància a errors i millorar la disponibilitat.
+        </p>
+      
+        <h4>Components habituals:</h4>
+        <ul>
+          <li>🖥️ Servidors de dades (nodes)</li>
+          <li> Xarxa de comunicació</li>
+          <li> Programari de coordinació i sincronització</li>
+        </ul>
+      
+        <h3> Exemples de SGBDD</h3>
+        <ul>
+          <li> Oracle Distributed Database</li>
+          <li> PostgreSQL amb BDR (Bi-Directional Replication)</li>
+          <li> Microsoft SQL Server Distributed Queries</li>
+          <li> Google Spanner, Amazon Aurora Global Databases</li>
+        </ul>
+      
+        <h3> Avantatges</h3>
+        <ul>
+          <li> Redundància de dades i tolerància a fallades</li>
+          <li> Millora el rendiment en entorns globals</li>
+          <li> Suporta usuaris de diferents ubicacions</li>
+        </ul>
+      
+        <h3>⚠️ Inconvenients</h3>
+        <ul>
+          <li> Més complexitat de gestió i sincronització</li>
+          <li> Dependència de la connexió entre nodes</li>
+          <li> Gestió més complicada de transaccions distribuïdes</li>
+        </ul>
+      
+        <h3>💬 Conclusió</h3>
+        <p>
+          Els SGBDD són ideals per a empreses amb presència global, grans volums de dades i necessitat de disponibilitat constant. 
+          Tot i la seva complexitat, són una eina poderosa per mantenir <strong>bases de dades robustes, escalables i resilients</strong>.
+        </p>
+      </section>
+      
+      <section id="date">
+        <h2> Regles D.A.T.E. per a la disponibilitat del SGBD</h2>
+      
+        <h3>📘 Què són les regles D.A.T.E.?</h3>
+        <p>
+          Les <strong>regles D.A.T.E.</strong> són un conjunt de principis que defineixen les característiques essencials que ha de tenir un sistema per ser considerat <strong>altament disponible</strong>.  
+          Aquest acrònim fa referència a:
+        </p>
+      
+        <ul>
+          <li><strong>D</strong> → <strong>Disponibilitat</strong></li>
+          <li><strong>A</strong> → <strong>Accessibilitat</strong></li>
+          <li><strong>T</strong> → <strong>Tolerància a errors</strong></li>
+          <li><strong>E</strong> → <strong>Escalabilitat</strong></li>
+        </ul>
+      
+        <hr>
+      
+        <h3> D – Disponibilitat</h3>
+        <p>
+          El sistema ha d’estar disponible <strong>la major part del temps</strong>. Això implica minimitzar els talls de servei, 
+          tant previstos (manteniments) com imprevistos (errors, fallades de maquinari...).
+        </p>
+        <p><strong>Exemple:</strong> sistemes amb SLA del 99,99% de disponibilitat anual.</p>
+      
+        <h3> A – Accessibilitat</h3>
+        <p>
+          Els usuaris autoritzats han de poder accedir al sistema quan ho necessitin, sense bloquejos ni problemes de connexió. 
+          Això implica garantir una <strong>conectivitat estable</strong> i una <strong>infraestructura de xarxa segura</strong>.
+        </p>
+        <p><strong>Exemple:</strong> configuració redundant de xarxes i sistemes de control d’accés.</p>
+      
+        <h3> T – Tolerància a errors</h3>
+        <p>
+          El sistema ha de continuar funcionant encara que es produeixi un <strong>error o fallada</strong> en una part del sistema.  
+          Això inclou mecanismes com el <strong>failover</strong>, rèpliques, backups, i sistemes de recuperació automàtica.
+        </p>
+        <p><strong>Exemple:</strong> clústers amb basculació automàtica (Oracle RAC, SQL AlwaysOn...)</p>
+      
+        <h3> E – Escalabilitat</h3>
+        <p>
+          El sistema ha de poder <strong>créixer i adaptar-se</strong> a l’augment de dades, d’usuaris o de càrrega de treball, sense perdre rendiment.  
+          Aquesta escalabilitat pot ser:
+        </p>
+        <ul>
+          <li> <strong>Vertical</strong>: afegir més recursos a un únic servidor (CPU, RAM…)</li>
+          <li> <strong>Horitzontal</strong>: afegir nous servidors (distribució de càrrega)</li>
+        </ul>
+        <p><strong>Exemple:</strong> bases de dades en núvol amb escalat automàtic.</p>
+      
+        <hr>
+      
+        <h3> Conclusió</h3>
+        <p>
+          Seguir les regles D.A.T.E. és fonamental per dissenyar i mantenir sistemes de bases de dades <strong>robustos i disponibles</strong>.  
+          Aquests criteris són especialment rellevants en entorns de producció crítica, on la pèrdua d’accés a les dades pot tenir un gran impacte.
+        </p>
+      </section>
+      
+      <section id="sgbdd2">
+        <h2> SGBDD – Funcionament i característiques (2a part)</h2>
+      
+        <h3>📘 Com funciona un SGBDD?</h3>
+        <p>
+          Un <strong>Sistema Gestor de Bases de Dades Distribuïdes (SGBDD)</strong> funciona sobre una col·lecció de bases de dades distribuïdes entre diversos ordinadors, però que als usuaris es presenten com una única base de dades lògica.
+        </p>
+      
+        <h3> Tipus de distribució</h3>
+        <ul>
+          <li><strong>Repartició horitzontal:</strong> cada servidor emmagatzema diferents files d’una taula.</li>
+          <li><strong>Repartició vertical:</strong> cada servidor conté diferents columnes d’una taula.</li>
+          <li><strong>Rèplica:</strong> es copia total o parcialment una taula a diferents ubicacions per garantir la disponibilitat i millorar l’accés.</li>
+        </ul>
+      
+        <h3> Transparències en un SGBDD</h3>
+        <p>
+          Un bon SGBDD ha d’oferir diversos nivells de <strong>transparència</strong> per a l’usuari, com:
+        </p>
+        <ul>
+          <li><strong>Transparència de localització:</strong> l’usuari no sap on es troben les dades físicament.</li>
+          <li><strong>Transparència de fragmentació:</strong> les dades poden estar dividides entre diversos llocs, però es consulten com si fossin una única unitat.</li>
+          <li><strong>Transparència de rèplica:</strong> l’usuari no és conscient de si les dades tenen còpies en diversos servidors.</li>
+          <li><strong>Transparència de concurrència:</strong> múltiples usuaris poden accedir a les dades simultàniament sense conflictes.</li>
+          <li><strong>Transparència de fallades:</strong> en cas de fallada d’un node, el sistema segueix funcionant.</li>
+        </ul>
+      
+        <h3> Gestió de transaccions</h3>
+        <p>
+          Una transacció distribuïda pot implicar diversos nodes. Per garantir-ne la coherència, s'utilitzen protocols com el <strong>2PC (Two-Phase Commit)</strong>:
+        </p>
+        <ol>
+          <li> <strong>Fase 1 – Preparació:</strong> cada node confirma si pot fer el commit.</li>
+          <li> <strong>Fase 2 – Confirmació:</strong> si tots els nodes accepten, es fa el commit; si no, es fa rollback.</li>
+        </ol>
+      
+        <h3>🔐 Seguretat i consistència</h3>
+        <p>
+          És fonamental garantir que les dades siguin <strong>consistents, segures i sincronitzades</strong> entre totes les ubicacions. Això pot incloure:
+        </p>
+        <ul>
+          <li> Còpies de seguretat distribuïdes</li>
+          <li> Sincronització automàtica de rèpliques</li>
+          <li> Control d’accés per node</li>
+        </ul>
+      
+        <h3> Exemples de solucions SGBDD</h3>
+        <ul>
+          <li> <strong>Oracle Distributed Database</strong></li>
+          <li> <strong>PostgreSQL amb BD-R</strong></li>
+          <li> <strong>Microsoft SQL Server Linked Servers</strong></li>
+          <li> <strong>Amazon Aurora Global Database</strong></li>
+          <li> <strong>Google Cloud Spanner</strong></li>
+        </ul>
+      
+        <h3> Avantatges d’un SGBDD</h3>
+        <ul>
+          <li> Disponibilitat global</li>
+          <li> Repartiment de càrrega entre servidors</li>
+          <li> Accés més ràpid segons localització de l’usuari</li>
+          <li> Escalabilitat horitzontal</li>
+          <li> Continuïtat de negoci en cas de fallada d’un node</li>
+        </ul>
+      
+        <h3>⚠️ Inconvenients</h3>
+        <ul>
+          <li> Implementació i manteniment més complexos</li>
+          <li> Dependència d’una bona infraestructura de xarxa</li>
+          <li> Gestió delicada de transaccions distribuïdes</li>
+        </ul>
+      
+        <h3> Conclusió</h3>
+        <p>
+          Els SGBDD són una solució robusta i escalable per a entorns distribuïts, especialment útils en aplicacions globals o crítiques. 
+          Tot i que requereixen una gestió tècnica més avançada, ofereixen una gran fiabilitat i disponibilitat si es configuren correctament.
+        </p>
+      </section>
+      
+      <section id="fragmentacio">
+        <h2> Fragmentació en SGBDD</h2>
+      
+        <h3>📘 Què és la fragmentació?</h3>
+        <p>
+          La <strong>fragmentació</strong> és una tècnica emprada en Sistemes Gestors de Bases de Dades Distribuïdes (SGBDD) que consisteix a <strong>dividir una base de dades en parts més petites</strong>, anomenades <strong>fragments</strong>, que poden ser emmagatzemades en diferents llocs (nodes).
+        </p>
+      
+        <p>
+          Aquesta estratègia permet:
+        </p>
+        <ul>
+          <li> Millorar el rendiment</li>
+          <li> Apropar les dades als usuaris finals</li>
+          <li> Repartir la càrrega</li>
+          <li> Facilitar l’escalabilitat i manteniment</li>
+        </ul>
+      
+        <hr>
+      
+        <h3> Tipus de fragmentació</h3>
+      
+        <h4>1. Fragmentació horitzontal</h4>
+        <p>
+          Consisteix a dividir les <strong>files</strong> d’una taula en grups. Cada fragment conté un subconjunt de registres amb la mateixa estructura.
+        </p>
+      
+        <p><strong>Exemple:</strong> una taula d’alumnes dividida per campus:</p>
+        <ul>
+          <li> <code>alumnes_campusA</code> → alumnes del campus A</li>
+          <li> <code>alumnes_campusB</code> → alumnes del campus B</li>
+        </ul>
+      
+        <h4>2. Fragmentació vertical</h4>
+        <p>
+          Consisteix a dividir les <strong>columnes</strong> d’una taula. Cada fragment conté només algunes columnes de la taula original, però inclou la clau primària per poder unir-les.
+        </p>
+      
+        <p><strong>Exemple:</strong></p>
+        <ul>
+          <li> <code>alumnes_dades_personals</code>: id, nom, cognoms</li>
+          <li> <code>alumnes_dades_academiques</code>: id, curs, nota</li>
+        </ul>
+      
+        <h4>3. Fragmentació híbrida (mixta)</h4>
+        <p>
+          Combina la fragmentació horitzontal i vertical. Es pot dividir primer per files i després per columnes, o viceversa.
+        </p>
+      
+        <p><strong>Exemple:</strong> alumnes del campus A (fragmentació horitzontal), amb dades separades en dues taules (vertical).</p>
+      
+        <hr>
+      
+        <h3> Avantatges de la fragmentació</h3>
+        <ul>
+          <li> Proximitat de les dades a l’usuari</li>
+          <li> Millor repartiment de càrrega</li>
+          <li> Millor manteniment i seguretat</li>
+          <li> Escalabilitat i rendiment optimitzats</li>
+        </ul>
+      
+        <h3>⚠️ Consideracions i desavantatges</h3>
+        <ul>
+          <li> Pot augmentar la complexitat de consultes</li>
+          <li> Cal sincronitzar la informació si es repliquen fragments</li>
+          <li> Cal garantir consistència en operacions distribuïdes</li>
+        </ul>
+      
+        <h3> Conclusió</h3>
+        <p>
+          La fragmentació és una tècnica essencial en sistemes distribuïts per millorar l’eficiència i adaptar el sistema a escenaris globals o complexos. 
+          Una bona estratègia de fragmentació <strong>pot reduir temps de resposta i millorar l’experiència d’usuari</strong>.
+        </p>
+      </section>
+      
+      <section id="replicacio">
+        <h2> Replicació de dades en SGBDD</h2>
+      
+        <h3>📘 Què és la replicació?</h3>
+        <p>
+          La <strong>replicació</strong> és el procés mitjançant el qual es creen i mantenen <strong>còpies sincronitzades</strong> d’una base de dades o d’un subconjunt de les seves dades 
+          en diversos nodes d’un <strong>sistema distribuït</strong>.
+        </p>
+        <p>
+          Aquesta tècnica s’utilitza per garantir una major <strong>disponibilitat</strong>, <strong>redundància</strong> i <strong>tolerància a fallades</strong>.
+        </p>
+      
+        <h3>🎯 Objectius de la replicació</h3>
+        <ul>
+          <li> Permetre l'accés a les dades des de diferents ubicacions</li>
+          <li> Garantir continuïtat del servei en cas de fallada d’un node</li>
+          <li> Repartir la càrrega de consultes entre diferents servidors</li>
+          <li> Millorar el rendiment i reduir la latència</li>
+        </ul>
+      
+        <h3> Tipus de replicació</h3>
+      
+        <h4>1. Replicació sincrònica</h4>
+        <p>
+          Les dades es repliquen en temps real entre nodes. Tota escriptura o actualització s’ha de completar en tots els nodes abans de considerar-se finalitzada.
+        </p>
+        <p><strong>Avantatge:</strong> màxima coherència.  
+        <br><strong>Inconvenient:</strong> pot alentir les operacions si algun node és lent o falla.</p>
+      
+        <h4>2. Replicació asincrònica</h4>
+        <p>
+          Les dades es repliquen amb cert retard (retard controlat). Les escriptures es fan primer en un node principal, i es propaguen després als altres.
+        </p>
+        <p><strong>Avantatge:</strong> més ràpid i tolerant a la latència.  
+        <br><strong>Inconvenient:</strong> pot haver-hi inconsistències temporals.</p>
+      
+        <h3> Models de replicació</h3>
+        <ul>
+          <li><strong>Master-slave:</strong> només el node mestre pot escriure; els esclaus només llegeixen.</li>
+          <li><strong>Master-master:</strong> tots els nodes poden llegir i escriure, amb sincronització entre ells.</li>
+        </ul>
+      
+        <h3> Exemples de replicació</h3>
+        <ul>
+          <li> Oracle Data Guard (sincrònica i asincrònica)</li>
+          <li> PostgreSQL Streaming Replication</li>
+          <li> MySQL Group Replication</li>
+          <li> Amazon Aurora Global Databases</li>
+        </ul>
+      
+        <h3> Avantatges</h3>
+        <ul>
+          <li> Redundància i tolerància a errors</li>
+          <li> Accés més ràpid segons ubicació geogràfica</li>
+          <li> Recuperació davant desastres (disaster recovery)</li>
+          <li> Escalabilitat de lectura</li>
+        </ul>
+      
+        <h3>⚠️ Inconvenients</h3>
+        <ul>
+          <li> Complexitat de configuració i manteniment</li>
+          <li> Possibles inconsistències (especialment en replicació asincrònica)</li>
+          <li> Dependència de l’estabilitat de xarxa entre nodes</li>
+        </ul>
+      
+        <h3> Conclusió</h3>
+        <p>
+          La replicació és una <strong>estratègia clau</strong> per millorar la disponibilitat i la resiliència de les bases de dades, 
+          especialment en entorns distribuïts o amb alts requeriments de servei. La seva correcta implementació permet garantir <strong>continuïtat operativa i rendiment</strong>.
+        </p>
+      </section>
+      
+
+      <section id="cluster-o">
+        <h2> Clúster d'Oracle – Oracle RAC</h2>
+      
+        <h3>📘 Què és Oracle RAC?</h3>
+        <p>
+          <strong>Oracle RAC (Real Application Clusters)</strong> és una solució d’Oracle que permet a diversos servidors accedir a una <strong>base de dades compartida</strong> simultàniament.
+          Està dissenyada per proporcionar <strong>alta disponibilitat, escalabilitat i tolerància a fallades</strong>.
+        </p>
+      
+        <h3> Característiques clau</h3>
+        <ul>
+          <li> <strong>Accés concurrent</strong> a la mateixa base de dades per diversos nodes (servidors)</li>
+          <li> <strong>Emmagatzematge compartit</strong> entre els nodes</li>
+          <li> <strong>Failover automàtic</strong>: si un node cau, un altre continua donant servei</li>
+          <li> <strong>Distribució de càrrega</strong> entre nodes</li>
+          <li> <strong>Escalabilitat horitzontal</strong> (es poden afegir més nodes segons les necessitats)</li>
+        </ul>
+      
+        <h3> Components d’un entorn RAC</h3>
+        <ul>
+          <li> Dos o més nodes amb Oracle instal·lat</li>
+          <li> Xarxa d’interconnexió (per sincronitzar memòria i processos entre nodes)</li>
+          <li> Sistema d’emmagatzematge compartit (SAN, NAS, ASM...)</li>
+          <li> Oracle Clusterware per gestionar el clúster i recursos</li>
+        </ul>
+      
+        <h3> Alta disponibilitat i failover</h3>
+        <p>
+          Oracle RAC garanteix que si un node falla, un altre node <strong>assumeix automàticament la càrrega</strong>, 
+          sense necessitat de reiniciar la base de dades o perdre connexions. Aquesta funcionalitat és essencial per sistemes 24/7.
+        </p>
+      
+        <h3> Escalabilitat</h3>
+        <p>
+          A mesura que creix el volum de dades o les consultes, es poden afegir nous nodes al clúster sense necessitat d’aturar el sistema.
+          Això permet adaptar-se a les necessitats de rendiment en temps real.
+        </p>
+      
+        <h3> Avantatges d'Oracle RAC</h3>
+        <ul>
+          <li> Continuïtat del servei</li>
+          <li> Failover i recuperació ràpida</li>
+          <li> Escalabilitat dinàmica</li>
+          <li> Millor ús dels recursos del sistema</li>
+        </ul>
+      
+        <h3>⚠️ Inconvenients o requisits</h3>
+        <ul>
+          <li> Cost elevat (licències i infraestructures)</li>
+          <li> Configuració i manteniment complexos</li>
+          <li> Requereix infraestructura de xarxa i emmagatzematge robusta</li>
+        </ul>
+      
+        <h3> Alternatives similars</h3>
+        <ul>
+          <li> Microsoft SQL Server AlwaysOn</li>
+          <li> MySQL Group Replication</li>
+          <li> PostgreSQL Patroni o Citus</li>
+        </ul>
+      
+        <h3> Conclusió</h3>
+        <p>
+          <strong>Oracle RAC</strong> és una de les solucions més potents per a entorns empresarials que requereixen <strong>alta disponibilitat i tolerància a fallades</strong>.  
+          Tot i el seu cost i complexitat, ofereix una plataforma estable per a aplicacions crítiques que no poden permetre’s caigudes de servei.
+        </p>
+      </section>
+      
+
+
+</main>
+
+</body>
+</html>

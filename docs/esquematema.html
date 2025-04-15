@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>Instal·lació Oracle</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #f0f4f8, #e6f7ff);
+      color: #333;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: white;
+      padding: 10px 30px;
+      height: 70px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header img {
+      height: 40px;
+    }
+
+    header h1 {
+      font-size: 22px;
+      color: #1f3c88;
+      margin: 0;
+    }
+
+    nav {
+      width: 260px;
+      background: linear-gradient(180deg, #1f3c88, #2e86de);
+      color: white;
+      padding: 100px 20px 30px;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+      top: 0;
+    }
+
+    nav h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    nav a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 12px 0;
+      padding: 8px 10px;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+
+    nav a:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    main {
+      margin-left: 280px;
+      padding: 100px 40px 40px;
+    }
+
+    section {
+      background: white;
+      margin-bottom: 40px;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+      color: #1f3c88;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    pre {
+      background: #f7f9fc;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    ul li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo">
+  <h1>ASGBD   -    Instal·lació Oracle</h1>
+</header>
+
+<nav>
+  <h2>Índex</h2>
+  <a href="#edicions">Edicions</a>
+  <a href="#versions">Versions</a>
+  <a href="#requisits">Requisits</a>
+  <a href="#instancia">Instància</a>
+  <a href="#arquitectura">Arquitectura</a>
+  <a href="#ofa">OFA</a>
+  <a href="#instalacio">Instal·lació Oracle</a>
+  <a href="#acces">Accés a Oracle</a>
+  <a href="#pdb">Creació de PDB manualment</a>
+  <a href="#conclusions">Conclusions</a>
+</nav>
+
+<main>
+  <section id="edicions">
+    <h2>Edicions</h2>
+    <p>Enterprise Edition (EE), Standard Edition (SE), Express Edition (XE), etc.</p>
+    <p>Inclou edicions per a serveis cloud com EE-High Performance, EE-Extreme Performance...</p>
+  </section>
+
+  <section id="versions">
+    <h2>Versions</h2>
+    <p>Inclou Oracle Standalone, Grid Infrastructure, Real Application Cluster.</p>
+  </section>
+
+
+
+
+  <section id="pdb">
+    <h2>Creació de PDB manualment</h2>
+    <pre>
+SQL> CREATE PLUGGABLE DATABASE nom_pdb 
+ADMIN USER pdbadmin1 IDENTIFIED BY 1234 
+roles=(dba) default tablespace users;
+
+SQL> ALTER PLUGGABLE DATABASE pdb_manual CLOSE IMMEDIATE;
+SQL> DROP PLUGGABLE DATABASE pdb_manual INCLUDING DATAFILES;
+    </pre>
+  </section>
+
+  <section id="conclusions">
+    <h2>Conclusions</h2>
+    <ul>
+      <li>Diferenciar entre CDB, PDB, instància...</li>
+      <li>Utilització de clients com SQL*Plus, SQL Developer</li>
+      <li>Creació i gestió de listeners</li>
+      <li>Instal·lació des de terminal (cmd, bash)</li>
+    </ul>
+  </section>
+</main>
+
+</body>
+</html>

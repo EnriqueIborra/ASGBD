@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>🛠️ Configuració Oracle</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo">
+  </a>
+  <h1>ASGBD   -    Configuració Oracle</h1>
+</header>
+
+<nav>
+  <h2>Índex</h2>
+  <a href="#entorn">Conf. Entorn</a>
+  <a href="#connexions">Conf. Connexions</a>
+  <a href="#instancia">Conf. Instància</a>
+  <a href="#admin">Comptes administració</a>
+  <a href="#arrancada">Arrancada i Parada</a>
+  <a href="#emm">Conf. emmagatzemament</a>
+  <a href="#diccionari">Diccionari de dades en Oracle</a>
+  <a href="#quadern">Quadern de bitàcola</a>
+  <a href="#logs">Fitxers LOG</a>
+</nav>
+
+<main>
+
+  
+
+  <section id="entorn">
+    <h2>Configuració de l’entorn</h2>
+  
+    <h3> Variables d’entorn essencials</h3>
+    <ul>
+      <li><strong>ORACLE_HOME</strong>: Ruta on està instal·lat el software d’Oracle (binaris, biblioteques...)</li>
+      <li><strong>ORACLE_BASE</strong>: Ruta arrel on es guarden dades, configuracions, logs i més</li>
+      <li><strong>ORACLE_SID</strong>: Identificador de la instància Oracle amb la qual es treballarà</li>
+      <li><strong>PATH</strong>: Variable del S.O. per accedir a les ordres d’Oracle des de qualsevol ruta (ex: <code>sqlplus</code>)</li>
+      <li><strong>NLS_LANG</strong>: Defineix idioma, territori i charset (ex: <code>SPANISH_SPAIN.WE8MSWIN1252</code>)</li>
+    </ul>
+  
+    <h3>🐧 En Linux</h3>
+    <p>Pots veure o configurar aquestes variables amb:</p>
+    <pre>
+  $ echo $ORACLE_SID
+  $ echo $ORACLE_HOME
+  $ export ORACLE_SID=orclcdb
+  $ export NLS_LANG=SPANISH_SPAIN.WE8MSWIN1252
+  $ env       # Llista totes les variables d’entorn
+    </pre>
+
+    <h3> Exemple de configuració</h3>
+    <pre>
+  export ORACLE_HOME=/opt/oracle/product/21c/dbhome_1
+  export ORACLE_BASE=/opt/oracle
+  export ORACLE_SID=costera
+  export PATH=$ORACLE_HOME/bin:$PATH
+  export NLS_LANG=SPANISH_SPAIN.WE8MSWIN1252
+    </pre>
+  
+    <h3>🖥️ En Windows</h3>
+    <p>Comprova o configura variables des del CMD o des de variables d’entorn del sistema:</p>
+    <pre>
+  > echo %PATH%
+  > set
+      </pre>
+      <p>Pots modificar-les des de <em>Propietats del sistema → Variables d'entorn</em>.</p>
+    <p>I, Per vore les varibles d'ORACLE s'ha de fer amb el (regedit) i dins buscar  ORACLE_HOME  per exemple</p>
+    <p>Pots modificar-les des del <strong>Registre (regedit)</strong></p>
+  
+   
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Configura correctament l’entorn abans d’executar qualsevol eina com <code>sqlplus</code> o <code>dbca</code></li>
+      <li> Canvia l’ORACLE_SID segons la base de dades amb què vols treballar</li>
+      <li> Si tens més d’una base de dades, assegura’t que les variables són correctes per a cada sessió</li>
+      <li> ORACLE_BASE i ORACLE_HOME són essencials per al correcte funcionament del SGBD</li>
+    </ul>
+  
+    <h3>🔧 Exercici pràctic suggerit</h3>
+    <p>
+      Comprova el valor actual del teu <code>ORACLE_SID</code>, i canvia’l a una altra instància com “<code>costera</code>” o “<code>ribera</code>”. Després obre el <strong>regedit</strong> i comprova on apunta <code>ORACLE_HOME</code>.
+    </p>
+  </section>
+  
+
+
+
+  <section id="connexions">
+    <h2>Configuració de les connexions</h2>
+  
+    <h3> Components clau per connectar-se a Oracle</h3>
+    <p>Per establir una connexió entre un client i una base de dades Oracle, es necessita:</p>
+    <ul>
+      <li> Un <strong>listener</strong> actiu al servidor</li>
+      <li> Un fitxer <strong>tnsnames.ora</strong> al client (i opcionalment al servidor)</li>
+      <li> El fitxer <strong>sqlnet.ora</strong> per determinar l'ordre de resolució</li>
+    </ul>
+  
+    <h3>📁 Fitxers implicats (ubicació típica)</h3>
+    <ul>
+      <li><code>$ORACLE_HOME/network/admin/listener.ora</code></li>
+      <li><code>$ORACLE_HOME/network/admin/tnsnames.ora</code></li>
+      <li><code>$ORACLE_HOME/network/admin/sqlnet.ora</code></li>
+    </ul>
+  
+     
+    <h3> Fitxer sqlnet.ora</h3>
+    <p>Defineix l'ordre de cerca per resoldre noms:</p>
+    <pre>
+  SQLNET.AUTHENTICATION_SERVICES = (NONE)
+  NAMES.DIRECTORY_PATH = (TNSNAMES, EZCONNECT)
+    </pre>
+  
+    <h3>🛠️ Eines per configurar la xarxa</h3>
+    <ul>
+      <li><strong>netca</strong>: assistent per crear listeners i serveis</li>
+      <li><strong>netmgr</strong>: gestió gràfica de connexions Oracle</li>
+    </ul>
+  
+    <h4>Exemple:</h4>
+    <pre>
+  $ netca     # Inicia l’assistent gràfic (en Linux o CMD)
+  $ netmgr    # (també gràfic)
+    </pre>
+  
+    <h3>🔍 Verificació amb tnsping</h3>
+    <p>Permet comprovar si la configuració funciona i si el listener està responent:</p>
+    <pre>
+  $ tnsping orcl
+    </pre>
+  
+    <p>Sortida esperada:</p>
+    <pre>
+  Used parameter files:
+  /opt/oracle/product/21c/dbhome_1/network/admin/sqlnet.ora
+  
+  Used TNSNAMES adapter to resolve the alias
+  Attempting to contact (DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))...)
+  OK (10 msec)
+    </pre>
+  
+    <h3>⚠️ Errors habituals</h3>
+    <ul>
+      <li> Listener no iniciat → <code>lsnrctl start</code></li>
+      <li> El servei no està registrat correctament → revisar <code>GLOBAL_DBNAME</code> o <code>SERVICE_NAME</code></li>
+      <li> El client no troba el tnsnames.ora → revisar ruta o variable <code>TNS_ADMIN</code></li>
+    </ul>
+  
+    <h3>✅ Bones pràctiques</h3>
+    <ul>
+      <li> Fer <code>tnsping</code> abans de provar una connexió completa</li>
+      <li> Mantenir una còpia de seguretat dels fitxers de configuració</li>
+      <li> En producció, usar noms DNS en lloc de IPs i restringir ports al tallafoc</li>
+    </ul>
+
+    <h3> Primera connexió</h3>
+    <pre>
+      $ sqlplus / as sysdba
+      C:\Users\enric> sqlplus / as sysdba
+      .............
+      SQL> show con_name
+      SQL> select name from v$database;
+      SQL> show user
+      SQL> show pdbs
+      SQL> show sga
+    </pre>
+
+    <h3> Navegar per les PDBs</h3>
+    <pre>
+      $ sqlplus / as sysdba
+      SQL> show con_name
+      SQL> select name from v$database;
+      SQL> show user
+      SQL> show pdbs
+      SQL> alter session set CONTAINER=PDB1;
+      SQL> show pdbs
+      SQL> alter session set CONTAINER=PDB2;
+      SQL> show pdbs
+      SQL> alter session set CONTAINER=cdb$root;
+      SQL> show pdbs
+    </pre>
+  </section>
+  
+  
+
+
+<section id="instancia">
+  <h2>Configuració de la instància</h2>
+
+  <h3>📘 Què és la instància?</h3>
+  <p>
+    Una instància Oracle necessita una configuració específica per funcionar correctament: memòria, rutes, noms, processos, etc.
+    Aquesta configuració es defineix mitjançant <strong>fitxers de paràmetres</strong>.
+  </p>
+
+  <h3> Fitxers de paràmetres</h3>
+  <ul>
+    <li><strong>spfile</strong> – Fitxer binari (Server Parameter File), llegit automàticament en iniciar la instància.</li>
+    <li><strong>pfile</strong> – Fitxer de text (init<SID>.ora), utilitzat com a alternativa o còpia editable.</li>
+  </ul>
+
+  <h4> Crear un PFILE a partir d’un SPFILE</h4>
+  <pre>SQL> CREATE PFILE FROM SPFILE;</pre>
+
+  <h4> Crear un SPFILE a partir d’un PFILE</h4>
+  <pre>SQL> CREATE SPFILE FROM PFILE;</pre>
+
+  <p> Ubicació típica:</p>
+  <pre>$ORACLE_HOME/dbs/initSID.ora</pre>
+
+  <h3> Tipus de paràmetres</h3>
+  <ul>
+    <li><strong>Estàtics</strong>: Només es poden modificar reiniciant la instància</li>
+    <li><strong>Dinàmics</strong>: Es poden canviar en temps real sense reiniciar</li>
+    <li><strong>Scope:</strong>
+      <ul>
+        <li><code>MEMORY</code> – Canvi temporal (fins al proper reinici)</li>
+        <li><code>SPFILE</code> – S’emmagatzema per al proper reinici</li>
+        <li><code>BOTH</code> – Canvi immediat i persistent</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3> Consultar paràmetres actuals</h3>
+  <p>Consulta de paràmetres:</p>
+  <pre>SQL> SHOW PARAMETER   o   SQL> SHOW PARAMETER sga;</pre>
+
+  <p>Consulta de totes les fonts dels valors:</p>
+  <pre>SQL> SELECT name, value, isspecified, isdefault 
+FROM v$parameter 
+WHERE name LIKE 'sga%';</pre>
+
+  <h3> Modificar un paràmetre</h3>
+  <p>Per exemple, modificar la mida de la SGA:</p>
+  <pre>SQL> ALTER SYSTEM SET sga_target=800M SCOPE=SPFILE;</pre>
+  <p><em>(cal reiniciar perquè tingui efecte)</em></p>
+
+  <h3> Reinici de la instància</h3>
+  <p>Per aplicar canvis definitius:</p>
+  <pre>
+SQL> SHUTDOWN IMMEDIATE;
+SQL> STARTUP;
+  </pre>
+
+  <h3> Resum de comandes útils</h3>
+  <ul>
+    <li><code>SHOW PARAMETER nom</code> – Consulta ràpida</li>
+    <li><code>ALTER SYSTEM SET ...</code> – Per canviar valors</li>
+    <li><code>CREATE PFILE FROM SPFILE</code> – Exportar config binària</li>
+    <li><code>CREATE SPFILE FROM PFILE</code> – Generar spfile</li>
+    <li><code>STARTUP PFILE='...'</code> – Iniciar amb fitxer concret</li>
+  </ul>
+
+  <h3>⚠️ Bones pràctiques</h3>
+  <ul>
+    <li> No modificar directament l’SPFILE (només amb SQL)</li>
+    <li> Fer còpia del PFILE abans de fer canvis</li>
+    <ul><li>⚠️ Canvis incorrectes poden impedir que la instància arranque</li> </ul> 
+  </ul>
+</section>
+
+
+
+
+
+
+  <section id="admin">
+    <h2>Comptes d’administració</h2>
+  
+    <h3>👤 Comptes d'administració predeterminats</h3>
+    <p>Quan es crea una base de dades Oracle (CDB o PDB), es generen automàticament diversos comptes especials:</p>
+    <ul>
+      <li><strong>SYS</strong>: usuari principal amb privilegis totals sobre la base de dades.</li>
+      <li><strong>SYSTEM</strong>: usuari administratiu per tasques generals i desenvolupament.</li>
+      <li><strong>PDBADMIN</strong>: usuari administrador dins d’una PDB específica.</li>
+    </ul>
+  
+    <p> Aquests comptes es creen automàticament en el moment de crear la base de dades amb l’eina <code>DBCA</code> o amb SQL.</p>
+  
+    <h3> Rols associats</h3>
+    <ul>
+      <li><strong>SYSDBA</strong>: accés complet, inclou totes les capacitats (startup, shutdown, backup, etc.).</li>
+      <li><strong>SYSOPER</strong>: rol amb permisos limitats a operacions bàsiques (iniciar, aturar, consultar).</li>
+      <li><strong>SYSBACKUP</strong>, <strong>SYSDG</strong>, <strong>SYSKM</strong>: rols especialitzats (backup, dataguard, encriptació).</li>
+    </ul>
+  
+    <h3>📍 Ubicació dels comptes</h3>
+    <p>
+      Els comptes SYS i SYSTEM s’ubiquen dins la <strong>CDB (contenidor principal)</strong> i també poden existir dins de cada <strong>PDB</strong> si es crea un nou espai.
+    </p>
+  
+    <p> Es pot canviar de contenidor amb:</p>
+    <pre>SQL> ALTER SESSION SET CONTAINER = nom_pdb;</pre>
+  
+    <h3> Canvi de contrasenya</h3>
+    <pre>
+  SQL> ALTER USER system IDENTIFIED BY nova_contrasenya;
+  SQL> ALTER USER pdbadmin IDENTIFIED BY segura123;
+    </pre>
+  
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Canviar les contrasenyes per defecte després de la instal·lació</li>
+      <li> Limitar l’ús de SYS només a tasques crítiques</li>
+      <li> Crear usuaris administradors propis amb rols específics si cal</li>
+      <li>⚠️ No treballar habitualment amb SYS/SYSTEM, especialment en entorns de producció</li>
+    </ul>
+  
+    <h3>🔍 Consultar rols assignats</h3>
+    <pre>
+  SQL> SELECT * FROM dba_role_privs WHERE grantee = 'SYSTEM';
+    </pre>
+  
+    <h3>🧪 Exemple pràctic</h3>
+    <p>Crear un nou usuari administrador dins una PDB:</p>
+    <pre>
+  SQL> ALTER SESSION SET CONTAINER = nom_pdb;
+  SQL> CREATE USER admin_pdb IDENTIFIED BY 1234;
+  SQL> GRANT dba TO admin_pdb;
+    </pre>
+  </section>
+  
+
+  <section id="arrancada">
+    <h2>Arrancada i parada de la instància Oracle</h2>
+  
+    <h3> Com arranca una instància Oracle?</h3>
+    <p>Una instància Oracle pot estar en diferents estats:</p>
+    <ul>
+      <li><strong>NOMOUNT</strong>: només carregat l’SPFILE/PFILE. No hi ha accés a la BBDD.</li>
+      <li><strong>MOUNT</strong>: es carrega el control file, però la BBDD continua tancada.</li>
+      <li><strong>OPEN</strong>: la BBDD està completament disponible per a operacions.</li>
+    </ul>
+  
+    <p>Comandos per arrancar pas a pas:</p>
+    <pre>
+  SQL> STARTUP NOMOUNT;
+  SQL> STARTUP MOUNT;
+  SQL> ALTER DATABASE OPEN;
+    </pre>
+  
+    <h3> Arrancada completa</h3>
+    <p>Per arrancar la base de dades directament a mode <code>OPEN</code>:</p>
+    <pre>SQL> STARTUP;</pre>
+  
+    <p>⚠️ Necessites rols <code>SYSDBA</code> o <code>SYSOPER</code> per fer aquesta acció.</p>
+  
+    <h3> Parada de la instància</h3>
+    <p>Opcions disponibles:</p>
+    <ul>
+      <li><strong>IMMEDIATE</strong> – Atura connexions de forma controlada (recomanat)</li>
+      <li><strong>NORMAL</strong> – Espera que els usuaris es desconnectin</li>
+      <li><strong>ABORT</strong> – Tall immediat (pot deixar la base de dades en estat incoherent)</li>
+    </ul>
+  
+    <p>Exemples:</p>
+    <pre>
+  SQL> SHUTDOWN IMMEDIATE;
+  SQL> SHUTDOWN NORMAL;
+  SQL> SHUTDOWN ABORT;
+    </pre>
+  
+    <h3> En Windows</h3>
+    <p>Executar <code>sqlplus / as sysdba</code> com a usuari <code>oracle</code> o administrador:</p>
+    <pre>
+  C:\> sqlplus / as sysdba
+  SQL> STARTUP;
+  SQL> SHUTDOWN IMMEDIATE;
+    </pre>
+  
+    <h3>🐧 En Linux</h3>
+    <p>Cal que les variables d’entorn estiguin ben configurades:</p>
+    <pre>
+  $ . oraenv
+  $ sqlplus / as sysdba
+  SQL> STARTUP;
+  SQL> SHUTDOWN IMMEDIATE;
+    </pre>
+  
+    <h3> Gestionar contenidors (PDB)</h3>
+    <p>Després d'obrir la CDB, cal obrir les PDB individualment si no estan configurades per obrir-se automàticament:</p>
+    <pre>
+  SQL> ALTER PLUGGABLE DATABASE ALL OPEN;
+  SQL> ALTER PLUGGABLE DATABASE nom_pdb OPEN;
+    </pre>
+  
+    <p>Per tancar-les:</p>
+    <pre>
+  SQL> ALTER PLUGGABLE DATABASE ALL CLOSE IMMEDIATE;
+  SQL> ALTER PLUGGABLE DATABASE nom_pdb CLOSE IMMEDIATE;
+    </pre>
+  
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Utilitza sempre <code>SHUTDOWN IMMEDIATE</code> per evitar corrupcions</li>
+      <li> Comprova que les PDB estan obertes després del <code>STARTUP</code></li>
+      <li>⚠️ Si fas <code>ABORT</code>, executa <code>RECOVER</code> o revisa la coherència de la BBDD després</li>
+      <li> Per entorns de pràctiques, pots fer <code>STARTUP MOUNT</code> per estudiar fases inicials</li>
+    </ul>
+  
+    <h3> Comprovar estat</h3>
+    <pre>
+  SQL> SELECT status FROM v$instance;
+  SQL> SELECT name, open_mode FROM v$pdbs;
+    </pre>
+  </section>
+  
+
+  <section id="emm">
+    <h2>Configuració de l’emmagatzematge</h2>
+  
+    <h3> Què és un tablespace?</h3>
+    <p>
+      Un <strong>tablespace</strong> és una unitat lògica d’emmagatzematge dins d’Oracle. Està format per un o més <strong>fitxers de dades</strong> (datafiles) que resideixen al disc i contenen les dades reals de la base de dades.
+    </p>
+  
+    <p>Els usuaris guarden les seues dades en els tablespaces, com per exemple <code>USERS</code>, <code>TEMP</code>, <code>SYSTEM</code>, etc.</p>
+  
+    <h3> Mètodes de gestió de l’espai</h3>
+    <ul>
+      <li><strong>Manual:</strong> l’administrador ha de crear i ampliar els fitxers de dades manualment.</li>
+      <li><strong>Automàtic:</strong> el sistema crea i amplia els datafiles automàticament amb <code>AUTOEXTEND</code>.</li>
+    </ul>
+  
+    <h3> Crear un nou tablespace manualment</h3>
+    <p>Exemple de creació amb gestió manual:</p>
+    <pre>
+  SQL> CREATE TABLESPACE dades 
+  DATAFILE '/opt/oracle/oradata/COSTERA/dades01.dbf' SIZE 10M;
+    </pre>
+  
+    <p>Exemple amb autoextensió activada:</p>
+    <pre>
+  SQL> CREATE TABLESPACE dades 
+  DATAFILE '/opt/oracle/oradata/COSTERA/dades01.dbf' 
+  SIZE 10M 
+  AUTOEXTEND ON 
+  NEXT 5M 
+  MAXSIZE 100M;
+    </pre>
+  
+    <h3> Afegir un fitxer de dades a un tablespace</h3>
+    <pre>
+  SQL> ALTER TABLESPACE dades 
+  ADD DATAFILE '/opt/oracle/oradata/COSTERA/dades02.dbf' SIZE 20M;
+    </pre>
+  
+    <h3> Consultar informació d’emmagatzematge</h3>
+    <p>Consulta dels fitxers de dades:</p>
+    <pre>
+  SQL> SELECT name FROM v$datafile;
+    </pre>
+  
+    <p>Consulta dels tablespaces:</p>
+    <pre>
+  SQL> SELECT tablespace_name, file_name, bytes/1024/1024 AS MB 
+  FROM dba_data_files;
+    </pre>
+  
+    <h3> Ubicació per defecte (si no s’especifica)</h3>
+    <p>Si no s’indica ruta explícita, Oracle fa servir la variable:</p>
+    <pre>DB_CREATE_FILE_DEST</pre>
+  
+    <p>Exemple de creació automàtica:</p>
+    <pre>
+  SQL> CREATE TABLESPACE dades;
+    </pre>
+  
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Activa <code>AUTOEXTEND</code> per evitar errors per espai</li>
+      <li> Assigna un tablespace específic als usuaris nous (evita usar <code>SYSTEM</code>)</li>
+      <li> Utilitza rutes clares i separades per a cada base de dades</li>
+      <li>⚠️ Controla la mida màxima de creixement per no omplir el disc</li>
+    </ul>
+  
+    <h3> Exemple complet</h3>
+    <pre>
+  SQL> CREATE TABLESPACE aplicacio 
+  DATAFILE '/opt/oracle/oradata/COSTERA/aplicacio01.dbf' 
+  SIZE 20M 
+  AUTOEXTEND ON 
+  NEXT 5M 
+  MAXSIZE UNLIMITED;
+  
+  SQL> CREATE USER us_aplicacio IDENTIFIED BY 1234 
+  DEFAULT TABLESPACE aplicacio 
+  QUOTA UNLIMITED ON aplicacio;
+    </pre>
+  </section>
+  
+
+  <section id="diccionari">
+    <h2>Diccionari de dades</h2>
+  
+    <h3>📘 Què és el diccionari de dades?</h3>
+    <p>
+      El <strong>diccionari de dades</strong> d’Oracle és un conjunt de vistes especials que contenen metadades sobre:
+    </p>
+    <ul>
+      <li> Taules, vistes, columnes</li>
+      <li> Usuaris, rols i privilegis</li>
+      <li> Estructura de la base de dades, espai, fitxers</li>
+      <li> Permisos d'accés i auditories</li>
+    </ul>
+  
+    <p>El diccionari és gestionat automàticament per Oracle i està format per milers de vistes prefixades per:</p>
+    <ul>
+      <li><code>USER_</code> → Mostra dades del propi usuari connectat</li>
+      <li><code>ALL_</code> → Mostra dades accessibles per l’usuari (les seves i d’altres)</li>
+      <li><code>DBA_</code> → Mostra totes les dades del sistema (requereix permisos de DBA)</li>
+    </ul>
+  
+    <h3>🔍🔍 Consultes habituals</h3>
+  
+    <h4>📂 Taules i columnes</h4>
+    <pre>
+  -- Taules creades per l’usuari actual
+  SELECT table_name FROM user_tables;
+  
+  -- Columnes d’una taula concreta
+  SELECT column_name, data_type, data_length 
+  FROM user_tab_columns 
+  WHERE table_name = 'EMPLEATS';
+    </pre>
+  
+    <h4>👤 Usuaris i rols</h4>
+    <pre>
+  -- Llista d’usuaris
+  SELECT username FROM dba_users;
+  
+  -- Rols assignats a un usuari
+  SELECT * FROM dba_role_privs WHERE grantee = 'SYSTEM';
+    </pre>
+  
+    <h4>🔐 Privilegis</h4>
+    <pre>
+  -- Privilegis d’usuari
+  SELECT * FROM user_sys_privs;
+  
+  -- Privilegis de rol
+  SELECT * FROM role_sys_privs WHERE role = 'DBA';
+    </pre>
+  
+    <h4>📁 Estructures d’emmagatzematge</h4>
+    <pre>
+  -- Fitxers de dades
+  SELECT file_name, tablespace_name, bytes/1024/1024 AS MB 
+  FROM dba_data_files;
+  
+  -- Espai lliure
+  SELECT tablespace_name, file_id, block_id, bytes/1024/1024 AS MB 
+  FROM dba_free_space;
+    </pre>
+  
+    <h3>📘 Bones pràctiques</h3>
+    <ul>
+      <li> Utilitza <code>USER_</code> si treballes com a usuari no administrador</li>
+      <li> Utilitza <code>DBA_</code> per fer auditories completes (només si ets <code>SYS</code> o tens <code>DBA</code>)</li>
+      <li> Fes servir <code>DESCRIBE</code> o <code>DESC</code> per veure l’estructura de les vistes del diccionari</li>
+    </ul>
+  
+    <h3> Consell final</h3>
+    <p>El diccionari de dades és clau per conèixer l'estat intern de la base de dades, i resulta imprescindible per a administradors i desenvolupadors.</p>
+  </section>
+  
+
+  <section id="quadern">
+    <h2>📒 Quadern de bitàcola (logs)</h2>
+  
+    <h3> Què és?</h3>
+    <p>
+      El <strong>quadern de bitàcola</strong> en Oracle fa referència als fitxers de registre que el sistema genera automàticament per monitorar l’activitat, errors i operacions internes.
+      Aquests fitxers són imprescindibles per a qualsevol tasca de diagnòstic o auditoria.
+    </p>
+  
+    <h3> Tipus de logs</h3>
+    <ul>
+      <li><strong>Alert log</strong>: fitxer principal del sistema, mostra missatges d’arrencada, aturada, errors greus, missatges de SHUTDOWN i STARTUP.</li>
+      <li><strong>Trace files</strong>: fitxers de seguiment detallat per a processos específics o errors concrets.</li>
+      <li><strong>Listener log</strong>: fitxer que recull les connexions i activitats del listener.</li>
+    </ul>
+  
+    <h3>📁 Ubicació dels fitxers</h3>
+    <ul>
+      <li><strong>Unix/Linux:</strong>  
+        <pre>$ORACLE_BASE/diag/rdbms/&lt;db_name&gt;/&lt;sid&gt;/trace/</pre>
+      </li>
+      <li><strong>Windows:</strong>  
+        <pre>%ORACLE_BASE%\diag\rdbms\<db_name>\<sid>\trace\</pre>
+      </li>
+    </ul>
+  
+    <p>El fitxer d’alertes sol anomenar-se:</p>
+    <pre>alert_<SID>.log</pre>
+  
+    <h3>🔍 Consultar l’alert log</h3>
+    <p>Es pot visualitzar amb qualsevol editor de text, però també es pot consultar des de SQL amb:</p>
+    <pre>
+  SQL> SELECT value FROM v$diag_info WHERE name = 'Diag Trace';
+    </pre>
+  
+    <p>També pots consultar entrades recents:</p>
+    <pre>
+  $ tail -f alert_costera.log   # En temps real (Linux)
+    </pre>
+  
+    <h3>📞 Listener log</h3>
+    <p>El fitxer de registre del listener mostra informació sobre connexions, errors i temps de resposta.</p>
+    <p>Ubicació típica:</p>
+    <pre>
+  $ORACLE_BASE/diag/tnslsnr/&lt;host&gt;/listener/trace/listener.log
+    </pre>
+  
+    <h3> Recomanacions</h3>
+    <ul>
+      <li> Revisa l’<strong>alert log</strong> després de qualsevol <code>startup</code>, <code>shutdown</code> o error inesperat</li>
+      <li> Configura eines de rotació de logs per evitar que ocupin massa espai</li>
+      <li> Utilitza <code>v$diag_info</code> per consultar rutes oficials dels directoris</li>
+      <li> Els trace files poden ajudar a identificar errors que no apareixen en altres llocs</li>
+    </ul>
+  
+    <h3> Comando útil</h3>
+    <pre>
+  SQL> SELECT name, value FROM v$diag_info;
+    </pre>
+  
+    <p>Això te mostra totes les rutes del sistema de diagnòstic: logs, trace, incidents, etc.</p>
+  </section>
+  
+  <section id="logs">
+    <h2>🧾 Fitxers log (Redo Log Files)</h2>
+  
+    <h3> Què són els fitxers log?</h3>
+    <p>
+      Els <strong>fitxers redo log</strong> són fitxers essencials que enregistren totes les modificacions fetes a la base de dades. 
+      Aquest registre permet a Oracle <strong>recuperar les dades en cas de fallada</strong> abans que les dades siguin escrites definitivament als fitxers de dades.
+    </p>
+  
+    <h3>🔁 Funcionament cíclic</h3>
+    <p>
+      Oracle utilitza un conjunt de fitxers redo log en mode circular (anells). Quan un fitxer es plena, s’escriu al següent. 
+      Quan es completa un cicle, torna a començar pel primer.
+    </p>
+  
+    <p>Com més grups de redo logs tinguis, més eficiència i seguretat ofereix el sistema.</p>
+  
+    <h3> Estructura típica</h3>
+    <p>Una instància pot tenir múltiples grups de redo logs, cadascun amb un o més membres (fitxers físics replicats):</p>
+    <pre>
+  GROUP 1 → redo01.log
+  GROUP 2 → redo02.log
+  GROUP 3 → redo03.log
+    </pre>
+  
+    <h3>📍 Ubicació típica dels redo logs</h3>
+    <pre>/opt/oracle/oradata/NOM_BBDD/redo0X.log</pre>
+    <p>(Es defineix durant la creació de la base de dades amb <code>DBCA</code>)</p>
+  
+    <h3>🔍 Consultar els redo logs</h3>
+    <pre>
+  SQL> SELECT group#, member FROM v$logfile;
+  
+  SQL> SELECT group#, status, archived FROM v$log;
+    </pre>
+  
+    <h3> Afegir un nou grup de redo logs</h3>
+    <pre>
+  SQL> ALTER DATABASE ADD LOGFILE GROUP 4 
+  ('/opt/oracle/oradata/NOM_BBDD/redo04.log') SIZE 50M;
+    </pre>
+  
+    <h3> Afegir un membre (fitxer addicional) a un grup existent</h3>
+    <pre>
+  SQL> ALTER DATABASE ADD LOGFILE MEMBER 
+  '/opt/oracle/oradata/NOM_BBDD/redo01b.log' TO GROUP 1;
+    </pre>
+  
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Tenir almenys 3 grups de redo logs</li>
+      <li> Tenir més d’un membre per grup (redundància)</li>
+      <li> Els redo logs han d’estar en discos ràpids i fiables</li>
+      <li> No compartir físicament el disc dels redo logs amb altres fitxers crítics</li>
+    </ul>
+  
+    <h3> En cas d’error amb els redo logs</h3>
+    <p>Poden impedir l’inici de la base de dades. Per exemple, si s’esborra un fitxer o falla un disc.</p>
+    <p>Es pot fer servir una ordre com:</p>
+    <pre>SQL> ALTER DATABASE CLEAR UNARCHIVED LOGFILE GROUP 1;</pre>
+    <p>⚠️ <strong>Només per a casos d’emergència!</strong></p>
+  </section>
+  
+
+
+</main>
+
+</body>
+</html>

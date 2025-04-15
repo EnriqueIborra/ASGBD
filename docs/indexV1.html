@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curs de ASGBD - Cicle ASIX</title>
+    <link rel="stylesheet" href="estilsindex.css">
+
+    <script>
+        function showObjectives(unit) {
+            document.getElementById('objectives').classList.remove('hidden');
+            if (unit === 1) {
+                document.getElementById('objectives').innerHTML = `
+                    <h2>OBJECTIUS DE LA UNITAT 1</h2>
+                    <ul>
+                        <li>Conèixer els Elements d’un sistema gestor de bases de dades</li>
+                        <li>Característiques dels principals sistemes gestors de bases de dades</li>
+                        <li>Seleccionar el sistema gestor de bases de dades</li>
+                        <li>Conèixer el Programari necessari per dur a terme la instal·lació</li>
+                        <li>Conèixer i verificar els Requisits de maquinari</li>
+                        <li>Realitzar la instal·lació de SGBD (SW i DADES)</li>
+                        <li>Documentació del procés d'instal·lació</li>
+                        <li>Fitxers de registre. Logs. Resolució d’incidències</li>
+                        <li>Verificació del funcionament del sistema gestor de bases de dades</li>
+                    </ul>
+                `;
+            } else if (unit === 2) {
+                document.getElementById('objectives').innerHTML = `
+                    <h2>OBJECTIUS DE LA UNITAT 2</h2>
+                    <ul>
+                        <li>Descriure les condicions d'inici i parada del sistema gestor</li>
+                        <li>Seleccionar el motor de base de dades</li>
+                        <li>Assegurar els comptes d'administració</li>
+                        <li>Configurar les eines i programari client del sistema gestor</li>
+                        <li>Configurar la connectivitat en xarxa del sistema gestor</li>
+                        <li>Definir les característiques per defecte de les bases de dades</li>
+                        <li>Definir els paràmetres relatius a les connexions (temps d'espera, nombre màxim de connexions, entre altres)</li>
+                        <li>Documentar el procés de configuració</li>
+                    </ul>
+                `;
+            } else if (unit === 3) {
+                document.getElementById('objectives').innerHTML = `
+                    <h2>OBJECTIUS DE LA UNITAT 3</h2>
+                    <ul>
+                        <li>Definir i eliminar comptes d'usuari</li>
+                        <li>Crear sinònims de taules i vistes</li>
+                        <li>Identificar els privilegis sobre les bases de dades i els seus elements</li>
+                        <li>Agrupar i desagrupar privilegis</li>
+                        <li>Assignar i eliminar privilegis a usuaris</li>
+                        <li>Assignar i eliminar grups de privilegis a usuaris</li>
+                        <li>Crear vistes personalitzades per a cada tipus d'usuari</li>
+                        <li>Garantir el compliment dels requisits de seguretat</li>
+                        <li>Tractament de CID en BBDD</li>
+                        <li>Confidencialitat => Encriptació . Auditoria</li>
+                        <li>Integritat  =>  Restriccions . Transaccions</li>
+                        <li>Disponibilitat  =>  Copies de seguretat . Recuperació</li>
+                        <li>Normativa vigent en matèria de dades personals</li>
+                    </ul>
+                `;
+            } else if (unit === 4) {
+                document.getElementById('objectives').innerHTML = `
+                    <h2>OBJECTIUS DE LA UNITAT 4</h2>
+                    <ul>
+                        <li>Reconéixer la importància d'automatitzar tasques administratives.</li>
+                        <li>Descriure els diferents mètodes d'execució de guions.</li>
+                        <li>Identificar les eines disponibles per redactar guions.</li>
+                        <li>Definir i utilitzar guions per automatitzar tasques.</li>
+                        <li>Identificar els esdeveniments susceptibles d'activar disparadors.</li>
+                        <li>Definir disparadors.</li>
+                        <li>Fer servir estructures de control de flux.</li>
+                        <li>Adoptar mesures per mantenir la integritat i la consistència de la informació.</li>
+                    </ul>
+                `;
+            } else if (unit === 5) {
+                document.getElementById('objectives').innerHTML = `
+                    <h2>OBJECTIUS DE LA UNITAT 5</h2>
+                    <ul>
+                        <li>Identificar les eines de monitoratge disponibles per al sistema gestor.</li>
+                        <li>Descriure els avantatges i inconvenients de la creació d'índexs.</li>
+                        <li>Crear índexs en taules i vistes.</li>
+                        <li>Optimitzar l'estructura de la base de dades.</li>
+                        <li>Optimitzar els recursos del sistema gestor.</li>
+                        <li>Obtindre informació sobre el rendiment de les consultes per a la seua optimització.</li>
+                        <li>Programar alertes de rendiment.</li>
+                        <li>Realitzar modificacions en la configuració del sistema operatiu per a millorar el rendiment del gestor.  </li>
+                    </ul>
+                `;
+            } else if (unit === 6) {
+                document.getElementById('objectives').innerHTML = `
+                    <h2>OBJECTIUS DE LA UNITAT 6</h2>
+                    <ul>
+                        <li>Reconeixer la utilitat de les bases de dades distribuïdes.</li>
+                        <li>Descriure les diverses polítiques de fragmentació de la informació.</li>
+                        <li>Implantar una base de dades distribuïda homogènia.</li>
+                        <li>Crear una base de dades distribuïda mitjançant la integració d'un conjunt de bases de dades preexistents.</li>
+                        <li>Configurar un node mestre i diversos esclaus per dur a terme la replicació del primer.</li>
+                        <li>Configurar un sistema de replicació en cadena.</li>
+                        <li>Comprovar l'efecte de la parada de determinats nodes sobre els sistemes distribuïts i els replicats.</li>
+                    </ul>
+                `;
+            }
+        }
+
+        function hideObjectives() {
+            document.getElementById('objectives').classList.add('hidden');
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Curs d'Administració de Sistemes de Gestió de Bases de Dades (ASGBD)</h1>
+        <p>Cicle Formatiu de Grau Superior en Administració de Sistemes Informàtics en Xarxa (ASIX)</p>
+    </header>
+    <nav>
+        <h2>Temari</h2>
+        <ul>
+            <li onmouseover="showObjectives(1)" onmouseout="hideObjectives()"><a href="isgbd.html">Instal·lació del SGBD</a></li>
+            <li onmouseover="showObjectives(2)" onmouseout="hideObjectives()"><a href="csgbd.html">Configuració del SGBD</a></li>
+            <li onmouseover="showObjectives(3)" onmouseout="hideObjectives()"><a href="uipsgbd.html">Usuaris i permisos. Seguretat</a></li>
+            <li onmouseover="showObjectives(4)" onmouseout="hideObjectives()"><a href="asgbd.html">Automatització de tasques</a></li>
+            <li onmouseover="showObjectives(5)" onmouseout="hideObjectives()"><a href="miosgbd.html">Monitorització i optimització</a></li>
+            <li onmouseover="showObjectives(6)" onmouseout="hideObjectives()"><a href="dsgbd.html">Disponibilitat del SGBD</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <section id="about">
+            <h2>Sobre el curs</h2>
+            <p>En aquest curs, aprendràs a instal·lar, administrar i gestionar sistemes gestors de bases de dades, assegurant la seua integritat,
+                 seguretat, rendiment i disponibilitat.</p>
+            <pre>
+        1. Implanta sistemes gestors de bases de dades analitzant les seues característiques i ajustant-se als requeriments del sistema.
+
+        2. Configura el sistema gestor de bases de dades interpretant les especificacions tècniques i els requisits d'explotació.
+        
+        3. Implanta mètodes de control d'accés utilitzant assistents, eines gràfiques i comandos del llenguatge del sistema gestor.
+        
+        4. Automatitza tasques d'administració del gestor descrivint-les i utilitzant guions de sentències.
+        
+        5. Optimitza el rendiment del sistema aplicant tècniques de monitoratge i realitzant adaptacions.
+        
+        6. Aplica criteris de disponibilitat analitzant-los i ajustant la configuració del sistema gestor.</pre>
+
+            <p>Explora els continguts de les seccions punxant damunt de cadascuna.</p>
+        </section>
+        <section id="objectives" class="hidden"></section>
+    </div>
+    <footer>
+     <!--   <p>&copy; 2025 Curs de ASGBD - Cicle ASIX. Tots els drets reservats.</p>-->
+    
+     <p style="font-size: 18px; line-height: 0.3;">Curs ASGBD - Cicle ASIX - 2025 - Enrique Iborra .
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
+            <img src="https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png" alt="Llicència Creative Commons">
+            </a>
+
+     </p>
+     <p style="font-size: 12px; line-height: 0.3;">
+      Aquesta obra està subjecta a una 
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
+      llicència de Reconeixement-NoComercial-CompartirIgual 4.0 Internacional de Creative Commons
+      </a>
+     </p>
+              
+
+    </footer>
+</body>
+</html>
