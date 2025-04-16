@@ -116,14 +116,29 @@
   position: relative;
 }
 
+.code-type{
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  background-color: #93a294;
+  border: none;
+  padding: 3px 12px;
+  font-size: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+
+}
+
 .copy-button  {
   position: absolute;
   top: 5px;
   right: 5px;
-  background-color: #5e9762;
+  background-color: #93a294;
   border: none;
-  padding: 4px 8px;
-  font-size: 12px;
+  padding: 4px 12px;
+  font-size: 10px;
   cursor: pointer;
   border-radius: 4px;
   transition: background-color 0.2s;
@@ -137,7 +152,6 @@
 /* Estils per als elements de codi */
 pre {
   background: #f7f9fc;
-  padding: 15px;
   border-radius: 8px;
   overflow-x: auto;
   font-family: 'Courier New', monospace;
@@ -146,8 +160,12 @@ pre {
 pre {
   background-color: #f4f4f4;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 8px;
   border: 1px solid #ccc;
   width: 100%;
   overflow-x: auto;
+}
+
+.pre-container pre{
+  padding-top: 27px;
 }

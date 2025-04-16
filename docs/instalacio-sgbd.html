@@ -519,18 +519,19 @@
     <p>Obrir una finestra de CMD com a <strong>usuari instal·lador</strong> i executar:</p>
     <pre>C:\Users\oracle> sqlplus / as SYSDBA</pre>
   
-    <p>Una vegada dins de SQL*Plus, es poden utilitzar comandes útils:</p>
+    <p>Una vegada dins de SQL*Plus, es poden utilitzar comandos útils:</p>
     <div class="pre-container">
-      <button class="copy-button">Copia Codi !</button>
+      <span class="code-type">SQL</span>
+      <button class="copy-button">⧉ COPIA Codi !</button>
       <pre>
-        SQL> show user;
-        SQL> show con_name;             -- Nom del contenidor actiu
-        SQL> select name from v$database;
-        SQL> show pdbs;                -- Mostra les PDB disponibles
-        SQL> conn system                -- Connecta com SYSTEM
-        SQL> show sga;
-        SQL> disc;                      -- Desconnecta
-        SQL> exit;
+  show user;
+  show con_name;             -- Nom del contenidor actiu
+  select name from v$database;
+  show pdbs;                -- Mostra les PDB disponibles
+  conn system                -- Connecta com SYSTEM
+  show sga;
+  disc;                      -- Desconnecta
+  exit;
      </pre>
   </div>
 
@@ -570,14 +571,17 @@
     </pre>
   
     <p>Una vegada dins:</p>
+    <div class="pre-container">
+      <span class="code-type">SQL</span>
+      <div class="copy-button">⧉ COPIA Codi</div>
     <pre>
-  SQL> startup;
-  SQL> show con_name;
-  SQL> show pdbs;
-  SQL> alter session set container=NOM_PDB;
-  SQL> conn system;
-  SQL> disc;
-    </pre>
+   startup;
+   show con_name;
+   show pdbs;
+   alter session set container=NOM_PDB;
+   conn system;
+   disc;      </pre>
+    </div>
   
     <h3>⚠️ Consideracions importants</h3>
     <ul>
@@ -604,16 +608,17 @@
     <h3> Altres maneres d'accedir a la instància:</h3>
     <ul>
       <li> Utilitzant SQL Developer</li>
-      <li> Utilitzant SQLcl</li>
       <li> Utilitzant  Visual Studio Code + Extensió SQL Developer</li>
-      <li> Utilitzant ORDS</li>
       <li> Utilitzant DBeaver ( multi-SGBD sw lliure)</li>
       <li> Utilitzant TOAD  (multi-SGBD propietari)</li>
+      <li> Utilitzant SQLcl</li>
+      <li> Utilitzant ORDS</li>  
     </ul>
-    <p>En cada solució, es posible que les connexions es preparen de forma diferent</p>
-    <p>En SQL Developer, cal afegir primer una connexió, configurar-la, guardar-la, 
-      i després, queda gravada. Cuan es vol connectar, sols es fa doble-click a sobre, i s'inicia la connexió</p>
-      <p>En VSCode, DBaver, TOAD, funciona igual</p>  
+    <p>En cada solució, es posible que les connexions es preparen de forma diferent
+    En SQL Developer, cal afegir primer una connexió, configurar-la, guardar-la, 
+      i després, queda gravada. Cuan es vol connectar, sols es fa doble-click a sobre, 
+      i s'inicia la connexió. En VSCode, DBaver, TOAD, funciona igual</p>  
+
   </section>
   
 
@@ -631,9 +636,10 @@
     <h3> Creació manual d’una PDB en Windows</h3>
     <p>Des d’una sessió SQL*Plus amb l’usuari <code>SYS</code> dins la CDB:</p>
     <div class="pre-container">
+      <span class="code-type">SQL</span>
       <button class="copy-button">Copia Codi !</button>
       <pre>
-        SQL> CREATE PLUGGABLE DATABASE nom_pdb 
+        CREATE PLUGGABLE DATABASE nom_pdb 
         ADMIN USER pdbadmin1 IDENTIFIED BY 1234 
         ROLES = (dba)
         DEFAULT TABLESPACE users;
@@ -752,10 +758,10 @@
   
 
   <section id="altres-recursos">
-    <h1>CDB i PDBs</h1>
-          <a href="https://github.com/EnriqueIborra/ASGBD/blob/03132b3f2c7c697f70e54ab7f9495aac08c0d610/UD1/ASGBD-UD1.2%20DB-CDB%20i%20PDB_v2.pdf" target="_blank">Abrir PDF</a> 
-
-          
+    <h2>CDB i PDBs</h2>
+       <a href="https://github.com/EnriqueIborra/ASGBD/blob/03132b3f2c7c697f70e54ab7f9495aac08c0d610/UD1/ASGBD-UD1.2%20DB-CDB%20i%20PDB_v2.pdf" target="_blank">CDB i PDBs</a> 
+    <h2>Ordres bàsiques i primers errors</h2>
+    <a href="https://github.com/EnriqueIborra/ASGBD/blob/2d8f9600385cfd520c1043e79bde7b7c9401f64b/UD1/ASGBD-UD1.3%20Ordres%20basiques%20i%20primers%20errors.pdf" target="_blank">Ordres bàsiques i primers errors</a>
   </section>
 
 
