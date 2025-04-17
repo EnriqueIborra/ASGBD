@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>📦 Repàs SQL</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo">
+  </a>
+  <h1>ASGBD   -    Repàs SQL</h1>
+</header>
+
+<nav class="repas">
+  <h2>Índex</h2>
+  <a href="#introduccio-sql">Introduccio a SQL</a>
+  <a href="#dades-tipus">Dades</a>
+  <a href="#taula">Taula</a>
+  <a href="#crud">CRUD</a>
+  <a href="#create"> --> C create</a>
+  <a href="#read"> -->  R read</a>
+  <a href="#update"> -->  U update</a>
+  <a href="#delete"> -->  D delete</a>
+  <a href="#modifica-taula">Modifica taula</a>
+  <a href="#condicions">Condicions</a>
+  <a href="#normalitzacio">Normalització</a>
+  <a href="#permisos">Permisos </a>
+  <a href="#funcions agregació">Funcions agregació </a>
+  <a href="#transaccions"> Transaccions</a>
+  <a href="#conclusions">Conclusions</a>
+</nav>
+
+<main>
+  
+
+    <section id="introduccio-sql">
+        <h2> Introducció al repàs SQL</h2>
+      
+        <h3>🎯 Objectiu de la unitat</h3>
+        <p>
+          Aquesta unitat forma part del mòdul <strong>ASGBD – Administració de Sistemes Gestors de Bases de Dades</strong> del cicle formatiu ASIX (Administració de Sistemes Informàtics en Xarxa).
+          Té com a objectiu fer un <strong>repàs pràctic i teòric dels fonaments de SQL</strong>, el llenguatge estàndard per a treballar amb bases de dades relacionals.
+        </p>
+      
+        <h3>📌 Contingut a repassar</h3>
+        <p>
+          Durant el primer curs es van adquirir les bases de treball amb SQL: creació i modificació d’estructures, manipulació de dades i consultes bàsiques.
+          Ara, es revisen aquests conceptes per consolidar coneixements i preparar-se per tasques més avançades com l’administració, optimització i seguretat del sistema gestor.
+        </p>
+      
+        <ul>
+          <li> Definició i manipulació de dades (<strong>DDL</strong> i <strong>DML</strong>)</li>
+          <li> Consultes amb filtres, ordenacions i funcions agregades</li>
+          <li> Ús de claus primàries i foranes</li>
+          <li> Funcions i operadors</li>
+          <li> Permisos: <code>GRANT</code> i <code>REVOKE</code></li>
+          <li> Transaccions i control d’errors: <code>COMMIT</code> i <code>ROLLBACK</code></li>
+          <li> Models relacionals i bones pràctiques de disseny</li>
+        </ul>
+      
+        <h3> Importància del repàs</h3>
+        <p>
+          Aquest reforç no sols ajuda a recordar conceptes, sinó que també prepara per:
+        </p>
+        <ul>
+          <li> Entendre el comportament intern del SGBD</li>
+          <li> Millorar la qualitat de les consultes i scripts</li>
+          <li> Desenvolupar sistemes més segurs i eficients</li>
+        </ul>
+      </section>
+      
+  
+
+
+  <section id="dades-tipus">
+    <h2>🔠 Dades: Tipus de dades </h2>
+    <p>Una <strong>dada</strong> en el context d'una base de dades és una unitat bàsica d'informació que s'emmagatzema 
+        i s'utilitza per a realitzar operacions o obtenir coneixement.
+         Es tracta d'un element que representa un fet concret, i pot ser de diversos tipus (numèric, textual, temporal, etc.).</p>
+    <p>Lloc on posar les dades: Variables o Cel·les d'una Taula</p>     
+
+    <p>Cada columna d’una taula ha de tenir un tipus de dada, segons el valor que ha d’emmagatzemar:</p>
+  
+    <ul>
+      <li> <code>NUMBER(n)</code> → enters o decimals amb n dígits</li>
+      <li> <code>VARCHAR2(n)</code> → cadenes de text de longitud variable (fins a n caràcters)</li>
+      <li> <code>DATE</code> → valors de data i hora</li>
+      <li> <code>CHAR(n)</code> → cadena de longitud fixa</li>
+      <li> <code>BOOLEAN</code> (no suportat a Oracle directament, però simulat)</li>
+    </ul>
+  
+    <p><strong>Nota:</strong> en Oracle, `VARCHAR2` és més habitual que `VARCHAR` per compatibilitat.</p>
+
+    <p>Una <strong>variable</strong> representa un contenidor o un espai en la memòria física o virtual d'una computadora, 
+        on s'emmagatzemen diferents tipus de dades (valors) durant l'execució d'un programa. A cada variable
+         se li assigna un nom descriptiu o un identificador que es refereix al valor guarda</p>
+    <p>Una <strong>taula</strong> és una estructura organitzada que s’utilitza per emmagatzemar dades en una base de dades. Està formada per
+         files (o registres) i columnes (o camps) i té un nom per a referir-se a ella</p>  
+
+    <p>La taula ALUMNES és pot representar com un fitxer amb fitxes, on cada fitxa es un alumne, i cada fitxa te la mateixa
+         estructura ( id, nom, cognoms, curs, edat)</p>     
+
+    <h3> Taules i registres</h3>
+    <ul>
+    <li> Una <strong>taula</strong> és com una fulla de càlcul: cada columna representa una propietat, i cada fila un element del món real (ex: un alumne, una factura...)</li>
+    <li> Una <strong>columna</strong> té un nom i un tipus de dada</li>
+    <li> Una <strong>fila</strong> és un registre que conté un valor per a cada columna</li>
+    </ul>
+
+    <h3> Exemple de taula "alumnes"</h3>
+    <table border="1">
+    <thead><tr><th>ID</th><th>Nom</th><th>Edat</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Joan</td><td>20</td></tr>
+        <tr><td>2</td><td>Laia</td><td>21</td></tr>
+    </tbody>
+    </table>     
+
+  </section>
+  
+
+
+  
+  <section id="crud">
+   
+<h2>que es el CRUD</h2>
+<p> El terme CRUD és un acrònim que fa referència a les quatre operacions bàsiques que es realitzen en bases de dades 
+    i sistemes de gestió d'informació:</p>
+<ul>
+    <li> Create (Crear): Fa referència a l'operació d'afegir nous registres o elements a la base de dades.</li>
+    <li>Read (Llegir): Implica obtenir o consultar les dades emmagatzemades a la base de dades.</li>
+    <li>Update (Actualitzar): Consisteix a modificar o actualitzar els registres existents.</li>
+    <li>Delete (Eliminar): Es refereix a eliminar registres o dades de la base de dades.</li>
+</ul>
+    <p>Aquestes operacions són fonamentals per a la gestió i manteniment de bases de dades en moltes aplicacions, 
+    des de sistemes senzills fins a plataformes més complexes. CRUD és un concepte que s'aplica en moltes àrees 
+    de desenvolupament de programari, especialment en el context d'aplicacions web o mòbils que interactuen amb 
+    bases de dades.</p>
+
+  </section>
+  
+
+
+
+ 
+  <section id="create">
+    <h2>🛠️ Creació de taules: <code>CREATE TABLE</code></h2>
+
+  <p>
+    Per definir una nova taula, fem servir el comando <code>CREATE TABLE</code> indicant el nom, les columnes, el tipus de dades i, opcionalment, les restriccions.
+  </p>
+
+  <h3>📄 Exemple bàsic:</h3>
+  <pre>
+CREATE TABLE alumnes (
+   id NUMBER(3),
+   nom VARCHAR2(30),
+   edat NUMBER(2)
+);   </pre>
+
+  <h3> Restriccions comunes</h3>
+  <ul>
+    <li> <strong>PRIMARY KEY</strong> → identifica de forma única cada fila</li>
+    <li> <strong>NOT NULL</strong> → obliga a tenir un valor</li>
+    <li> <strong>UNIQUE</strong> → impedeix valors duplicats</li>
+    <li> <strong>DEFAULT</strong> → estableix un valor per defecte</li>
+    <li> <strong>CHECK</strong> → condició que s’ha de complir</li>
+    <li> <strong>FOREIGN KEY</strong> → crea una relació amb una altra taula</li>
+  </ul>
+
+  <h3> Exemple amb restriccions:</h3>
+  <pre>
+CREATE TABLE alumnes (
+   id NUMBER(3) PRIMARY KEY,
+   nom VARCHAR2(30) NOT NULL,
+   edat NUMBER(2) DEFAULT 18 CHECK (edat >= 16)
+);
+  </pre>
+  
+  <!-- insertar dades en una taula -->
+
+    <h2> Omplir una taula: <code>INSERT INTO</code></h2>
+  
+    <h3>📘 Què fa l’ordre <code>INSERT</code>?</h3>
+    <p>
+      L’ordre <code>INSERT INTO</code> s’utilitza per afegir <strong>noves files (registres)</strong> en una taula. 
+      Pots inserir una fila concreta indicant els valors per a cada columna, o múltiples files si el SGBD ho permet.
+    </p>
+  
+    <h3> Sintaxi bàsica</h3>
+    <pre>
+  INSERT INTO nom_taula (col1, col2, ..., colN)
+  VALUES (valor1, valor2, ..., valorN);
+    </pre>
+  
+    <h4> Exemple bàsic</h4>
+    <pre>
+  INSERT INTO alumnes (id, nom, edat)
+  VALUES (1, 'Joan', 20);
+    </pre>
+  
+    <h4> Exemple sense especificar columnes (no recomanat)</h4>
+    <pre>
+  INSERT INTO alumnes
+  VALUES (2, 'Laia', 21);
+    </pre>
+    <p><strong>⚠️ Compte:</strong> s’ha de respectar l’ordre de les columnes definides en la taula.</p>
+  
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Sempre indica els noms de les columnes per claredat</li>
+      <li> Revisa que els valors siguin compatibles amb el tipus de dada (ex: número, text...)</li>
+      <li> Respecta les restriccions: <code>NOT NULL</code>, <code>CHECK</code>, <code>FOREIGN KEY</code>...</li>
+    </ul>
+  
+    <h3>📦 Inserir múltiples files (Oracle 12c+ o amb <code>INSERT ALL</code>)</h3>
+    <pre>
+  INSERT ALL
+    INTO alumnes (id, nom, edat) VALUES (3, 'Marc', 19)
+    INTO alumnes (id, nom, edat) VALUES (4, 'Anna', 22)
+  SELECT * FROM dual;
+    </pre>
+  
+    <h3> Exemple complet amb valors per defecte</h3>
+    <p>Suposem que la taula <code>alumnes</code> té un valor per defecte d’edat = 18:</p>
+    <pre>
+  CREATE TABLE alumnes (
+    id NUMBER PRIMARY KEY,
+    nom VARCHAR2(30) NOT NULL,
+    edat NUMBER DEFAULT 18
+  );
+  
+  INSERT INTO alumnes (id, nom)
+  VALUES (5, 'Núria');
+    </pre>
+    <p><strong>Resultat:</strong> s’inserirà l’edat 18 automàticament.</p>
+  
+    <h3> Comprovació</h3>
+    <pre>
+  SELECT * FROM alumnes;
+    </pre>
+  
+    <h3> Possibles errors comuns</h3>
+    <ul>
+      <li> Inserir un valor duplicat en una <code>PRIMARY KEY</code></li>
+      <li> Ometre una columna amb <code>NOT NULL</code> sense valor per defecte</li>
+      <li> Violació d’una <code>FOREIGN KEY</code>: insertar un valor que no existeix a la taula referenciada</li>
+    </ul>
+
+
+    </section>
+
+    <section id="read">
+<!-- consulta de dades en una taula -->
+  <h2>🔎 Consultes SELECT i condicions amb WHERE</h2>
+
+  <h3>📘 Comando <code>SELECT</code></h3>
+  <p>
+    El comando <code>SELECT</code> s’utilitza per <strong>consultar dades</strong> d’una o més taules. Es poden seleccionar columnes específiques o totes.
+  </p>
+
+  <pre>
+SELECT * FROM alumnes;
+   ==>  resultat: mostra les dades de TOTES columnes 
+        de TOTES les files de la taula <code>alumnes</code> </pre>
+<pre>
+SELECT nom, edat FROM alumnes;   
+==>  resultat: mostra les dades de columnes <code> nom i edat</code>
+     de TOTES les files de la taula <code>alumnes</code> </pre>
+
+  <h3>🔍 Filtrar registres amb <code>WHERE</code></h3>
+  <p>
+    El clàusula <code>WHERE</code> permet filtrar les files segons una o més condicions.
+  </p>
+
+  <pre>
+SELECT * FROM alumnes  WHERE edat > 18;
+   ==>  resultat: mostra les dades de TOTES columnes , 
+     però sols de les files que en la cel·la edat 
+     te una dada major que 18,  de la taula <code>alumnes</code> </pre>
+  
+  <p><strong>Només mostra els alumnes que tenen més de 18 anys.</strong></p>
+
+  <h3>🧮 Operadors de comparació</h3>
+  <ul>
+    <li><code>=</code> igual a</li>
+    <li><code>&lt;&gt;</code> diferent de</li>
+    <li><code>&gt;</code>, <code>&lt;</code> → major o menor</li>
+    <li><code>&gt;=</code>, <code>&lt;=</code> → major o igual, menor o igual</li>
+    <li><code>LIKE</code> → cerca per patrons (ex: <code>'L%'</code>)</li>
+    <li><code>IN</code> → un valor dins d’un conjunt</li>
+    <li><code>BETWEEN</code> → dins un rang de valors</li>
+  </ul>
+
+  <pre>
+SELECT * FROM alumnes WHERE nom LIKE 'L%';     -- noms que comencen amb L
+SELECT * FROM alumnes WHERE edat BETWEEN 18 AND 21;
+SELECT * FROM alumnes WHERE id_curs IN (1, 2, 3);
+  </pre>
+
+    </section>
+
+  <section id="delete">
+  <!-- esborrar files d una taula -->
+  <h2>🗑️ Esborrar files d’una taula: <code> comando DELETE</code></h2>
+
+  <h3>📘 Què fa el comando <code>DELETE</code>?</h3>
+  <p>
+    L’ordre <code>DELETE</code> serveix per eliminar <strong>una o més files</strong> d’una taula segons un criteri determinat. 
+    Quan s’executa, les files desapareixen permanentment (si no hi ha transaccions o backups).
+  </p>
+
+  <h3>🔍 Sintaxi bàsica</h3>
+  <pre>
+DELETE FROM nom_taula
+WHERE condició;
+  </pre>
+
+  <h4>🧱 Exemple: eliminar alumnes menors de 18 anys</h4>
+  <pre>
+DELETE FROM alumnes  
+WHERE edat &lt; 18;
+  </pre>
+
+  <h3>⚠️ Molt important: NO oblidis el <code>WHERE</code></h3>
+  <p>
+    Si no inclous cap condició, <strong>s’eliminaran totes les files</strong> de la taula!
+  </p>
+
+  <pre>
+-- ⚠️ Elimina totes les files!
+DELETE FROM alumnes;
+  </pre>
+
+  <p><strong>Recomanació:</strong> abans d’un DELETE, comprova les files afectades amb un <code>SELECT</code>:</p>
+
+  <pre>
+SELECT * FROM alumnes WHERE edat &lt; 18;
+DELETE FROM alumnes WHERE edat &lt; 18;
+  </pre>
+
+  <h3> Control de seguretat amb claus foranes</h3>
+  <p>
+    Si una fila està relacionada amb una altra taula mitjançant una <code>FOREIGN KEY</code>, pot ser que el DELETE <strong>no es permeti</strong> (error de restricció), 
+    a menys que estigui configurada l’opció <code>ON DELETE CASCADE</code>.
+  </p>
+
+  <h4>Exemple amb relació:</h4>
+  <pre>
+-- alumnes té una clau forana cap a cursos
+DELETE FROM cursos WHERE id = 1;  -- error si hi ha alumnes vinculats
+  </pre>
+
+  <p>Amb <code>ON DELETE CASCADE</code>, també s’eliminarien automàticament els alumnes del curs 1.</p>
+
+  <h3> Comparació amb <code>TRUNCATE</code></h3>
+  <table border="1">
+    <tr>
+      <th></th>
+      <th><code>DELETE</code></th>
+      <th><code>TRUNCATE</code></th>
+    </tr>
+    <tr>
+      <td>Condicions</td>
+      <td>Permet <code>WHERE</code></td>
+      <td>No permet condicions (tot s’esborra)</td>
+    </tr>
+    <tr>
+      <td>Recuperació</td>
+      <td>Es pot fer <code>ROLLBACK</code> si està dins d'una transacció</td>
+      <td>No es pot recuperar</td>
+    </tr>
+    <tr>
+      <td>Velocitat</td>
+      <td>Més lenta (registre per registre)</td>
+      <td>Molt ràpida (reconstrueix la taula)</td>
+    </tr>
+  </table>
+
+  <h3> Exemple final</h3>
+  <pre>
+-- Mostrar alumnes del curs 3
+SELECT * FROM alumnes WHERE id_curs = 3;
+
+-- Esborrar-los
+DELETE FROM alumnes WHERE id_curs = 3;
+  </pre>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Fes un <code>SELECT</code> abans d’esborrar</li>
+    <li> Treballa amb <code>COMMIT</code> i <code>ROLLBACK</code> per seguretat</li>
+    <li> Assegura’t que no trenques relacions entre taules</li>
+    <li>⚠️⚠️⚠️ Mai facis <code>DELETE</code> sense <code>WHERE</code> si no tens clar el que fas</li>
+  </ul>
+    </section>
+
+  <section id="update">
+  <!-- actualitzar dades  d una taula -->
+  <h2>✏️ Actualització de registres: <code>comando UPDATE</code></h2>
+
+  <h3>📘 Què fa l’ordre <code>UPDATE</code>?</h3>
+  <p>
+    L’ordre <code>UPDATE</code> serveix per <strong>modificar valors d’una o més columnes</strong> dins de les files d’una taula. 
+    Com amb <code>DELETE</code>, és molt important aplicar-lo amb una condició <code>WHERE</code> per limitar les files afectades.
+  </p>
+
+  <h3>🧱 Sintaxi bàsica</h3>
+  <pre>
+UPDATE nom_taula
+SET columna1 = valor1,
+    columna2 = valor2
+WHERE condició;
+  </pre>
+
+  <h4> Exemple senzill: canviar l’edat d’un alumne</h4>
+  <pre>
+UPDATE alumnes
+SET edat = 21
+WHERE id = 3;
+  </pre>
+
+  <p><strong>Resultat:</strong> l’alumne amb id 3 tindrà l’edat actualitzada a 21.</p>
+
+  <h3>🔁 Modificar múltiples camps</h3>
+  <pre>
+UPDATE alumnes
+SET edat = edat + 1,
+    nom = 'Marc Actualitzat'
+WHERE id = 5;
+  </pre>
+
+  <p>És possible utilitzar càlculs, expressions o funcions dins del <code>SET</code>.</p>
+
+  <h3>🔍 Important: incloure sempre una clàusula <code>WHERE</code></h3>
+  <pre>
+-- ⚠️ Sense WHERE: actualitza TOTES les files!
+UPDATE alumnes
+SET edat = 18;
+  </pre>
+
+  <p>
+    Sempre comprova primer les files afectades amb una <code>SELECT</code>:
+  </p>
+  <pre>
+SELECT * FROM alumnes WHERE id = 3;
+UPDATE alumnes SET edat = 22 WHERE id = 3;
+  </pre>
+
+  <h3> Exemple real: increment d’edat per a majors d’edat</h3>
+  <pre>
+UPDATE alumnes
+SET edat = edat + 1
+WHERE edat >= 18;
+  </pre>
+
+  <p> Totes les persones majors d’edat tindran 1 any més.</p>
+
+  <h3> Possibles errors habituals</h3>
+  <ul>
+    <li> Ometre <code>WHERE</code> i modificar totes les files</li>
+    <li> Assignar valors incompatibles amb el tipus de dada (ex: text a una columna numèrica)</li>
+    <li> Violar restriccions com <code>CHECK</code> o <code>FOREIGN KEY</code></li>
+  </ul>
+
+  <h3> Bon ús en entorns transaccionals</h3>
+  <p>
+    Si estàs treballant en un entorn que suporta transaccions (com Oracle), pots utilitzar:
+  </p>
+  <ul>
+    <li><code>COMMIT</code>: per fer permanents els canvis</li>
+    <li><code>ROLLBACK</code>: per desfer els canvis si has comès un error</li>
+  </ul>
+
+  <pre>
+UPDATE alumnes SET edat = 30 WHERE id = 999; -- Ups!
+ROLLBACK; -- Desfem el canvi
+  </pre>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Comprova prèviament amb un <code>SELECT</code></li>
+    <li> Aplica el <code>WHERE</code> sempre que no vulguis modificar tot</li>
+    <li> Fes còpia de seguretat o treballa dins d’una transacció si tens dubtes</li>
+    <li> Usa aliasses si treballes amb subconsultes o joins</li>
+  </ul>
+
+
+  </section>
+  
+
+  
+
+
+
+  <section id="modifica-taula">
+   
+    <h2> Afegir una columna a una taula existent: <code>ALTER TABLE ... ADD</code></h2>
+
+    <h3>📘 Per a què serveix?</h3>
+    <p>
+      Quan necessites <strong>modificar l’estructura d’una taula</strong> que ja existeix, per exemple, afegint una nova columna per a una informació nova (telèfon, correu, etc.), fas servir la comanda <code>ALTER TABLE</code>.
+    </p>
+  
+    <h3>🔧 Sintaxi bàsica</h3>
+    <pre>
+  ALTER TABLE nom_taula
+  ADD (nom_columna tipus_dada [restriccions]);
+    </pre>
+  
+    <h4> Exemple senzill: afegir el correu electrònic</h4>
+    <pre>
+  ALTER TABLE alumnes
+  ADD (correu VARCHAR2(50));
+    </pre>
+  
+    <p>Amb això, la taula <code>alumnes</code> ara tindrà una nova columna anomenada <code>correu</code>, de fins a 50 caràcters.</p>
+  
+    <h3>🧱 Afegir diverses columnes a la vegada</h3>
+    <pre>
+  ALTER TABLE alumnes
+  ADD (
+    telefon VARCHAR2(15),
+    data_alta DATE
+  );
+    </pre>
+  
+    <p>Això és útil quan fas evolucions del model de dades.</p>
+  
+    <h3>🔐 Afegir columna amb restricció <code>NOT NULL</code></h3>
+    <p>
+      Quan afegeixes una nova columna i li poses la restricció <code>NOT NULL</code>, has d’assegurar-te que totes les files actuals tindran un valor vàlid.
+    </p>
+  
+    <pre>
+  -- Això provocarà error si no assignem un valor a totes les files existents
+  ALTER TABLE alumnes
+  ADD (dni VARCHAR2(9) NOT NULL); -- ❌ ERROR
+    </pre>
+  
+    <h4>✅ Solució: primer afegir-la sense restricció, omplir-la, i després aplicar-la</h4>
+    <pre>
+  ALTER TABLE alumnes
+  ADD (dni VARCHAR2(9));
+  
+  UPDATE alumnes SET dni = 'PENDENT'; -- o un valor real
+  
+  ALTER TABLE alumnes
+  MODIFY (dni VARCHAR2(9) NOT NULL);
+    </pre>
+  
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Planeja bé quins camps nous necessites</li>
+      <li> Revisa que els noms no existeixin ja</li>
+      <li> Si la columna ha de ser obligatòria, assegura’t que totes les files tinguin valor abans de posar <code>NOT NULL</code></li>
+      <li> Utilitza tipus de dada adequats per a l’ús que faràs</li>
+    </ul>
+  
+    <h3>🔍 Comprovar els canvis</h3>
+    <p>Pots veure l’estructura actual d’una taula amb:</p>
+    <pre>
+  DESC alumnes;
+  -- o
+  SELECT column_name, data_type FROM user_tab_columns
+  WHERE table_name = 'ALUMNES';
+    </pre>
+  
+    <h3> Casos habituals d’ús</h3>
+    <ul>
+      <li> Afegir una columna <code>observacions</code> o <code>comentaris</code></li>
+      <li> Afegir un <code>telefon</code> o <code>email</code> si abans no s’havia registrat</li>
+      <li> Afegir una data de creació o d’actualització de registres</li>
+    </ul>
+
+
+    <!-- esborrar columna d'una taula-->
+    <h2>🗑️ Esborrar una columna d’una taula: <code>ALTER TABLE ... DROP COLUMN</code></h2>
+
+    <h3>📘 Quan cal esborrar una columna?</h3>
+    <p>
+      A vegades, una columna ja no és necessària perquè:
+    </p>
+    <ul>
+      <li>Ha quedat obsoleta (ex: <code>fax</code>)</li>
+      <li>Ha estat substituïda per una altra més útil o normalitzada</li>
+      <li>S'ha afegit per error o durant proves</li>
+    </ul>
+  
+    <h3>🧱 Sintaxi bàsica</h3>
+    <pre>
+  ALTER TABLE nom_taula
+  DROP COLUMN nom_columna;
+    </pre>
+  
+    <h4> Exemple: eliminar el camp <code>telefon</code></h4>
+    <pre>
+  ALTER TABLE alumnes
+  DROP COLUMN telefon;
+    </pre>
+  
+    <p>Aquesta comanda elimina completament la columna <code>telefon</code> i totes les dades que contenia.</p>
+  
+    <h3>⚠️ Atenció amb la pèrdua de dades!</h3>
+    <p>
+      Aquesta operació <strong>no es pot desfer</strong> fàcilment. Un cop eliminada una columna, les dades desapareixen definitivament, a menys que:
+    </p>
+    <ul>
+      <li> Tinguem una còpia de seguretat (backup)</li>
+      <li> L’hàgim exportada prèviament</li>
+    </ul>
+  
+    <h3> Alternativa: posar-la com a inactiva (via convenció)</h3>
+    <p>
+      Si no vols perdre les dades immediatament, pots:
+    </p>
+    <ul>
+      <li>Renombrar-la (ex: <code>telefon_obsolet</code>)</li>
+      <li>Deixar-la buida (<code>NULL</code>) i ignorar-la</li>
+    </ul>
+  
+    <h3> Esborrar múltiples columnes (Oracle 12c+)</h3>
+    <pre>
+  ALTER TABLE alumnes
+  DROP (telefon, observacions);
+    </pre>
+  
+    <p> No tots els SGBD permeten aquesta sintaxi directa. En Oracle antic cal fer-ho de forma individual.</p>
+  
+    <h3> Com comprovar que ha desaparegut?</h3>
+    <pre>
+  DESC alumnes;
+  -- o
+  SELECT column_name FROM user_tab_columns
+  WHERE table_name = 'ALUMNES';
+    </pre>
+  
+    <h3> Bones pràctiques abans d’esborrar</h3>
+    <ul>
+      <li> Assegura’t que realment no s’utilitza ni en consultes ni aplicacions</li>
+      <li> Exporta les dades si poden tenir valor futur</li>
+      <li> Informa l’equip o documenta el canvi</li>
+      <li> Considera posar la columna com a <code>NULL</code> i fer una neteja progressiva</li>
+    </ul>
+  
+    <h3> Exemple complet</h3>
+    <pre>
+  -- Comprovem si la columna hi és
+  DESC alumnes;
+  
+  -- Eliminem la columna
+  ALTER TABLE alumnes DROP COLUMN data_alta;
+  
+  -- Verifiquem de nou
+  DESC alumnes;
+    </pre>     
+
+
+  </section>
+
+  
+ 
+
+  <section id="condicions">
+    <h2>⚙️ Operadors lògics i tractament de NULL</h2>
+
+    <h3> Operadors lògics</h3>
+    <p>Permeten combinar condicions:</p>
+  
+    <ul>
+      <li><code>AND</code> → totes les condicions han de ser certes</li>
+      <li><code>OR</code> → almenys una condició ha de ser certa</li>
+      <li><code>NOT</code> → inverteix una condició</li>
+    </ul>
+  
+    <pre>
+  SELECT * FROM alumnes
+  WHERE edat > 18 AND id_curs = 1;
+  
+  SELECT * FROM alumnes
+  WHERE edat < 18 OR id_curs = 2;
+
+     ¿que fa cada select? 
+    </pre>
+  
+    <h3>🔍 Atenció amb els parèntesis</h3>
+    <p>Quan hi ha múltiples condicions, <strong>l’ordre de prioritat importa</strong>. Usa parèntesis per controlar-ho:</p>
+  
+    <pre>
+  SELECT * FROM alumnes
+  WHERE (edat > 18 AND id_curs = 1) OR (nom LIKE 'M%');
+    </pre>
+  
+    <p>
+      Aquesta consulta retorna alumnes que:
+      <br>➡️ tinguen més de 18 anys i estiguen al curs 1,
+      <br>**o bé** el seu nom comence per M.
+    </p>
+  
+    <h3> Treballar amb <code>NULL</code></h3>
+    <p>
+      Els camps <code>NULL</code> representen valors desconeguts o absents. No es poden comparar directament amb <code>=</code> o <code>&lt;&gt;</code>.
+    </p>
+  
+    <ul>
+      <li> <code>IS NULL</code> → comprova si un valor és nul</li>
+      <li> <code>IS NOT NULL</code> → comprova si té valor</li>
+    </ul>
+  
+    <pre>
+  SELECT * FROM alumnes WHERE nota IS NULL;
+  SELECT * FROM alumnes WHERE nota IS NOT NULL;
+    </pre>
+  
+    <p><strong>Important:</strong> <code>nota = NULL</code> <u>no funcionarà</u>, sempre retorna FALSE.</p>
+    <p><strong>Recorda:</strong> <code>NULL</code> <u>no es 0 (zero)</u> , <code>NULL</code> <u>no es "" (cadena buida)</u></p>
+
+  </section>
+
+  <section id="normalitzacio">
+    <h2> Normalització</h2>
+    <pre>
+        Exemple
+        Posar en la taula alumnes, el curs amb VARCHAR2.
+        * Analitzar posibles problemes
+        * 1 CURS, 1 curs, 1er curs, ...
+        Cal normalitzar. 
+    </pre>
+   
+  </section>
+
+  
+  <section id="permisos">
+    <h2> GRANT i REVOKE</h2>
+    <pre>
+        Els usuaris poden tindre privilegis per fer operacions sobre la base de dades.
+        Per atorgar privilegis utilitzarem
+        GRANT
+        Per revocar(llevar) privilegis atorgats prèviament utilitzarem
+        REVOKE 
+    </pre>
+   
+  </section>
+
+  <section id="agregacio">
+    <h2> Funcions d'agregació</h2>
+    <pre>
+        AVG , MAX , MIN , COUNT , SUM
+        Exemple
+        SELECT MAX(edat) FROM alumnes ;
+        SELECT MAX(edat) FROM alumnes where curs=5;
+        SELECT count(*) FROM alumnes where curs=1;        
+    </pre>
+    <p>En el primer cas, visualiza la edat major de tota la taula alumnes</p>
+    <p>En el segon cas, visualiza la edat major dels alumnes del curs=5</p>
+    <p>En el tercer cas, visualiza el compte (quants) dels alumnes del curs=1</p>
+    <p>Es pot traure més potència amb el <code>GROUP BY</code> i el <code>HAVING</code></p>
+   
+  </section>
+  
+
+  <section id="transaccions">
+    <h2> Transaccions</h2>
+   <p>
+    Les transaccions en bases de dades (com Oracle) són un conjunt d'operacions que es tracten com una unitat 
+    indivisible de treball. És a dir, totes les operacions dins d'una transacció s’han de completar amb èxit o 
+    cap d’elles ha de tindre efecte
+   </p>
+   <p>
+    Objectiu d’una transacció
+    Assegurar la coherència, integritat i fiabilitat de les dades, especialment en sistemes 
+    amb múltiples usuaris o processos simultanis
+   </p>
+
+   <p>Propietats d’una transacció ( ACID )</p>
+   <ul>
+    <li>A Atomicitat: Tot o res. Si una part falla, tot es cancel·la.</li>
+    <li>C Consistència: Després de la transacció, la base de dades ha d’estar en un estat vàlid.</li>
+    <li>I Aïllament(Isolation): Les transaccions simultànies no es veuen entre si fins que acaben.</li>
+    <li>D Durabilitat: Una vegada confirmada, la transacció no es perd, encara que falle el sistema.</li>
+   </ul>
+
+   <pre>
+    Si una transacció va bé. Es fa un COMMIT
+    Si una transacció NO va bé. Es fa un ROLLBACK
+    Quan Oracle fa COMMIT automàtic?
+    Després d’un DDL (com CREATE, ALTER, DROP) i Quan es tanca la sessió    </pre>
+
+  </section>
+  
+
+  <section id="conclusions">
+    <h2> Conclusions del repàs SQL</h2>
+
+    <h3> Reforç de coneixements essencials</h3>
+    <p>
+      Aquesta unitat ha servit per <strong>consolidar els fonaments de SQL</strong>, un llenguatge essencial per a la gestió i manipulació de dades en sistemes relacionals.
+      A través del repàs pràctic s’ha enfortit la base necessària per abordar amb seguretat tasques d’administració, optimització i automatització de bases de dades.
+    </p>
+  
+    <h3> Conceptes clau treballats</h3>
+    <ul>
+      <li> Creació i modificació de taules amb <code>CREATE TABLE</code> i <code>ALTER TABLE</code></li>
+      <li> Inserció, esborrat i actualització de dades amb <code>INSERT</code>, <code>DELETE</code> i <code>UPDATE</code></li>
+      <li> Consultes amb <code>SELECT</code>, filtres amb <code>WHERE</code>, condicions lògiques i tractament de <code>NULL</code></li>
+      <li> Ús correcte de tipus de dades, restriccions i clau primària / clau forana</li>
+      <li> Gestió segura i eficaç dels canvis estructurals com afegir o eliminar columnes</li>
+    </ul>
+  
+    <h3> Habilitats pràctiques adquirides</h3>
+    <p>
+      L’estudiant ha après a construir consultes SQL correctes, identificar errors habituals, aplicar bones pràctiques de disseny de taules i gestionar les dades amb criteri.
+      Aquest coneixement és indispensable per treballar amb sistemes com Oracle, MySQL o PostgreSQL en entorns reals.
+    </p>
+  
+    <h3> Projecció cap a temes més avançats</h3>
+    <p>
+      Amb aquesta base sòlida, l’alumnat està preparat per afrontar temes com:
+    </p>
+    <ul>
+      <li> Gestió de permisos i rols d’usuari</li>
+      <li> Automatització de processos amb PL/SQL</li>
+      <li> Anàlisi de rendiment i optimització de consultes</li>
+      <li> Disseny d’esquemes i relacions complexes</li>
+      <li> Integració amb entorns cloud i sistemes distribuïts</li>
+    </ul>
+  
+    <h3>💬 Reflexió final</h3>
+    <p>
+      Dominar el llenguatge SQL és molt més que saber escriure consultes: és entendre com es modela la informació, com s’interactua amb ella i com s’assegura la seva integritat i disponibilitat.
+      Aquest repàs ha estat una oportunitat per revisar, entendre i millorar la competència tècnica i analítica en un àmbit fonamental de les TIC.
+    </p>
+
+  </section>
+  
+
+</main>
+
+<script>
+
+  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+      //  <div class="pre-container">
+      //    <button class="copy-button">Copia Codi !</button>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+</script>
+
+</body>
+</html>

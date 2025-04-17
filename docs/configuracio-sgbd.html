@@ -15,7 +15,7 @@
 </header>
 
 <nav>
-  <h2>Índex</h2>
+  <h3>Índex</h3>
   <a href="#entorn">Conf. Entorn</a>
   <a href="#connexions">Conf. Connexions</a>
   <a href="#instancia">Conf. Instància</a>
@@ -108,6 +108,7 @@
   <section id="connexions">
     <h2>Configuració de les connexions</h2>
     <p>⚠️⚠️ En Windows, no deixar APIPA activat. Posar IP manualment</p>
+    <p>⚠️⚠️ Permetre el port 1521 en el Firewall  🛡️🧱🔥</p>
     <h3> Components clau per connectar-se a Oracle</h3>
     <p>Per establir una connexió entre un client i una base de dades Oracle, es necessita:</p>
     <ul>
@@ -209,9 +210,23 @@
       SQL> alter session set CONTAINER=cdb$root;
       SQL> show pdbs
     </pre>
+
+    <h3>🔧 Exercicis pràctics suggerits</h3>
+    <p>
+      ✔️Instal·lar Oracle Instant Client (sqlplus) en altra màquina de la mateixa xarxa, configurar i fer:  <code>tnsping</code>.
+    </p> 
+    <p>
+      ✔️Instal·lar SQL Developer en altra màquina de la mateixa xarxa, configurar nova connexió i provar </code>.
+    </p> 
   </section>
   
-  
+  <section id="stop">
+    <img src="imgs/stop.png" class="imatge-esquerra"  alt="stop" style="width: 6%">
+    <h2>Abans de continuar.... </h2>
+    <h1>Fem un repàs de SQL</h1>
+    <h3><a href="repas-sql.html"> Accés al Repàs ..   </a> </h3>
+
+  </section>
 
 
 <section id="instancia">

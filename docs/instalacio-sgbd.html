@@ -15,7 +15,7 @@
 </header>
 
 <nav>
-  <h2>Índex</h2>
+  <h3>Índex</h3>
   <a href="#edicions">Edicions</a>
   <a href="#versions">Versions</a>
   <a href="#requisits">Requisits</a>
@@ -428,8 +428,6 @@
   
  
 
-
-
   <section id="instalacio">
     <h2>Instal·lació Oracle</h2>
   
@@ -452,6 +450,7 @@
       </ul>
       <li>És important executar el setup amb l’usuari <strong>oracle</strong> des de CMD amb permisos d'administrador.</li>
     </ul>
+    <p>(no cal que l'usuari instal·lador s'anomene <strong>oracle</strong>, pot ser altre nom)</p>
   
     <h3>Opcions de setup</h3>
     <p>Durant l’execució de <code>setup.exe</code> es poden escollir diferents opcions:</p>
@@ -461,7 +460,7 @@
     </ul>
     <p><strong>⚠️ No executar <code>setup.exe</code> més d’una vegada!</strong></p>
   
-    <h3>Creació de la base de dades (CDB)</h3> 
+    <h3>Creació de la base de dades (CDB + PDB)</h3> 
     <ul>
       <li>Es fa amb l’eina <code>dbca</code> (Database Configuration Assistant).</li>
       <li>Executar des de CMD amb permisos d’administrador:
@@ -484,9 +483,7 @@
       </li>
     </ul>
   
-    <h3>Primera instal·lació</h3>
-    <p>Una vegada es tenen tots els requisits preparats, es realitza la primera instal·lació d’Oracle amb l’usuari <code>oracle</code>.</p>
-  
+      
     <h3>Instal·lació / creacio del LISTENER</h3>
     <p>Una vegada instal·lat el SW i la BBDD , s'ha d'instal·lar el LISTENER.</p>
     <pre>C:\Windows\system32> netca</pre>
@@ -508,18 +505,31 @@
       <li>Després, crear la CDB i PDB amb <code>dbca</code></li>
       <li>Després, crear noves PDB amb <code>dbca</code>, i també esborrar</li>
     </ul>
+
+    <h3>Primera instal·lació</h3>
+    <p>Una vegada es tenen tots els requisits preparats, es realitza la primera
+       instal·lació d’Oracle amb l’usuari designat per a ser usuari instal·lador, per exemple  <code>oracle</code>.</p>
   </section>
   
+
+  <section id="stop">
+    <img src="imgs/stop.png" class="imatge-esquerra"  alt="stop" style="width: 6%">
+    <h2>Abans de continuar.... </h2>
+    <h1>Realitzem la nostra primera instal·lació d’ORACLE</h1>
+
+  </section>
+
 
 
   <section id="acces">
     <h2>Accés a Oracle</h2>
-  
+    <p>Després de tindre acabada la instal·lació, hem de comprovar que es pot accedir a la instància.</p>
     <h3> Des de Windows (sqlplus)</h3>
-    <p>Obrir una finestra de CMD com a <strong>usuari instal·lador</strong> i executar:</p>
+    <p>Obrir una finestra de CMD com a <strong>usuari instal·lador</strong> i executar el comando <code>sqlplus</code></p>
     <pre>C:\Users\oracle> sqlplus / as SYSDBA</pre>
   
-    <p>Una vegada dins de SQL*Plus, es poden utilitzar comandos útils:</p>
+    <p>Este comando ens connecta a la CDB principal apuntada per ORACLE_SID. Una vegada dins de SQL*Plus, 
+      es poden utilitzar comandos útils:</p>
     <div class="pre-container">
       <span class="code-type">SQL</span>
       <button class="copy-button">⧉ COPIA Codi !</button>
@@ -534,8 +544,14 @@
   exit;
      </pre>
   </div>
-
-    
+   <p>Els comandos SHOW PDBS, SHOW USER,  són instruccions especials de l'entorn SQL*Plus (
+    o eines compatibles com SQLcl), no formen part de SQL estàndard ni de PL/SQL.
+  El comando SELECT si és un comando SQL</p>
+  <pre>
+Els comandos sqlplus solen ser ALIAS de consultes SQL. 
+Per exemple SHOW PDBS es pot fer amb:
+SELECT CON_ID, NAME, OPEN_MODE, RESTRICTED FROM V$PDBS; 
+SELECT * FROM DBA_PDBS;     </pre>
   
     <h3>🔁 Connexió directa a una PDB</h3>
     <pre>
@@ -553,6 +569,7 @@
   SQL> show sga;
   SQL> show user;
     </pre>
+    <p>⚠️ SYS i SYSTEM són usuaris diferents</p>
   
     <h3>🔄 Canvi de contenidor</h3>
     <p>Per passar d’una CDB a una PDB, o viceversa:</p>
@@ -586,19 +603,20 @@
     <h3>⚠️ Consideracions importants</h3>
     <ul>
       <li> Només l’usuari que ha fet la instal·lació pot entrar com <code>SYSDBA</code> sense contrasenya.</li>
-      <li> Si les variables d’entorn no estan carregades (en Linux), no es podrà iniciar <code>sqlplus</code> correctament.</li>
+      <li> Si les variables d’entorn no estan carregades (en Linux <code>'. oraenv'</code>), no es podrà iniciar <code>sqlplus</code> correctament.</li>
       <li> <strong>CON_ID=1</strong> representa la CDB, però no sempre es mostra amb <code>show pdbs</code>.</li>
-      <li> Quan es veuen camps en groc o marcs vermells al PDF, són pràctiques recomanades!</li>
     </ul>
   
-    <h3> Com és SQL*Plus?</h3>
-    <p>És un client per línia d’ordres que permet executar SQL i PL/SQL.</p>
+    <h3> Què és SQL*Plus?</h3>
+    <p>És un client per línia d’ordres proporcionat per ORACLE que permet executar SQL, PL/SQL i comandos específics d'sqlplus. 
+      És una de les eines més antigues i utilitzades per administradors i desenvolupadors.
+    </p>
     <ul>
       <li> Ideal per fer proves ràpides i administració local</li>
       <li> Permet connectar localment o remotament</li>
       <li> Permet executar scripts</li>
     </ul>
-    <p>Es poden obrir múltiples finestres de <code>sqlplus</code> i cada una tindrà una sessió diferent.</p>
+    <p>Es poden obrir múltiples finestres de <code>CMD + sqlplus</code> i cada una tindrà una sessió diferent.</p>
   
     <pre>
   SQL> help index
@@ -631,7 +649,11 @@
     </p>
     <p>
       Aquesta opció ofereix més control sobre noms, ubicacions, contrasenyes i configuració de la base de dades.
+      Permet integrar-ho en scripts i automatitzar la creació de PDBs, 
+      sent ideal per entorns de desenvolupament, testing o desplegaments massius.
     </p>
+    <p>El codi es pot posar dins un .sql i executar-lo des de sqlplus, com per exemple:</p>
+    <pre>sqlplus sys/password@CDB1 as sysdba @create_pdb.sql     </pre>
   
     <h3> Creació manual d’una PDB en Windows</h3>
     <p>Des d’una sessió SQL*Plus amb l’usuari <code>SYS</code> dins la CDB:</p>

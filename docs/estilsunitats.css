@@ -46,6 +46,11 @@
     top: 0;
   }
 
+  .repas {
+    background: linear-gradient(180deg, #247c46, #43d680);
+    color: white;
+  }
+
   nav h2 {
     font-size: 18px;
     margin-bottom: 20px;
