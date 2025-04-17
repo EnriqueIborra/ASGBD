@@ -25,6 +25,7 @@
   <a href="#diccionari">Diccionari de dades en Oracle</a>
   <a href="#quadern">Quadern de bitàcola</a>
   <a href="#logs">Fitxers LOG</a>
+  <a href="#altres-recursos">Altres Recursos</a>
 </nav>
 
 <main>
@@ -63,13 +64,18 @@
     </pre>
   
     <h3>🖥️ En Windows</h3>
-    <p>Comprova o configura variables des del CMD o des de variables d’entorn del sistema:</p>
+    <strong>
+    <ul>
+      <li> Des de cmd amb ECHO  (el path)</li>
+      <li> La resta de configuracions, des del registre de windows (REGEDIT)</li>
+    </ul> </strong>
+    
     <pre>
   > echo %PATH%
   > set
       </pre>
-      <p>Pots modificar-les des de <em>Propietats del sistema → Variables d'entorn</em>.</p>
-    <p>I, Per vore les varibles d'ORACLE s'ha de fer amb el (regedit) i dins buscar  ORACLE_HOME  per exemple</p>
+      <p>Pots modificar-les (el PATH) des de <em>Propietats del sistema → Variables d'entorn</em>.</p>
+    <p>Per vore les varibles d'entorn d'ORACLE s'ha de fer amb el (REGEDIT) i dins buscar  ORACLE_HOME  per exemple</p>
     <p>Pots modificar-les des del <strong>Registre (regedit)</strong></p>
   
    
@@ -85,6 +91,15 @@
     <p>
       Comprova el valor actual del teu <code>ORACLE_SID</code>, i canvia’l a una altra instància com “<code>costera</code>” o “<code>ribera</code>”. Després obre el <strong>regedit</strong> i comprova on apunta <code>ORACLE_HOME</code>.
     </p>
+    <h4>Altres variables d'entorn interessants en REGEDIT</h4>
+    <ul> <CODE>
+      <li> ORA_SID_AUTOSTART</li>
+      <li> ORA_SID_SHUTDOWN</li>
+      <li> ORA_SID_SHUTDOWN_TIMEOUT</li>
+      <li> ORA_SID_SHUTDOWNTYPE</li> </CODE>
+    </ul>
+  
+
   </section>
   
 
@@ -92,22 +107,31 @@
 
   <section id="connexions">
     <h2>Configuració de les connexions</h2>
-  
+    <p>⚠️⚠️ En Windows, no deixar APIPA activat. Posar IP manualment</p>
     <h3> Components clau per connectar-se a Oracle</h3>
     <p>Per establir una connexió entre un client i una base de dades Oracle, es necessita:</p>
     <ul>
-      <li> Un <strong>listener</strong> actiu al servidor</li>
+      <li> Un <strong>listener</strong> actiu al servidor, configurar amb el fitxer <code>listener.ora</code></li>
       <li> Un fitxer <strong>tnsnames.ora</strong> al client (i opcionalment al servidor)</li>
       <li> El fitxer <strong>sqlnet.ora</strong> per determinar l'ordre de resolució</li>
     </ul>
   
     <h3>📁 Fitxers implicats (ubicació típica)</h3>
     <ul>
+      EN EL SERVIDOR  (LINUX) 
       <li><code>$ORACLE_HOME/network/admin/listener.ora</code></li>
-      <li><code>$ORACLE_HOME/network/admin/tnsnames.ora</code></li>
       <li><code>$ORACLE_HOME/network/admin/sqlnet.ora</code></li>
+      EN EL CLIENT
+      <li><code>$ORACLE_HOME/network/admin/tnsnames.ora</code></li>
     </ul>
   
+    <ul>
+      EN EL SERVIDOR (WINDOWS)  
+      <li><code>%ORACLE_BASE%/homes/%ORACLE_HOME_NAME%/network/admin/listener.ora</code></li>
+      <li><code>%ORACLE_BASE%/homes/%ORACLE_HOME_NAME%/network/admin/sqlnet.ora</code></li>
+      EN EL CLIENT
+      <li><code>%ORACLE_BASE%/homes/%ORACLE_HOME_NAME%/network/admin/tnsnames.ora</code></li>
+    </ul>    
      
     <h3> Fitxer sqlnet.ora</h3>
     <p>Defineix l'ordre de cerca per resoldre noms:</p>
@@ -118,7 +142,7 @@
   
     <h3>🛠️ Eines per configurar la xarxa</h3>
     <ul>
-      <li><strong>netca</strong>: assistent per crear listeners i serveis</li>
+      <li><strong>netca</strong>: assistent per crear listeners i serveis ⚠️ Important, executar amb administrador</li>
       <li><strong>netmgr</strong>: gestió gràfica de connexions Oracle</li>
     </ul>
   
@@ -130,11 +154,12 @@
   
     <h3>🔍 Verificació amb tnsping</h3>
     <p>Permet comprovar si la configuració funciona i si el listener està responent:</p>
+    <p><strong>Esta verificació té sentit si es fa des d'una màquina distinta al servidor</strong></p>
     <pre>
   $ tnsping orcl
     </pre>
   
-    <p>Sortida esperada:</p>
+    <p>Eixida esperada:</p>
     <pre>
   Used parameter files:
   /opt/oracle/product/21c/dbhome_1/network/admin/sqlnet.ora
@@ -210,8 +235,12 @@
   <h4> Crear un SPFILE a partir d’un PFILE</h4>
   <pre>SQL> CREATE SPFILE FROM PFILE;</pre>
 
-  <p> Ubicació típica:</p>
-  <pre>$ORACLE_HOME/dbs/initSID.ora</pre>
+  <p> Ubicació típica: (en windows)</p>
+  <pre>$ORACLE_BASE/database/spfileSID.ora</pre>
+  <p>On SID és el nom de la CDB</p>
+  <h4>⚠️ El fitxer spfile no es pot manipular directament, o es produirà un error. Els valors del fitxer s'han de modificar 
+    mitjançant sentències SQL (<code> ALTER SYSTEM SET </code>)</h4>
+  <p>Dins del fitxer spfile___  es guaden els valors dels <strong>paràmetres</strong> de la instància, que es carregen en memòria només esta arranca.</p>
 
   <h3> Tipus de paràmetres</h3>
   <ul>
@@ -229,7 +258,9 @@
   <h3> Consultar paràmetres actuals</h3>
   <p>Consulta de paràmetres:</p>
   <pre>SQL> SHOW PARAMETER   o   SQL> SHOW PARAMETER sga;</pre>
-
+  <pre>SQL> SHOW SPPARAMETER   o   SQL> SHOW SPPARAMETER sga;</pre>
+  <p>SHOW PARAMETERS->Consulta els valors actuals en ús per la instància.<br>SHOW SPPARAMETERS
+    ->Consulta els valors que hi ha desats a l’SPFILE (Server Parameter File)</p>
   <p>Consulta de totes les fonts dels valors:</p>
   <pre>SQL> SELECT name, value, isspecified, isdefault 
 FROM v$parameter 
@@ -291,7 +322,8 @@ SQL> STARTUP;
   
     <h3>📍 Ubicació dels comptes</h3>
     <p>
-      Els comptes SYS i SYSTEM s’ubiquen dins la <strong>CDB (contenidor principal)</strong> i també poden existir dins de cada <strong>PDB</strong> si es crea un nou espai.
+      Els comptes SYS i SYSTEM s’ubiquen dins la <strong>CDB (contenidor principal)</strong> i també dins de cada una de les <strong>PDB</strong>. 
+      Estos comptes són uns comptes "especials" anomenats COMUNS, que están en totes les PDBs i en la CDB principal
     </p>
   
     <p> Es pot canviar de contenidor amb:</p>
@@ -418,8 +450,10 @@ SQL> STARTUP;
     <p>
       Un <strong>tablespace</strong> és una unitat lògica d’emmagatzematge dins d’Oracle. Està format per un o més <strong>fitxers de dades</strong> (datafiles) que resideixen al disc i contenen les dades reals de la base de dades.
     </p>
-  
+    <p>Cada datafile pot estar en un disc físic diferent</p>
     <p>Els usuaris guarden les seues dades en els tablespaces, com per exemple <code>USERS</code>, <code>TEMP</code>, <code>SYSTEM</code>, etc.</p>
+    <p>Crear tablespaces addicionals ajuda a organitzar les aplicacions que es creen sobre la base d'esquemes</p>
+    <p>Utilitzar tablespaces és fonamental per a la seguretat</p>
   
     <h3> Mètodes de gestió de l’espai</h3>
     <ul>
@@ -427,6 +461,25 @@ SQL> STARTUP;
       <li><strong>Automàtic:</strong> el sistema crea i amplia els datafiles automàticament amb <code>AUTOEXTEND</code>.</li>
     </ul>
   
+    <h3> Tipus de tablespaces</h3>
+    <ul>
+      <li>Existeixen en instal·lar <strong>SYSTEM, SYSAUX, UNDO, TEMP, USERSW</strong> </li>
+      <li>El tablespace USERS és el que es farà servir per guardar dades de les taules dels usuaris 
+        (si no es creen tablespaces addicionas per este menester)</li>
+      <li>Es poden crear tablespaces TEMPORALS, PERMANENTS, DE SOLS LECTURA, i posar un tablespace OFFLINE o ONLINE</li>  
+    </ul>
+
+
+    <h3> Consultar informació d’emmagatzematge</h3>
+    <p>Consulta dels tablespaces:</p>
+    <pre>
+  SQL> SELECT tablespace_name, status from dba_tablespaces;
+    </pre>
+    <p>Consulta dels fitxers de dades:</p>
+    <pre>
+  SQL> SELECT file_name, tablespace_name from dba_data_files;
+    </pre>
+
     <h3> Crear un nou tablespace manualment</h3>
     <p>Exemple de creació amb gestió manual:</p>
     <pre>
@@ -448,19 +501,7 @@ SQL> STARTUP;
     <pre>
   SQL> ALTER TABLESPACE dades 
   ADD DATAFILE '/opt/oracle/oradata/COSTERA/dades02.dbf' SIZE 20M;
-    </pre>
-  
-    <h3> Consultar informació d’emmagatzematge</h3>
-    <p>Consulta dels fitxers de dades:</p>
-    <pre>
-  SQL> SELECT name FROM v$datafile;
-    </pre>
-  
-    <p>Consulta dels tablespaces:</p>
-    <pre>
-  SQL> SELECT tablespace_name, file_name, bytes/1024/1024 AS MB 
-  FROM dba_data_files;
-    </pre>
+    </pre>    
   
     <h3> Ubicació per defecte (si no s’especifica)</h3>
     <p>Si no s’indica ruta explícita, Oracle fa servir la variable:</p>
@@ -481,16 +522,21 @@ SQL> STARTUP;
   
     <h3> Exemple complet</h3>
     <pre>
-  SQL> CREATE TABLESPACE aplicacio 
+  CREATE TABLESPACE aplicacio 
   DATAFILE '/opt/oracle/oradata/COSTERA/aplicacio01.dbf' 
   SIZE 20M 
   AUTOEXTEND ON 
   NEXT 5M 
   MAXSIZE UNLIMITED;
   
-  SQL> CREATE USER us_aplicacio IDENTIFIED BY 1234 
+  CREATE USER us_aplicacio IDENTIFIED BY 1234 
   DEFAULT TABLESPACE aplicacio 
   QUOTA UNLIMITED ON aplicacio;
+
+  // Des de dins de l'usuari
+  CREATE table tabla1 ( codi number(6),  Nom varchar2(40) )  TABLESPACE aplicacio;
+
+  CREATE index indice1 on tabla1(nom DESC) TABLESPACE aplicacio;
     </pre>
   </section>
   
@@ -514,8 +560,13 @@ SQL> STARTUP;
       <li><code>USER_</code> → Mostra dades del propi usuari connectat</li>
       <li><code>ALL_</code> → Mostra dades accessibles per l’usuari (les seves i d’altres)</li>
       <li><code>DBA_</code> → Mostra totes les dades del sistema (requereix permisos de DBA)</li>
+      <li><code>V$___</code> → Vistes dinàmiques</li>
+      <li><code>TABS, DUAL, DICTIONARY</code> → Vistes "legacy"</li>
     </ul>
-  
+    <p>El diccionari s'emmagatzema en l'esquema de SYS. El DD pertany a SYS</p>
+    <p>SYS està present en CDB$ROOT i en totes les PDB</p>
+    <p>Les dades del DD estan en MAJÚSCULES</p>
+
     <h3>🔍🔍 Consultes habituals</h3>
   
     <h4>📂 Taules i columnes</h4>
@@ -570,20 +621,141 @@ SQL> STARTUP;
   </section>
   
 
+
+
   <section id="quadern">
-    <h2>📒 Quadern de bitàcola (logs)</h2>
   
-    <h3> Què és?</h3>
+    <h2> 🧾 Quadern de bitàcola (Redo Log Files)</h2>
+     <h3>📒 Què és?</h3>
     <p>
-      El <strong>quadern de bitàcola</strong> en Oracle fa referència als fitxers de registre que el sistema genera automàticament per monitorar l’activitat, errors i operacions internes.
+      El <strong>quadern de bitàcola</strong> en Oracle (en anglès, log file o redo log) és un concepte clau per garantir la recuperació de dades 
+      i la integritat del sistema en cas de fallada.
+    </p>
+    <p>El <strong>'quadern'</strong> es composa d'un grup de fitxers especials que Oracle utilitza per registrar tots els canvis que es fan a la base de dades, abans que aquests es confirmen 
+      físicament als fitxers de dades</p>
+    <p>També conegut com:  Redo log files,  Fitxers de redo,  Fitxers de registre de redo</p>  
+    <p> Els <strong>fitxers redo log</strong> són fitxers essencials que enregistren totes les modificacions fetes a la base de dades. 
+      Aquest registre permet a Oracle <strong>recuperar les dades en cas de fallada</strong> abans que les dades siguin escrites definitivament als fitxers de dades.
+    </p>
+   <h3> 🔧 Per a què serveix?</h3>
+   <ul>
+    <li>Permet recuperar la base de dades després d’una fallada (ex: tall elèctric).</li>
+    <li>Registra instruccions com INSERT, UPDATE, DELETE, etc.</li>
+    <li>No registra consultes SELECT perquè no modifiquen dades.</li>
+   </ul>
+
+   <h3>🗂️ Tipus de redo logs:</h3>
+   <ul>
+    <li>Redo logs en línia: Són els principals. Oracle escriu contínuament en aquests.</li>
+    <li>Redo logs d’arxiu (archived redo logs): Si la base de dades està en mode ARCHIVELOG, els redo logs antics es guarden per a recuperació completa.</li>
+   </ul>
+   <p>També s'anomenen ONLINE REDO LOG i  OFFLINE REDO LOG</p>
+
+   <h3>🔁 Funcionament cíclic</h3>
+   <p>
+     Oracle utilitza un conjunt de fitxers redo log en mode circular (anells). Quan un fitxer es plena, s’escriu al següent. 
+     Quan es completa un cicle, torna a començar pel primer.
+   </p>
+   <p>Com més grups de redo logs tinguis, més eficiència i seguretat ofereix el sistema.</p>
+
+   <h3> Estructura típica</h3>
+   <p>Una instància pot tenir múltiples grups de redo logs, cadascun amb un o més membres (fitxers físics replicats):</p>
+   <pre>
+   GROUP 1 → redo01.log
+   GROUP 2 → redo02.log
+   GROUP 3 → redo03.log
+   </pre>
+
+    <p> Normalment hi ha tres fitxers Redo Log, que van rotant. Quan un es plena, pasa al següent, i quan l'últim es plena, pasa altra vegada al primer</p>
+    <p>El procés de memòria LGWR s'encarrega de fer açò.</p>
+    <pre>
+    (forçar rotació dels fitxers Redo Log)
+    SQL> alter system switch logfile;
+    </pre>
+
+    <h3> Afegir un nou grup de redo logs</h3>
+    <pre>
+    SQL> ALTER DATABASE ADD LOGFILE GROUP 4 
+    ('/opt/oracle/oradata/NOM_BBDD/redo04.log') SIZE 50M;
+    </pre>
+
+    <h3> Afegir un membre (fitxer addicional) a un grup existent</h3>
+    <pre>
+    SQL> ALTER DATABASE ADD LOGFILE MEMBER 
+    '/opt/oracle/oradata/NOM_BBDD/redo01b.log' TO GROUP 1;
+    </pre>
+
+    <h3>🔍 On es troben?</h3>
+    Pots veure on estan consultant el DD:
+     <pre>
+     SELECT member FROM v$logfile; 
+     select * from v$log; </pre>
+     <h3>📍 Ubicació típica dels redo logs</h3>
+     <pre>/opt/oracle/oradata/NOM_BBDD/redo0X.log</pre>
+     <p>(Es defineix durant la creació de la base de dades amb <code>DBCA</code>)</p>
+    
+
+<p>⚠️En un entorn de producció, estos fitxers deurien estar en un disc físic diferent al que conté els datafiles</p>
+
+<h3> En cas d’error amb els redo logs</h3>
+<p>Poden impedir l’inici de la base de dades. Per exemple, si s’esborra un fitxer o falla un disc.</p>
+<p>Es pot fer servir una ordre com:</p>
+<pre>SQL> ALTER DATABASE CLEAR UNARCHIVED LOGFILE GROUP 1;</pre>
+<p>⚠️ <strong>Només per a casos d’emergència!</strong></p>
+
+<br><h3> ARCHIVELOG o  Offline Redo Log</h3>
+<p>El Online Redo Log ve activat per defecte, però el Offline Redo Log ve desactivat per defecte</p>
+<p>El procés de memòria ARCH s'encarrega de portar el Offline Redo Log, també conegut com ARCHIVELOG.</p>
+<P>ARCHIVELOG guarda fora de línia els arxuis redo log que no estan actius.
+  D’esta manera, quan es fa la transició de l’últim al primer, abans el primer s’ha guardat fora de línia, 
+i no hi ha perill de sobreescriure transicions que ocupen massa espai</P>
+
+<h3> Com activar el ARCHIVELOG</h3>
+<pre>
+SQL> archive log list
+SQL> alter system set log_archive_dest_1='LOCATION=/archivelog/carpeta/arch' SCOPE=SPFILE;
+SQL> alter system set log_archive_format='arch_%r_%t_%s.arc' scope=spfile;
+SQL> alter system set LOG_ARCHIVE_START=TRUE SCOPE=spfile;
+SQL> shutdown immeditate; startup mount;
+SQL> alter database archivelog;
+SQL> alter database open;
+SQL> archive log list
+SQL> select name, log_mode from v$database;
+SQL> ALTER SYSTEM SWITCH LOGFILE;
+</pre>
+
+<h3> Bones pràctiques</h3>
+<ul>
+  <li> Tenir almenys 3 grups de redo logs</li>
+  <li> Tenir més d’un membre per grup (redundància)</li>
+  <li> Els redo logs han d’estar en discos ràpids i fiables</li>
+  <li> No compartir físicament el disc dels redo logs amb altres fitxers crítics</li>
+  <ul><li>Els fitcher REDO deuen estar en altre disc físic</li></ul>
+</ul>
+ 
+</section>
+  
+
+
+
+  <section id="logs">
+  <h2>🧾 Fitxers log </h2>
+   <h3> Què són els fitxers log?</h3>
+     <p>
+      Els <strong>logs</strong> en Oracle fan referència als fitxers de registre que el sistema genera automàticament per monitorar l’activitat, errors i operacions internes.
       Aquests fitxers són imprescindibles per a qualsevol tasca de diagnòstic o auditoria.
     </p>
-  
+
     <h3> Tipus de logs</h3>
     <ul>
       <li><strong>Alert log</strong>: fitxer principal del sistema, mostra missatges d’arrencada, aturada, errors greus, missatges de SHUTDOWN i STARTUP.</li>
       <li><strong>Trace files</strong>: fitxers de seguiment detallat per a processos específics o errors concrets.</li>
       <li><strong>Listener log</strong>: fitxer que recull les connexions i activitats del listener.</li>
+      <li><strong>log d'instal·lació del SW</strong>: fitxer que recull les accions d'instal·lació.</li>
+      <li><strong>log d'instal·lació de la BBDD</strong>: fitxer que recull les accions d'instal·lació.</li>
+      <li><strong>log d'instal·lació de Patch/upgrades</strong>: fitxer que recull les accions d'instal·lació.</li>
+      <li><strong>log de còpies de seguretat</strong>: fitxer que recull les accions de còpies de seguretat (fetes o fallides) de Datapump i RMAN.</li>
+      <li><strong>log d'administració de WEB d'OEM</strong>: Oracle Enterprise Manager</li>
     </ul>
   
     <h3>📁 Ubicació dels fitxers</h3>
@@ -592,12 +764,12 @@ SQL> STARTUP;
         <pre>$ORACLE_BASE/diag/rdbms/&lt;db_name&gt;/&lt;sid&gt;/trace/</pre>
       </li>
       <li><strong>Windows:</strong>  
-        <pre>%ORACLE_BASE%\diag\rdbms\<db_name>\<sid>\trace\</pre>
+        <pre>%ORACLE_BASE%\diag\rdbms\<db_name>\&lt;sid&gt\trace\</pre>
       </li>
     </ul>
   
     <p>El fitxer d’alertes sol anomenar-se:</p>
-    <pre>alert_<SID>.log</pre>
+    <pre>alert_SID_.log</pre>
   
     <h3>🔍 Consultar l’alert log</h3>
     <p>Es pot visualitzar amb qualsevol editor de text, però també es pot consultar des de SQL amb:</p>
@@ -631,71 +803,17 @@ SQL> STARTUP;
     </pre>
   
     <p>Això te mostra totes les rutes del sistema de diagnòstic: logs, trace, incidents, etc.</p>
+
   </section>
   
-  <section id="logs">
-    <h2>🧾 Fitxers log (Redo Log Files)</h2>
-  
-    <h3> Què són els fitxers log?</h3>
-    <p>
-      Els <strong>fitxers redo log</strong> són fitxers essencials que enregistren totes les modificacions fetes a la base de dades. 
-      Aquest registre permet a Oracle <strong>recuperar les dades en cas de fallada</strong> abans que les dades siguin escrites definitivament als fitxers de dades.
-    </p>
-  
-    <h3>🔁 Funcionament cíclic</h3>
-    <p>
-      Oracle utilitza un conjunt de fitxers redo log en mode circular (anells). Quan un fitxer es plena, s’escriu al següent. 
-      Quan es completa un cicle, torna a començar pel primer.
-    </p>
-  
-    <p>Com més grups de redo logs tinguis, més eficiència i seguretat ofereix el sistema.</p>
-  
-    <h3> Estructura típica</h3>
-    <p>Una instància pot tenir múltiples grups de redo logs, cadascun amb un o més membres (fitxers físics replicats):</p>
-    <pre>
-  GROUP 1 → redo01.log
-  GROUP 2 → redo02.log
-  GROUP 3 → redo03.log
-    </pre>
-  
-    <h3>📍 Ubicació típica dels redo logs</h3>
-    <pre>/opt/oracle/oradata/NOM_BBDD/redo0X.log</pre>
-    <p>(Es defineix durant la creació de la base de dades amb <code>DBCA</code>)</p>
-  
-    <h3>🔍 Consultar els redo logs</h3>
-    <pre>
-  SQL> SELECT group#, member FROM v$logfile;
-  
-  SQL> SELECT group#, status, archived FROM v$log;
-    </pre>
-  
-    <h3> Afegir un nou grup de redo logs</h3>
-    <pre>
-  SQL> ALTER DATABASE ADD LOGFILE GROUP 4 
-  ('/opt/oracle/oradata/NOM_BBDD/redo04.log') SIZE 50M;
-    </pre>
-  
-    <h3> Afegir un membre (fitxer addicional) a un grup existent</h3>
-    <pre>
-  SQL> ALTER DATABASE ADD LOGFILE MEMBER 
-  '/opt/oracle/oradata/NOM_BBDD/redo01b.log' TO GROUP 1;
-    </pre>
-  
-    <h3> Bones pràctiques</h3>
-    <ul>
-      <li> Tenir almenys 3 grups de redo logs</li>
-      <li> Tenir més d’un membre per grup (redundància)</li>
-      <li> Els redo logs han d’estar en discos ràpids i fiables</li>
-      <li> No compartir físicament el disc dels redo logs amb altres fitxers crítics</li>
-    </ul>
-  
-    <h3> En cas d’error amb els redo logs</h3>
-    <p>Poden impedir l’inici de la base de dades. Per exemple, si s’esborra un fitxer o falla un disc.</p>
-    <p>Es pot fer servir una ordre com:</p>
-    <pre>SQL> ALTER DATABASE CLEAR UNARCHIVED LOGFILE GROUP 1;</pre>
-    <p>⚠️ <strong>Només per a casos d’emergència!</strong></p>
+
+  <section id="altres-recursos">
+    <h2>Tablespaces i Datafiless</h2>
+       <a href="https://github.com/EnriqueIborra/ASGBD/blob/main/UD2/ASGBD-UD2.2%20Tablespaces%20i%20datafiles_simple.pdf">link</a> 
+    <h2>Ús d'sqlplus</h2>
+    <a href="https://github.com/EnriqueIborra/ASGBD/blob/main/UD2/ASGBD-UD2.4%20Us%20d%20sqlplus.pdf" target="_blank">link</a>
   </section>
-  
+
 
 
 </main>
