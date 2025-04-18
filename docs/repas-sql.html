@@ -20,10 +20,10 @@
   <a href="#dades-tipus">Dades</a>
   <a href="#taula">Taula</a>
   <a href="#crud">CRUD</a>
-  <a href="#create"> --> C create</a>
-  <a href="#read"> -->  R read</a>
-  <a href="#update"> -->  U update</a>
-  <a href="#delete"> -->  D delete</a>
+  <a href="#create"> &emsp; C create</a>
+  <a href="#read">   &emsp; R read</a>
+  <a href="#update"> &emsp; U update</a>
+  <a href="#delete"> &emsp; D delete</a>
   <a href="#modifica-taula">Modifica taula</a>
   <a href="#condicions">Condicions</a>
   <a href="#normalitzacio">Normalització</a>
@@ -97,27 +97,50 @@
     <p>Una <strong>variable</strong> representa un contenidor o un espai en la memòria física o virtual d'una computadora, 
         on s'emmagatzemen diferents tipus de dades (valors) durant l'execució d'un programa. A cada variable
          se li assigna un nom descriptiu o un identificador que es refereix al valor guarda</p>
-    <p>Una <strong>taula</strong> és una estructura organitzada que s’utilitza per emmagatzemar dades en una base de dades. Està formada per
+    <p>Una <strong>taula</strong> és una estructura organitzada que s’utilitza per emmagatzemar dades en una base de dades. 
+      Està formada per
          files (o registres) i columnes (o camps) i té un nom per a referir-se a ella</p>  
-
-    <p>La taula ALUMNES és pot representar com un fitxer amb fitxes, on cada fitxa es un alumne, i cada fitxa te la mateixa
-         estructura ( id, nom, cognoms, curs, edat)</p>     
 
     <h3> Taules i registres</h3>
     <ul>
-    <li> Una <strong>taula</strong> és com una fulla de càlcul: cada columna representa una propietat, i cada fila un element del món real (ex: un alumne, una factura...)</li>
+    <li> Una <strong>taula</strong> és com una fulla de càlcul: cada columna representa una propietat, i cada fila un element
+       del món real (ex: un alumne, una factura...)</li>
     <li> Una <strong>columna</strong> té un nom i un tipus de dada</li>
     <li> Una <strong>fila</strong> és un registre que conté un valor per a cada columna</li>
     </ul>
+    <h4> En un esquema relacional</h4>
+    <ul>
+      <li> Cada <strong>taula</strong> representa una entitat (per exemple: clients, productes, treballadors)</li>
+      <li> Cada <strong>columna</strong> representa un camp / atribut de la taula, li dona nom als valors que després s'emmagatzemen</li>      
+      &emsp;&emsp;***fins ací encara no hem posat dades, sols estructura.
+      <li> Cada <strong>fila</strong> representa un registre / element d'eixa entitat</li>
+      <li> Cada <strong>cel·la</strong> guarda una dada d'informació d'una fila / element </li>
+      </ul>
+       
 
     <h3> Exemple de taula "alumnes"</h3>
     <table border="1">
-    <thead><tr><th>ID</th><th>Nom</th><th>Edat</th></tr></thead>
+    <thead><tr><th>ID</th><th>Nom</th><th>Edat</th><th>Curs</th></tr></thead>
     <tbody>
-        <tr><td>1</td><td>Joan</td><td>20</td></tr>
-        <tr><td>2</td><td>Laia</td><td>21</td></tr>
+        <tr><td>1</td><td>Julia</td><td>19<td>2n ASIX</td></tr>
+        <tr><td>2</td><td>Marc</td><td>18</td><td>1r ASIX</td></tr>
+        <tr><td>3</td><td>Laia</td><td>16</td><td>1r SMX</td></tr>
+        <tr><td>4</td><td>Pau</td><td>15</td><td>1r SMX</td></tr>
     </tbody>
     </table>     
+
+    <img src="imgs/fitxer-taula.png" class="imatge-esquerra" alt="fitxer-fitxes" style="width: 20%">
+    <p> La <strong>taula</strong> ALUMNES és pot representar com un fitxer amb fitxes, on cada fitxa es un alumne,
+       i cada fitxa te la mateixa estructura ( id, nom, cognoms, curs, edat)     </p>
+       <code>Una fitxa del fitxer correspon amb una fila ( registre ) de la taula</code>
+
+       <table border="1">
+        <tbody>
+            <tr><td>2</td><td>Marc</td><td>18</td><td>1r ASIX</td></tr>
+        </tbody>
+        </table> 
+        <p>On ID és 2, Nom és "Marc" Edat és 18  Curs és "1r ASIX"</p>
+       <br><br>
 
   </section>
   
@@ -126,7 +149,7 @@
   
   <section id="crud">
    
-<h2>que es el CRUD</h2>
+<h2>Què és el CRUD</h2>
 <p> El terme CRUD és un acrònim que fa referència a les quatre operacions bàsiques que es realitzen en bases de dades 
     i sistemes de gestió d'informació:</p>
 <ul>
@@ -158,7 +181,8 @@
 CREATE TABLE alumnes (
    id NUMBER(3),
    nom VARCHAR2(30),
-   edat NUMBER(2)
+   edat NUMBER(2),
+   curs VARCHAR2(10)
 );   </pre>
 
   <h3> Restriccions comunes</h3>
@@ -176,10 +200,13 @@ CREATE TABLE alumnes (
 CREATE TABLE alumnes (
    id NUMBER(3) PRIMARY KEY,
    nom VARCHAR2(30) NOT NULL,
-   edat NUMBER(2) DEFAULT 18 CHECK (edat >= 16)
+   edat NUMBER(2) DEFAULT 18 CHECK (edat >= 16),
+   curs VARCHAR2(10)
 );
   </pre>
-  
+  <table border="1">      <thead><tr><th>ID</th><th>Nom</th><th>Edat</th><th>Curs</th></tr></thead>      </table>  
+  <p>Però una cosa és crear una taula (estructura), la qual es crea buida, 
+    i una altra cosa és posar dades dins de la taula, omplir la taula amb dades</p>
   <!-- insertar dades en una taula -->
 
     <h2> Omplir una taula: <code>INSERT INTO</code></h2>
@@ -198,14 +225,15 @@ CREATE TABLE alumnes (
   
     <h4> Exemple bàsic</h4>
     <pre>
-  INSERT INTO alumnes (id, nom, edat)
-  VALUES (1, 'Joan', 20);
+  INSERT INTO alumnes (id, nom, edat, curs)
+  VALUES (1, 'Julia', 19, '2n ASIX');
     </pre>
   
     <h4> Exemple sense especificar columnes (no recomanat)</h4>
     <pre>
   INSERT INTO alumnes
-  VALUES (2, 'Laia', 21);
+  VALUES (2, 'Marc', 18 '1r ASIX');
+  //  Funciona, però no es recomana !
     </pre>
     <p><strong>⚠️ Compte:</strong> s’ha de respectar l’ordre de les columnes definides en la taula.</p>
   
@@ -216,15 +244,7 @@ CREATE TABLE alumnes (
       <li> Respecta les restriccions: <code>NOT NULL</code>, <code>CHECK</code>, <code>FOREIGN KEY</code>...</li>
     </ul>
   
-    <h3>📦 Inserir múltiples files (Oracle 12c+ o amb <code>INSERT ALL</code>)</h3>
-    <pre>
-  INSERT ALL
-    INTO alumnes (id, nom, edat) VALUES (3, 'Marc', 19)
-    INTO alumnes (id, nom, edat) VALUES (4, 'Anna', 22)
-  SELECT * FROM dual;
-    </pre>
-  
-    <h3> Exemple complet amb valors per defecte</h3>
+    <h3> Exemple amb valors per defecte</h3>
     <p>Suposem que la taula <code>alumnes</code> té un valor per defecte d’edat = 18:</p>
     <pre>
   CREATE TABLE alumnes (
@@ -300,8 +320,11 @@ SELECT * FROM alumnes WHERE nom LIKE 'L%';     -- noms que comencen amb L
 SELECT * FROM alumnes WHERE edat BETWEEN 18 AND 21;
 SELECT * FROM alumnes WHERE id_curs IN (1, 2, 3);
   </pre>
+  <p> Als operadors <code>LIKE, IN, BETWEEN</code> també se'ls anomena <strong>predicats</strong>. 
+    I altres són <code>IS NULL, EXISTS, ALL, ANY</code></p>
 
     </section>
+
 
   <section id="delete">
   <!-- esborrar files d una taula -->
@@ -333,28 +356,11 @@ WHERE edat &lt; 18;
   <pre>
 -- ⚠️ Elimina totes les files!
 DELETE FROM alumnes;
+
+TRUNCATE TABLE alumnes;  
+// És equivalent i més eficient si el que volem és esborrar totes les files
+/// La taula quedarà buida, però la estructura encara existeix en la BBDD
   </pre>
-
-  <p><strong>Recomanació:</strong> abans d’un DELETE, comprova les files afectades amb un <code>SELECT</code>:</p>
-
-  <pre>
-SELECT * FROM alumnes WHERE edat &lt; 18;
-DELETE FROM alumnes WHERE edat &lt; 18;
-  </pre>
-
-  <h3> Control de seguretat amb claus foranes</h3>
-  <p>
-    Si una fila està relacionada amb una altra taula mitjançant una <code>FOREIGN KEY</code>, pot ser que el DELETE <strong>no es permeti</strong> (error de restricció), 
-    a menys que estigui configurada l’opció <code>ON DELETE CASCADE</code>.
-  </p>
-
-  <h4>Exemple amb relació:</h4>
-  <pre>
--- alumnes té una clau forana cap a cursos
-DELETE FROM cursos WHERE id = 1;  -- error si hi ha alumnes vinculats
-  </pre>
-
-  <p>Amb <code>ON DELETE CASCADE</code>, també s’eliminarien automàticament els alumnes del curs 1.</p>
 
   <h3> Comparació amb <code>TRUNCATE</code></h3>
   <table border="1">
@@ -380,14 +386,27 @@ DELETE FROM cursos WHERE id = 1;  -- error si hi ha alumnes vinculats
     </tr>
   </table>
 
-  <h3> Exemple final</h3>
-  <pre>
--- Mostrar alumnes del curs 3
-SELECT * FROM alumnes WHERE id_curs = 3;
+  <p><strong>Recomanació:</strong> abans d’un DELETE, comprova les files afectades amb un <code>SELECT</code>:</p>
 
--- Esborrar-los
-DELETE FROM alumnes WHERE id_curs = 3;
+  <pre>
+SELECT * FROM alumnes WHERE edat &lt; 18;
+DELETE FROM alumnes WHERE edat &lt; 18;
   </pre>
+
+  <h3> Control de seguretat amb claus foranes</h3>
+  <p>** Per entendre millor este cas pot ser convenient mirar el apartat de "Normalització" primer</p>
+  <p>
+    Si una fila està relacionada amb una altra taula mitjançant una <code>FOREIGN KEY</code>, pot ser que el DELETE <strong>no es permeti</strong> (error de restricció), 
+    a menys que estigui configurada l’opció <code>ON DELETE CASCADE</code>.
+  </p>
+
+  <h4>Exemple amb relació:</h4>
+  <pre> 
+-- alumnes té una clau forana cap a cursos
+DELETE FROM cursos WHERE id = 1;  -- error si hi ha alumnes vinculats
+  </pre>
+
+  <p>Amb <code>ON DELETE CASCADE</code>, també s’eliminarien automàticament els alumnes del curs 1.</p>
 
   <h3> Bones pràctiques</h3>
   <ul>
@@ -578,6 +597,7 @@ ROLLBACK; -- Desfem el canvi
 
 
     <!-- esborrar columna d'una taula-->
+     <h2>&nbsp;</h2>
     <h2>🗑️ Esborrar una columna d’una taula: <code>ALTER TABLE ... DROP COLUMN</code></h2>
 
     <h3>📘 Quan cal esborrar una columna?</h3>
@@ -729,7 +749,35 @@ ROLLBACK; -- Desfem el canvi
         * 1 CURS, 1 curs, 1er curs, ...
         Cal normalitzar. 
     </pre>
-   
+    <p>Per exemple, en la següent taula</p>
+    <table border="1">
+      <thead><tr><th>ID</th><th>Nom</th><th>Edat</th><th>Curs</th></tr></thead>
+      <tbody>
+          <tr><td>1</td><td>Julia</td><td>19<td>2n ASIX</td></tr>
+          <tr><td>2</td><td>Marc</td><td>18</td><td>2 ASIX</td></tr>
+          <tr><td>3</td><td>Laia</td><td>16</td><td>2on ASIX</td></tr>
+          <tr><td>4</td><td>Pau</td><td>15</td><td>2n ASIR</td></tr>
+      </tbody>
+      </table> 
+   <p>Tots els alumnes estan en el mateix curs, però el nom del curs és diferent en cadascuna de les files</p>
+   <p>Si es fa una consulta filtrant pel curs</p>
+   <pre>  SELECT * FROM ALUMNES WHERE curs='2n ASIX'  </pre>
+   <p>¡¡  Sols eixirà <strong>un</strong> alumne !!</p>
+   <img src="imgs/normalitzacio1.png" class="imatge-esquerra" alt="fitxer-fitxes" style="width: 30%">
+   <h3>CAL NORMALITZAR</h3>
+  <table border="1">
+    <thead><tr><th>ID-curs</th><th>NomCurs</th></thead>    <tbody>
+        <tr><td>10</td><td>1r ASIX</td></tr>
+        <tr><td>20</td><td>2n ASIX</td></tr>
+    </tbody>      </table> 
+    <table border="1">
+      <thead><tr><th>ID-alu</th><th>Nom</th><th>Edat</th><th>Curs</th></tr></thead>        <tbody>
+          <tr><td>1</td><td>Julia</td><td>19<td>20</td></tr>
+          <tr><td>2</td><td>Marc</td><td>18</td><td>20</td></tr>
+          <tr><td>3</td><td>Laia</td><td>16</td><td>20</td></tr>
+          <tr><td>4</td><td>Pau</td><td>15</td><td>10</td></tr>
+      </tbody>        </table> 
+
   </section>
 
   
