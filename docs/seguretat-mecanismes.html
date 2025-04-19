@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>🔒 Seguretat Oracle</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+
+</head>
+<body>
+
+<header>
+  <a href="index.html">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo">
+</a>
+  <h1>ASGBD   -    Mecanismes de Seguretat</h1>
+</header>
+
+<nav>
+  <h3>Índex</h3>
+  <a href="#encripta">Encriptació en  ORACLE</a>
+  <a href="#auditoria">Auditoria en ORACLE</a>
+  <a href="#integritat">Integritat</a>
+  <a href="#transaccions">Transaccions (TCL)</a>
+  <a href="#backups">Backups</a>
+  <a href="#normativa-vigent">Normativa vigent</a>
+  <a href="#altres-recursos">Altres Recursos</a>
+</nav>
+
+<main>
+     
+    <section id="encripta">
+    <h2>🔐 Encriptació en Oracle</h2>
+
+    <h3> Què és i per què encriptar?</h3>
+    <p>L’encriptació converteix dades llegibles en format codificat (xifrat) que només pot ser desxifrat amb una clau. És essencial per protegir informació sensible.</p>
+
+    <h4> Raons per aplicar encriptació:</h4>
+    <ul>
+        <li>Protecció de dades sensibles (DNI, contrasenyes...)</li>
+        <li>Evitar robatori de dades en cas d’atac o accés indegut</li>
+        <li>Compliment legal (RGPD, LOPDGDD)</li>
+        <li>Requisits de seguretat corporativa o governamental (CCN-CERT)</li>
+    </ul>
+
+    <h4>⚠️ Possibles inconvenients:</h4>
+    <ul>
+        <li>Rendiment reduït si s’usa massivament</li>
+        <li>Augment de complexitat en la gestió</li>
+        <li>Pot limitar compatibilitats amb aplicacions</li>
+    </ul>
+
+    <h3>🛠️ Tipus d’encriptació a Oracle</h3>
+    <ul>
+        <li><strong>Manual amb DBMS_CRYPTO</strong>: per programadors o xifrat personalitzat</li>
+        <li><strong>TDE (Transparent Data Encryption)</strong>: xifrat automàtic per columnes o tablespaces</li>
+    </ul>
+
+    <h3> DBMS_CRYPTO (manual)</h3>
+    <p>Paquet per fer xifrat, hash i autenticació.</p>
+    <ul>
+        <li><code>DBMS_CRYPTO.ENCRYPT()</code> / <code>DECRYPT()</code></li>
+        <li><code>DBMS_CRYPTO.HASH()</code></li>
+        <li><code>DBMS_CRYPTO.MAC()</code></li>
+    </ul>
+
+    <h4> Exemple: fer un hash SHA-1 d’una contrasenya</h4>
+    <pre>
+    SELECT DBMS_CRYPTO.HASH(
+    UTL_I18N.STRING_TO_RAW('contrasenya', 'AL32UTF8'), 
+    1) 
+    FROM dual;
+    </pre>
+
+    <p>També es pot fer servir <code>UTL_ENCODE.BASE64_ENCODE</code> per codificació (no segura).</p>
+
+    <h4> Convertir entre formats:</h4>
+    <ul>
+        <li><code>UTL_I18N.STRING_TO_RAW</code> → text a RAW</li>
+        <li><code>RAWTOHEX</code> → RAW a hexadecimal</li>
+        <li><code>UTL_I18N.RAW_TO_CHAR</code> → RAW a text</li>
+    </ul>
+
+    <h3>💾 TDE – Transparent Data Encryption</h3>
+    <p>Xifrat automàtic a nivell de disc. No cal modificar el codi de les aplicacions.</p>
+
+    <h4> Components:</h4>
+    <ul>
+        <li><strong>TDE Master Key</strong> → clau mestra</li>
+        <li><strong>Keystore (Wallet)</strong> → arxiu amb claus</li>
+        <li><strong>Column / Tablespace Keys</strong> → claus específiques</li>
+    </ul>
+
+    <h4>🔁 Modalitats:</h4>
+    <ul>
+        <li><strong>Column-level TDE</strong>: només algunes columnes</li>
+        <li><strong>Tablespace-level TDE</strong>: totes les dades dins l’espai de taules</li>
+    </ul>
+
+    <h3>📦 Exemple pràctic amb <code>DBMS_CRYPTO.ENCRYPT</code></h3>
+    <pre>
+    DECLARE
+    text_original VARCHAR2(100) := 'Hola món!';
+    text_raw RAW(2000);
+    clau RAW(32) := UTL_I18N.STRING_TO_RAW('clausecreta', 'AL32UTF8');
+    text_xifrat RAW(2000);
+    BEGIN
+    text_raw := UTL_I18N.STRING_TO_RAW(text_original, 'AL32UTF8');
+    text_xifrat := DBMS_CRYPTO.ENCRYPT(
+        text_raw,
+        DBMS_CRYPTO.ENCRYPT_AES256 + DBMS_CRYPTO.CHAIN_CBC,
+        clau);
+    DBMS_OUTPUT.PUT_LINE(RAWTOHEX(text_xifrat));
+    END;
+    </pre>
+
+    <h3> Bones pràctiques</h3>
+    <ul>
+        <li>Xifra només les dades sensibles</li>
+        <li>Evita BASE64 o ROT13 per contrasenyes</li>
+        <li>Usa funcions <code>HASH()</code> per emmagatzemar contrasenyes</li>
+        <li>Gestiona la keystore amb seguretat</li>
+        <li>Audita l’accés a dades xifrades</li>
+    </ul>
+
+    <h3> Conclusió</h3>
+    <p>L’encriptació és essencial per a la protecció de dades en entorns reals i és un requisit legal i de bones pràctiques. Oracle ofereix solucions potents com TDE i DBMS_CRYPTO que cobreixen necessitats tècniques i legals.</p>
+
+    <blockquote>
+        🔐 Una bona gestió de claus, un ús moderat del xifrat i l’auditoria d’accés són claus per garantir seguretat real.
+    </blockquote>
+    </section>
+         
+
+    <section id="auditoria">
+        <h2>🕵️ Auditoria en Oracle</h2>
+      
+        <h3>📘 Què és una auditoria?</h3>
+        <p>
+          L’auditoria és una funcionalitat dels sistemes gestors de bases de dades que permet <strong>registrar i controlar l’activitat dels usuaris</strong>.
+          És especialment útil per motius de seguretat, detecció d’errors, traçabilitat i compliment normatiu (ex. RGPD).
+        </p>
+      
+        <h3>🎯 Objectius de l’auditoria</h3>
+        <ul>
+          <li> Detectar accions no autoritzades</li>
+          <li> Rastrejar canvis o accés a dades sensibles</li>
+          <li> Monitorar l’activitat d’usuaris privilegiats</li>
+          <li> Complir amb auditories internes o externes</li>
+        </ul>
+      
+        <h3>⚙️ Tipus d’auditoria en Oracle</h3>
+        <ul>
+          <li><strong>Estàndard (traditional)</strong>: basada en ordres com <code>AUDIT</code></li>
+          <li><strong>Auditoria unificada (Unified Audit)</strong>: disponible des d’Oracle 12c</li>
+        </ul>
+      
+        <h4>🔎 Diferències:</h4>
+        <table border="1">
+          <thead><tr><th>Característica</th><th>Estàndard</th><th>Unificada</th></tr></thead>
+          <tbody>
+            <tr><td>Implementació</td><td>Bases separades (AUD$)</td><td>Totes les auditories integrades</td></tr>
+            <tr><td>Activa per defecte</td><td>No</td><td>Sí, des de 12c</td></tr>
+            <tr><td>Control granular</td><td>Limitat</td><td>Molt flexible</td></tr>
+            <tr><td>Millor rendiment</td><td>No</td><td>Sí</td></tr>
+          </tbody>
+        </table>
+      
+        <h3>🛠️ Activar auditoria estàndard</h3>
+        <pre>
+      -- Activar l’auditoria global
+      AUDIT TRAIL;
+        </pre>
+        <p>
+          S’ha de configurar el paràmetre:
+          <code>audit_trail = DB</code> al fitxer d’inici <code>init.ora</code> o via <code>ALTER SYSTEM</code>
+        </p>
+      
+        <h3> Exemples de comandes <code>AUDIT</code></h3>
+        <pre>
+      -- Audita l’accés a taula
+      AUDIT SELECT ON alumnes;
+      
+      -- Audita connexions fallides
+      AUDIT SESSION WHENEVER NOT SUCCESSFUL;
+      
+      -- Audita qualsevol modificació de taula
+      AUDIT INSERT, UPDATE, DELETE ON alumnes;
+        </pre>
+      
+        <h3> Consultar resultats d’auditoria</h3>
+        <ul>
+          <li><code>DBA_AUDIT_TRAIL</code>: accés general</li>
+          <li><code>USER_AUDIT_TRAIL</code>: accés només al propi esquema</li>
+          <li><code>DBA_COMMON_AUDIT_TRAIL</code>: auditories unificades</li>
+        </ul>
+      
+        <pre>
+      SELECT username, action_name, obj_name, timestamp
+      FROM dba_audit_trail
+      WHERE obj_name = 'ALUMNES';
+        </pre>
+      
+        <h3>🧹 Esborrar o buidar resultats (amb compte!)</h3>
+        <pre>
+      DELETE FROM sys.aud$ WHERE obj$name = 'ALUMNES';
+      -- o
+      TRUNCATE TABLE sys.aud$;
+        </pre>
+      
+        <h3> Unified Audit (Oracle 12c+)</h3>
+        <p>
+          Unifica tots els registres d’auditoria: privilegis, ordres, errors, logons...  
+          S’activa amb <code>ENABLE_UNIFIED_AUDIT = TRUE</code> al paràmetre de sistema.
+        </p>
+      
+        <h4>Exemple de política unificada:</h4>
+        <pre>
+      CREATE AUDIT POLICY acces_alumnes
+        ACTIONS SELECT ON alumnes;
+      
+      AUDIT POLICY acces_alumnes;
+        </pre>
+      
+        <h3>📦 Vistes d’auditoria unificada</h3>
+        <ul>
+          <li><code>UNIFIED_AUDIT_TRAIL</code></li>
+          <li><code>DBA_AUDIT_POLICIES</code></li>
+          <li><code>DBA_OBJ_AUDIT_OPTS</code></li>
+        </ul>
+      
+        <h3> Consells de seguretat i gestió</h3>
+        <ul>
+          <li> Activa l’auditoria per accions sensibles (login, esborrar, canviar permisos)</li>
+          <li> Revisa regularment els registres d’auditoria</li>
+          <li> No deixis l’auditoria oberta en producció sense revisar l’espai</li>
+          <li> Automatitza l’anàlisi amb scripts o informes</li>
+        </ul>
+      
+        <h3> Conclusió</h3>
+        <p>
+          L’auditoria és una eina potent per a la seguretat i el control de bases de dades Oracle.  
+          Permet identificar comportaments sospitosos, controlar accés no autoritzat i mantenir la traçabilitat de les operacions.
+          A més, és una pràctica recomanada per normatives legals i de qualitat.
+        </p>
+      </section>
+      
+      <section id="exercici-auditoria">
+        <h2>🧪 Exercici interactiu de simulació d’auditoria Oracle</h2>
+        <p>Introdueix comandes d’auditoria o consultes per veure què s’hauria registrat.</p>
+      
+        <textarea id="inputSQL" rows="5" style="width: 100%;" placeholder="Escriu una comanda, ex:
+      AUDIT SELECT ON alumnes;
+      SELECT * FROM dba_audit_trail WHERE obj_name = 'ALUMNES';"></textarea>
+      
+        <button onclick="executarSimulacio()">Executar</button>
+      
+        <div id="resultatSimulacio" style="margin-top: 20px; background: #f4f4f4; padding: 1rem; border-radius: 6px;"></div>
+      
+        <script>
+          const auditories = [];
+      
+          function executarSimulacio() {
+            const entrada = document.getElementById('inputSQL').value.trim().toUpperCase();
+            const output = document.getElementById('resultatSimulacio');
+            let resposta = "";
+      
+            if (entrada.startsWith("AUDIT ")) {
+              const accio = entrada.replace("AUDIT", "").trim();
+              auditories.push({
+                accio: accio,
+                usuari: "USUARI1",
+                objecte: accio.includes("ON") ? accio.split("ON")[1].trim() : "GLOBAL",
+                timestamp: new Date().toLocaleString()
+              });
+              resposta = `<b>✅ Auditoria activada correctament:</b> <code>${accio}</code>`;
+            } else if (entrada.startsWith("SELECT") && entrada.includes("DBA_AUDIT_TRAIL")) {
+              if (auditories.length === 0) {
+                resposta = "📭 No s'ha registrat cap acció encara.";
+              } else {
+                resposta = "<table border='1' cellpadding='6'><thead><tr><th>Usuari</th><th>Acció</th><th>Objecte</th><th>Hora</th></tr></thead><tbody>";
+                auditories.forEach(a =>
+                  resposta += `<tr><td>${a.usuari}</td><td>${a.accio}</td><td>${a.objecte}</td><td>${a.timestamp}</td></tr>`
+                );
+                resposta += "</tbody></table>";
+              }
+            } else {
+              resposta = "⚠️ Comanda no reconeguda. Pots usar <code>AUDIT ...</code> o <code>SELECT * FROM DBA_AUDIT_TRAIL</code>.";
+            }
+      
+            output.innerHTML = resposta;
+          }
+        </script>
+      </section>
+      
+
+      <section id="integritat">
+        <h2>🧬 Integritat en bases de dades Oracle</h2>
+      
+        <h3>📘 Què és la integritat?</h3>
+        <p>
+          La <strong>integritat</strong> d’una base de dades fa referència al conjunt de normes i restriccions que garanteixen que les dades emmagatzemades siguen <strong>coherents, correctes i fiables</strong>.
+          Aquesta integritat és fonamental per garantir la <strong>qualitat de la informació</strong> i el correcte funcionament de les aplicacions que la utilitzen.
+        </p>
+      
+        <h3> Tipus d’integritat</h3>
+        <ul>
+          <li><strong>Integritat d’entitat</strong> → cada fila ha de ser identificable de forma única (clau primària)</li>
+          <li><strong>Integritat referencial</strong> → assegura la coherència entre taules relacionades (claus foranes)</li>
+          <li><strong>Integritat de domini</strong> → les dades han de complir certs valors o formats (tipus de dades, CHECK...)</li>
+          <li><strong>Integritat d’usuari</strong> → validacions aplicacionals o de negoci imposades per l'usuari o aplicació</li>
+        </ul>
+      
+        <h3> Integritat d'entitat</h3>
+        <p>
+          Es garanteix mitjançant l’ús de <code>PRIMARY KEY</code>, que assegura que cada fila sigui única i no nul·la.
+        </p>
+        <pre>
+      CREATE TABLE alumnes (
+        id NUMBER PRIMARY KEY,
+        nom VARCHAR2(50)
+      );
+        </pre>
+      
+        <h3> Integritat referencial</h3>
+        <p>
+          Manté la coherència entre dues taules relacionades mitjançant una <code>FOREIGN KEY</code>.  
+          Evita que una fila faci referència a un valor inexistent.
+        </p>
+        <pre>
+      CREATE TABLE cursos (
+        id NUMBER PRIMARY KEY,
+        nom VARCHAR2(50)
+      );
+      
+      CREATE TABLE alumnes (
+        id NUMBER PRIMARY KEY,
+        nom VARCHAR2(50),
+        id_curs NUMBER,
+        FOREIGN KEY (id_curs) REFERENCES cursos(id)
+      );
+        </pre>
+      
+        <p>Amb això, no es pot assignar un <code>id_curs</code> a un alumne que no existeixi a la taula <code>cursos</code>.</p>
+      
+        <h3> Integritat de domini</h3>
+        <p>
+          Limita els valors permesos en una columna. Es pot implementar amb tipus de dades, restriccions <code>NOT NULL</code>, <code>CHECK</code> o <code>DEFAULT</code>.
+        </p>
+      
+        <pre>
+      CREATE TABLE alumnes (
+        id NUMBER PRIMARY KEY,
+        nom VARCHAR2(50) NOT NULL,
+        edat NUMBER CHECK (edat >= 16),
+        pais VARCHAR2(30) DEFAULT 'Espanya'
+      );
+        </pre>
+      
+        <p>
+          Això garanteix que <code>nom</code> sempre tindrà valor, <code>edat</code> sigui ≥ 16 i <code>pais</code> tindrà un valor per defecte.
+        </p>
+      
+        <h3> Integritat d’usuari</h3>
+        <p>
+          No s’implementa a nivell de base de dades, sinó via aplicacions o triggers. Controla normes específiques com:
+        </p>
+        <ul>
+          <li>Un usuari no pot tenir dues reserves actives</li>
+          <li>Els horaris d’una aula no poden solapar-se</li>
+        </ul>
+      
+        <p>
+          Aquest tipus d’integritat sovint es basa en <code>PL/SQL</code> o lògica de negoci a l’aplicació.
+        </p>
+      
+        <h3> Conclusió</h3>
+        <p>
+          Mantenir la integritat de les dades és essencial per garantir que el sistema sigui <strong>fiable, coherent i funcional</strong>.  
+          Oracle ofereix múltiples mecanismes per implementar integritat a nivell físic, lògic i d’aplicació.
+        </p>
+      
+        <blockquote>
+          🔐 “La seguretat comença amb la confiança en les dades. I la confiança es construeix amb integritat.”
+        </blockquote>
+      </section>
+      
+
+      <section id="transaccions">
+        <h2> Transaccions en Oracle</h2>
+      
+        <h3>📘 Què és una transacció?</h3>
+        <p>
+          Una <strong>transacció</strong> és una seqüència d’operacions SQL (normalment de manipulació de dades: <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>) que es tracten com una <strong>unitat indivisible de treball</strong>.
+          L’objectiu d’una transacció és assegurar que les dades es mantinguin <strong>coherents</strong> i <strong>integrades</strong>.
+        </p>
+        <p>Una transacció, o es fa tota o no es fa res, però no pot en cap cas quedar a mitges, una part feta i una altra no.</p>
+        <p>Totes les operacions que en formen part han de completar-se correctament. Si alguna falla, cap de les altres no ha de tenir efecte.</p>
+
+        <h3> Propietats d’una transacció (ACID)</h3>
+        <ul>
+          <li><strong>Atomicitat:</strong> totes les operacions s’executen o cap (tot o res)</li>
+          <li><strong>Consistència:</strong> deixa la BD en un estat vàlid després de completar-se</li>
+          <li><strong>Aïllament:</strong> cada transacció s’executa com si fos l’única</li>
+          <li><strong>Durabilitat:</strong> un cop feta la transacció, els canvis són permanents</li>
+        </ul>
+      
+        <h3> Ordres bàsiques de control de transaccions</h3>
+      
+        <h4> <code>COMMIT</code></h4>
+        <p>
+          Fa permanents tots els canvis realitzats en la transacció. No es poden desfer després.
+        </p>
+        <pre>
+      INSERT INTO alumnes VALUES (10, 'Joan', 20);
+      COMMIT;
+        </pre>
+      
+        <h4> <code>ROLLBACK</code></h4>
+        <p>
+          Desfà tots els canvis realitzats des del darrer <code>COMMIT</code>. Torna l’estat de la BD a com estava abans.
+        </p>
+        <pre>
+      UPDATE alumnes SET edat = 30 WHERE id = 10;
+      ROLLBACK; -- Anul·la l'actualització
+        </pre>
+      
+        <h4> <code>SAVEPOINT</code></h4>
+        <p>
+          Permet definir punts intermedis dins d’una transacció per fer <code>ROLLBACK</code> parcial.
+        </p>
+        <pre>
+      SAVEPOINT punt1;
+      DELETE FROM alumnes WHERE edat &lt; 18;
+      
+      SAVEPOINT punt2;
+      UPDATE alumnes SET nom = 'Anònim' WHERE edat &gt; 25;
+      
+      ROLLBACK TO punt1; -- desfà només fins al punt1
+        </pre>
+      
+        <h3> Transaccions automàtiques i manuals</h3>
+        <ul>
+          <li>En entorns interactius (SQL*Plus, Oracle SQL Developer), cada comanda és una transacció si s’executa amb <code>AUTOCOMMIT</code>.</li>
+          <li>En entorns de producció, es recomana el control manual mitjançant blocs <code>BEGIN</code> ... <code>END</code>.</li>
+        </ul>
+      
+        <h3> Consells pràctics</h3>
+        <ul>
+          <li> Fes <code>COMMIT</code> només quan estiguis segur que la transacció ha anat bé</li>
+          <li> Utilitza <code>SAVEPOINT</code> per controlar operacions complexes</li>
+          <li> Usa <code>ROLLBACK</code> sempre que detectis un error o canvi involuntari</li>
+          <li> En entorns multiusuari, la gestió correcta de transaccions evita bloquejos i inconsistències</li>
+        </ul>
+      
+        <h3> Relació amb la seguretat</h3>
+        <p>
+          Una gestió acurada de les transaccions garanteix:
+        </p>
+        <ul>
+          <li> Traçabilitat i reversibilitat en cas d’error</li>
+          <li> Integritat davant fallades del sistema</li>
+          <li> Registre coherent en conjunció amb l’auditoria</li>
+        </ul>
+      
+        <h3> Conclusió</h3>
+        <p>
+          El control de transaccions és una eina fonamental per garantir que el sistema de base de dades sigui <strong>segur, coherent i robust</strong>.
+          Oracle proporciona instruccions clares per controlar de forma manual i segura l’execució de canvis en les dades.
+        </p>
+
+        <h3> Exemple</h3>
+        <p>Obrim 2 sessions ( en SQL*PLUS ) amb usuari1 ( dos cmd diferents)   </p>
+        <pre> 
+    En la primera sessió (1er CMD)
+    SQL> insert into prueba10 (id, nom) values (1000,’valor1 ’);
+    1 row created.
+        </pre>
+    <pre>
+    En la segon sessió  (2on cmd)    
+    SQL> select count(*) from prueba10;
+    COUNT(*)
+    ----------
+    0</pre>
+        <pre>
+    En la primera sessió (1er CMD)
+    SQL> commit;            
+        </pre>
+    <pre>
+    En la segon sessió (2on CMD)    
+    SQL> select count(*) from prueba10;
+    COUNT(*)
+    ----------
+    1
+    </pre>
+
+   </section>
+      
+
+      <section id="backups">
+        <h2>💾 Recuperació i còpies de seguretat en Oracle</h2>
+      
+        <h3> Per què cal fer còpies de seguretat?</h3>
+        <p>
+          Les còpies de seguretat són essencials per garantir la <strong>continuïtat del servei</strong> i la <strong>protecció de la informació</strong>.  
+          En cas de fallada del sistema, error humà, corrupció de dades o atacs, una bona estratègia de backup permet recuperar la base de dades sense pèrdues.
+        </p>
+      
+        <h3>🎯 Objectius d’una còpia de seguretat</h3>
+        <ul>
+          <li>Restaurar les dades després d’un error</li>
+          <li>Permetre la recuperació puntual o total</li>
+          <li>Facilitar entorns de prova o migracions</li>
+          <li>Complir normatives legals (protecció de dades)</li>
+        </ul>
+      
+        <h3> Tipus de còpies de seguretat</h3>
+        <ul>
+          <li><strong>Físiques</strong>: còpies dels fitxers físics (datafiles, control files, logs...)</li>
+          <li><strong>Lògiques</strong>: exportació d’esquemes, taules, usuaris o dades via utilitats com <code>expdp</code> i <code>impdp</code></li>
+        </ul>
+      
+        <h3> Estratègies de backup</h3>
+        <ul>
+          <li><strong>Completa:</strong> còpia total de la BD</li>
+          <li><strong>Incremental:</strong> només les dades modificades des del darrer backup</li>
+          <li><strong>Diferencial:</strong> totes les modificacions des del darrer backup complet</li>
+          <li><strong>Continuada:</strong> amb redologs i archivelogs actius</li>
+        </ul>
+      
+        <h3> Eines principals de backup en Oracle</h3>
+      
+        <h4>1. 🔄 RMAN (Recovery Manager)</h4>
+        <p>
+          Eina oficial d'Oracle per fer backups i recuperar dades. Pot treballar amb còpies incrementals, verificar integritat i automatitzar tasques.
+        </p>
+        <pre>
+      -- Exemple: backup complet
+      RMAN> BACKUP DATABASE;
+      
+      -- Backup només de la part SYSTEM
+      RMAN> BACKUP TABLESPACE system;
+      
+      -- Recuperació
+      RMAN> RESTORE DATABASE;
+      RMAN> RECOVER DATABASE;
+        </pre>
+      
+        <h4>2. 📤 Exportació i importació (Data Pump)</h4>
+        <p>
+          <code>expdp</code> i <code>impdp</code> són utilitats per exportar i importar dades de forma lògica.
+        </p>
+      
+        <pre>
+      -- Exportar tot un esquema
+      expdp usuari/password SCHEMAS=usuari DUMPFILE=export.dmp LOGFILE=export.log
+      
+      -- Importar en una altra BD
+      impdp usuari/password DUMPFILE=export.dmp LOGFILE=import.log
+        </pre>
+      
+        <h3> Arxius implicats en la recuperació</h3>
+        <ul>
+          <li><strong>Datafiles:</strong> contenen les dades</li>
+          <li><strong>Control file:</strong> descriu l'estructura de la BD</li>
+          <li><strong>Redo logs:</strong> registren tots els canvis</li>
+          <li><strong>Archivelogs:</strong> còpia dels redo logs, essencial per a recuperació completa</li>
+        </ul>
+      
+        <h3> Escenaris de recuperació</h3>
+        <ul>
+          <li> Recuperació completa: amb tots els archivelogs i datafiles</li>
+          <li> Recuperació parcial: taules, fitxers o instància</li>
+          <li> Restauració en cas de pèrdua del control file</li>
+        </ul>
+      
+        <h3> Bones pràctiques de seguretat</h3>
+        <ul>
+          <li> Programar backups regulars</li>
+          <li> Mantenir còpies en ubicacions externes</li>
+          <li> Fer proves periòdiques de recuperació</li>
+          <li> Utilitzar <code>RMAN VALIDATE</code> per comprovar integritat</li>
+          <li> Documentar el procediment de recuperació</li>
+        </ul>
+      
+        <h3>📋 Exemple de procediment bàsic amb RMAN</h3>
+        <pre>
+      -- Connexió
+      rman target /
+      
+      -- Comprovació de còpia
+      VALIDATE DATABASE;
+      
+      -- Còpia
+      BACKUP AS BACKUPSET DATABASE PLUS ARCHIVELOG;
+      
+      -- Restauració
+      RESTORE DATABASE;
+      RECOVER DATABASE;
+        </pre>
+      
+        <h3> Conclusió</h3>
+        <p>
+          Disposar d’un pla de còpies de seguretat fiable i efectiu és <strong>fonamental per garantir la seguretat i continuïtat</strong> de qualsevol sistema basat en Oracle.
+          Les eines com RMAN i Data Pump permeten adaptar-se a múltiples escenaris, i una bona estratègia de backup ha d’estar acompanyada d’una política de recuperació clara.
+        </p>
+      </section>
+      
+
+      <section id="normativa-vigent">
+        <h2>⚖️ Normativa vigent en matèria de protecció de dades</h2>
+      
+        <h3>📘 Què és la normativa de protecció de dades?</h3>
+        <p>
+          És el conjunt de lleis i regulacions que tenen com a objectiu <strong>garantir la privadesa i la seguretat de les dades personals</strong> que gestionen les empreses i organitzacions.
+          Afecta directament la gestió dels sistemes d’informació, especialment els que contenen bases de dades amb informació de persones físiques.
+        </p>
+      
+        <h3>🇪🇺 Reglament General de Protecció de Dades (RGPD)</h3>
+        <ul>
+          <li><strong>Nom complet:</strong> Reglament (UE) 2016/679 del Parlament Europeu i del Consell</li>
+          <li><strong>Aplicació:</strong> obligatòria a tots els estats membres de la Unió Europea des del 25 de maig de 2018</li>
+          <li><strong>Objectiu:</strong> protegir els drets fonamentals de les persones pel que fa al tractament de les seves dades personals</li>
+        </ul>
+      
+        <h4> Principis bàsics del RGPD</h4>
+        <ul>
+          <li> Lícit, lleial i transparent</li>
+          <li> Finalitat determinada i legítima</li>
+          <li> Minimització de dades</li>
+          <li> Exactitud</li>
+          <li> Limitació de conservació</li>
+          <li> Integritat i confidencialitat</li>
+          <li> Responsabilitat proactiva</li>
+        </ul>
+      
+        <h4>👥 Drets de les persones usuàries</h4>
+        <ul>
+          <li> Dret d’accés</li>
+          <li> Dret de rectificació</li>
+          <li> Dret de supressió (“dret a l’oblit”)</li>
+          <li> Dret d’oposició</li>
+          <li> Dret a la limitació del tractament</li>
+          <li> Dret a la portabilitat de dades</li>
+        </ul>
+      
+        <h3>🇪🇸 LOPDGDD – Llei orgànica 3/2018</h3>
+        <p>
+          A Espanya, la normativa RGPD es complementa amb la LOPDGDD:
+        </p>
+        <ul>
+          <li><strong>Nom complet:</strong> Llei Orgànica 3/2018 de Protecció de Dades Personals i garantia dels drets digitals</li>
+          <li><strong>Objectiu:</strong> adaptar el RGPD a l’ordenament jurídic espanyol i afegir drets digitals</li>
+        </ul>
+      
+        <h4> Alguns punts destacats de la LOPDGDD</h4>
+        <ul>
+          <li> Designació d’un Delegat de Protecció de Dades (DPO) en determinades entitats</li>
+          <li> Mesures de seguretat segons el risc de les dades tractades</li>
+          <li> Registre d’activitats de tractament</li>
+          <li> Avaluació d’impacte quan hi ha risc elevat</li>
+          <li> Drets digitals: educació digital, neutralitat, desconnexió laboral, etc.</li>
+        </ul>
+      
+        <h3> Obligacions tècniques relacionades amb bases de dades</h3>
+        <ul>
+          <li> Control d’accés i permisos per rols</li>
+          <li> Auditories d’accés a dades personals</li>
+          <li> Registre de canvis i transaccions</li>
+          <li> Còpies de seguretat i plans de recuperació</li>
+          <li> Encriptació de dades sensibles</li>
+        </ul>
+
+        <h3>Drets ARCO</h3>
+        <ul>
+          <li> Accés</li>
+          <li> Rectificació</li>
+          <li> Cancel·lació</li>
+          <li> Oposició</li>
+        </ul>
+
+        <h3>Paper del SGBD</h3>
+        <ul>
+            <li> Gestió d’usuaris i permisos</li>
+            <li>Sistemes de recuperació</li>
+            <li>  RI</li>
+            <li>Encriptació (informació sensible)</li>
+            <li>   Auditoria </li>
+        </ul>
+
+        <h3>Classificar informació</h3>
+            <ul>
+                <li>Nivell bàsic</li>
+                <li> Nivell mig</li>
+                <li>Nivell alt </li>
+            </ul>
+        <h4 style="color:red">Els procediments han d’estar documentats i supervisats per poder garantir el compliment de la normativa i la llei.</h4>
+      
+        <h3>📊 Sancions per incompliment</h3>
+        <p>
+          El RGPD preveu sancions de fins al <strong>4% del volum de negoci anual global</strong> o <strong>20 milions d’euros</strong>, segons quina sigui més elevada.
+        </p>
+      
+        <h3> Conclusió</h3>
+        <p>
+          Tant el <strong>RGPD</strong> com la <strong>LOPDGDD</strong> estableixen un marc normatiu estricte i necessari per protegir les dades personals.
+          A l’hora d’administrar bases de dades, cal assegurar-se que:
+        </p>
+        <ul>
+          <li>Les dades sensibles estan ben protegides</li>
+          <li>Només hi accedeix qui està autoritzat</li>
+          <li>Es poden traçar les operacions sobre dades personals</li>
+          <li>Es poden complir els drets dels usuaris</li>
+        </ul>
+      
+        <blockquote>
+          ⚖️ “Una base de dades segura no només és eficient, sinó també legalment responsable.”
+        </blockquote>
+      </section>
+            
+
+
+
+  <section id="altres-recursos">
+    <h2>Altres recursos</h2>
+    
+  </section>
+ 
+</main>
+
+<script>
+
+// Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+      //  <div class="pre-container">
+      //    <button class="copy-button">Copia Codi !</button>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+</script>
+
+</body>
+</html>

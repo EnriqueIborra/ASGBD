@@ -75,18 +75,11 @@
   > set
       </pre>
       <p>Pots modificar-les (el PATH) des de <em>Propietats del sistema → Variables d'entorn</em>.</p>
-    <p>Per vore les varibles d'entorn d'ORACLE s'ha de fer amb el (REGEDIT) i dins buscar  ORACLE_HOME  per exemple</p>
+      <img src="imgs/regedit-captura.png" class="imatge-dreta"  alt="stop" style="width: 50%">
+      <p>Per vore les varibles d'entorn d'ORACLE s'ha de fer amb el (REGEDIT) i dins buscar  ORACLE_HOME  per exemple</p>
     <p>Pots modificar-les des del <strong>Registre (regedit)</strong></p>
-  
-   
-    <h3> Bones pràctiques</h3>
-    <ul>
-      <li> Configura correctament l’entorn abans d’executar qualsevol eina com <code>sqlplus</code> o <code>dbca</code></li>
-      <li> Canvia l’ORACLE_SID segons la base de dades amb què vols treballar</li>
-      <li> Si tens més d’una base de dades, assegura’t que les variables són correctes per a cada sessió</li>
-      <li> ORACLE_BASE i ORACLE_HOME són essencials per al correcte funcionament del SGBD</li>
-    </ul>
-  
+    
+    
     <h3>🔧 Exercici pràctic suggerit</h3>
     <p>
       Comprova el valor actual del teu <code>ORACLE_SID</code>, i canvia’l a una altra instància com “<code>costera</code>” o “<code>ribera</code>”. Després obre el <strong>regedit</strong> i comprova on apunta <code>ORACLE_HOME</code>.
@@ -98,6 +91,14 @@
       <li> ORA_SID_SHUTDOWN_TIMEOUT</li>
       <li> ORA_SID_SHUTDOWNTYPE</li> </CODE>
     </ul>
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Configura correctament l’entorn abans d’executar qualsevol eina com <code>sqlplus</code> o <code>dbca</code></li>
+      <li> Canvia l’ORACLE_SID segons la base de dades amb què vols treballar</li>
+      <li> Si tens més d’una base de dades, assegura’t que les variables són correctes per a cada sessió</li>
+      <li> ORACLE_BASE i ORACLE_HOME són essencials per al correcte funcionament del SGBD</li>
+    </ul>
+  
   
 
   </section>
@@ -107,6 +108,7 @@
 
   <section id="connexions">
     <h2>Configuració de les connexions</h2>
+    <img src="imgs/port1521.png" class="imatge-dreta"  alt="stop" style="width: 30%">
     <p>⚠️⚠️ En Windows, no deixar APIPA activat. Posar IP manualment</p>
     <p>⚠️⚠️ Permetre el port 1521 en el Firewall  🛡️🧱🔥</p>
     <h3> Components clau per connectar-se a Oracle</h3>
@@ -392,9 +394,9 @@ SQL> STARTUP;
     </pre>
   
     <h3> Arrancada completa</h3>
-    <p>Per arrancar la base de dades directament a mode <code>OPEN</code>:</p>
+        <p>Per arrancar la base de dades directament a mode <code>OPEN</code>:</p>
     <pre>SQL> STARTUP;</pre>
-  
+    <img src="imgs/estats-arrancada.png" class="imatge-dreta"  alt="stop" style="width: 46%">
     <p>⚠️ Necessites rols <code>SYSDBA</code> o <code>SYSOPER</code> per fer aquesta acció.</p>
   
     <h3> Parada de la instància</h3>
@@ -462,9 +464,9 @@ SQL> STARTUP;
     <h2>Configuració de l’emmagatzematge</h2>
   
     <h3> Què és un tablespace?</h3>
-    <p>
-      Un <strong>tablespace</strong> és una unitat lògica d’emmagatzematge dins d’Oracle. Està format per un o més <strong>fitxers de dades</strong> (datafiles) que resideixen al disc i contenen les dades reals de la base de dades.
-    </p>
+        <p>  Un <strong>tablespace</strong> és una unitat lògica d’emmagatzematge dins d’Oracle. Està format per un 
+          o més <strong>fitxers de dades</strong> (datafiles) que resideixen al disc i contenen les dades reals de la base de dades.  </p>
+    <img src="imgs/tablespaces.png" class="imatge-esquerra"  alt="stop" style="width: 20%">
     <p>Cada datafile pot estar en un disc físic diferent</p>
     <p>Els usuaris guarden les seues dades en els tablespaces, com per exemple <code>USERS</code>, <code>TEMP</code>, <code>SYSTEM</code>, etc.</p>
     <p>Crear tablespaces addicionals ajuda a organitzar les aplicacions que es creen sobre la base d'esquemes</p>
@@ -675,12 +677,12 @@ SQL> STARTUP;
 
    <h3> Estructura típica</h3>
    <p>Una instància pot tenir múltiples grups de redo logs, cadascun amb un o més membres (fitxers físics replicats):</p>
-   <pre>
+      <pre>
    GROUP 1 → redo01.log
    GROUP 2 → redo02.log
    GROUP 3 → redo03.log
    </pre>
-
+   <img src="imgs/redolog.png" class="imatge-esquerra"  alt="stop" style="width: 26%">
     <p> Normalment hi ha tres fitxers Redo Log, que van rotant. Quan un es plena, pasa al següent, i quan l'últim es plena, pasa altra vegada al primer</p>
     <p>El procés de memòria LGWR s'encarrega de fer açò.</p>
     <pre>
@@ -719,6 +721,7 @@ SQL> STARTUP;
 <p>⚠️ <strong>Només per a casos d’emergència!</strong></p>
 
 <br><h3> ARCHIVELOG o  Offline Redo Log</h3>
+<img src="imgs/archivelog.png" class="imatge-esquerra"  alt="stop" style="width: 26%">
 <p>El Online Redo Log ve activat per defecte, però el Offline Redo Log ve desactivat per defecte</p>
 <p>El procés de memòria ARCH s'encarrega de portar el Offline Redo Log, també conegut com ARCHIVELOG.</p>
 <P>ARCHIVELOG guarda fora de línia els arxuis redo log que no estan actius.

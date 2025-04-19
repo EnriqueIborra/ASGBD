@@ -17,21 +17,76 @@
 
 <nav>
   <h3>Índex</h3>
+  <a href="#cid">CID en ORACLE</a>
   <a href="#usuaris">Usuaris en ORACLE</a>
+  <a href="#segusuaris">Seguretat en Usuaris</a>
   <a href="#permisos">Permisos o Privilegis</a>
   <a href="#rols">Rols en ORACLE</a>
-  <a href="#perfils">Perfils en ORACLE</a>
-  <a href="#esquemes">Esquemes externs</a>
-  <a href="#altres-recursos">Esquemes externs</a>
+  <a href="#perfils">Quotes i Perfils en ORACLE</a>
+  <a href="#vistes">Vistes com mecanisme de seguretat</a>
+  <a href="#synonym">synonym en ORACLE</a>
+  <a href="#altres-recursos">Altres Recursos</a>
+  <a href="#seguretat">2on Part - Seguretat</a>
 </nav>
 
 <main>
+
+    
+  <section id="cid">
+        <h1>La Triada CID (Confidencialitat, Integritat, Disponibilitat) en Oracle</h1>
+        <img src="imgs/CID-ciber.png" class="imatge-esquerra"  alt="stop" style="width: 20%">
+    <p>La triada CID (Confidencialitat, Integritat i Disponibilitat) és un model de seguretat fonamental per garantir la protecció de la informació en qualsevol sistema informàtic, inclòs Oracle. Aquest model es fa servir per establir les bases de les polítiques de seguretat, i Oracle, com a sistema de gestió de bases de dades (SGBD), té diverses característiques i eines que permeten implementar-lo eficaçment.</p>
+
+    <h2>1. Confidencialitat (Confidentiality)</h2>
+    <p>La confidencialitat es refereix a la protecció de la informació per evitar que sigui accedida per usuaris no autoritzats. A Oracle, això es pot aconseguir mitjançant:</p>
+    <ul>
+        <li><strong>Autenticació i control d'accés</strong>: Oracle utilitza sistemes d'autenticació com l'usuari/contrassenya per garantir que només els usuaris autoritzats puguin accedir a la base de dades.</li>
+        <li><strong>Privilegis i rols</strong>: Els rols i privilegis d'Oracle defineixen els drets d'accés de cada usuari a les dades. Els privilegis poden ser assignats a rols específics i aquests rols assignats als usuaris.</li>
+        <li><strong>Xifrat de dades (Encryption)</strong>: Oracle permet xifrar tant les dades en repòs com les dades en trànsit. La funció de xifrat de bases de dades d'Oracle (TDE - Transparent Data Encryption) xifra les dades emmagatzemades, mentre que el xifrat SSL/TLS s'utilitza per protegir les dades durant la transmissió.</li>
+        <li><strong>Auditoria</strong>: Oracle ofereix eines per auditar l'accés a la base de dades i registrar les operacions realitzades. Això permet detectar accés no autoritzat a dades sensibles.</li>
+    </ul>
+
+    <h2>2. Integritat (Integrity)</h2>
+    <p>La integritat de les dades fa referència a la seva exactitud, coherència i fiabilitat al llarg del temps. Per garantir-la en Oracle, es poden utilitzar diversos mecanismes:</p>
+    <ul>
+        <li><strong>Restriccions (Constraints)</strong>: Oracle permet definir restriccions per garantir la coherència de les dades (per exemple, restriccions de clau primària, clau forana, unicitat i validesa).</li>
+        <li><strong>Comprovació de validesa (Validations)</strong>: Es poden utilitzar triggers o funcions per validar les dades abans d'introduir-les a la base de dades. Això ajuda a mantenir la qualitat i la integritat de la informació.</li>
+        <li><strong>Control de versions i còpies de seguretat</strong>: Les còpies de seguretat regulars i el control de versions ajuden a garantir que les dades puguin ser recuperades de manera fiable en cas de pèrdua o corrupció.</li>
+        <li><strong>Controls de transaccions (ACID)</strong>: Oracle utilitza el model ACID (Atomicitat, Consistència, Aïllament, Durabilitat) per assegurar-se que les transaccions són processades correctament i no alteren la integritat de les dades.</li>
+    </ul>
+
+    <h2>3. Disponibilitat (Availability)</h2>
+    <p>La disponibilitat fa referència a la capacitat de la base de dades per estar accessible i operativa en tot moment. Per assegurar la disponibilitat en Oracle, es poden utilitzar diversos mecanismes i tecnologies:</p>
+    <ul>
+        <li><strong>Clústers i alta disponibilitat</strong>: Oracle suporta diverses solucions d'alta disponibilitat, com Oracle Real Application Clusters (RAC), que permeten que múltiples instàncies de bases de dades treballin en conjunt per garantir que la base de dades estigui sempre disponible, fins i tot en cas de fallades del sistema.</li>
+        <li><strong>Recuperació davant de desastres (Disaster Recovery)</strong>: Oracle ofereix opcions de recuperació davant de desastres, com Oracle Data Guard, que permet replicar les dades en un lloc secundari per garantir que la base de dades estigui disponible en cas d'incidents importants.</li>
+        <li><strong>Còpies de seguretat i restauració</strong>: Utilitzar Oracle Recovery Manager (RMAN) per realitzar còpies de seguretat i restaurar les dades és essencial per garantir la disponibilitat dels serveis.</li>
+        <li><strong>Manteniment i monitorització</strong>: Oracle proporciona eines per monitoritzar la salut del sistema (Oracle Enterprise Manager) i per planificar el manteniment, per evitar aturades no desitjades i per identificar de manera proactiva possibles problemes de disponibilitat.</li>
+    </ul>
+
+    <h2>Resum</h2>
+    <p>Implementar la triada CID en Oracle implica la combinació de múltiples mecanismes i eines que permeten protegir la informació:</p>
+    <ul>
+        <li><strong>Confidencialitat</strong>: Autenticació, xifrat de dades, control d'accés i auditoria.</li>
+        <li><strong>Integritat</strong>: Restriccions de dades, control de transaccions i còpies de seguretat.</li>
+        <li><strong>Disponibilitat</strong>: Alta disponibilitat, recuperació davant de desastres i monitorització activa.</li>
+    </ul>
+
+    <p>Amb aquests mecanismes, Oracle permet als administradors de bases de dades protegir les dades i garantir que es compleixin les pràctiques de seguretat requerides per a una bona gestió de la informació.</p>
+
+
+  </section>
   
+
   <section id="usuaris">
     <h2>👤 Usuaris en Oracle</h2>
-  
+   <p>Els usuaris permeten configurar el mecanisme de <strong>Confidencialitat</strong>, Identificant (nom d'usuari), 
+    autenticant (amb password, per exemple) i restringint l'accés a dades no permeses (amb els privilegis)</p>  
+    <p>Un usuari pot fer i desfer dins del seu esquema, però NO pot fer res en un altre esquema. Llevat que se li atorgue algun 
+      permís o privilegi per tal menester </p>
     <h3> Què és un usuari?</h3>
     <p>Un <strong>usuari Oracle</strong> identifica una entitat que accedeix a la base de dades. Pot representar una persona, aplicació o procés.</p>
+    <img src="imgs/schema.png" class="imatge-dreta"  alt="stop" style="width: 30%">
     <p>Quan es crea un usuari, també es crea automàticament el seu <strong>esquema</strong> (schema), que conté els seus objectes: taules, vistes, procediments, etc.</p>
   
     <h3>🔐 Autenticació d'usuaris</h3>
@@ -83,6 +138,7 @@
       <li> Bloquejat</li>
       <li> Expirat</li>
       <li> Expirat en període de gràcia</li>
+      <li> <a href="https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/USER_USERS.html">i més..</a></li>  
     </ul>
   
     <h4>Exemples de gestió:</h4>
@@ -150,9 +206,83 @@
   </section>
   
 
+  <section id="segusuaris">
+        <h2>🔐 Bloquejar Usuaris i Forçar a Canviar Contrasenya en Oracle</h1>
+        
+        <p>Per bloquejar usuaris i forçar-los a canviar la seva contrasenya a Oracle, cal fer servir diverses 
+          funcionalitats d'Oracle per gestionar les contrasenyes i els comptes d'usuari. A continuació, t'explico com es poden dur a terme aquestes tasques:</p>
+        <p>Un usuari bloquejat NO POT accedir al sistema i no pot canviar el estat per si mateix. Ho ha de sol·licitar al DBA</p>  
+        <p>Un usuari amb la password expirada  ( i en periode de gràcia) SI pot accedir, sempre que abans canvie la contrasenya expirada</p>  
+        <p>Un usuari amb la password expirada i fora del periode de gràcia, NO pot accedir. Si vol accedir, ho ha de sol·licitar al DBA</p>  
+        <p>Usuari amb contrasenya a punt de caducar (Període de gràcia imminent). Oracle pot permetre l'accés, però el sistema pot 
+          mostrar una advertència que la contrasenya caducarà en breu. Això depèn de la configuració del perfil.</p>
+    
+        <h2>1. Bloquejar un Usuari en Oracle</h2>
+        <p>Per bloquejar un usuari, es poden utilitzar les comandes SQL següents:</p>
+    
+        <h3>Bloquejar un usuari:</h3>
+        <pre><code>ALTER USER &lt;nom_usuari&gt; ACCOUNT LOCK;</code></pre>
+        <p>On &lt;nom_usuari&gt; és el nom de l'usuari que vols bloquejar.</p>
+    
+        <h4>Exemple:</h4>
+        <pre><code>ALTER USER jdoe ACCOUNT LOCK;</code></pre>
+        <p>Aquesta comanda bloqueja l'accés a l'usuari <code>jdoe</code> a la base de dades.</p>
+    
+        <h3>Desbloquejar un usuari:</h3>
+        <pre><code>ALTER USER &lt;nom_usuari&gt; ACCOUNT UNLOCK;</code></pre>
+        <p>Si després vols desbloquejar l'usuari, utilitza:</p>
+    
+        <h4>Exemple:</h4>
+        <pre><code>ALTER USER jdoe ACCOUNT UNLOCK;</code></pre>
+    
+        <h2>2. Forçar un Usuari a Canviar la Contrasenya</h2>
+        <p>Oracle permet forçar que un usuari canviï la seva contrasenya en el pròxim inici de sessió. Per fer-ho, utilitzes la comanda següent:</p>
+    
+        <h3>Forçar a canviar la contrasenya:</h3>
+        <pre><code>ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></pre>
+        <p>Aquesta comanda força l'usuari a canviar la contrasenya la pròxima vegada que intenti iniciar sessió.</p>
+    
+        <h4>Exemple:</h4>
+        <pre><code>ALTER USER jdoe PASSWORD EXPIRE;</code></pre>
+    
+        <h2>3. Combinació de Comandes per Bloquejar i Forçar el Canvi de Contrasenya</h2>
+        <p>Si vols bloquejar un usuari i, a més, forçar-lo a canviar la contrasenya, pots utilitzar aquestes dues comandes:</p>
+    
+        <pre><code>ALTER USER &lt;nom_usuari&gt; ACCOUNT LOCK;
+    ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></pre>
+    
+        <p>Amb això, bloqueges l'usuari, però si decideixes desbloquejar-lo posteriorment, estaràs forçant-lo a canviar la contrasenya en el seu següent inici de sessió.</p>
+    
+        <h4>Exemple complet:</h4>
+        <pre><code>ALTER USER jdoe ACCOUNT LOCK;
+    ALTER USER jdoe PASSWORD EXPIRE;</code></pre>
+    
+        <h2>4. Configurar el Caducament Automàtic de Contrasenyes</h2>
+        <p>Per configurar que Oracle forci el canvi de contrasenya automàticament després d'un cert temps (per exemple, després de 30 dies), pots configurar la política de contrasenyes de la base de dades. Això es fa mitjançant l'atribut <code>PASSWORD_LIFE_TIME</code> del perfil d'usuari:</p>
+    
+        <pre><code>ALTER PROFILE &lt;nom_perfil&gt; LIMIT PASSWORD_LIFE_TIME &lt;dies&gt;;</code></pre>
+    
+        <h4>Exemple (per 30 dies):</h4>
+        <pre><code>ALTER PROFILE DEFAULT LIMIT PASSWORD_LIFE_TIME 30;</code></pre>
+    
+        <p>Això farà que les contrasenyes dels usuaris que tinguin aquest perfil caduquin després de 30 dies, forçant-los a canviar la contrasenya en el següent inici de sessió.</p>
+    
+        <h2>Resum</h2>
+        <ul>
+            <li><strong>Bloquejar un usuari</strong>: <code>ALTER USER &lt;nom_usuari&gt; ACCOUNT LOCK;</code></li>
+            <li><strong>Desbloquejar un usuari</strong>: <code>ALTER USER &lt;nom_usuari&gt; ACCOUNT UNLOCK;</code></li>
+            <li><strong>Forçar a canviar la contrasenya</strong>: <code>ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></li>
+            <li><strong>Configurar caducitat automàtica de contrasenyes</strong>: <code>ALTER PROFILE &lt;nom_perfil&gt; LIMIT PASSWORD_LIFE_TIME &lt;dies&gt;;</code></li>
+        </ul>
+    
+        <p>Aquests són els mecanismes bàsics per gestionar usuaris en Oracle, bloquejant-los i forçant-los a canviar les contrasenyes quan sigui necessari.</p>
+ 
+  </section>
+
+
 
   <section id="permisos">
-    <h2>🔐 Permisos en Oracle</h2>
+    <h2>🗝️ Permisos en Oracle</h2>
   
     <h3> Què són els permisos (privilegis)?</h3>
     <p>
@@ -327,9 +457,17 @@
     <h3> Què és un perfil?</h3>
     <p>
       En Oracle, un <strong>perfil</strong> és un conjunt de restriccions i paràmetres que s’apliquen als usuaris de la base de dades. 
-      Aquests paràmetres permeten controlar l’ús de recursos del sistema (com el nombre màxim de sessions, temps connectat, etc.) i establir polítiques de seguretat sobre les contrasenyes.
+      Aquests paràmetres permeten controlar l’ús de recursos del sistema (com el nombre màxim de sessions, temps connectat, etc.) 
+      i establir polítiques de seguretat sobre les contrasenyes.
     </p>
-  
+    <p>En oracle hi ha un perfil predefinit. El perfil anomenat <strong>DEFAULT</strong></p>
+    <p> Quan es crea un usuari, se li assigna un perfil per defecte -> DEFAULT</p>
+  <pre>SQL> select * from dba_profiles where profile=’DEFAULT’;   </pre>
+  <p>Un perfil té dos tipus/grups de paràmetres</p>
+  <ul>
+    <li>Paràmetres de recursos</li>
+    <li>Paràmetres de contrasenyes</li>
+  </ul>
     <h3> Paràmetres de recursos</h3>
     <p>
       Els paràmetres de recursos limiten l’ús que pot fer un usuari del sistema. Alguns dels més comuns són:
@@ -357,7 +495,7 @@
     </ul>
   
     <h3> Crear i modificar perfils</h3>
-    <p>Pots crear un perfil nou amb la comanda <code>CREATE PROFILE</code> i modificar-lo amb <code>ALTER PROFILE</code>.</p>
+    <p>Pots crear un perfil nou amb el comando <code>CREATE PROFILE</code> i modificar-lo amb <code>ALTER PROFILE</code>.</p>
     <pre>
   -- Exemple de creació d'un perfil amb restriccions de recursos i contrasenya
   CREATE PROFILE perf-adm LIMIT
@@ -403,7 +541,14 @@
   -- Consultar usuaris i els seus perfils
   SELECT username, profile FROM dba_users;
     </pre>
-    
+    <h3>🔍 Esborrar perfils</h3>
+<pre>DROP PROFILE nom_perfil;
+     o
+     DROP PROFILE nom_perfil [CASCADE]; </pre>
+    <p>Especifiqueu CASCADE per desassignar el perfil dels usuaris a qui estigui assignat. Oracle Database assigna 
+      automàticament el perfil DEFAULT a aquests usuaris. Heu d'especificar aquesta clàusula per eliminar un perfil
+       que està assignat actualment als usuaris</p>
+
     <h3> Resum</h3>
     <p>
       Els perfils en Oracle són eines fonamentals per controlar l’ús dels recursos i reforçar la seguretat dels comptes d’usuaris. 
@@ -411,15 +556,136 @@
       tot assegurant un rendiment òptim i la protecció de la base de dades.
     </p>
   </section>
+
   
 
+  <section id="vistes">
+
+    <h1>Vistes com a Element de Seguretat en Oracle</h1>
+    <p>Les <strong>vistes (views)</strong> en Oracle poden ser un element molt poderós per a la seguretat de les dades, ja que permeten controlar quines dades poden ser accessibles pels usuaris i com aquestes dades són presentades. Les vistes no emmagatzemen dades pròpiament dites, sinó que són definicions de consultes SQL que es poden utilitzar com si fossin taules normals. Això significa que les vistes permeten a l'administrador de bases de dades (DBA) establir un nivell de seguretat i restricció per a l'accés a la informació a través de consultes personalitzades.</p>
+
+    <h2>Vistes com a element de seguretat a Oracle</h2>
+    <p>A continuació, explico algunes de les principals maneres en què les vistes poden ser utilitzades per millorar la seguretat en Oracle:</p>
+
+    <h3>1. Restricció d'Accés a Dades Sensibles</h3>
+    <p><strong>Descripció</strong>: Les vistes permeten crear consultes personalitzades que poden ocultar certes columnes o taules que contenen dades sensibles. En lloc de permetre que un usuari accedeixi directament a una taula, es pot crear una vista que exposi només una part de les dades.</p>
+    <pre><code>CREATE VIEW vista_clients_completa AS
+SELECT nom, adreca, telefon
+FROM clients;</code></pre>
+    <p><strong>Avantatge de seguretat</strong>: Limita l'exposició de dades sensibles a només la informació necessària, millorant la seguretat de la informació confidencial.</p>
+
+    <h3>2. Autenticació de Consultes</h3>
+    <p><strong>Descripció</strong>: Pots utilitzar vistes per garantir que només es poden realitzar consultes sobre un conjunt específic de dades segons el rol o els permisos d'un usuari. Això es fa mitjançant el control de permisos en les vistes.</p>
+    <pre><code>GRANT SELECT ON vista_clients_completa TO usuari_x;</code></pre>
+    <p><strong>Avantatge de seguretat</strong>: Aquesta tècnica permet controlar l'accés a les dades a nivell d'usuari, garantint que només els usuaris autoritzats tinguin accés a les vistes que exposen les dades filtrades o restringides.</p>
+
+    <h3>3. Control de Columnes</h3>
+    <p><strong>Descripció</strong>: Les vistes permeten ocultar columnes senceres d'una taula, cosa que és útil per amagar dades que no s'haurien de mostrar. Això és especialment útil quan les taules contenen dades sensibles, com ara contrasenyes, números de seguretat social, etc.</p>
+    <pre><code>CREATE VIEW vista_usuaris AS
+SELECT id, nom, correu
+FROM usuaris;</code></pre>
+    <p><strong>Avantatge de seguretat</strong>: Permet amagar dades sensibles i garantir que només la informació necessària sigui accessible.</p>
+
+    <h3>4. Control de les Consultes Realitzades</h3>
+    <p><strong>Descripció</strong>: Mitjançant la creació de vistes, es pot controlar exactament quines consultes són permeses i com són realitzades. Això permet als administradors establir regles de consulta que limitin l'accés a determinats conjunts de dades.</p>
+    <pre><code>CREATE VIEW vista_transaccions_usuaris AS
+SELECT transaccio_id, data, import
+FROM transaccions
+WHERE usuari_id = :usuari_id;</code></pre>
+    <p><strong>Avantatge de seguretat</strong>: Pot restringir l'abast de les dades consultades i garantir que els usuaris només obtinguin informació rellevant i personalitzada.</p>
+
+    <h3>5. Vistes Amb Funcionalitat de Seguretat Basada en Rols</h3>
+    <p><strong>Descripció</strong>: Utilitzant vistes, pots aplicar seguretat a nivell de rols, permetent que només certs rols d'usuari puguin accedir a determinades dades. Per exemple, un DBA pot crear una vista per a usuaris normals que només mostri informació bàsica, mentre que un usuari amb un rol administratiu podria tenir accés a una vista més detallada.</p>
+    <pre><code>CREATE VIEW vista_dades_normals AS
+SELECT nom, adreça FROM clients;
+
+CREATE VIEW vista_dades_administrador AS
+SELECT * FROM clients;</code></pre>
+    <p>L'usuari amb un rol normal només pot veure <code>vista_dades_normals</code>, mentre que l'usuari amb rol d'administrador té accés a <code>vista_dades_administrador</code>.</p>
+    <p><strong>Avantatge de seguretat</strong>: Permet controlar l'accés a les dades basat en rols d'usuari, garantint que els usuaris només tinguin accés a la informació que necessiten.</p>
+
+    <h3>6. Auditoria i Monitorització de Consultes</h3>
+    <p><strong>Descripció</strong>: Les vistes també poden ser útils per auditar i monitoritzar les consultes. Per exemple, pots crear una vista que permeti a l'usuari visualitzar només els canvis realitzats en la taula de transaccions en un període de temps determinat.</p>
+    <pre><code>CREATE VIEW vista_transaccions_audit AS
+SELECT transaccio_id, data, import, operacio
+FROM transaccions_audit
+WHERE data > '2024-01-01';</code></pre>
+    <p><strong>Avantatge de seguretat</strong>: Això permet monitoritzar l'activitat de la base de dades i detectar possibles accessos no autoritzats o activitats sospitoses.</p>
+
+    <h2>Conclusions</h2>
+    <p>Les <strong>vistes en Oracle</strong> són una eina molt potent per millorar la seguretat de les dades en una base de dades. Algunes de les maneres en què es poden utilitzar com a element de seguretat són:</p>
+    <ul>
+        <li><strong>Restricció d'accés a dades sensibles</strong></li>
+        <li><strong>Autenticació de consultes</strong> mitjançant l'assignació de permisos a les vistes.</li>
+        <li><strong>Control de columnes</strong> per amagar dades sensibles.</li>
+        <li><strong>Control de consultes</strong> per limitar l'abast de les dades consultades.</li>
+        <li><strong>Seguretat basada en rols</strong> per restringir l'accés a vistes específiques segons els permisos d'usuari.</li>
+        <li><strong>Auditoria i monitorització</strong> per fer seguiment de les operacions en la base de dades.</li>
+    </ul>
+    <p>Les vistes permeten personalitzar l'accés a la informació i garantir que només els usuaris autoritzats tinguin accés a dades crítiques.</p>
+  </section>  
+
+
+
+  <section id="synonym">
+  <h1>Ús de Synonyms en Oracle</h1>
+
+  <p>Un <strong>synonym</strong> (sinònim) en Oracle és un àlies o nom alternatiu per a un objecte de base de dades com una taula, vista, seqüència, procediment, funció, paquet o altre objecte. Els synonyms s’utilitzen per simplificar l'accés als objectes i millorar la seguretat.</p>
+
+  <h2>Tipus de Synonyms</h2>
+  <ul>
+    <li><strong>Public Synonym:</strong> Visible per a tots els usuaris de la base de dades.</li>
+    <li><strong>Private Synonym:</strong> Només visible per a l’usuari que el crea.</li>
+  </ul>
+
+  <h2>Beneficis de Seguretat i Usabilitat</h2>
+  <ul>
+    <li>Oculta el nom real o l'esquema de l'objecte.</li>
+    <li>Permet controlar millor els accessos a objectes a través de permisos sobre el synonym.</li>
+    <li>Facilita la migració o canvi d'esquema sense afectar el codi SQL que fa servir el synonym.</li>
+  </ul>
+
+  <h2>Exemples d’ús</h2>
+
+  <h3>1. Crear un synonym privat</h3>
+  <pre><code>CREATE SYNONYM emp FOR empresa.empleats;</code></pre>
+  <p>Ara, en lloc de fer servir <code>empresa.empleats</code>, l’usuari pot fer servir simplement <code>emp</code>.</p>
+
+  <h3>2. Crear un synonym públic</h3>
+  <pre><code>CREATE PUBLIC SYNONYM emp FOR empresa.empleats;</code></pre>
+  <p>Tots els usuaris poden accedir a la taula <code>empleats</code> com <code>emp</code>, sempre que tinguin permisos.</p>
+
+  <h3>3. Eliminar un synonym</h3>
+  <pre><code>DROP SYNONYM emp;
+DROP PUBLIC SYNONYM emp;</code></pre>
+
+  <h2>Consideracions de Seguretat</h2>
+  <ul>
+    <li>No atorga automàticament permisos sobre l'objecte. Cal fer un <code>GRANT</code> per separat.</li>
+    <li>Poden ser útils per limitar l’exposició d’esquemes i estructures internes.</li>
+    <li>Els synonyms públics han de ser usats amb precaució per evitar conflictes i exposició d’objectes no desitjats.</li>
+  </ul>
+
+  <h2>Conclusió</h2>
+  <p>Els <strong>synonyms</strong> en Oracle són útils per simplificar noms d’objectes i ocultar detalls interns. Utilitzats correctament, poden millorar l’organització, la seguretat i la flexibilitat de les aplicacions que accedeixen a la base de dades.</p>
+
+  </section> 
+
+
+
   <section id="altres-recursos">
-    <h2>Usuaris NO admin en Windows</h2>
+    <h2>Altres recursos</h2>
+    <h3>Usuaris NO admin en Windows</h3>
        <a href="https://github.com/EnriqueIborra/ASGBD/blob/3110bfbccca9c294245e153db8cffb709ace32b0/UD3/ASGBD-UD3.1.1%20Usuaris%20NO%20admin%20en%20W10.pdf">link</a> 
-    <h2>Update i Select en ORACLE</h2>
+    <h3>Update i Select en ORACLE</h3>
     <a href="https://github.com/EnriqueIborra/ASGBD/blob/3110bfbccca9c294245e153db8cffb709ace32b0/UD3/ASGBD-UD3.1.2%20Update%20i%20select%20en%20oracle.pdf">link</a>
-    <h2>Usuaris Comuns ORACLE</h2>
+    <h3>Usuaris Comuns ORACLE</h3>
     <a href="https://github.com/EnriqueIborra/ASGBD/blob/3110bfbccca9c294245e153db8cffb709ace32b0/UD3/ASGBD-UD3.1.3%20usuaris%20comuns%20en%20oracle.pdf">link</a>
+  </section>
+ 
+  <section id="seguretat">
+    <h2> <a href="seguretat-mecanismes.html">Seguretat en ORACLE</a></h2>
+  
   </section>
  
 
