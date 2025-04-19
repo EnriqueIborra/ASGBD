@@ -18,7 +18,6 @@
   <h2>Índex</h2>
   <a href="#introduccio-sql">Introduccio a SQL</a>
   <a href="#dades-tipus">Dades</a>
-  <a href="#taula">Taula</a>
   <a href="#crud">CRUD</a>
   <a href="#create"> &emsp; C create</a>
   <a href="#read">   &emsp; R read</a>
@@ -28,7 +27,7 @@
   <a href="#condicions">Condicions</a>
   <a href="#normalitzacio">Normalització</a>
   <a href="#permisos">Permisos </a>
-  <a href="#funcions agregació">Funcions agregació </a>
+  <a href="#agregacio">Funcions agregació </a>
   <a href="#transaccions"> Transaccions</a>
   <a href="#conclusions">Conclusions</a>
 </nav>
@@ -41,23 +40,27 @@
       
         <h3>🎯 Objectiu de la unitat</h3>
         <p>
-          Aquesta unitat forma part del mòdul <strong>ASGBD – Administració de Sistemes Gestors de Bases de Dades</strong> del cicle formatiu ASIX (Administració de Sistemes Informàtics en Xarxa).
-          Té com a objectiu fer un <strong>repàs pràctic i teòric dels fonaments de SQL</strong>, el llenguatge estàndard per a treballar amb bases de dades relacionals.
+          Aquesta unitat forma part del mòdul <strong>ASGBD – Administració de Sistemes Gestors de Bases de Dades</strong> 
+          del cicle formatiu ASIX (Administració de Sistemes Informàtics en Xarxa).
+          Té com a objectiu fer un <strong>repàs pràctic i teòric dels fonaments de SQL</strong>, 
+          el llenguatge estàndard per a treballar amb bases de dades relacionals.
         </p>
       
-        <h3>📌 Contingut a repassar</h3>
+        <h3> Contingut a repassar</h3>
         <p>
-          Durant el primer curs es van adquirir les bases de treball amb SQL: creació i modificació d’estructures, manipulació de dades i consultes bàsiques.
-          Ara, es revisen aquests conceptes per consolidar coneixements i preparar-se per tasques més avançades com l’administració, optimització i seguretat del sistema gestor.
+          Durant el primer curs es van adquirir les bases de treball amb <strong>SQL</strong> : creació i modificació d’estructures,
+           manipulació de dades i consultes bàsiques.
+          Ara, es revisen aquests conceptes per consolidar coneixements i preparar-se per tasques més avançades 
+          com l’administració, optimització i seguretat del sistema gestor.
         </p>
-      
+        <img src="imgs/sql.png" class="imatge-dreta" alt="fitxer-fitxes" style="width: 25%">
         <ul>
-          <li> Definició i manipulació de dades (<strong>DDL</strong> i <strong>DML</strong>)</li>
-          <li> Consultes amb filtres, ordenacions i funcions agregades</li>
+          <li> Definició de taules i manipulació de dades (<strong>DDL</strong> i <strong>DML</strong>)</li>
           <li> Ús de claus primàries i foranes</li>
+          <li> Consultes amb filtres, ordenacions i funcions agregades (<strong>DQL</strong>)</li>
           <li> Funcions i operadors</li>
-          <li> Permisos: <code>GRANT</code> i <code>REVOKE</code></li>
-          <li> Transaccions i control d’errors: <code>COMMIT</code> i <code>ROLLBACK</code></li>
+          <li> Permisos: <code>GRANT</code> i <code>REVOKE</code> (<strong>DCL</strong>)</li>
+          <li> Transaccions i control d’errors: <code>COMMIT</code> i <code>ROLLBACK</code> (<strong>TCL</strong>)</li>
           <li> Models relacionals i bones pràctiques de disseny</li>
         </ul>
       
@@ -85,18 +88,19 @@
     <p>Cada columna d’una taula ha de tenir un tipus de dada, segons el valor que ha d’emmagatzemar:</p>
   
     <ul>
-      <li> <code>NUMBER(n)</code> → enters o decimals amb n dígits</li>
+      <li> <code>NUMBER(n) o NUMBER</code> → enters o decimals amb n dígits</li>
       <li> <code>VARCHAR2(n)</code> → cadenes de text de longitud variable (fins a n caràcters)</li>
-      <li> <code>DATE</code> → valors de data i hora</li>
+      <li> <code>DATE o TIMESTAMP</code> → valors de data i hora</li>
       <li> <code>CHAR(n)</code> → cadena de longitud fixa</li>
       <li> <code>BOOLEAN</code> (no suportat a Oracle directament, però simulat)</li>
     </ul>
+    <p> &emsp;<strong>Nota:</strong> Des d'Oracle 23, boolean es pot fer servir en columnes de taules i en consultes</p>
   
-    <p><strong>Nota:</strong> en Oracle, `VARCHAR2` és més habitual que `VARCHAR` per compatibilitat.</p>
+    <p> &emsp;<strong>Nota:</strong> en Oracle, `VARCHAR2` és més habitual que `VARCHAR` per compatibilitat.</p>
 
     <p>Una <strong>variable</strong> representa un contenidor o un espai en la memòria física o virtual d'una computadora, 
         on s'emmagatzemen diferents tipus de dades (valors) durant l'execució d'un programa. A cada variable
-         se li assigna un nom descriptiu o un identificador que es refereix al valor guarda</p>
+         se li assigna un nom descriptiu o un identificador que es refereix al valor guardat</p>
     <p>Una <strong>taula</strong> és una estructura organitzada que s’utilitza per emmagatzemar dades en una base de dades. 
       Està formada per
          files (o registres) i columnes (o camps) i té un nom per a referir-se a ella</p>  
@@ -110,7 +114,7 @@
     </ul>
     <h4> En un esquema relacional</h4>
     <ul>
-      <li> Cada <strong>taula</strong> representa una entitat (per exemple: clients, productes, treballadors)</li>
+      <li> Cada entitat es representa mitjançant una <strong>taula</strong> (per exemple: clients, productes, treballadors)</li>
       <li> Cada <strong>columna</strong> representa un camp / atribut de la taula, li dona nom als valors que després s'emmagatzemen</li>      
       &emsp;&emsp;***fins ací encara no hem posat dades, sols estructura.
       <li> Cada <strong>fila</strong> representa un registre / element d'eixa entitat</li>
@@ -184,6 +188,8 @@ CREATE TABLE alumnes (
    edat NUMBER(2),
    curs VARCHAR2(10)
 );   </pre>
+  <p>Se sol posar d'aquesta forma per llegibilitat, però tambè es pot posar així:</p>
+  <pre>   CREATE TABLE alumnes (id NUMBER(3), nom VARCHAR2(30), edat NUMBER(2), curs VARCHAR2(10) ); </pre>
 
   <h3> Restriccions comunes</h3>
   <ul>
@@ -275,7 +281,7 @@ CREATE TABLE alumnes (
 
     <section id="read">
 <!-- consulta de dades en una taula -->
-  <h2>🔎 Consultes SELECT i condicions amb WHERE</h2>
+  <h2>🔎 Consultes SELECT i condicions amb WHERE  (DQL)</h2>
 
   <h3>📘 Comando <code>SELECT</code></h3>
   <p>
@@ -326,96 +332,7 @@ SELECT * FROM alumnes WHERE id_curs IN (1, 2, 3);
     </section>
 
 
-  <section id="delete">
-  <!-- esborrar files d una taula -->
-  <h2>🗑️ Esborrar files d’una taula: <code> comando DELETE</code></h2>
-
-  <h3>📘 Què fa el comando <code>DELETE</code>?</h3>
-  <p>
-    L’ordre <code>DELETE</code> serveix per eliminar <strong>una o més files</strong> d’una taula segons un criteri determinat. 
-    Quan s’executa, les files desapareixen permanentment (si no hi ha transaccions o backups).
-  </p>
-
-  <h3>🔍 Sintaxi bàsica</h3>
-  <pre>
-DELETE FROM nom_taula
-WHERE condició;
-  </pre>
-
-  <h4>🧱 Exemple: eliminar alumnes menors de 18 anys</h4>
-  <pre>
-DELETE FROM alumnes  
-WHERE edat &lt; 18;
-  </pre>
-
-  <h3>⚠️ Molt important: NO oblidis el <code>WHERE</code></h3>
-  <p>
-    Si no inclous cap condició, <strong>s’eliminaran totes les files</strong> de la taula!
-  </p>
-
-  <pre>
--- ⚠️ Elimina totes les files!
-DELETE FROM alumnes;
-
-TRUNCATE TABLE alumnes;  
-// És equivalent i més eficient si el que volem és esborrar totes les files
-/// La taula quedarà buida, però la estructura encara existeix en la BBDD
-  </pre>
-
-  <h3> Comparació amb <code>TRUNCATE</code></h3>
-  <table border="1">
-    <tr>
-      <th></th>
-      <th><code>DELETE</code></th>
-      <th><code>TRUNCATE</code></th>
-    </tr>
-    <tr>
-      <td>Condicions</td>
-      <td>Permet <code>WHERE</code></td>
-      <td>No permet condicions (tot s’esborra)</td>
-    </tr>
-    <tr>
-      <td>Recuperació</td>
-      <td>Es pot fer <code>ROLLBACK</code> si està dins d'una transacció</td>
-      <td>No es pot recuperar</td>
-    </tr>
-    <tr>
-      <td>Velocitat</td>
-      <td>Més lenta (registre per registre)</td>
-      <td>Molt ràpida (reconstrueix la taula)</td>
-    </tr>
-  </table>
-
-  <p><strong>Recomanació:</strong> abans d’un DELETE, comprova les files afectades amb un <code>SELECT</code>:</p>
-
-  <pre>
-SELECT * FROM alumnes WHERE edat &lt; 18;
-DELETE FROM alumnes WHERE edat &lt; 18;
-  </pre>
-
-  <h3> Control de seguretat amb claus foranes</h3>
-  <p>** Per entendre millor este cas pot ser convenient mirar el apartat de "Normalització" primer</p>
-  <p>
-    Si una fila està relacionada amb una altra taula mitjançant una <code>FOREIGN KEY</code>, pot ser que el DELETE <strong>no es permeti</strong> (error de restricció), 
-    a menys que estigui configurada l’opció <code>ON DELETE CASCADE</code>.
-  </p>
-
-  <h4>Exemple amb relació:</h4>
-  <pre> 
--- alumnes té una clau forana cap a cursos
-DELETE FROM cursos WHERE id = 1;  -- error si hi ha alumnes vinculats
-  </pre>
-
-  <p>Amb <code>ON DELETE CASCADE</code>, també s’eliminarien automàticament els alumnes del curs 1.</p>
-
-  <h3> Bones pràctiques</h3>
-  <ul>
-    <li> Fes un <code>SELECT</code> abans d’esborrar</li>
-    <li> Treballa amb <code>COMMIT</code> i <code>ROLLBACK</code> per seguretat</li>
-    <li> Assegura’t que no trenques relacions entre taules</li>
-    <li>⚠️⚠️⚠️ Mai facis <code>DELETE</code> sense <code>WHERE</code> si no tens clar el que fas</li>
-  </ul>
-    </section>
+  
 
   <section id="update">
   <!-- actualitzar dades  d una taula -->
@@ -506,11 +423,99 @@ ROLLBACK; -- Desfem el canvi
     <li> Fes còpia de seguretat o treballa dins d’una transacció si tens dubtes</li>
     <li> Usa aliasses si treballes amb subconsultes o joins</li>
   </ul>
-
-
   </section>
   
 
+  <section id="delete">
+    <!-- esborrar files d una taula   https://www.youtube.com/watch?v=i_cVJgIz_Cs  -->
+    <h2>🗑️ Esborrar files d’una taula: <code> comando DELETE</code></h2>
+  
+    <h3>📘 Què fa el comando <code>DELETE</code>?</h3>
+    <p>
+      L’ordre <code>DELETE</code> serveix per eliminar <strong>una o més files</strong> d’una taula segons un criteri determinat. 
+      Quan s’executa, les files desapareixen permanentment (si no hi ha transaccions o backups).
+    </p>
+  
+    <h3>🔍 Sintaxi bàsica</h3>
+    <pre>
+  DELETE FROM nom_taula
+  WHERE condició;
+    </pre>
+  
+    <h4>🧱 Exemple: eliminar alumnes menors de 18 anys</h4>
+    <pre>
+  DELETE FROM alumnes  
+  WHERE edat &lt; 18;
+    </pre>
+  
+    <h3>⚠️ Molt important: NO oblidis el <code>WHERE</code></h3>
+    <p>
+      Si no inclous cap condició, <strong>s’eliminaran totes les files</strong> de la taula!
+    </p>
+  
+    <pre>
+  -- ⚠️ Elimina totes les files!
+  DELETE FROM alumnes;
+  
+  TRUNCATE TABLE alumnes;  
+  // És equivalent i més eficient si el que volem és esborrar totes les files
+  /// La taula quedarà buida, però la estructura encara existeix en la BBDD
+    </pre>
+  
+    <h3> Comparació amb <code>TRUNCATE</code></h3>
+    <table border="1">
+      <tr>
+        <th></th>
+        <th><code>DELETE</code></th>
+        <th><code>TRUNCATE</code></th>
+      </tr>
+      <tr>
+        <td>Condicions</td>
+        <td>Permet <code>WHERE</code></td>
+        <td>No permet condicions (tot s’esborra)</td>
+      </tr>
+      <tr>
+        <td>Recuperació</td>
+        <td>Es pot fer <code>ROLLBACK</code> si està dins d'una transacció</td>
+        <td>No es pot recuperar</td>
+      </tr>
+      <tr>
+        <td>Velocitat</td>
+        <td>Més lenta (registre per registre)</td>
+        <td>Molt ràpida (reconstrueix la taula)</td>
+      </tr>
+    </table>
+  
+    <p><strong>Recomanació:</strong> abans d’un DELETE, comprova les files afectades amb un <code>SELECT</code>:</p>
+  
+    <pre>
+  SELECT * FROM alumnes WHERE edat &lt; 18;
+  DELETE FROM alumnes WHERE edat &lt; 18;
+    </pre>
+  
+    <h3> Control de seguretat amb claus foranes</h3>
+    <p>** Per entendre millor este cas pot ser convenient mirar el apartat de "Normalització" primer</p>
+    <p>
+      Si una fila està relacionada amb una altra taula mitjançant una <code>FOREIGN KEY</code>, pot ser que el DELETE <strong>no es permeti</strong> (error de restricció), 
+      a menys que estigui configurada l’opció <code>ON DELETE CASCADE</code>.
+    </p>
+  
+    <h4>Exemple amb relació:</h4>
+    <pre> 
+  -- alumnes té una clau forana cap a cursos
+  DELETE FROM cursos WHERE id = 1;  -- error si hi ha alumnes vinculats
+    </pre>
+  
+    <p>Amb <code>ON DELETE CASCADE</code>, també s’eliminarien automàticament els alumnes del curs 1.</p>
+  
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Fes un <code>SELECT</code> abans d’esborrar</li>
+      <li> Treballa amb <code>COMMIT</code> i <code>ROLLBACK</code> per seguretat</li>
+      <li> Assegura’t que no trenques relacions entre taules</li>
+      <li>⚠️⚠️⚠️ Mai facis <code>DELETE</code> sense <code>WHERE</code> si no tens clar el que fas</li>
+    </ul>
+      </section>  
   
 
 
@@ -523,8 +528,16 @@ ROLLBACK; -- Desfem el canvi
     <p>
       Quan necessites <strong>modificar l’estructura d’una taula</strong> que ja existeix, per exemple, afegint una nova columna per a una informació nova (telèfon, correu, etc.), fas servir la comanda <code>ALTER TABLE</code>.
     </p>
+
+    <h3> Què és pot modificar</h3>
+    <ul>
+      <li> Afegir una columna</li>
+      <li> Esborrar una columna</li>
+      <li> Modificar una columna</li>
+    </ul>
+
   
-    <h3>🔧 Sintaxi bàsica</h3>
+    <h3>🔧 Sintaxi bàsica - Afegir columna nova</h3>
     <pre>
   ALTER TABLE nom_taula
   ADD (nom_columna tipus_dada [restriccions]);
@@ -595,10 +608,29 @@ ROLLBACK; -- Desfem el canvi
       <li> Afegir una data de creació o d’actualització de registres</li>
     </ul>
 
+  <!-- modificar columna d'una taula-->
+  <h2>&nbsp;</h2>
+  <h2>🗑️ Modificar una columna d’una taula: <code>ALTER TABLE ... MODIFY COLUMN ...</code></h2>
+    <p>Pot interessar modificar una columna, com per exemple, afegir una restricció que no té</p>
+    <pre>
+    ALTER TABLE alumnes
+    MODIFY (dni VARCHAR2(9) NOT NULL);
+  </pre>
+  <p>Si es fa açò, s'ha de comprovar que totes les files compleixen la restricció, de no ser així, fallarà i donarà ERROR</p>
+  <p>Quan modifiques el tipus d'una columna en Oracle, com per exemple de <code>NUMBER</code> a <code>VARCHAR2</code>,
+     Oracle intenta convertir automàticament les dades existents al nou tipus.</p>
+  <pre>
+    CREATE TABLE test (  id NUMBER );
+    INSERT INTO test VALUES (123);
+    ALTER TABLE test MODIFY id VARCHAR2(10);    </pre>   
+  <h4>✅ Si la conversió és possible:</h4>
+     <p>    Oracle converteix totes les dades automàticament i sense error</p>   
+  <h4>❌ Si hi ha valors que no es poden convertir:</h4>   
+   <p>     L'operació fallarà amb un error de tipus ORA-01439. Això passa, per exemple, si vas de VARCHAR2 a NUMBER i hi ha valors no numèrics</p>    
 
     <!-- esborrar columna d'una taula-->
      <h2>&nbsp;</h2>
-    <h2>🗑️ Esborrar una columna d’una taula: <code>ALTER TABLE ... DROP COLUMN</code></h2>
+    <h2>🗑️ Esborrar una columna d’una taula: <code>ALTER TABLE ... DROP COLUMN ...</code></h2>
 
     <h3>📘 Quan cal esborrar una columna?</h3>
     <p>
@@ -679,7 +711,58 @@ ROLLBACK; -- Desfem el canvi
     </pre>     
 
 
-  </section>
+ <!-- esborrar una taula  !!-->
+ <h2>&nbsp;</h2>
+ <h2>🗑️ Esborrar una taula: <code>DROP TABLE ... </code></h2>
+
+ <h3>📘 Quan cal esborrar una taula</h3>
+ <p>
+   A vegades, una taula deixa de formar part del E-R perquè:
+ </p>
+ <ul>
+   <li>Ha quedat obsoleta </li>
+   <li>Ha estat substituïda per una altra més útil o normalitzada</li>
+   <li>S'ha afegit per error o durant proves</li>
+ </ul>
+
+ <h3>🧱 Sintaxi bàsica</h3>
+ <pre>
+DROP TABLE nom_taula;
+ </pre>
+
+ <h4> Exemple: eliminar la taula  <code>alumnes</code></h4>
+ <pre>
+DROP TABLE alumnes;
+ </pre>
+
+ <p>Aquesta comanda elimina completament la taula i totes les dades que contenia.</p>
+
+ <h3>⚠️ Atenció amb la pèrdua de dades!</h3>
+ <p>
+   Aquesta operació <strong>no es pot desfer</strong> fàcilment. Un cop eliminada una taula, les dades desapareixen 
+   definitivament, a menys que:
+ </p>
+ <ul>
+   <li> Tinguem una còpia de seguretat (backup)</li>
+   <li> L’hàgim exportada prèviament</li>
+ </ul>
+
+ <h3> Com comprovar que ha desaparegut?</h3>
+ <pre>
+  SELECT table_name
+  FROM user_tables
+  WHERE table_name = 'NOM_TAULA';  </pre>
+ <p>Si la consulta no retorna cap fila, vol dir que la taula ja no existeix dins del teu esquema d'usuari.</p>
+ <p>NOM_TAULA hauria d'estar en majúscules, ja que Oracle desa els noms d’objectes en majúscules per defecte</p>
+
+ <h3> Bones pràctiques abans d’esborrar</h3>
+ <ul>
+   <li> Assegura’t que realment no s’utilitza ni en consultes ni aplicacions</li>
+   <li> Exporta les dades si poden tenir valor futur</li>
+   <li> Informa l’equip o documenta el canvi</li>
+ </ul>
+
+ </section>
 
   
  
@@ -782,7 +865,7 @@ ROLLBACK; -- Desfem el canvi
 
   
   <section id="permisos">
-    <h2> GRANT i REVOKE</h2>
+    <h2> GRANT i REVOKE  (DCL)</h2>
     <pre>
         Els usuaris poden tindre privilegis per fer operacions sobre la base de dades.
         Per atorgar privilegis utilitzarem
@@ -811,7 +894,7 @@ ROLLBACK; -- Desfem el canvi
   
 
   <section id="transaccions">
-    <h2> Transaccions</h2>
+    <h2> Transaccions (TCL)</h2>
    <p>
     Les transaccions en bases de dades (com Oracle) són un conjunt d'operacions que es tracten com una unitat 
     indivisible de treball. És a dir, totes les operacions dins d'una transacció s’han de completar amb èxit o 
@@ -884,6 +967,97 @@ ROLLBACK; -- Desfem el canvi
 
   </section>
   
+  <section>
+
+  <h1>Tipus de JOIN en Oracle SQL</h1>
+  <img src="imgs/joins1.png" class="imatge-dreta" alt="fitxer-fitxes" style="width: 45%">
+    <h2>1. INNER JOIN (JOIN)</h2>
+    <p>Només retorna files que tenen coincidència en ambdues taules.</p>
+    <pre style="width:50%; "><code>SELECT a.nom, b.departament
+      FROM empleats a
+      JOIN departaments b ON a.dept_id = b.id;</code></pre>
+      
+      <h2>2. LEFT JOIN (LEFT OUTER JOIN)</h2>
+      <p>Mostra totes les files de la taula de l’esquerra, amb coincidències (si n’hi ha) de la taula de la dreta.</p>
+      <pre style="width:50%;"><code>SELECT a.nom, b.departament
+      FROM empleats a
+      LEFT JOIN departaments b ON a.dept_id = b.id;</code></pre>
+
+    <h2>3. RIGHT JOIN (RIGHT OUTER JOIN)</h2>
+    <p>Mostra totes les files de la taula de la dreta, amb coincidències (si n’hi ha) de la taula de l’esquerra.</p>
+    <pre style="width:50%;"><code>SELECT a.nom, b.departament
+FROM empleats a
+RIGHT JOIN departaments b ON a.dept_id = b.id;</code></pre>
+   
+    <h2>4. FULL JOIN (FULL OUTER JOIN)</h2>
+    <p>Combina LEFT i RIGHT JOIN. Torna totes les files d’ambdues taules amb NULL si no hi ha coincidència.</p>
+    <pre style="width:50%;"><code>SELECT a.nom, b.departament
+FROM empleats a
+FULL OUTER JOIN departaments b ON a.dept_id = b.id;</code></pre>
+   
+    <h2>5. CROSS JOIN</h2>
+    <p>Producte cartesià: combina totes les files de la primera taula amb totes les de la segona.</p>
+    <pre style="width:50%;"><code>SELECT a.nom, b.departament
+FROM empleats a
+CROSS JOIN departaments b;</code></pre>
+   
+    <h2>6. Sintaxi antiga (Oracle 8 o abans)</h2>
+    <p>Oracle permet encara aquesta sintaxi antiga per fer LEFT JOINs:</p>
+    <pre style="width:50%;"><code>SELECT a.nom, b.departament
+FROM empleats a, departaments b
+WHERE a.dept_id = b.id(+);</code></pre>
+    <p><strong>Nota:</strong> el <code>(+)</code> va al costat de la taula que pot tenir <code>NULL</code>.</p>
+
+<h1>Diferència entre <code>JOIN</code> i unió amb coma en SQL Oracle</h1>
+
+          <h2>1. JOIN explícit (moderna i clara)</h2>
+      <p>És la forma recomanada actualment, amb una sintaxi clara i separació entre la lògica de la unió i la resta de condicions.</p>
+      <pre><code>SELECT e.nom, d.nom
+  FROM empleats e
+  JOIN departaments d ON e.dept_id = d.id;</code></pre>
+   
+          <h2>2. Ús de coma (sintaxi antiga)</h2>
+      <p>És una forma antiga de fer INNER JOINs. Més propensa a errors, especialment si oblides posar condicions al <code>WHERE</code>.</p>
+      <pre><code>SELECT e.nom, d.nom
+  FROM empleats e, departaments d
+  WHERE e.dept_id = d.id;</code></pre>
+      <p><strong>Sense condició al WHERE:</strong></p>
+      <pre><code>SELECT e.nom
+  FROM empleats e, departaments d;
+  -- Crea un producte cartesià no desitjat!</code></pre>
+   
+          <h2>3. Comparativa resumida</h2>
+      <table>
+        <tr>
+          <th>Aspecte</th>
+          <th>JOIN explícit</th>
+          <th>Coma al FROM</th>
+        </tr>
+        <tr>
+          <td>Clar i llegible</td>
+          <td>✅</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td>Permet OUTER JOIN</td>
+          <td>✅</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td>Evita errors</td>
+          <td>✅</td>
+          <td>❌ (si oblides WHERE)</td>
+        </tr>
+        <tr>
+          <td>Recomanat</td>
+          <td>✅</td>
+          <td>❌</td>
+        </tr>
+      </table>
+   
+
+  </section>
+
 
 </main>
 
