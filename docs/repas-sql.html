@@ -2,14 +2,16 @@
 <html lang="ca">
 <head>
   <meta charset="UTF-8">
-  <title>📦 Repàs SQL</title>
+  <title>⏳ Repàs SQL</title>
   <link rel="stylesheet" href="estilsunitats.css">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
 </head>
 <body>
 
 <header>
   <a href="index.html">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo">
+      <!--<img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo"> -->
+      <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
   </a>
   <h1>ASGBD   -    Repàs SQL</h1>
 </header>
@@ -177,7 +179,7 @@
     <h2>🛠️ Creació de taules: <code>CREATE TABLE</code></h2>
 
   <p>
-    Per definir una nova taula, fem servir el comando <code>CREATE TABLE</code> indicant el nom, les columnes, el tipus de dades i, opcionalment, les restriccions.
+    Per definir una nova taula, fem servir la ordre <code>CREATE TABLE</code> indicant el nom, les columnes, el tipus de dades i, opcionalment, les restriccions.
   </p>
 
   <h3>📄 Exemple bàsic:</h3>
@@ -283,9 +285,9 @@ CREATE TABLE alumnes (
 <!-- consulta de dades en una taula -->
   <h2>🔎 Consultes SELECT i condicions amb WHERE  (DQL)</h2>
 
-  <h3>📘 Comando <code>SELECT</code></h3>
+  <h3>📘 Ordre <code>SELECT</code></h3>
   <p>
-    El comando <code>SELECT</code> s’utilitza per <strong>consultar dades</strong> d’una o més taules. Es poden seleccionar columnes específiques o totes.
+    La ordre <code>SELECT</code> s’utilitza per <strong>consultar dades</strong> d’una o més taules. Es poden seleccionar columnes específiques o totes.
   </p>
 
   <pre>
@@ -336,7 +338,7 @@ SELECT * FROM alumnes WHERE id_curs IN (1, 2, 3);
 
   <section id="update">
   <!-- actualitzar dades  d una taula -->
-  <h2>✏️ Actualització de registres: <code>comando UPDATE</code></h2>
+  <h2>✏️ Actualització de registres: <code>Ordre UPDATE</code></h2>
 
   <h3>📘 Què fa l’ordre <code>UPDATE</code>?</h3>
   <p>
@@ -428,9 +430,9 @@ ROLLBACK; -- Desfem el canvi
 
   <section id="delete">
     <!-- esborrar files d una taula   https://www.youtube.com/watch?v=i_cVJgIz_Cs  -->
-    <h2>🗑️ Esborrar files d’una taula: <code> comando DELETE</code></h2>
+    <h2>🗑️ Esborrar files d’una taula: <code> Ordre DELETE</code></h2>
   
-    <h3>📘 Què fa el comando <code>DELETE</code>?</h3>
+    <h3>📘 Què fa la Ordre <code>DELETE</code>?</h3>
     <p>
       L’ordre <code>DELETE</code> serveix per eliminar <strong>una o més files</strong> d’una taula segons un criteri determinat. 
       Quan s’executa, les files desapareixen permanentment (si no hi ha transaccions o backups).

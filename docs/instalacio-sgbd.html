@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <title>📦 Instal·lació Oracle</title>
   <link rel="stylesheet" href="estilsunitats.css">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
 </head>
 <body>
 
 <header>
   <a href="index.html">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo">
+    <!--<img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo"> -->
+    <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
   </a>
   <h1>ASGBD   -    Instal·lació Oracle</h1>
 </header>
@@ -525,11 +527,11 @@
     <h2>Accés a Oracle</h2>
     <p>Després de tindre acabada la instal·lació, hem de comprovar que es pot accedir a la instància.</p>
     <h3> Des de Windows (sqlplus)</h3>
-    <p>Obrir una finestra de CMD com a <strong>usuari instal·lador</strong> i executar el comando <code>sqlplus</code></p>
+    <p>Obrir una finestra de CMD com a <strong>usuari instal·lador</strong> i executar la ordre <code>sqlplus</code></p>
     <pre>C:\Users\oracle> sqlplus / as SYSDBA</pre>
   
-    <p>Este comando ens connecta a la CDB principal apuntada per ORACLE_SID. Una vegada dins de SQL*Plus, 
-      es poden utilitzar comandos útils:</p>
+    <p>Esta ordre ens connecta a la CDB principal apuntada per ORACLE_SID. Una vegada dins de SQL*Plus, 
+      es poden utilitzar ordres útils:</p>
     <div class="pre-container">
       <span class="code-type">SQL</span>
       <button class="copy-button">⧉ COPIA Codi !</button>
@@ -544,11 +546,11 @@
   exit;
      </pre>
   </div>
-   <p>Els comandos SHOW PDBS, SHOW USER,  són instruccions especials de l'entorn SQL*Plus (
+   <p>Les ordres SHOW PDBS, SHOW USER,  són instruccions especials de l'entorn SQL*Plus (
     o eines compatibles com SQLcl), no formen part de SQL estàndard ni de PL/SQL.
-  El comando SELECT si és un comando SQL</p>
+  La ordre SELECT si és una ordre SQL</p>
   <pre>
-Els comandos sqlplus solen ser ALIAS de consultes SQL. 
+Les ordres sqlplus solen ser ALIAS de consultes SQL. 
 Per exemple SHOW PDBS es pot fer amb:
 SELECT CON_ID, NAME, OPEN_MODE, RESTRICTED FROM V$PDBS; 
 SELECT * FROM DBA_PDBS;     </pre>
@@ -608,7 +610,7 @@ SELECT * FROM DBA_PDBS;     </pre>
     </ul>
   
     <h3> Què és SQL*Plus?</h3>
-    <p>És un client per línia d’ordres proporcionat per ORACLE que permet executar SQL, PL/SQL i comandos específics d'sqlplus. 
+    <p>És un client per línia d’ordres proporcionat per ORACLE que permet executar SQL, PL/SQL i ordres específiques d'sqlplus. 
       És una de les eines més antigues i utilitzades per administradors i desenvolupadors.
     </p>
     <ul>

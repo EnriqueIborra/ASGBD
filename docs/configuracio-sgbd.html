@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <title>🛠️ Configuració Oracle</title>
   <link rel="stylesheet" href="estilsunitats.css">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
 </head>
 <body>
 
 <header>
   <a href="index.html">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo">
+      <!--<img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo"> -->
+      <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
   </a>
   <h1>ASGBD   -    Configuració Oracle</h1>
 </header>
@@ -386,7 +388,7 @@ SQL> STARTUP;
       <li><strong>OPEN</strong>: la BBDD està completament disponible per a operacions.</li>
     </ul>
   
-    <p>Comandos per arrancar pas a pas:</p>
+    <p>Ordres per arrancar pas a pas:</p>
     <pre>
   SQL> STARTUP NOMOUNT;
   SQL> STARTUP MOUNT;
@@ -815,7 +817,7 @@ SQL> ALTER SYSTEM SWITCH LOGFILE;
       <li> Els trace files poden ajudar a identificar errors que no apareixen en altres llocs</li>
     </ul>
   
-    <h3> Comando útil</h3>
+    <h3> Ordre útil</h3>
     <pre>
   SQL> SELECT name, value FROM v$diag_info;
     </pre>
