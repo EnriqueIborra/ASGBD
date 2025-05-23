@@ -133,6 +133,16 @@
   <p><strong>&nom</strong> Una variable de substitució és una variable que s'utilitza principalment en eines com SQL*Plus, SQL Developer o Toad, per a permetre que l’usuari introduïsca un valor en temps d’execució, abans que s'execute un bloc PL/SQL o una sentència SQL.
     No és part del llenguatge PL/SQL com a tal, sinó una funcionalitat d’aquestes eines per fer scripts més dinàmics i interactius.</p>
     <p><strong>PUT_LINE</strong> És un procediment del paquet <strong>DBMS_OUTPUT</strong> d'ORACLE.</p>
+    <p><strong>PUT_LINE</strong> avalua !!  i imprimeix el resultat.</p>
+    <pre>
+  DBMS_OUTPUT.PUT_LINE('La data actual és: '); -- una cadena
+  DBMS_OUTPUT.PUT_LINE(  vdata  );             -- una variable (el contenido)
+  DBMS_OUTPUT.PUT_LINE(  'vdata'  );           -- una cadena
+  DBMS_OUTPUT.PUT_LINE(  sysdate );            --  resultado de una funcion
+  DBMS_OUTPUT.PUT_LINE('La data actual és: ' ||  sysdate);  -- una concatenación
+  DBMS_OUTPUT.PUT_LINE(  3*4+5**2+1 );              --  un cálculo matemático
+  DBMS_OUTPUT.PUT_LINE(  3*4+5**2+1 || '  456');    --  un casting  !!
+        </pre>
 
     <h3> Exemple senzill</h3>
     <pre>
@@ -168,8 +178,8 @@
   
     <h3> Ordres útils en SQL Developer</h3>
     <ul>
-      <li><code>F5</code> → executa l'script de la sessió activa. Mostra el resultat en l’àrea de Script Output.</li>
-      <li><code>F9</code> → executa sentència (una). Mostra el resultat en l’àrea de Resultats.</li>
+      <li><strong><code>F5</code></strong> → executa l'script de la sessió activa. Mostra el resultat en l’àrea de Script Output.</li>
+      <li><strong><code>F9</code></strong> → executa sentència (una). Mostra el resultat en l’àrea de Resultats.</li>
       <li><code>.</code> → En SQL Developer no cal posar un punt al final</li>
       <li>Recorda posar <code>SET SERVEROUTPUT ON;</code> abans del bloc anònim</li>
       
@@ -289,6 +299,7 @@
           <pre><code>SELECT sou INTO v_sou FROM empleats WHERE id = 5;</code></pre>
         </li>
         <li><strong>Entrada de l’usuari (SQL Developer):</strong> <code>v_nom := '&amp;nom_usuari';</code></li>
+        <li>Utilitzant el <strong> DEFAULT</strong></li>
       </ul>
     
       <h4>❗ Detalls importants</h4>
@@ -350,6 +361,10 @@
        DBMS_OUTPUT.PUT_LINE('Demà serà: ' || (avui + 1));
     END;
     /</code></pre>
+    <p class="tips"> ✔️ El tipus "DATE" pot emmagatzemar fins al minut i el segon. (Exemple d'un valor de tipus DATE: 23-MAI-2025 14:35:22)
+       <br> Si es necessita més precisió, es pot utilitzar el tipus "TIMESTAMP", el qual
+      pot emmagatzemar fins a milionèsima de segon (Exemple d'un valor de tipus TIMESTAMP: 23-MAI-2025 14:35:22.123456)
+    </p>
     
       <h3> 4. Operacions lògiques</h3>
       <p>Amb variables <code>BOOLEAN</code>, pots fer condicions:</p>

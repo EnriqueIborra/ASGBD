@@ -74,6 +74,7 @@
 
   nav a:hover {
     background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
   }
 
   main {
@@ -195,3 +196,14 @@ th, td {
 th {
   background-color: #e0e0ff;
 }
+
+.alert {
+    padding: 7px;
+    background: #f9dcce;
+    border-left: 6px solid #f39c12;
+  }
+.tips {
+    padding: 7px;
+    background: #d2f8e1;
+    border-left: 6px solid #27ae60;
+  }

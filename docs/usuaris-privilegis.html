@@ -220,7 +220,7 @@
           mostrar una advertència que la contrasenya caducarà en breu. Això depèn de la configuració del perfil.</p>
     
         <h2>1. Bloquejar un Usuari en Oracle</h2>
-        <p>Per bloquejar un usuari, es poden utilitzar les comandes SQL següents:</p>
+        <p>Per bloquejar un usuari, es poden utilitzar les ordres SQL següents:</p>
     
         <h3>Bloquejar un usuari:</h3>
         <pre><code>ALTER USER &lt;nom_usuari&gt; ACCOUNT LOCK;</code></pre>
@@ -228,7 +228,7 @@
     
         <h4>Exemple:</h4>
         <pre><code>ALTER USER jdoe ACCOUNT LOCK;</code></pre>
-        <p>Aquesta comanda bloqueja l'accés a l'usuari <code>jdoe</code> a la base de dades.</p>
+        <p>Aquesta ordre bloqueja l'accés a l'usuari <code>jdoe</code> a la base de dades.</p>
     
         <h3>Desbloquejar un usuari:</h3>
         <pre><code>ALTER USER &lt;nom_usuari&gt; ACCOUNT UNLOCK;</code></pre>
@@ -238,17 +238,17 @@
         <pre><code>ALTER USER jdoe ACCOUNT UNLOCK;</code></pre>
     
         <h2>2. Forçar un Usuari a Canviar la Contrasenya</h2>
-        <p>Oracle permet forçar que un usuari canviï la seva contrasenya en el pròxim inici de sessió. Per fer-ho, utilitzes la comanda següent:</p>
+        <p>Oracle permet forçar que un usuari canviï la seva contrasenya en el pròxim inici de sessió. Per fer-ho, utilitzes l'ordre següent:</p>
     
         <h3>Forçar a canviar la contrasenya:</h3>
         <pre><code>ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></pre>
-        <p>Aquesta comanda força l'usuari a canviar la contrasenya la pròxima vegada que intenti iniciar sessió.</p>
+        <p>Aquesta ordre força l'usuari a canviar la contrasenya la pròxima vegada que intenti iniciar sessió.</p>
     
         <h4>Exemple:</h4>
         <pre><code>ALTER USER jdoe PASSWORD EXPIRE;</code></pre>
     
-        <h2>3. Combinació de Comandes per Bloquejar i Forçar el Canvi de Contrasenya</h2>
-        <p>Si vols bloquejar un usuari i, a més, forçar-lo a canviar la contrasenya, pots utilitzar aquestes dues comandes:</p>
+        <h2>3. Combinació d'ordres per Bloquejar i Forçar el Canvi de Contrasenya</h2>
+        <p>Si vols bloquejar un usuari i, a més, forçar-lo a canviar la contrasenya, pots utilitzar aquestes dues ordres:</p>
     
         <pre><code>ALTER USER &lt;nom_usuari&gt; ACCOUNT LOCK;
     ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></pre>

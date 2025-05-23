@@ -52,7 +52,7 @@
       <li><strong>Standard Edition 2 (SE2)</strong> – Substituta de SE1. Limitada a 2 sockets i 16 fils de CPU.</li>
       <li><strong>Express Edition (XE)</strong> – ✅ Gratuïta! Limitada en recursos (1 CPU, 2GB RAM, 12GB espai).</li>
       <li><strong>Personal Edition (PE)</strong> – Orientada a desenvolupadors, només disponible en Windows.</li>
-      <li><strong>Lite Edition (LE)</strong> – Edició lleugera per a dispositius mòbils i embarcats (molt poc utilitzada).</li>
+      <li><strong>Lite Edition (LE)</strong> – Edició lleugera per a dispositius mòbils (molt poc utilitzada).</li>
       <li><strong>Oracle Database 23ai Free</strong> – ✅ Versió moderna gratuïta per a educació i proves, successora de XE.</li>
     </ul>
   
@@ -88,11 +88,12 @@
     <h3>🔗 Recursos</h3>
     <ul>
       <li><a href="https://soyundba.com/2021/05/19/diferencias-entre-enterprise-standard-standard-one-personal-y-express/" target="_blank">Comparació entre edicions (SoyUnDBA)</a></li>
-      <li><a href="https://www.oracle.com/database/free/#educators" target="_blank">Oracle Free 23ai (oficial)</a></li>
-      <li><a href="https://www.oracle.com/es/database/technologies/appdev/xe.html" target="_blank">Express Edition (XE)</a></li>
+      <li><a href="https://www.oracle.com/database/free/" target="_blank">Oracle Free 23ai (oficial)</a></li>
+      <li><a href="https://www.oracle.com/es/database/technologies/appdev/xe.html" target="_blank">Express Edition (21c XE)</a></li>
     </ul>
+    <p class="tips">(Practica 🧪) <a href="https://github.com/EnriqueIborra/ASGBD/blob/6e076602d64271984c39ce27b6ddea544ff78443/UD1/desplegar%20ORACLEdb23%20sobre%20Docker_simplif.pdf" target="_blank">
+       Primer contacte amb Oracle Database</a></p>
   </section>
-   
 
 
 
@@ -242,7 +243,7 @@
       <li><strong>PGA</strong> – Àrea de memòria privada per cada sessió/usuari</li>
     </ul>
   
-    <p>Es poden consultar amb les següents comandes des de SQL*Plus:</p>
+    <p>Es poden consultar amb les següents ordres des de SQL*Plus:</p>
     <pre>
   SQL> show sga;
   SQL> show parameter sga;
@@ -255,7 +256,7 @@
       Una instància sempre està associada a una base de dades (BBDD) concreta. Quan s’inicia la instància, es carrega la informació necessària per gestionar aquesta BBDD.
     </p>
     <ul>
-      <li> Una instància ↔ una base de dades muntada (normalment una CDB)</li>
+      <li> Una instància ⇄ una base de dades muntada (normalment una CDB)</li> 
       <li>⚠️ Si no s’inicia l’instància, no es pot accedir a la base de dades</li>
     </ul>
   
@@ -460,7 +461,7 @@
       <li><strong>Instal·lació només del software:</strong> és l'opció recomanada. Es fa servir després <code>dbca</code> per crear la base de dades.</li>
       <li><strong>Instal·lació del software amb creació de CDB + PDB :</strong> no és l’opció que utilitzarem.</li>
     </ul>
-    <p><strong>⚠️ No executar <code>setup.exe</code> més d’una vegada!</strong></p>
+    <p class="alert"> ⚠️ No executar <code>setup.exe</code> més d’una vegada!</p>
   
     <h3>Creació de la base de dades (CDB + PDB)</h3> 
     <ul>
@@ -746,7 +747,7 @@ SELECT * FROM DBA_PDBS;     </pre>
     <ul>
       <li> Instal·lar el <strong>software Oracle</strong> amb <code>setup.exe</code> o <code>runInstaller</code></li>
       <li> Crear una <strong>CDB i PDB</strong> amb l’eina <code>dbca</code></li>
-      <li> Crear manualment PDBs o CDBs des de línia de comandes</li>
+      <li> Crear manualment PDBs o CDBs des de línia d'ordres</li>
       <li> Coneixement dels permisos necessaris segons el rol de l’usuari (admin, oracle...)</li>
     </ul>
   

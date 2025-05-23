@@ -647,12 +647,12 @@ PARTITIONS 4;</code></pre>
 
     <h4>4. Particionament compost (<code>COMPOSITE</code>)</h4>
     <p>Combina dos tipus de particionament, típicament RANGE + HASH o RANGE + LIST.</p>
-    <pre><code>CREATE TABLE comandes (
+    <pre><code>CREATE TABLE ordres (
     id NUMBER,
-    data_comanda DATE,
+    data_ordre DATE,
     client_id NUMBER
 )
-PARTITION BY RANGE (data_comanda)
+PARTITION BY RANGE (data_ordre)
 SUBPARTITION BY HASH (client_id)
 SUBPARTITIONS 4
 (

@@ -177,7 +177,7 @@
           <code>audit_trail = DB</code> al fitxer d’inici <code>init.ora</code> o via <code>ALTER SYSTEM</code>
         </p>
       
-        <h3> Exemples de comandes <code>AUDIT</code></h3>
+        <h3> Exemples d'ordres <code>AUDIT</code></h3>
         <pre>
       -- Audita l’accés a taula
       AUDIT SELECT ON alumnes;
@@ -248,9 +248,9 @@
       
       <section id="exercici-auditoria">
         <h2>🧪 Exercici interactiu de simulació d’auditoria Oracle</h2>
-        <p>Introdueix comandes d’auditoria o consultes per veure què s’hauria registrat.</p>
+        <p>Introdueix ordres d’auditoria o consultes per veure què s’hauria registrat.</p>
       
-        <textarea id="inputSQL" rows="5" style="width: 100%;" placeholder="Escriu una comanda, ex:
+        <textarea id="inputSQL" rows="5" style="width: 100%;" placeholder="Escriu una ordre, ex:
       AUDIT SELECT ON alumnes;
       SELECT * FROM dba_audit_trail WHERE obj_name = 'ALUMNES';"></textarea>
       
@@ -286,7 +286,7 @@
                 resposta += "</tbody></table>";
               }
             } else {
-              resposta = "⚠️ Comanda no reconeguda. Pots usar <code>AUDIT ...</code> o <code>SELECT * FROM DBA_AUDIT_TRAIL</code>.";
+              resposta = "⚠️ Ordre no reconeguda. Pots usar <code>AUDIT ...</code> o <code>SELECT * FROM DBA_AUDIT_TRAIL</code>.";
             }
       
             output.innerHTML = resposta;
@@ -442,7 +442,7 @@
       
         <h3> Transaccions automàtiques i manuals</h3>
         <ul>
-          <li>En entorns interactius (SQL*Plus, Oracle SQL Developer), cada comanda és una transacció si s’executa amb <code>AUTOCOMMIT</code>.</li>
+          <li>En entorns interactius (SQL*Plus, Oracle SQL Developer), cada ordre és una transacció si s’executa amb <code>AUTOCOMMIT</code>.</li>
           <li>En entorns de producció, es recomana el control manual mitjançant blocs <code>BEGIN</code> ... <code>END</code>.</li>
         </ul>
       
