@@ -5,6 +5,8 @@ Visita:  https://enriqueiborra.github.io/ASGBD/
 En FP - CFGS - ASIX
 Mòdul: 0377 - Administració de Sistemes de Gestió de Bases de Dades
 
+![CID](docs/imgs/cid.png)
+
 RA 1. Implanta sistemes gestors de bases de dades analitzant les seues característiques i ajustant-se als requeriments del sistema
 
 RA 2. Configura el sistema gestor de bases de dades interpretant les seues especificacions tècniques i els requeriments d'explotació.
