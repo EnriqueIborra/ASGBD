@@ -7,7 +7,7 @@ Mòdul: 0377 - Administració de Sistemes de Gestió de Bases de Dades
 
 ![CID](docs/imgs/sistemas-GBD.jpg)
 
-## Resultados de aprendizaje
+## Resultats d'aprenentatge
 RA 1. Implanta sistemes gestors de bases de dades analitzant les seues característiques i ajustant-se als requeriments del sistema
 
 RA 2. Configura el sistema gestor de bases de dades interpretant les seues especificacions tècniques i els requeriments d'explotació.
@@ -20,9 +20,9 @@ RA 5. Optimitza el rendiment del sistema aplicant tècniques de monitorització 
 
 RA 6. Aplica criteris de disponibilitat i els analitza ajustant la configuració del sistema gestor.
 
-## Criterios de evaluación
-Los criterios de evaluación se pueden consultar en la página principal, pasando el ratón por encima de cada RA / UD
-Página principal :  https://enriqueiborra.github.io/ASGBD/ 
+## Criteris d'avaluació
+Els criteris d'avaluació es poden consultar a la pàgina principal, passant el ratolí per sobre de cada RA/UD
+Pàgina principal :  https://enriqueiborra.github.io/ASGBD/ 
 
 
 
