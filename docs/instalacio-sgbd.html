@@ -18,6 +18,7 @@
 
 <nav>
   <h3>Índex</h3>
+  <a href="#intro">Introducció</a>
   <a href="#edicions">Edicions</a>
   <a href="#versions">Versions</a>
   <a href="#requisits">Requisits</a>
@@ -32,7 +33,376 @@
 </nav>
 
 <main>
+  <section id="intro">
+    <h2>Definicions</h2>
 
+    <h3>Què és un DBA</h3>
+    <p>
+        La figura del DBA fa referència a la persona o a l’equip de persones responsables d’assegurar 
+        la disponibilitat de les dades d’una organització i l’accés a les mateixes de manera òptima.
+         Serà el responsable de tot el cicle de vida del sistema d’informació.
+    </p>
+
+    <h4>1. Tasques d’un DBA</h4>
+    <ul>
+        <li>Configurar el maquinari on s’instal·larà el SGBD</li>
+        <li>Configurar el sistema operatiu</li>
+        <li>Instal·lar i mantindre el SGBD</li>
+        <li>Crear i configurar bases de dades</li>
+        <li>Control d’usuaris i permisos</li>
+        <li>Gestió de la seguretat</li>
+        <li>Monitorar i optimitzar el rendiment de les bases de dades</li>
+        <li>Realitzar tasques de còpies de seguretat i recuperació</li>
+    </ul>
+
+    <h3>Què és un SGBD</h3>
+    <p>
+        Un SGBD és un conjunt de programes que permeten l’emmagatzematge, modificació i extracció de la informació d’una base de dades, a més de proporcionar ferramentes per a explotar, administrar i gestionar les bases de dades. 
+    </p>
+    <p>
+        En anglés DBMS o RDBMS (Data Base Management System).
+    </p>
+
+    <p><strong>Ranking DBMS:</strong> <a href="https://db-engines.com/en/ranking" target="_blank">https://db-engines.com/en/ranking</a></p>
+    <ul>
+        <li>Quants SGBD hi ha al rànquing</li>
+        <li>Dels 5 primers, quants són de codi obert</li>
+        <li>Els dos primers, a quina empresa pertanyen</li>
+        <li>Dels 7 primers, quins sistemes operatius suporten</li>
+        <li>El 8 i el 9, quins sistemes operatius suporten</li>
+    </ul>
+ <hr>
+
+    <h2>Classificacions dels SGBD</h2>
+    <p>
+        Les classificacions dels Sistemes de Gestió de Bases de Dades (SGBD) poden organitzar-se en diverses categories segons la seua arquitectura, nombre d’usuaris, model de dades i el seu propòsit o tipus de càrrega de treball.
+    </p>
+
+    <h3>1. Segons el nombre d’usuaris</h3>
+    <ul>
+        <li><strong>Monousuari</strong>
+            <ul>
+                <li>Dissenyats per a ser utilitzats per un únic usuari alhora.</li>
+                <li>Exemple: Microsoft Access (en entorns personals o d’escriptori).</li>
+            </ul>
+        </li>
+        <li><strong>Multiusuari</strong>
+            <ul>
+                <li>Permeten que múltiples usuaris accedisquen i treballen simultàniament amb la base de dades.</li>
+                <li>Controlen l’accés concurrent i la integritat de les dades.</li>
+                <li>Exemples: MySQL, PostgreSQL, Oracle Database, SQL Server.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>2. Segons la seua arquitectura</h3>
+    <ul>
+        <li><strong>Centralitzats</strong>
+            <ul>
+                <li>Tota la base de dades s’emmagatzema i gestiona en un únic servidor.</li>
+                <li>Els usuaris accedeixen al SGBD a través d’una xarxa, però tot el processament ocorre al servidor central.</li>
+                <li>Més fàcils de mantindre, però poden ser un coll de botella i un punt únic de fallada.</li>
+            </ul>
+        </li>
+        <li><strong>Distribuïts</strong>
+            <ul>
+                <li>La base de dades està repartida en múltiples nodes (servidors).</li>
+                <li>Les dades poden estar replicades o fragmentades entre diferents ubicacions.</li>
+                <li>Més complexos, però ofereixen major disponibilitat i escalabilitat.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>3. Segons el model de dades (o tipus de base de dades)</h3>
+    <p>Aquests SGBD es classifiquen segons la forma en què estructuren i accedeixen a les dades:</p>
+    <ul>
+        <li><strong>Relacionals</strong>
+            <ul>
+                <li>Basats en taules amb files i columnes.</li>
+                <li>Estructura fixa (esquema definit).</li>
+                <li>Usen SQL.</li>
+                <li>Exemples: MySQL, PostgreSQL, Oracle.</li>
+            </ul>
+        </li>
+        <li><strong>Documentals</strong>
+            <ul>
+                <li>Emmagatzemen dades en forma de documents (normalment JSON, BSON, etc.).</li>
+                <li>Flexibles, ideals per a dades semi-estructurades.</li>
+                <li>Exemples: MongoDB, CouchDB. Són part de NoSQL.</li>
+            </ul>
+        </li>
+        <li><strong>De grafs</strong>
+            <ul>
+                <li>Optimitzats per a representar relacions complexes entre dades.</li>
+                <li>Les dades s’emmagatzemen com a nodes i arestes.</li>
+                <li>Exemples: Neo4j, ArangoDB. També considerats NoSQL.</li>
+            </ul>
+        </li>
+        <li><strong>In-memory</strong>
+            <ul>
+                <li>Emmagatzemen les dades directament en la memòria RAM per a màxima velocitat.</li>
+                <li>Usats en temps real, memòries cau o aplicacions crítiques.</li>
+                <li>Exemples: Redis, SAP HANA.</li>
+            </ul>
+        </li>
+        <li><strong>De sèries temporals</strong>
+            <ul>
+                <li>Especialitzats en gestionar dades amb marques temporals (mètriques, logs, sensors).</li>
+                <li>Optimitzats per a inserir, consultar i analitzar dades cronològiques.</li>
+                <li>Exemples: InfluxDB, TimescaleDB.</li>
+            </ul>
+        </li>
+        <li><strong>Espacials</strong>
+            <ul>
+                <li>Dissenyats per a emmagatzemar i consultar dades geogràfiques i geomètriques.</li>
+                <li>Suporten operacions com intersecció de polígons, distàncies, coordenades.</li>
+                <li>Exemples: PostGIS (extensió de PostgreSQL), Oracle Spatial, MongoDB (suport geoespacial).</li>
+            </ul>
+        </li>
+        <li><strong>Altres models clàssics</strong>
+            <ul>
+                <li><em>Navegacionals</em>: Organitzats en arbres o xarxes jeràrquiques. (Ex. IMS)</li>
+                <li><em>Orientats a objectes</em>: Emmagatzemen objectes complets. (Ex. ObjectDB)</li>
+            </ul>
+        </li>
+    </ul>
+
+    <p><strong>Notes importants:</strong></p>
+    <ul>
+        <li>Alguns SGBD combinen múltiples models (per exemple, ArangoDB combina grafs, documents i claus-valor).</li>
+        <li>Molts motors relacionals moderns ofereixen extensions per a models no relacionals, com PostgreSQL amb PostGIS (espacial) o TimescaleDB (sèries temporals).</li>
+    </ul>
+
+    <h3>4. Segons el propòsit o tipus de càrrega de treball</h3>
+    <ul>
+        <li><strong>OLTP (Online Transaction Processing) – Transaccionals</strong>
+            <ul>
+                <li>Dissenyats per a gestionar moltes transaccions ràpides i concurrents.</li>
+                <li>Usats en sistemes operacionals: vendes, bancs, reserves, etc.</li>
+                <li>Requereixen alta integritat, concurrència i recuperació davant fallades.</li>
+                <li>Exemples: MySQL, PostgreSQL, Oracle, SQL Server.</li>
+            </ul>
+        </li>
+        <li><strong>OLAP (Online Analytical Processing) – Analítics / Data Warehouse</strong>
+            <ul>
+                <li>Optimitzats per a consultes complexes i anàlisi de grans volums de dades.</li>
+                <li>Suporten operacions com agregació, slicing, dicing, drill-down.</li>
+                <li>Usats en intel·ligència de negoci, informes, dashboards.</li>
+                <li>Exemples: Amazon Redshift, Snowflake, Google BigQuery, Microsoft Synapse, Teradata.</li>
+            </ul>
+        </li>
+    </ul>
+    <p>Alguns SGBD moderns (com PostgreSQL o SQL Server) poden realitzar funcions OLTP i OLAP híbrides, encara que no tan especialitzades com les eines pures.</p>
+
+    <h2>Tipus de connexió a una Base de Dades</h2>
+
+    <h3>1. Des de consola (CLI - Command Line Interface)</h3>
+    <ul>
+        <li><strong>In situ</strong>
+            <ul>
+                <li>Connexió local, des del mateix equip on està la base de dades.</li>
+                <li>Exemples:<br>
+                    <code>sqlplus usuari/pass@host/nombasedades</code>
+                    <code>mysql -u usuari -p</code><br>
+                    <code>psql -U usuari -d basedades</code>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Per SSH (Secure Shell)</strong>
+            <ul>
+                <li>Connexió remota i segura a través d’un túnel SSH al servidor on està la BD.</li>
+                <li>Útil per a mantindre la seguretat en entorns productius.</li>
+                <li>Exemples:<br>
+                    <code>ssh usuari@servidor</code><br>
+                    <code>mysql -u usuari -p</code>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>2. Des d’un entorn gràfic (GUI - Graphical User Interface)</h3>
+    <p>Ferramentes visuals que permeten gestionar bases de dades de manera amigable:</p>
+    <ul>
+        <li>Interfície intuïtiva, ideal per a usuaris no tècnics o per a tasques ràpides.</li>
+        <li>Exemples:
+            <ul>
+                <li>SQL Developer</li>
+                <li>DBeaver</li>
+                <li>phpMyAdmin</li>
+                <li>pgAdmin</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>3. Des d’un llenguatge de programació (via driver o API)</h3>
+    <p>Connexió programada des d’una aplicació o script.</p>
+    <ul>
+        <li><strong>PDO (PHP Data Objects)</strong>
+            <ul>
+                <li>Abstracció d’accés a base de dades en PHP.</li>
+                <li>Suporta múltiples motors (MySQL, SQLite, PostgreSQL, etc.).</li>
+                <li>Exemple:<br>
+                    <code>$pdo = new PDO("mysql:host=localhost;dbname=mi_bd", "usuari", "contrasenya");</code>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Altres drivers per llenguatge</strong>
+            <ul>
+                <li>JDBC (Java)</li>
+                <li>ODBC (multiplataforma)</li>
+                <li>psycopg2 (Python per a PostgreSQL)</li>
+                <li>SQLAlchemy (ORM per a Python)</li>
+                <li>etc...</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>Funcions d’un SGBD</h2>
+<ul>
+    <li><strong>DDL (Data Definition Language)</strong>: <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>, <code>TRUNCATE</code>, <code>COMMENT</code>, <code>RENAME</code></li>
+    <li><strong>DML (Data Manipulation Language)</strong>: <code>INSERT</code>, <code>DELETE</code>, <code>UPDATE</code>, <code>SELECT</code>
+        <br>↳ <strong>DQL (Data Query Language)</strong>: <code>SELECT</code>
+    </li>
+    <li><strong>DCL (Data Control Language)</strong>: <code>GRANT</code>, <code>REVOKE</code></li>
+    <li><strong>TCL (Transaction Control Language)</strong>: <code>COMMIT</code>, <code>ROLLBACK</code>, <code>SAVEPOINT</code></li>
+    <li><strong>Integritat referencial</strong>: Garantir la coherència entre taules relacionades (claus foranes, dependències, etc.).</li>
+    <li><strong>Auditoria</strong>: Registrar qui accedeix o modifica dades, i quan ho fa.</li>
+    <li><strong>Temps de resposta idoni</strong>: Proporcionar respostes ràpides i eficients a consultes i operacions.</li>
+    <li><strong>Independència física i lògica</strong>: Separar la manera com es veuen les dades de com estan emmagatzemades internament.</li>
+    <li><strong>Monitoratge del SGBD</strong>: Supervisar el rendiment, ús de recursos, sessions, etc.</li>
+    <li><strong>Connectivitat</strong>: Permetre accés des de diferents aplicacions, sistemes operatius i ubicacions.</li>
+    <li><strong>Còpia i recuperació</strong>: Fer còpies de seguretat i restaurar-les en cas de fallada o pèrdua de dades.</li>
+</ul>
+
+<h2>Elements d’un SGBD</h2>
+<p>Un Sistema Gestor de Bases de Dades (SGBD) està compost per diversos elements o components que treballen conjuntament per facilitar l’emmagatzematge, recuperació, manipulació i administració de dades.</p>
+
+<h3>1. Processador de consultes</h3>
+<p>És el component encarregat d’interpretar i executar les consultes realitzades pels usuaris (normalment en SQL). Les seues funcions inclouen:</p>
+<ul>
+    <li>Anàlisi lèxica i sintàctica de les consultes.</li>
+    <li>Optimització de consultes per millorar-ne el rendiment.</li>
+    <li>Generació del pla d’execució.</li>
+</ul>
+
+<h3>2. Gestor de la base de dades</h3>
+<p>És el nucli del SGBD. Controla l’accés a les dades i garanteix la seua integritat, seguretat i concurrència. Les seues responsabilitats són:</p>
+<ul>
+    <li>Control de transaccions.</li>
+    <li>Gestió de la concurrència (accés simultani).</li>
+    <li>Recuperació davant de fallades.</li>
+    <li>Control d’integritat.</li>
+</ul>
+
+<h3>3. Gestor d’arxius</h3>
+<p>Aquest component administra l’emmagatzematge físic de les dades en disc. Entre les seues funcions estan:</p>
+<ul>
+    <li>Lectura i escriptura de blocs de dades.</li>
+    <li>Organització i emmagatzematge eficient.</li>
+    <li>Manteniment d’índexs i estructures d’emmagatzematge.</li>
+</ul>
+
+<h3>4. Interfícies externes</h3>
+<p>Són els mecanismes que permeten als usuaris i aplicacions comunicar-se amb el SGBD. Poden incloure:</p>
+<ul>
+    <li>Interfícies gràfiques (GUI).</li>
+    <li>Interfícies de programació (API).</li>
+    <li>Consoles de comandes.</li>
+    <li>Connectors per a llenguatges de programació.</li>
+</ul>
+
+<h3>5. Preprocessador del llenguatge de manipulació de dades (DML)</h3>
+<p>Aquest component s’encarrega d’identificar les sentències DML (com <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>) dins del codi font d’una aplicació. Funcions clau:</p>
+<ul>
+    <li>Integrar sentències DML en llenguatges com C, Java, etc.</li>
+    <li>Traduir-les a crides al processador de consultes del SGBD.</li>
+</ul>
+
+<h3>6. Compilador del llenguatge de definició de dades (DDL)</h3>
+<p>Traduïx les sentències DDL (com <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>) que definixen l’estructura de la base de dades. La seua funció és:</p>
+<ul>
+    <li>Processar les definicions d’esquemes, taules, índexs, vistes, etc.</li>
+    <li>Actualitzar el diccionari de dades amb aquesta informació.</li>
+</ul>
+
+<h3>7. Gestor del diccionari</h3>
+<p>El diccionari (o catàleg) de dades és una base de dades interna que emmagatzema metadades. Aquest gestor:</p>
+<ul>
+    <li>Administra el diccionari de dades.</li>
+    <li>Proporciona informació sobre les estructures, restriccions, usuaris i permisos.</li>
+    <li>És consultat per quasi tots els altres components del SGBD.</li>
+</ul>
+<hr>
+
+<h2>Com seleccionar un SGBD</h2>
+<p>Una vegada es coneixen els elements d’un SGBD, els tipus de SGBD i els conceptes clau, ja s’està en posició de poder triar un SGBD tenint en compte els factors que determinaran l’elecció.</p>
+
+<h3>Factors per a l’elecció del SGBD</h3>
+<ul>
+    <li>Tipus de dades a tractar</li>
+    <li>Volum de dades</li>
+    <li>Nombre d’usuaris i necessitat de concurrència</li>
+    <li>Tipus de consultes</li>
+    <li>Cost (compra i manteniment), llicències</li>
+    <li>Velocitat de lectura/escriptura</li>
+    <li>Arquitectura i connectivitat (escalabilitat)</li>
+    <li>Recursos i política de l’empresa</li>
+    <li>Seguretat (compliment normatiu – <em>compliance</em>)</li>
+    <li>Requisits del sistema
+        <ul>
+            <li>Integració amb altres aplicacions</li>
+            <li>APIs</li>
+            <li>Migració de dades</li>
+        </ul>
+    </li>
+    <li>Tipologia de la base de dades (relacional, NoSQL, etc.)</li>
+    <li>Experiència de l’equip (comunitat, documentació disponible)</li>
+    <li>Suport tècnic</li>
+    <li>Actualitzacions del producte</li>
+</ul>
+
+<h2>Documentació</h2>
+<p>En cada instal·lació s’haurà d’elaborar o omplir una documentació amb la informació següent. Aquesta documentació <strong>no serà pública</strong> i es guardarà per a consultes tècniques.</p>
+
+<ul>
+    <li>Nom i contacte de la persona instal·ladora</li>
+    <li>Data de la instal·lació</li>
+    <li>Màquina, IP, DNS, port(s)</li>
+    <li>Característiques de la màquina</li>
+    <li>Com accedir a la màquina (física, virtual, núvol)</li>
+    <li>Sistema Operatiu / versió</li>
+    <li>Usuari administrador del sistema operatiu</li>
+    <li>Usuari que realitza la instal·lació</li>
+    <li>Producte i versió utilitzada del SGBD</li>
+    <li>Llocs/carpetes on s’instal·la el producte</li>
+    <li>Llocs/carpetes on s’instal·la la base de dades</li>
+    <li>Llocs/carpetes on estan els fitxers rellevants</li>
+    <li>Noms de les bases de dades (CDB, PDBs, ...)</li>
+    <li>... i qualsevol altra informació que es considere rellevant</li>
+</ul>
+<hr>
+<h2>Verificar els requisits d’instal·lació</h2>
+<p>En cada SGBD hi haurà uns requisits que podem trobar en la documentació de cada versió del producte concret ... ORACLE, PostgreSQL, MySQL, etc.</p>
+<p>Abans de començar la instal·lació, cal aconseguir i tindre disponibles aquests documents!</p>
+<p><strong>Verificar:</strong></p>
+<ul>
+    <li>Requisits de hardware</li>
+    <li>Kernel del sistema operatiu adequat</li>
+    <li>Comunicacions</li>
+    <li>Espai lliure (memòria i emmagatzematge)</li>
+    <li>Existència de paquets i versions</li>
+    <li>Variables d’entorn</li>
+    <li>Usuaris</li>
+</ul>
+
+<h2>Registre de la instal·lació (log de la instal·lació)</h2>
+<p>Tots els instal·ladors de sistemes gestors de bases de dades guarden un registre de les operacions 
+  realitzades durant la instal·lació. Aquest registre és útil en cas que es produeixi algun problema, 
+  per a diagnosticar-ne el motiu.</p>
+<p>L’estructura i ubicació del registre de la instal·lació dependrà del SGBD.</p>
+
+
+  </section>
 
   
   <section id="edicions">
@@ -139,8 +509,12 @@
           <li>Requisits de seguretat, escalabilitat i disponibilitat</li>
         </ul>
       </li>
+      <li>També es molt important tindre en consideració el fi de suport d'una versió (EOL, End of Life)</li>
     </ul>
-  
+  <p>El  Fi de vida útil, més conegut pel seu terme anglès End Of Life (EOL), és un terme que fa referència a 
+    la caducitat d'un producte de programari. És a dir, és el moment en què un programari deixa de tenir 
+    manteniment i suport.</p>
+
     <h3> Resum</h3>
     <ul>
       <li> La versió defineix la tecnologia i característiques disponibles</li>
@@ -274,7 +648,7 @@
   
     <h3> Notes tècniques</h3>
     <ul>
-      <li> Una mateixa màquina pot tindre diverses instàncies (una per SID)</li>
+      <li> Una mateixa màquina pot tindre diverses instàncies </li>
       <li> És possible connectar-se a una instància sense obrir la base de dades (per manteniment)</li>
       <li> La instància i la base de dades estan lligades però són components separats</li>
     </ul>
