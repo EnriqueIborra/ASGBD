@@ -20,5 +20,10 @@ RA 5. Optimitza el rendiment del sistema aplicant tècniques de monitorització 
 
 RA 6. Aplica criteris de disponibilitat i els analitza ajustant la configuració del sistema gestor.
 
+## Criterios de evaluación
+Los criterios de evaluación se pueden consultar en la página principal, pasando el ratón por encima de cada RA / UD
+Página principal :  https://enriqueiborra.github.io/ASGBD/ 
+
+
 
 
