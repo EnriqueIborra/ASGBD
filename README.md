@@ -5,7 +5,7 @@ Visita:  https://enriqueiborra.github.io/ASGBD/
 En FP - CFGS - ASIX
 Mòdul: 0377 - Administració de Sistemes de Gestió de Bases de Dades
 
-![CID](docs/imgs/cid.png)
+![CID](docs/imgs/sistemas-GBD.jpg)
 
 RA 1. Implanta sistemes gestors de bases de dades analitzant les seues característiques i ajustant-se als requeriments del sistema
 
