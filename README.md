@@ -8,7 +8,7 @@ Mòdul: 0377 - Administració de Sistemes de Gestió de Bases de Dades
 
 ![CID](docs/imgs/sistemas-GBD.jpg)
 
-D'acord amb el Reial decret 1629/2009, de 30 d'octubre, i actualitzat al Reial decret 500/2024, de 21 de maig, 
+D'acord amb el Reial decret 1629/2009, de 30 d'octubre, i actualitzat en Reial decret 500/2024, de 21 de maig, 
 pel qual s'estableix el títol de tècnic superior en administració de sistemes informàtics en xarxa i 
 se'n fixen els ensenyaments mínims, els resultats d'aprenentatge són:
 ## Resultats d'aprenentatge
