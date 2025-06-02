@@ -22,7 +22,7 @@ RA 6. Aplica criteris de disponibilitat i els analitza ajustant la configuració
 
 ## Criteris d'avaluació
 Els criteris d'avaluació es poden consultar a la pàgina principal, passant el ratolí per sobre de cada RA/UD
-Pàgina principal :  https://enriqueiborra.github.io/ASGBD/ 
+ Pàgina principal :  https://enriqueiborra.github.io/ASGBD/ 
 
 
 
