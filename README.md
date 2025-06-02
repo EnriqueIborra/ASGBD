@@ -8,6 +8,9 @@ Mòdul: 0377 - Administració de Sistemes de Gestió de Bases de Dades
 
 ![CID](docs/imgs/sistemas-GBD.jpg)
 
+De acuerdo al Real Decreto 1629/2009, de 30 de octubre, y actualizado en el Real Decreto 500/2024, de 21 de mayo, 
+por el que se establece el título de Técnico Superior en Administración de Sistemas Informáticos en Red y 
+se fijan sus enseñanzas mínimas, los resultados de aprendizaje son:
 ## Resultats d'aprenentatge
 RA 1. Implanta sistemes gestors de bases de dades analitzant les seues característiques i ajustant-se als requeriments del sistema
 
