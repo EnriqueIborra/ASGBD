@@ -2,9 +2,9 @@
 
 Visita pàgina principal de continguts en:  https://enriqueiborra.github.io/ASGBD/ 
 
-En FP - CFGS - ASIX 
+Per al Mòdul: 0377 - Administració de Sistemes de Gestió de Bases de Dades
 
-Mòdul: 0377 - Administració de Sistemes de Gestió de Bases de Dades
+Del cicle CFGS ASIX
 
 ![CID](docs/imgs/sistemas-GBD.jpg)
 
