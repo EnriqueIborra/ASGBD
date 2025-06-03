@@ -1,6 +1,6 @@
 # ASGBD
 
-Visita:  https://enriqueiborra.github.io/ASGBD/ 
+Visita pàgina principal de continguts en:  https://enriqueiborra.github.io/ASGBD/ 
 
 En FP - CFGS - ASIX 
 
