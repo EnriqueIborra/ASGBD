@@ -43,7 +43,7 @@
          Serà el responsable de tot el cicle de vida del sistema d’informació.
     </p>
 
-    <h4>1. Tasques d’un DBA</h4>
+    <h4><u>Tasques d’un DBA</u></h4>
     <ul>
         <li>Configurar el maquinari on s’instal·larà el SGBD</li>
         <li>Configurar el sistema operatiu</li>
@@ -64,13 +64,14 @@
     </p>
 
     <p><strong>Ranking DBMS:</strong> <a href="https://db-engines.com/en/ranking" target="_blank">https://db-engines.com/en/ranking</a></p>
-    <ul>
+    <p>Contesta a les preguntes ...</p>
+    <div class="preg"><ul >
         <li>Quants SGBD hi ha al rànquing</li>
         <li>Dels 5 primers, quants són de codi obert</li>
         <li>Els dos primers, a quina empresa pertanyen</li>
         <li>Dels 7 primers, quins sistemes operatius suporten</li>
         <li>El 8 i el 9, quins sistemes operatius suporten</li>
-    </ul>
+    </ul></div>
  <hr>
 
     <h2>Classificacions dels SGBD</h2>
@@ -161,8 +162,8 @@
         </li>
         <li><strong>Altres models clàssics</strong>
             <ul>
-                <li><em>Navegacionals</em>: Organitzats en arbres o xarxes jeràrquiques. (Ex. IMS)</li>
-                <li><em>Orientats a objectes</em>: Emmagatzemen objectes complets. (Ex. ObjectDB)</li>
+                <li><em>Navegacionals</em>: Organitzats en arbres o xarxes jeràrquiques.</li>
+                <li><em>Orientats a objectes</em>: Emmagatzemen objectes complets.</li>
             </ul>
         </li>
     </ul>
@@ -522,6 +523,11 @@
       <li> 19c és la versió estable més utilitzada en producció (fins avui)</li>
       <li> 23ai és una nova versió gratuïta orientada a innovació</li>
     </ul>
+
+    <div class="preg">
+      <li>Quina és l'última versió que suporta non-cdb</li>
+      <li>Quines versions estan dins del seu cicle de vida</li>
+    </div>
   </section>
   
 
@@ -947,9 +953,28 @@ SELECT * FROM DBA_PDBS;     </pre>
   SQL> show user;
     </pre>
     <p>⚠️ SYS i SYSTEM són usuaris diferents</p>
-  
+
+    <p>Per connectar a un SGBD que es troba en una altra màquina: (necessitem <strong>ip</strong> o <strong>nom_dns</strong>)</p>
+    <pre>
+  SQL> conn system/1234@<strong>10.0.2.6</strong>/NOMPDB
+  o 
+  SQL> conn system/1234@<strong>altramaquina.com</strong>/NOMPDB
+  SQL> show sga;
+  SQL> show user;
+    </pre>
+
+    <p>Per connectar a un SGBD que es troba escoltant en un altre port (diferent al port habitual d'oracle)</p>
+    <pre>
+  SQL> conn system/1234@10.0.2.6<strong>:1525</strong>/NOMPDB
+  o 
+  SQL> conn system/1234@altramaquina.com<strong>:1525</strong>/NOMPDB
+  SQL> show sga;
+  SQL> show user;
+    </pre>  
+<p>⚠️ <strong>1521</strong> és el port habitual d'oracle</p>
+
     <h3>🔄 Canvi de contenidor</h3>
-    <p>Per passar d’una CDB a una PDB, o viceversa:</p>
+    <p>Una vegada connectats a l'SGBD mitjançant sqlplus, per passar d’una CDB a una PDB, o viceversa:</p>
     <pre>
   SQL> alter session set container=NOMPDB;
   SQL> show con_name;
