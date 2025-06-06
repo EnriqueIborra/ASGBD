@@ -1,6 +1,7 @@
 # ASGBD
 
 Visita pàgina principal de continguts en:  https://enriqueiborra.github.io/ASGBD/ 
+
 Fes servir ![traductor](docs/imgs/icono-trad-google.png) per visualitzar en altres llengües.
 
 Per al Mòdul: 0377 - Administració de Sistemes de Gestió de Bases de Dades
