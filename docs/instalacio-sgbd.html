@@ -69,8 +69,10 @@
         <li>Quants SGBD hi ha al rànquing</li>
         <li>Dels 5 primers, quants són de codi obert</li>
         <li>Els dos primers, a quina empresa pertanyen</li>
-        <li>Dels 7 primers, quins sistemes operatius suporten</li>
-        <li>El 8 i el 9, quins sistemes operatius suporten</li>
+        <li>Dels 7 primers, quins sistemes operatius suporten (fes una graella o taula)</li>
+        <li>Dels 7 primers, quins suporten el model relacional</li>
+        <li>Dels 7 primers, quins suporten el model documental</li>
+        
     </ul></div>
  <hr>
 
@@ -782,7 +784,7 @@
     <p>On:</p>
     <ul>
       <li><code>/u01</code> és el punt de muntatge principal</li>
-      <li><code>oracle</code> és el nom de l’usuari que instal·la</li>
+      <li><code>oracle</code> és el nom de l’usuari que instal·la  ⚠️</li>
       <li><code>product</code> conté diferents versions del software</li>
       <li><code>21.0.0</code> és la versió instal·lada</li>
     </ul>
@@ -867,7 +869,7 @@
     </ul>
   
       
-    <h3>Instal·lació / creacio del LISTENER</h3>
+    <h3>Instal·lació / creacio del LISTENER ⚠️⚠️</h3>
     <p>Una vegada instal·lat el SW i la BBDD , s'ha d'instal·lar el LISTENER.</p>
     <pre>C:\Windows\system32> netca</pre>
       <ul>
@@ -981,7 +983,31 @@ SELECT * FROM DBA_PDBS;     </pre>
   SQL> alter session set container=CDB$ROOT;
     </pre>
   
-    <h3>🐧 Des de Linux</h3>
+    <h3>🐧 Des de Linux amb  🐳 contenidor podman</h3>
+    <pre>
+  podman exec -it cont-oracle sqlplus / as sysdba
+     -- Per entrar al CDB i vore les PDB , o crear PDBs noves
+ 
+  podman exec -it cont-oracle sqlplus sys/1234@FREEPDB1 as sysdba      
+     -- Per entrar a la PDB anomenada FREEPDB1  (la que porta inicialment)
+    </pre>
+    <p>Una vegada dins:</p>
+    <div class="pre-container">
+      <span class="code-type">SQL</span>
+      <div class="copy-button">⧉ COPIA Codi</div>
+    <pre>
+   show con_name
+   show pdbs
+   alter session set container=FREEPDB1;
+   show pdbs
+   conn system
+   show pdbs
+   disc      </pre>
+    </div>
+
+
+
+        <h3>🐧 Des de Linux</h3>
     <p>Des de terminal amb usuari <code>oracle</code>:</p>
     <pre>
   $ . oraenv                  # Carrega l'entorn Oracle
@@ -1083,17 +1109,24 @@ SELECT * FROM DBA_PDBS;     </pre>
       Des de <code>sqlplus</code> com <code>SYS</code> i dins la CDB, podem crear la PDB indicant els fitxers exactes i rutes:
     </p>
     <pre>
-  SQL> CREATE PLUGGABLE DATABASE datapdb 
-  ADMIN USER pdbadmin1 IDENTIFIED BY 1234 
-  ROLES = (dba) 
-  PATH_PREFIX = '/opt/oracle/oradata/ORCLCDB/DATAPDB/'
+  SQL> 
+  -- En contenidor d'oracle23ai
+  CREATE PLUGGABLE DATABASE DATAPDB
+  ADMIN USER pdbadmin1 IDENTIFIED BY 1234
+  ROLES = (dba)
+  PATH_PREFIX = '/opt/oracle/oradata/FREE/DATAPDB/'
   FILE_NAME_CONVERT = (
-    '/opt/oracle/oradata/ORCLCDB/pdbseed/',
-    '/opt/oracle/oradata/ORCLCDB/DATAPDB/'
+    '/opt/oracle/oradata/FREE/pdbseed/',
+    '/opt/oracle/oradata/FREE/DATAPDB/'
   )
-  DEFAULT TABLESPACE users 
-  DATAFILE '/opt/oracle/oradata/DATAPDB/users01.dbf' AUTOEXTEND ON;
+  DEFAULT TABLESPACE users
+  DATAFILE '/opt/oracle/oradata/DATAPDB/users01.dbf' AUTOEXTEND ON
     </pre>
+    <p>Es recomana utilitzar el comando <code>edit  </code> i <code>run</code> per facilitar el treball</p>
+    <p>El editor funciona com un editor <code>vi</code> 
+     ( <a href="https://labex.io/es/tutorials/linux-edit-text-files-with-the-vi-editor-in-linux-590850">Aprén l'editor vi</a> )  </p>
+    
+ 
   
     <h4> Notes útils:</h4>
     <ul>
