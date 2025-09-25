@@ -70,9 +70,7 @@
         <li>Dels 5 primers, quants són de codi obert</li>
         <li>Els dos primers, a quina empresa pertanyen</li>
         <li>Dels 7 primers, quins sistemes operatius suporten (fes una graella o taula)</li>
-        <li>Dels 7 primers, quins suporten el model relacional</li>
-        <li>Dels 7 primers, quins suporten el model documental</li>
-        
+        <li>Dels 7 primers, quins models de dades suporten (fes una graella o taula)</li>
     </ul></div>
  <hr>
 
@@ -933,6 +931,15 @@
     o eines compatibles com SQLcl), no formen part de SQL estàndard ni de PL/SQL.
   La ordre SELECT si és una ordre SQL</p>
   <pre>
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 FREEPDB1			  READ WRITE NO
+
+  </pre>
+  <pre>
 Les ordres sqlplus solen ser ALIAS de consultes SQL. 
 Per exemple SHOW PDBS es pot fer amb:
 SELECT CON_ID, NAME, OPEN_MODE, RESTRICTED FROM V$PDBS; 
@@ -1108,9 +1115,8 @@ SELECT * FROM DBA_PDBS;     </pre>
     <p>
       Des de <code>sqlplus</code> com <code>SYS</code> i dins la CDB, podem crear la PDB indicant els fitxers exactes i rutes:
     </p>
-    <pre>
-  SQL> 
-  -- En contenidor d'oracle23ai
+  <div class="pre-container">       <span class="code-type">SQL</span>      <button class="copy-button">Copia Codi !</button>   <pre>
+  -- En contenidor d'oracle23ai  
   CREATE PLUGGABLE DATABASE DATAPDB
   ADMIN USER pdbadmin1 IDENTIFIED BY 1234
   ROLES = (dba)
@@ -1121,15 +1127,24 @@ SELECT * FROM DBA_PDBS;     </pre>
   )
   DEFAULT TABLESPACE users
   DATAFILE '/opt/oracle/oradata/DATAPDB/users01.dbf' AUTOEXTEND ON
-    </pre>
+    </pre> </div>
+
     <p>Es recomana utilitzar el comando <code>edit  </code> i <code>run</code> per facilitar el treball</p>
-    <p>El editor funciona com un editor <code>vi</code> 
-     ( <a href="https://keepcoding.io/blog/como-funciona-el-editor-de-texto-vi/">Aprén l'editor vi</a> )  </p>
- 
-  
+    <p>El comando <code>edit</code> obri un editor  (vi en linux, notepad en Windows) per introduir més comodament les sentències SQL, i en acabar, guardem, eixim, i des
+    de la linea de SQL> , executem amb el comando  <code>run</code> </p>
+    <ul> <li> ( <a href="https://keepcoding.io/blog/como-funciona-el-editor-de-texto-vi/">Aprén l'editor vi</a> )  </li></ul>
+    <h5>Una vegada es crea la PDB nova, incialment està en mode MOUNT, i en este mode no és pot accedir. Per accedir necessitem obrir-la </h5>
+   <div class="pre-container">       <span class="code-type">SQL</span>      <button class="copy-button">Copia Codi !</button>   <pre>
+     -- Per obrir la PDB
+  ALTER PLUGGABLE DATABASE DATAPDB OPEN;
+
+     -- Per fer que s'obriga automaticament quan es reinicie el sistema (maquina)
+  ALTER PLUGGABLE DATABASE DATAPDB SAVE STATE;
+ </pre> </div>
+
     <h4> Notes útils:</h4>
     <ul>
-      <li> Pots consultar on es troben els fitxers de dades amb:</li>
+      <li> Es pot consultar on es troben els fitxers de dades amb:</li>
       <pre>SQL> SELECT name FROM v$datafile;</pre>
       <li> <code>PATH_PREFIX</code> ajuda a identificar la ruta base de la nova PDB</li>
       <li> <code>FILE_NAME_CONVERT</code> copia i adapta fitxers del PDB$SEED</li>
@@ -1137,8 +1152,8 @@ SELECT * FROM DBA_PDBS;     </pre>
   
     <h4>🗑️ Esborrar una PDB (Linux):</h4>
     <pre>
-  SQL> ALTER PLUGGABLE DATABASE pdb_manual CLOSE IMMEDIATE;
-  SQL> DROP PLUGGABLE DATABASE pdb_manual INCLUDING DATAFILES;
+  SQL> ALTER PLUGGABLE DATABASE nom_pdb CLOSE IMMEDIATE;
+  SQL> DROP PLUGGABLE DATABASE nom_pdb INCLUDING DATAFILES;
     </pre>
   
     <h3> Recomanacions finals</h3>
