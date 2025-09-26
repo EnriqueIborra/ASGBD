@@ -852,11 +852,21 @@
       <li>L’usuari que fa la instal·lació passa a ser l’<strong>usuari instal·lador del SGBD</strong>.</li>
       <li>Al final del procés, es mostra la <strong>ruta del fitxer de log</strong> de la instal·lació.</li>
     </ul>
-  
+      <p>Una vegada el SGBD i la CDB estan en funcionament (instància) , des del SO es pot verificar amb:</p>
+     <h4> En Windows </h4>
+     <p> Obri la finestra de serveis (services.msc) i busca: <br>
+      &nbsp;&nbsp;  OracleServiceNOMBD → indica si la instància de la BD està en marxa.</p>
+        
+    <h4> 🐧 En Linux</h4>
+    <pre>
+      ps -ef | grep pmon
+      ps -ef | grep mon  </pre>
+      <p>I es mostre més d'una línia (la del grep) !!</p>  
+     <hr>
     <h3>Creació de més  PDB</h3>
-    <p>També es fa amb <code>dbca</code>:</p>
+    <p>També es fa amb <code>dbca</code> (des del Sistema Operatiu ), encara que més endavant es vorà com fer-ho des de dins del SGBD</p>
     <ul>
-      <li>CMD amb permisos d’administrador:</li>
+      <li>En un CMD amb permisos d’administrador:</li>
       <pre>C:\Windows\system32> dbca</pre>
       <li>També pot executar-se com a:
         <ul>
@@ -865,8 +875,7 @@
         </ul>
       </li>
     </ul>
-  
-      
+    <hr>      
     <h3>Instal·lació / creacio del LISTENER ⚠️⚠️</h3>
     <p>Una vegada instal·lat el SW i la BBDD , s'ha d'instal·lar el LISTENER.</p>
     <pre>C:\Windows\system32> netca</pre>
@@ -879,6 +888,14 @@
           <li>nomenclatura de connexió senzilla</li>
         </ul>
       </ul>
+    <p>Una vegada el LISTENER en funcionament, des del SO es pot verificar amb:</p>
+    <pre>
+      C:\Windows\system32> lsnrctl status 
+
+    o en linux
+      $ lsnrctl status     </pre>  
+    <p> També es pot comprovar obrint la finestra de serveis (services.msc) i buscant: <br>
+     &nbsp;&nbsp;   OracleOraDB...TNSListener → indica si el listener està actiu.  </p>
 
     <p><strong>Resum:</strong></p>
     <ul>
@@ -1041,7 +1058,7 @@ SELECT * FROM DBA_PDBS;     </pre>
       <li> Si les variables d’entorn no estan carregades (en Linux <code>'. oraenv'</code>), no es podrà iniciar <code>sqlplus</code> correctament.</li>
       <li> <strong>CON_ID=1</strong> representa la CDB, però no sempre es mostra amb <code>show pdbs</code>.</li>
     </ul>
-  
+       <hr>
     <h3> Què és SQL*Plus?</h3>
     <p>És un client per línia d’ordres proporcionat per ORACLE que permet executar SQL, PL/SQL i ordres específiques d'sqlplus. 
       És una de les eines més antigues i utilitzades per administradors i desenvolupadors.
@@ -1130,7 +1147,7 @@ SELECT * FROM DBA_PDBS;     </pre>
     </pre> </div>
 
     <p>Es recomana utilitzar el comando <code>edit  </code> i <code>run</code> per facilitar el treball</p>
-    <p>El comando <code>edit</code> obri un editor  (vi en linux, notepad en Windows) per introduir més comodament les sentències SQL, i en acabar, guardem, eixim, i des
+    <p>El comando <code>edit</code> obri un editor  ( <strong>vi</strong> en linux, <strong>notepad</strong> en Windows) per introduir més comodament les sentències SQL, i en acabar, guardem, eixim, i des
     de la linea de SQL> , executem amb el comando  <code>run</code> </p>
     <ul> <li> ( <a href="https://keepcoding.io/blog/como-funciona-el-editor-de-texto-vi/">Aprén l'editor vi</a> )  </li></ul>
     <h5>Una vegada es crea la PDB nova, incialment està en mode MOUNT, i en este mode no és pot accedir. Per accedir necessitem obrir-la </h5>
