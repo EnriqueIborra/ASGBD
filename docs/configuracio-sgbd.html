@@ -381,8 +381,43 @@ SQL> STARTUP;
     <pre>
   SQL> ALTER SESSION SET CONTAINER = nom_pdb;
   SQL> CREATE USER admin_pdb IDENTIFIED BY 1234;
-  SQL> GRANT dba TO admin_pdb;
-    </pre>
+  SQL> GRANT dba TO admin_pdb;      </pre>
+    <p>Donar més privilègis...</p>
+    <pre>GRANT SYSDBA TO admin_pdb;</pre>
+    <pre>---  I es pot connectar com sysdba
+sqlplus admin_pdb/1234 AS SYSDBA     </pre>
+<p>Això li dóna el mateix nivell d'accés que SYS, però sense ser el propietari del diccionari de dades. És el màxim privilegi possible per a un usuari que no és SYS</p>
+    <p>En altres SGBDs, l'usuari administrador varia...</p>
+    <table >
+  <caption >Comparativa d'usuaris administradors</caption>
+  <thead>
+    <tr>
+      <th >Sistema</th>
+      <th >Usuari administrador</th>
+      <th >Descripció breu</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td >Oracle</td>
+      <td ><code>SYS</code></td>
+      <td >Superusuari amb accés al diccionari de dades.</td>
+    </tr>
+    <tr>
+      <td >MySQL</td>
+      <td ><code>root</code></td>
+      <td >Superusuari amb tots els privilegis sobre el servidor.</td>
+    </tr>
+    <tr>
+      <td >PostgreSQL</td>
+      <td ><code>postgres</code></td>
+      <td >Superusuari creat per defecte durant la instal·lació.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
   </section>
   
 
