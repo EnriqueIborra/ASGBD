@@ -35,6 +35,7 @@
   
 
   <section id="entorn">
+    <h1>Configuració d'un SGBD</h1> <hr>
     <h2>Configuració de l’entorn</h2>
   
     <h3> Variables d’entorn essencials</h3>
@@ -51,8 +52,8 @@
     <pre>
   $ echo $ORACLE_SID
   $ echo $ORACLE_HOME
-  $ export ORACLE_SID=orclcdb
-  $ export NLS_LANG=SPANISH_SPAIN.WE8MSWIN1252
+  $ export ORACLE_SID=orclcdb     # Canviar el valor de ORACLE_SDI
+  $ echo $ORACLE_BASE
   $ env       # Llista totes les variables d’entorn
     </pre>
 
@@ -62,7 +63,7 @@
   export ORACLE_BASE=/opt/oracle
   export ORACLE_SID=costera
   export PATH=$ORACLE_HOME/bin:$PATH
-  export NLS_LANG=SPANISH_SPAIN.WE8MSWIN1252
+    <!-- export NLS_LANG=SPANISH_SPAIN.WE8MSWIN1252  -->
     </pre>
   
     <h3>🖥️ En Windows</h3>
@@ -254,6 +255,8 @@
   <h4> Crear un SPFILE a partir d’un PFILE</h4>
   <pre>SQL> CREATE SPFILE FROM PFILE;</pre>
 
+  <p> Ubicació típica: (en linux)</p>
+  <pre>$ORACLE_BASE/oradata/dbconfig/NOMCDB/dbs/spfileNOMCDB.ora</pre>
   <p> Ubicació típica: (en windows)</p>
   <pre>$ORACLE_BASE/database/spfileSID.ora</pre>
   <p>On SID és el nom de la CDB</p>
