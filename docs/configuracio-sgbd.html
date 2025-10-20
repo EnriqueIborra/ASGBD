@@ -62,9 +62,15 @@
   export ORACLE_HOME=/opt/oracle/product/21c/dbhome_1
   export ORACLE_BASE=/opt/oracle
   export ORACLE_SID=costera
-  export PATH=$ORACLE_HOME/bin:$PATH
+  export PATH=$ORACLE_HOME/bin:$PATH   </pre>
     <!-- export NLS_LANG=SPANISH_SPAIN.WE8MSWIN1252  -->
-    </pre>
+   
+    <p>O fer canvis permanents en  bashrc</p>
+    <pre>vi ~/.bashrc
+---   fer canvis  
+---   guardar
+---   carregar canvis sense reiniciar
+source ~/.bashrc       </pre>
   
     <h3>🖥️ En Windows</h3>
     <strong>
@@ -587,7 +593,8 @@ SQL> STARTUP;
     </ul>
     <p>El diccionari s'emmagatzema en l'esquema de SYS. El DD pertany a SYS</p>
     <p>SYS està present en CDB$ROOT i en totes les PDB</p>
-    <p>Les dades del DD estan en MAJÚSCULES</p>
+    <p class="alert">Les dades del DD estan en MAJÚSCULES</p>
+    <hr>
 
     <h3>🔍🔍 Consultes habituals</h3>
   
@@ -715,6 +722,7 @@ SQL> STARTUP;
      <h3>📍 Ubicació típica dels redo logs</h3>
      <pre>/opt/oracle/oradata/NOM_BBDD/redo0X.log</pre>
      <p>(Es defineix durant la creació de la base de dades amb <code>DBCA</code>)</p>
+     <p class="alert">🧪 Practica: Busca en la maquina servidor la ruta concreta dels teus REDO LOGS</p>
     
 
 <p>⚠️En un entorn de producció, estos fitxers deurien estar en un disc físic diferent al que conté els datafiles</p>
