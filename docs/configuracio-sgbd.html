@@ -321,10 +321,12 @@ SQL> STARTUP;
     <li> Fer còpia del PFILE abans de fer canvis</li>
     <ul><li>⚠️ Canvis incorrectes poden impedir que la instància arranque</li> </ul> 
   </ul>
+  <hr>
+  <p> <code> ==> Com saber quants parametres hi ha en la instància?</code></p>
+  <pre>SELECT COUNT(*) FROM v$spparameter WHERE value IS NOT NULL;
+SELECT COUNT(*) FROM v$parameter WHERE value IS NOT NULL;
+</pre>
 </section>
-
-
-
 
 
 
@@ -449,7 +451,7 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
     <p>Opcions disponibles:</p>
     <ul>
       <li><strong>IMMEDIATE</strong> – Atura connexions de forma controlada (recomanat)</li>
-      <li><strong>NORMAL</strong> – Espera que els usuaris es desconnectin</li>
+      <li><strong>NORMAL</strong> – Espera que els usuaris es desconnecten</li>
       <li><strong>ABORT</strong> – Tall immediat (pot deixar la base de dades en estat incoherent)</li>
     </ul>
   
