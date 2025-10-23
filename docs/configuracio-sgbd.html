@@ -291,7 +291,7 @@ source ~/.bashrc       </pre>
   <p>SHOW PARAMETERS->Consulta els valors actuals en ús per la instància.<br>SHOW SPPARAMETERS
     ->Consulta els valors que hi ha desats a l’SPFILE (Server Parameter File)</p>
   <p>Consulta de totes les fonts dels valors:</p>
-  <pre>SQL> SELECT name, value, isspecified, isdefault 
+  <pre>SQL> SELECT name, value, isspecified, isdefault , issys_modifiable, isses_modifiable
 FROM v$parameter 
 WHERE name LIKE 'sga%';</pre>
 
@@ -299,6 +299,13 @@ WHERE name LIKE 'sga%';</pre>
   <p>Per exemple, modificar la mida de la SGA:</p>
   <pre>SQL> ALTER SYSTEM SET sga_target=800M SCOPE=SPFILE;</pre>
   <p><em>(cal reiniciar perquè tingui efecte)</em></p>
+  <pre>Exemples de parametres dinamics i estatics
+    sessions        estatic
+    open_cursors    dinamic
+    processes       estatic
+    sort_area_size  dinamic
+    optimizer_mode  dinamic
+  </pre>
 
   <h3> Reinici de la instància</h3>
   <p>Per aplicar canvis definitius:</p>
@@ -529,7 +536,7 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
   
     <h3> Tipus de tablespaces</h3>
     <ul>
-      <li>Existeixen en instal·lar <strong>SYSTEM, SYSAUX, UNDO, TEMP, USERSW</strong> </li>
+      <li>Existeixen en instal·lar <strong>SYSTEM, SYSAUX, UNDO, TEMP, USERS</strong> </li>
       <li>El tablespace USERS és el que es farà servir per guardar dades de les taules dels usuaris 
         (si no es creen tablespaces addicionas per este menester)</li>
       <li>Es poden crear tablespaces TEMPORALS, PERMANENTS, DE SOLS LECTURA, i posar un tablespace OFFLINE o ONLINE</li>  
@@ -541,7 +548,7 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
     <pre>
   SQL> SELECT tablespace_name, status from dba_tablespaces;
     </pre>
-    <p>Consulta dels fitxers de dades:</p>
+    <p>Consulta dels fitxers de dades: <strong>Molt útil per saber les rutes físiques als fitxers del s.o.</strong></p>
     <pre>
   SQL> SELECT file_name, tablespace_name from dba_data_files;
     </pre>
@@ -572,10 +579,12 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
     <h3> Ubicació per defecte (si no s’especifica)</h3>
     <p>Si no s’indica ruta explícita, Oracle fa servir la variable:</p>
     <pre>DB_CREATE_FILE_DEST</pre>
+    <p>Si <code>DB_CREATE_FILE_DEST</code> no te valor, la ubicació serà $ORACLE_HOME/dbs (en Unix/Linux)
+       o %ORACLE_HOME%\database (en Windows)</p>
   
-    <p>Exemple de creació automàtica:</p>
+    <p>Exemple de creació de tablespace/datafile amb ruta automàtica:</p>
     <pre>
-  SQL> CREATE TABLESPACE dades;
+  SQL> CREATE TABLESPACE dades123 DATAFILE 'dades123' SIZE 10M;
     </pre>
   
     <h3> Bones pràctiques</h3>
