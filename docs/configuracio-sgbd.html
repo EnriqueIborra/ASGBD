@@ -540,6 +540,11 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
       <li>El tablespace USERS és el que es farà servir per guardar dades de les taules dels usuaris 
         (si no es creen tablespaces addicionas per este menester)</li>
       <li>Es poden crear tablespaces TEMPORALS, PERMANENTS, DE SOLS LECTURA, i posar un tablespace OFFLINE o ONLINE</li>  
+      <li>El "undo" tablespace és gestionar la informació de reversió (les versions anteriors de dades per a ROLLBACK, lectura consistent, etc.).</li>
+      <li>TEMP s’utilitza per a emmagatzemar dades temporals que Oracle genera durant l’execució de certes operacions SQL (i no caben en memòria PGA). Oeracions com sort, index, join, etc..</li>
+      <li>El tablespace SYSTEM és obligatori i no es pot eliminar. SYSTEM guarda el DD, el codi PL/SQL, objectes de SYS i part de SYSTEM </li>
+      <li>El tablespace SYSAUX actua com a “complement” del SYSTEM. Components opcionals (AWR, RMAN, Enterprise Manager, etc.). SYSAUX també és obligatori. 
+        La seva funció és descarregar el SYSTEM d’una gran quantitat de components i metadades que abans s’hi guardaven, per millorar el rendiment i l’organització. </li>
     </ul>
 
 
@@ -573,14 +578,17 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
     <h3> Afegir un fitxer de dades a un tablespace</h3>
     <pre>
   SQL> ALTER TABLESPACE dades 
-  ADD DATAFILE '/opt/oracle/oradata/COSTERA/dades02.dbf' SIZE 20M;
-    </pre>    
+  ADD DATAFILE '/opt/oracle/oradata/COSTERA/dades02.dbf' SIZE 20M;        </pre>    
   
     <h3> Ubicació per defecte (si no s’especifica)</h3>
     <p>Si no s’indica ruta explícita, Oracle fa servir la variable:</p>
     <pre>DB_CREATE_FILE_DEST</pre>
     <p>Si <code>DB_CREATE_FILE_DEST</code> no te valor, la ubicació serà $ORACLE_HOME/dbs (en Unix/Linux)
        o %ORACLE_HOME%\database (en Windows)</p>
+    <p>Des d'Oracle 21c XE / 23ai Free, Oracle no usa directament $ORACLE_HOME/dbs com ubicació de treball.
+      Cada base de dades (CDB o Free) té el seu propi  <strong>“dbconfig_directory”</strong> :</p>   
+    <pre>/opt/oracle/oradata/dbconfig/'DB_NAME'/ </pre>
+  <pre>I oracle utilitza este dbconfig_directory/dbs  per a operacions relatives</pre>
   
     <p>Exemple de creació de tablespace/datafile amb ruta automàtica:</p>
     <pre>
@@ -597,6 +605,7 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
   
     <h3> Exemple complet</h3>
     <pre>
+  --  Crear tablespace    
   CREATE TABLESPACE aplicacio 
   DATAFILE '/opt/oracle/oradata/COSTERA/aplicacio01.dbf' 
   SIZE 20M 
@@ -604,14 +613,21 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
   NEXT 5M 
   MAXSIZE UNLIMITED;
   
+  -- Crear un usuari i assignar-li un tablespace (DEFAULT TABLESPACE)
+  -- Tots els objectes que cree este usuari  s'emmagatzemaran dins del tablespace
   CREATE USER us_aplicacio IDENTIFIED BY 1234 
   DEFAULT TABLESPACE aplicacio 
   QUOTA UNLIMITED ON aplicacio;
 
-  // Des de dins de l'usuari
-  CREATE table tabla1 ( codi number(6),  Nom varchar2(40) )  TABLESPACE aplicacio;
 
-  CREATE index indice1 on tabla1(nom DESC) TABLESPACE aplicacio;
+  -- Des de dins de l'usuari
+  -- En el moment de crear un objecte, especificar en quin TABLESPACE s'emmagatzemarà
+  CREATE table tabla1 ( codi number(6),  Nom varchar2(40) )  TABLESPACE aplicacio2;
+  CREATE index indice1 on tabla1(nom DESC) TABLESPACE aplicacio2;
+
+  -- Si volem que al crear un usuari, sense especificar res, se li assigne un tablespace diferent d'USERS
+  ALTER DATABASE DEFAULT TABLESPACE dades001;   -- dades001 deu estar creat !!
+  -- A partir d'este moment, qualsevol CREATE USER sense especificar DEFAULT TABLESPACE usarà "dades001".
     </pre>
   </section>
   
