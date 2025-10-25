@@ -521,10 +521,11 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
   
     <h3> Què és un tablespace?</h3>
         <p>  Un <strong>tablespace</strong> és una unitat lògica d’emmagatzematge dins d’Oracle. Està format per un 
-          o més <strong>fitxers de dades</strong> (datafiles) que resideixen al disc i contenen les dades reals de la base de dades.  </p>
-    <img src="imgs/tablespaces.png" class="imatge-esquerra"  alt="stop" style="width: 20%">
+          o més <strong>fitxers de dades (datafiles)</strong> que resideixen al disc i contenen les dades reals de la base de dades.  </p>
+    <img src="imgs/tablespaces.png" class="imatge-esquerra"  alt="stop" style="width: 25%">
     <p>Cada datafile pot estar en un disc físic diferent</p>
-    <p>Els usuaris guarden les seues dades en els tablespaces, com per exemple <code>USERS</code>, <code>TEMP</code>, <code>SYSTEM</code>, etc.</p>
+    <p>Els usuaris guarden les seues dades en tablespaces, com per exemple <code>USERS</code> </p>
+    <p>SYS guarda les seues dades en el tablespace 'especial' <code>SYSTEM</code> </p>
     <p>Crear tablespaces addicionals ajuda a organitzar les aplicacions que es creen sobre la base d'esquemes</p>
     <p>Utilitzar tablespaces és fonamental per a la seguretat</p>
   
@@ -546,6 +547,8 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
       <li>El tablespace SYSAUX actua com a “complement” del SYSTEM. Components opcionals (AWR, RMAN, Enterprise Manager, etc.). SYSAUX també és obligatori. 
         La seva funció és descarregar el SYSTEM d’una gran quantitat de components i metadades que abans s’hi guardaven, per millorar el rendiment i l’organització. </li>
     </ul>
+    <li>L’usuari com a entitat (el seu nom, password, privilegis) està al diccionari de dades, que viu dins del tablespace SYSTEM.</li>
+    <li>Però les taules, índexs, vistes, etc. que crea aquest usuari es guarden en el seu DEFAULT TABLESPACE (USERS).</li>
 
 
     <h3> Consultar informació d’emmagatzematge</h3>
