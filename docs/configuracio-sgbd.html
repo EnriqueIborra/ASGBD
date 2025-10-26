@@ -872,22 +872,94 @@ SQL> ALTER SYSTEM SWITCH LOGFILE;
       Després, fes una classificació dels fitxers de log i relaciona amb les variables d'entorn (ORACLE_BASE, ORACLE_HOME, etc)</p>
   
     <h3>🔍 Consultar l’alert log</h3>
-    <p>Es pot visualitzar amb qualsevol editor de text, però també es pot consultar des de SQL amb:</p>
+    <p>Un fitxer log sol ser molt extens, amb molta informació distinta, de diferents events, el que fa dificultós trobar dades concretes</p>
+    <p>Com actuar</p>
+    <ol><li>Localitzar el fitxer</li>
+    <li>Esbrinar com s'emmagatzema l'event que es vol consultar</li>
+    <li>Filtrar per l'event</li>
+    <li>Buscar al voltant de l'event més informació rellevant</li></ol>
+    <pre><code>find / -name alert 2>/dev/null
+--  L'event que volem consultar es quan arranca la BBDD  =>   Correspon amb  "Starting"
+cat /opt/oracle/diag/rdbms/free/FREE/trace/alert_FREE.log | grep Starting        
+cat /opt/oracle/diag/rdbms/free/FREE/trace/alert_FREE.log | grep -A 1 Starting      </code></pre>
+        
+    
+  <!-- <p>Es pot visualitzar amb qualsevol editor de text, però també es pot consultar des de SQL amb:</p>
     <pre>
   SQL> SELECT value FROM v$diag_info WHERE name = 'Diag Trace';
-    </pre>
+    </pre>-->
   
-    <p>També pots consultar entrades recents:</p>
-    <pre>
-  $ tail -f alert_costera.log   # En temps real (Linux)
-    </pre>
+    <p>També es pot consultar entrades recents:</p>
+    <pre><code>   $ tail -f alert_costera.log   # En temps real (Linux)     </code></pre>
   
+    <h4>Exemples reals de línies dins de <code>alert_FREE.log</code></h4>
+    <pre>Starting ORACLE instance (normal)
+ORACLE instance started.
+Total System Global Area 2147483648 bytes
+Fixed Size                  9133424 bytes
+Variable Size             637534208 bytes
+Database mounted.
+Database opened.
+Completed: ALTER DATABASE OPEN
+ALTER SYSTEM SET sga_target=2048M SCOPE=BOTH;
+ORA-00600: internal error code, arguments
+Errors in file /opt....
+ARC0: Archiving completed. Archiving:
+    </pre>
+    <p>Buscar per un error concret</p>
+     <pre><code>grep ORA- alert_FREE.log  </code></pre>
+    <p>Buscar per una data concreta</p>
+    <pre><code>grep "2025-10-26" alert_FREE.log </code></pre>
+
+
+    <h4>Usar ADRCI</h4>
+    <p>ADRCI es basa en ADR (Automatic Diagnostic Repository) és una estructura de directoris 
+      que Oracle utilitza per desar tota la informació de diagnòstic, com:</p>
+      <ul>
+        <li>fitxers alert log</li>
+        <li>trace files (traces dels processos)</li>
+        <li>informes d’errors (incident reports)</li>
+        <li>core dumps</li>
+        <li>dades de seguiment de rendiment  </li>
+      </ul>
+      <p>... que normalment es troba a: <code>$ORACLE_BASE/diag/ </code></p>
+
+    <p>El ADRCI és l’eina amb què pots accedir i analitzar tot això sense haver d’obrir els fitxers manualment.
+És una CLI (Command-Line Interface) que et permet veure, filtrar i gestionar els incidents.</p>
+    <pre>Des de bash:
+    $ adrci     </pre>
+    <p>Exemple d'ús bàsic</p>
+    <pre><code>$ adrci
+adrci> show homes
+ADR Homes:
+diag/rdbms/free/FREE
+
+adrci> set home diag/rdbms/free/FREE
+adrci> show alert -tail 20
+
+adrci> show alert -p "message_text like '%ORA-%'"
+
+adrci> show incident
+    </code></pre>
+
     <h3>📞 Listener log</h3>
     <p>El fitxer de registre del listener mostra informació sobre connexions, errors i temps de resposta.</p>
     <p>Ubicació típica:</p>
     <pre>
   $ORACLE_BASE/diag/tnslsnr/&lt;host&gt;/listener/trace/listener.log
     </pre>
+    <p>exemple</p>
+    <pre><code>cat /opt/oracle/diag/tnslsnr/a2444629be58/listener/trace/listener.log | grep establish </code></pre>
+    <p>o</p>
+    <pre><code>cat /opt/oracle/diag/tnslsnr/a2444629be58/listener/trace/listener.log | grep establish | grep 26-OCT</code></pre>
+    <p>.. i amb adrci</p>
+    <pre><code>show home
+set home diag/........../listener
+show alert -tail 10
+show alert -p "message_text like '%CONNECT%'"
+show alert -p "message_text like '%establish%'"      -- vore connexions
+show alert -p "message_text like '%TNS-%'"       -- vore errors de xarxa
+    </code></pre>
   
     <h3> Recomanacions</h3>
     <ul>
@@ -896,16 +968,10 @@ SQL> ALTER SYSTEM SWITCH LOGFILE;
       <li> Utilitza <code>v$diag_info</code> per consultar rutes oficials dels directoris</li>
       <li> Els trace files poden ajudar a identificar errors que no apareixen en altres llocs</li>
     </ul>
-  
-    <h3> Ordre útil</h3>
-    <pre>
-  SQL> SELECT name, value FROM v$diag_info;
-    </pre>
-  
-    <p>Això te mostra totes les rutes del sistema de diagnòstic: logs, trace, incidents, etc.</p>
-
+ 
   </section>
   
+
 
   <section id="altres-recursos">
     <h2>Recursos addicionals</h2>
