@@ -845,7 +845,9 @@ SQL> ALTER SYSTEM SWITCH LOGFILE;
 
     <h3> Tipus de logs</h3>
     <ul>
-      <li><strong>Alert log</strong>: fitxer principal del sistema, mostra missatges d’arrencada, aturada, errors greus, missatges de SHUTDOWN i STARTUP.</li>
+      <li><strong>Alert log</strong>: és un dels principals fitxers de registre del sistema, mostra missatges d’arrencada, aturada, errors greus,
+                       missatges de SHUTDOWN i STARTUP en els diferents modes, errors greus o crítics (ORA-xxxxx), 
+                       creació, canvi o eliminació de tablespaces, datafiles o redo logs, ...i més...</li>
       <li><strong>Trace files</strong>: fitxers de seguiment detallat per a processos específics o errors concrets.</li>
       <li><strong>Listener log</strong>: fitxer que recull les connexions i activitats del listener.</li>
       <li><strong>log d'instal·lació del SW</strong>: fitxer que recull les accions d'instal·lació.</li>
@@ -872,22 +874,17 @@ SQL> ALTER SYSTEM SWITCH LOGFILE;
       Després, fes una classificació dels fitxers de log i relaciona amb les variables d'entorn (ORACLE_BASE, ORACLE_HOME, etc)</p>
   
     <h3>🔍 Consultar l’alert log</h3>
-    <p>Un fitxer log sol ser molt extens, amb molta informació distinta, de diferents events, el que fa dificultós trobar dades concretes</p>
+    <p>Un fitxer log sol ser molt extens, amb molta informació distinta, de diferents esdeveniments, el que fa dificultós trobar dades concretes</p>
     <p>Com actuar</p>
     <ol><li>Localitzar el fitxer</li>
-    <li>Esbrinar com s'emmagatzema l'event que es vol consultar</li>
-    <li>Filtrar per l'event</li>
-    <li>Buscar al voltant de l'event més informació rellevant</li></ol>
+    <li>Esbrinar com s'emmagatzema l'esdeveniment que es vol consultar</li>
+    <li>Filtrar per l'esdeveniment</li>
+    <li>Buscar al voltant de l'esdeveniment més informació rellevant</li></ol>
     <pre><code>find / -name alert 2>/dev/null
 --  L'event que volem consultar es quan arranca la BBDD  =>   Correspon amb  "Starting"
 cat /opt/oracle/diag/rdbms/free/FREE/trace/alert_FREE.log | grep Starting        
 cat /opt/oracle/diag/rdbms/free/FREE/trace/alert_FREE.log | grep -A 1 Starting      </code></pre>
-        
     
-  <!-- <p>Es pot visualitzar amb qualsevol editor de text, però també es pot consultar des de SQL amb:</p>
-    <pre>
-  SQL> SELECT value FROM v$diag_info WHERE name = 'Diag Trace';
-    </pre>-->
   
     <p>També es pot consultar entrades recents:</p>
     <pre><code>   $ tail -f alert_costera.log   # En temps real (Linux)     </code></pre>
@@ -912,7 +909,7 @@ ARC0: Archiving completed. Archiving:
     <pre><code>grep "2025-10-26" alert_FREE.log </code></pre>
 
 
-    <h4>Usar ADRCI</h4>
+    <h4><u>Usar ADRCI</u></h4>
     <p>ADRCI es basa en ADR (Automatic Diagnostic Repository) és una estructura de directoris 
       que Oracle utilitza per desar tota la informació de diagnòstic, com:</p>
       <ul>
@@ -942,6 +939,16 @@ adrci> show alert -p "message_text like '%ORA-%'"
 adrci> show incident
     </code></pre>
 
+    <h4><u> Vistes de diagnostic</u></h4>
+    <p>Des d’Oracle 11g, el sistema de diagnòstic automàtic (ADR – Automatic Diagnostic Repository)
+      permet llegir el contingut del alert.log des de SQL amb la vista  <code>V$DIAG_ALERT_EXT</code></p>
+      <p>Exemple</p>
+      <pre><code>SELECT originating_timestamp, message_text
+FROM   V$DIAG_ALERT_EXT
+WHERE  message_text LIKE '%Starting%';
+</code></pre>
+
+<hr>
     <h3>📞 Listener log</h3>
     <p>El fitxer de registre del listener mostra informació sobre connexions, errors i temps de resposta.</p>
     <p>Ubicació típica:</p>
@@ -960,7 +967,8 @@ show alert -p "message_text like '%CONNECT%'"
 show alert -p "message_text like '%establish%'"      -- vore connexions
 show alert -p "message_text like '%TNS-%'"       -- vore errors de xarxa
     </code></pre>
-  
+   <strong> ⚠️ Els missatges de listener.log no es poden consultar directament amb una vista de diagnostic com en el
+    cas dels missatges de alert.log </strong>
     <h3> Recomanacions</h3>
     <ul>
       <li> Revisa l’<strong>alert log</strong> després de qualsevol <code>startup</code>, <code>shutdown</code> o error inesperat</li>
