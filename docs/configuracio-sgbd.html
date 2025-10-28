@@ -848,7 +848,7 @@ SQL> ALTER SYSTEM SWITCH LOGFILE;
       <li><strong>Alert log</strong>: és un dels principals fitxers de registre del sistema, mostra missatges d’arrencada, aturada, errors greus,
                        missatges de SHUTDOWN i STARTUP en els diferents modes, errors greus o crítics (ORA-xxxxx), 
                        creació, canvi o eliminació de tablespaces, datafiles o redo logs, ...i més...</li>
-      <li><strong>Trace files</strong>: fitxers de seguiment detallat per a processos específics o errors concrets.</li>
+      <li><strong>Trace files</strong>: .trc .trm ➜ fitxers de seguiment detallat per a processos específics o errors concrets.</li>
       <li><strong>Listener log</strong>: fitxer que recull les connexions i activitats del listener.</li>
       <li><strong>log d'instal·lació del SW</strong>: fitxer que recull les accions d'instal·lació.</li>
       <li><strong>log d'instal·lació de la BBDD</strong>: fitxer que recull les accions d'instal·lació.</li>
@@ -858,7 +858,9 @@ SQL> ALTER SYSTEM SWITCH LOGFILE;
     </ul>
   
     <h3>📁 Ubicació dels fitxers</h3>
+    <p>La majoria dins de  <code>$ORACLE_BASE/diag/ </code>, però també en <code>$ORACLE_BASE/oraInventory/logs/</code> </p>
     <ul>
+      Del fitxer alert:
       <li><strong>Unix/Linux:</strong>  
         <pre>$ORACLE_BASE/diag/rdbms/&lt;db_name&gt;/&lt;sid&gt;/trace/</pre>
       </li>
@@ -868,7 +870,7 @@ SQL> ALTER SYSTEM SWITCH LOGFILE;
     </ul>
   
     <p>El fitxer d’alertes sol anomenar-se:</p>
-    <pre>alert_SID_.log</pre>
+    <pre>alert_SID_.log   -- Substitueix SID pel nom del CDB</pre>
 
     <p class="alert">🧪 Practica: Busca en la maquina servidor tots els fitxers que continguen la paraula "alert" (i la seua ruta). 
       Després, fes una classificació dels fitxers de log i relaciona amb les variables d'entorn (ORACLE_BASE, ORACLE_HOME, etc)</p>
