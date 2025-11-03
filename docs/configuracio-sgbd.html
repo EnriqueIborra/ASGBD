@@ -52,7 +52,7 @@
     <pre>
   $ echo $ORACLE_SID
   $ echo $ORACLE_HOME
-  $ export ORACLE_SID=orclcdb     # Canviar el valor de ORACLE_SDI
+  $ export ORACLE_SID=orclcdb     # Canviar el valor de ORACLE_SID
   $ echo $ORACLE_BASE
   $ env       # Llista totes les variables d’entorn
     </pre>
@@ -273,13 +273,13 @@ source ~/.bashrc       </pre>
 
   <h3> Tipus de paràmetres</h3>
   <ul>
-    <li><strong>Estàtics</strong>: Només es poden modificar reiniciant la instància</li>
+    <li><strong>Estàtics</strong>: Es poden modificar però no fan efecte fins que es reinicie la instància</li>
     <li><strong>Dinàmics</strong>: Es poden canviar en temps real sense reiniciar</li>
     <li><strong>Scope:</strong>
       <ul>
         <li><code>MEMORY</code> – Canvi temporal (fins al proper reinici)</li>
         <li><code>SPFILE</code> – S’emmagatzema per al proper reinici</li>
-        <li><code>BOTH</code> – Canvi immediat i persistent</li>
+        <li><code>BOTH</code> – Canvi immediat i persistent (si el paràmetre ho permet)</li>
       </ul>
     </li>
   </ul>
@@ -730,7 +730,7 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
       físicament als fitxers de dades</p>
     <p>També conegut com:  Redo log files,  Fitxers de redo,  Fitxers de registre de redo</p>  
     <p> Els <strong>fitxers redo log</strong> són fitxers essencials que enregistren totes les modificacions fetes a la base de dades. 
-      Aquest registre permet a Oracle <strong>recuperar les dades en cas de fallada</strong> abans que les dades siguin escrites definitivament als fitxers de dades.
+      Aquest registre permet a Oracle <strong>recuperar les dades en cas de fallada</strong> abans que les dades siguen escrites definitivament als fitxers de dades.
     </p>
    <h3> 🔧 Per a què serveix?</h3>
    <ul>
@@ -741,11 +741,10 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
 
    <h3>🗂️ Tipus de redo logs:</h3>
    <ul>
-    <li>Redo logs en línia: Són els principals. Oracle escriu contínuament en aquests.</li>
-    <li>Redo logs d’arxiu (archived redo logs): Si la base de dades està en mode ARCHIVELOG, els redo logs antics es guarden per a recuperació completa.</li>
+    <li>Online Redo logs (en línia): Són els principals. Oracle escriu contínuament en aquests.</li>
+    <li>Offline Redo logs (archived redo logs): Si la base de dades està en mode ARCHIVELOG, els redo logs antics es guarden per a recuperació completa.</li>
    </ul>
-   <p>També s'anomenen ONLINE REDO LOG i  OFFLINE REDO LOG</p>
-
+  
    <h3>🔁 Funcionament cíclic</h3>
    <p>
      Oracle utilitza un conjunt de fitxers redo log en mode circular (anells). Quan un fitxer es plena, s’escriu al següent. 
@@ -982,7 +981,6 @@ show alert -p "message_text like '%TNS-%'"       -- vore errors de xarxa
   </section>
   
 
-
   <section id="altres-recursos">
     <h2>Recursos addicionals</h2>
     <h3> <a href="https://github.com/EnriqueIborra/ASGBD/blob/main/UD2/ASGBD-UD2.2%20Tablespaces%20i%20datafiles_simple.pdf">🎯 Tablespaces i Datafiles</a> </h3>
@@ -990,6 +988,87 @@ show alert -p "message_text like '%TNS-%'"       -- vore errors de xarxa
     <h3> <a href="https://github.com/EnriqueIborra/ASGBD/blob/45a0bb752d27338cb918cf1bca25649af09132cd/UD2/ASGBD-UD2.4%20Us%20de%20vi.pdf" target="_blank">🎯 Ús de  <code>vi</code></a>  </h3>
     <h3> <a href="https://github.com/EnriqueIborra/ASGBD/blob/3110bfbccca9c294245e153db8cffb709ace32b0/UD2/ASGBD-UD2.3%20Dates-Oracle.pdf" target="_blank">🎯 Gestió de Dates en ORACLE</a></h3>
     
+    <hr>
+    <p>Els paràmetres NLS (National Language Support) a Oracle Database es gestionen en tres nivells jeràrquics. Aquesta jerarquia determina quina configuració (llengua, format de data, ordenació, etc.) s'aplica en cada moment.</p>
+     <ul>
+      <li>Nivell de DATABASE</li>
+      <li>Nivell d'Instància</li>
+      <li>Nivell de sessió</li>
+     </ul>
+    <div class="section-header">
+        <h3>🌎 NLS_DATABASE_PARAMETERS</h3>
+    </div>
+    <div class="content">
+        <ul>
+            <li><span class="key-point">Àmbit:</span> <strong>Tota la Base de Dades.</strong> És la configuració més permanent.</li>
+            <li><span class="key-point">Què regeix:</span> Principalment el <strong style="color:#0073e6;">joc de caràcters de la base de dades</strong> (<code style="background-color: #e0f0ff; padding: 2px 4px; border-radius: 3px;">NLS_CHARACTERSET</code>), que és crucial per a l'emmagatzematge de les dades.</li>
+            <li><span class="key-point">Configuració:</span> Es fixa durant la <strong>creació de la base de dades</strong> (amb la sentència <code style="background-color: #e0f0ff; padding: 2px 4px; border-radius: 3px;">CREATE DATABASE</code>) i és molt difícil de canviar posteriorment (requereix migracions complexes).</li>
+            <li><span class="key-point">Prioritat:</span> <strong style="color:#cc3300;">La més baixa.</strong> Sempre és sobreescrit pels nivells d'Instància i Sessió.</li>
+        </ul>
+    </div>
+
+    <div class="section-header">
+        <h3>⚙️ NLS_INSTANCE_PARAMETERS</h3>
+    </div>
+    <div class="content">
+        <ul>
+            <li><span class="key-point">Àmbit:</span> <strong>La Instància del servidor Oracle.</strong> S'aplica a totes les sessions que es connecten, excepte si la sessió ho sobreescriu.</li>
+            <li><span class="key-point">Què regeix:</span> Estableix els <strong style="color:#0073e6;">valors per defecte</strong> (<em>defaults</em>) per a la majoria de paràmetres NLS (com <code style="background-color: #e0f0ff; padding: 2px 4px; border-radius: 3px;">NLS_LANGUAGE</code> o <code style="background-color: #e0f0ff; padding: 2px 4px; border-radius: 3px;">NLS_DATE_FORMAT</code>) abans que la sessió es connecti.</li>
+            <li><span class="key-point">Configuració:</span> Es llegeix des del <strong style="color:#0073e6;">fitxer d'inicialització</strong> (<code style="background-color: #e0f0ff; padding: 2px 4px; border-radius: 3px;">pfile</code> / <code style="background-color: #e0f0ff; padding: 2px 4px; border-radius: 3px;">spfile</code>). Cal <strong>reiniciar la instància</strong> per aplicar els canvis.</li>
+            <li><span class="key-point">Prioritat:</span> <strong style="color:#cc3300;">Mitjana.</strong> Sobreescriu el nivell de Base de Dades, però és sobreescrit pel nivell de Sessió.</li>
+        </ul>
+    </div>
+
+    <div class="section-header">
+        <h3>💻 NLS_SESSION_PARAMETERS</h3>
+    </div>
+    <div class="content">
+        <ul>
+            <li><span class="key-point">Àmbit:</span> <strong>La Sessió actual de l'usuari.</strong> És el nivell més flexible i el que realment s'utilitza per a les consultes.</li>
+            <li><span class="key-point">Què regeix:</span> Com <strong style="color:#0073e6;">es mostren i s'interpreten les dades</strong> durant l'execució d'una consulta (ex. format de data, símbol decimal, regles d'ordenació).</li>
+            <li><span class="key-point">Configuració:</span> S'estableix mitjançant la variable de client <code style="background-color: #e0f0ff; padding: 2px 4px; border-radius: 3px;">NLS_LANG</code> de forma dinàmica amb la comanda <strong style="color:#0073e6;"><code style="background-color: #e0f0ff; padding: 2px 4px; border-radius: 3px;">ALTER SESSION SET...</code></strong></li>
+            <li><span class="key-point">Configuració:</span> S'estableix mitjançant la variable de client <code style="background-color: #e0f0ff; padding: 2px 4px; border-radius: 3px;">NLS_LANG</code> establint una variable d'entorn del sistema operatiu $NLS_LANG <strong style="color:#0073e6;"><code style="background-color: #e0f0ff; padding: 2px 4px; border-radius: 3px;">NLS_LANG = Language_Territory.Charset en el fitxer .bashrc o puntualment amb EXPORT </Charset></code></strong></li>
+            <li> Exemple :  export NLS_LANG=CATALAN_SPAIN.AL32UTF8  o   dins del .bashrc </li>
+            <li><span class="key-point">Prioritat:</span> <strong style="color:#cc3300;">La més alta.</strong> Aquests valors sempre sobreescriuen la configuració de la Instància i de la Base de Dades.</li>
+        </ul>
+    </div>
+
+    <h2>🔢 Resum de la Jerarquia i Prioritat</h2>
+
+    <p>El valor que utilitza Oracle per a la majoria d'operacions de presentació de dades sempre segueix aquesta lògica: <span class="hierarchy">Sessió > Instància > Base de Dades</span>.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Paràmetre</th>
+                <th>Àmbit d'Aplicació</th>
+                <th>Mètode de Configuració</th>
+                <th>Prioritat</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>NLS_DATABASE_PARAMETERS</strong></td>
+                <td>Base de Dades Completa (Emmagatzematge)</td>
+                <td>Durant el <code style="background-color: #f2f2f2;">CREATE DATABASE</code></td>
+                <td><span class="key-point">Baixa (Només per defecte)</span></td>
+            </tr>
+            <tr>
+                <td><strong>NLS_INSTANCE_PARAMETERS</strong></td>
+                <td>Instància del Servidor (Valors per Defecte)</td>
+                <td><code style="background-color: #f2f2f2;">SPFILE</code> / <code style="background-color: #f2f2f2;">PFILE</code> (Requereix reiniciar)</td>
+                <td>Mitjana</td>
+            </tr>
+            <tr>
+                <td><strong>NLS_SESSION_PARAMETERS</strong></td>
+                <td>Sessió d'Usuari Actual (Presentació)</td>
+                <td><code style="background-color: #f2f2f2;">NLS_LANG</code> del client o <code style="background-color: #f2f2f2;">ALTER SESSION</code></td>
+                <td><span class="key-point">Més Alta</span></td>
+            </tr>
+        </tbody>
+    </table> 
+
+
   </section>
  
 
