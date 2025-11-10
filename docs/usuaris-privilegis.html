@@ -90,7 +90,12 @@
     <p>Un <strong>usuari Oracle</strong> identifica una entitat que accedeix a la base de dades. Pot representar una persona, aplicació o procés.</p>
     <img src="imgs/schema.png" class="imatge-dreta"  alt="stop" style="width: 30%">
     <p>Quan es crea un usuari, també es crea automàticament el seu <strong>esquema</strong> (schema), que conté els seus objectes: taules, vistes, procediments, etc.</p>
-  
+    <p>Si un usuari <code>'user1'</code> vol accedir a un objecte d'un altre usuari <code>'user2'</code>, haurà de anteposar al nom del objecte
+      , el nom del schema del propietari del objecte en el moment d'utilitzar la sentència SQL adequada.  </p>
+      <p>Per exemple</p>
+      <pre><code>-- Des d'user1, suposant que user1 té permis sobre table1 de user2....
+SELECT * FROM user2.table1;</code></pre>
+
     <h3>🔐 Autenticació d'usuaris</h3>
     <ul>
       <li><strong>Local</strong>: usuari amb credencials dins de la base de dades</li>
@@ -108,7 +113,7 @@
   
     <h3> Creació, modificació i baixa d'usuaris</h3>
     <pre>
-  -- Crear usuari local
+  -- Crear usuari en una PDB  (cas més usual)
   CREATE USER joan IDENTIFIED BY '1234';
   
   -- Crear usuari comú (en CDB)
@@ -119,6 +124,9 @@
   
   -- Eliminar usuari
   DROP USER joan CASCADE;
+  -- Borra usuari i tots els objectes del seu schema
+  DROP USER joan;   
+  -- Donarà error si joan te objectes en el seu schema
     </pre>
   
     <h3> Atributs addicionals en la creació</h3>
@@ -127,11 +135,12 @@
   DEFAULT TABLESPACE users
   TEMPORARY TABLESPACE temp
   QUOTA UNLIMITED ON users
-  PROFILE default;
-    </pre>
+  PROFILE default;     </pre>
+  <p class="alert">- QUOTA és obligatori si es volen crear objectes dins de l'schema</p>
   
     <h3>🔑 Donar permisos de connexió</h3>
     <p>Un usuari no pot connectar si no té el privilegi <code>CREATE SESSION</code>:</p>
+    <p>(i inicialment, quan es crea l'usuari, no té el privilegi automaticament !!)</p>
     <pre>GRANT CREATE SESSION TO joan;</pre>
   
     <h3> Estats dels comptes</h3>
@@ -355,7 +364,16 @@
   
   -- Permetre a marta consultar alumnes
   GRANT SELECT ON alumnes TO marta;
+  -- 'o'
+  GRANT SELECT ON joan.alumnes TO marta;
     </pre>
+
+    <p>Si un usuari <code>'user1'</code> vol accedir a un objecte d'un altre usuari <code>'user2'</code>, haurà de anteposar al nom del objecte
+      , el nom del schema del propietari del objecte en el moment d'utilitzar la sentència SQL adequada.  </p>
+      <p>Per exemple</p>
+      <pre><code>-- Des d'user1, suposant que user1 té permis sobre table1 de user2....
+SELECT * FROM user2.table1;</code></pre>
+
   
     <h3>Consideracions importants</h3>
     <ul>
