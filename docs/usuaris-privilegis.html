@@ -363,9 +363,10 @@ SELECT * FROM user2.table1;</code></pre>
   GRANT CREATE SESSION, CREATE TABLE TO marta;
   
   -- Permetre a marta consultar alumnes
-  GRANT SELECT ON alumnes TO marta;
+  GRANT SELECT ON alumnes TO marta;   -- es dona a marta permis per consultar taula alumnes (usuari propietari de la taula alumnes)
   -- 'o'
   GRANT SELECT ON joan.alumnes TO marta;
+  -- es dona a marta permis per consultar taula alumnes de l'usuari joan
     </pre>
 
     <p>Si un usuari <code>'user1'</code> vol accedir a un objecte d'un altre usuari <code>'user2'</code>, haurà de anteposar al nom del objecte
