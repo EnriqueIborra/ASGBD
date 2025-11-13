@@ -220,73 +220,50 @@ SELECT * FROM user2.table1;</code></pre>
   <section id="segusuaris">
         <h2>🔐 Bloquejar Usuaris i Forçar a Canviar Contrasenya en Oracle</h1>
         
-        <p>Per bloquejar usuaris i forçar-los a canviar la seva contrasenya a Oracle, cal fer servir diverses 
-          funcionalitats d'Oracle per gestionar les contrasenyes i els comptes d'usuari. A continuació, t'explico com es poden dur a terme aquestes tasques:</p>
+        <p>Per bloquejar usuaris i forçar-los a canviar la seua contrasenya a Oracle, es poden fer servir diverses 
+          funcionalitats per gestionar les contrasenyes i els comptes d'usuari. </p>
         <p>Un usuari bloquejat NO POT accedir al sistema i no pot canviar el estat per si mateix. Ho ha de sol·licitar al DBA</p>  
         <p>Un usuari amb la password expirada  ( i en periode de gràcia) SI pot accedir, sempre que abans canvie la contrasenya expirada</p>  
         <p>Un usuari amb la password expirada i fora del periode de gràcia, NO pot accedir. Si vol accedir, ho ha de sol·licitar al DBA</p>  
         <p>Usuari amb contrasenya a punt de caducar (Període de gràcia imminent). Oracle pot permetre l'accés, però el sistema pot 
           mostrar una advertència que la contrasenya caducarà en breu. Això depèn de la configuració del perfil.</p>
     
-        <h2>1. Bloquejar un Usuari en Oracle</h2>
-        <p>Per bloquejar un usuari, es poden utilitzar les ordres SQL següents:</p>
-    
+        <h2>1. Bloquejar / desbloquejar un Usuari en Oracle</h2>
+
         <h3>Bloquejar un usuari:</h3>
         <pre><code>ALTER USER &lt;nom_usuari&gt; ACCOUNT LOCK;</code></pre>
         <p>On &lt;nom_usuari&gt; és el nom de l'usuari que vols bloquejar.</p>
-    
-        <h4>Exemple:</h4>
-        <pre><code>ALTER USER jdoe ACCOUNT LOCK;</code></pre>
-        <p>Aquesta ordre bloqueja l'accés a l'usuari <code>jdoe</code> a la base de dades.</p>
-    
+     
         <h3>Desbloquejar un usuari:</h3>
         <pre><code>ALTER USER &lt;nom_usuari&gt; ACCOUNT UNLOCK;</code></pre>
-        <p>Si després vols desbloquejar l'usuari, utilitza:</p>
-    
-        <h4>Exemple:</h4>
-        <pre><code>ALTER USER jdoe ACCOUNT UNLOCK;</code></pre>
     
         <h2>2. Forçar un Usuari a Canviar la Contrasenya</h2>
-        <p>Oracle permet forçar que un usuari canviï la seva contrasenya en el pròxim inici de sessió. Per fer-ho, utilitzes l'ordre següent:</p>
-    
-        <h3>Forçar a canviar la contrasenya:</h3>
-        <pre><code>ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></pre>
-        <p>Aquesta ordre força l'usuari a canviar la contrasenya la pròxima vegada que intenti iniciar sessió.</p>
-    
-        <h4>Exemple:</h4>
-        <pre><code>ALTER USER jdoe PASSWORD EXPIRE;</code></pre>
-    
+        <p>Oracle permet forçar que un usuari canvie la seva contrasenya en el pròxim inici de sessió.
+           Per fer-ho, s'utilitza l'ordre següent:</p>
+         <pre><code>ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></pre>
+  
         <h2>3. Combinació d'ordres per Bloquejar i Forçar el Canvi de Contrasenya</h2>
-        <p>Si vols bloquejar un usuari i, a més, forçar-lo a canviar la contrasenya, pots utilitzar aquestes dues ordres:</p>
+        <p>Si vols bloquejar un usuari i, a més, forçar-lo a canviar la contrasenya quan siga desbloquejat, pots utilitzar aquestes dues ordres:</p>
     
         <pre><code>ALTER USER &lt;nom_usuari&gt; ACCOUNT LOCK;
-    ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></pre>
-    
-        <p>Amb això, bloqueges l'usuari, però si decideixes desbloquejar-lo posteriorment, estaràs forçant-lo a canviar la contrasenya en el seu següent inici de sessió.</p>
-    
-        <h4>Exemple complet:</h4>
-        <pre><code>ALTER USER jdoe ACCOUNT LOCK;
-    ALTER USER jdoe PASSWORD EXPIRE;</code></pre>
-    
+ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></pre>
+  
         <h2>4. Configurar el Caducament Automàtic de Contrasenyes</h2>
-        <p>Per configurar que Oracle forci el canvi de contrasenya automàticament després d'un cert temps (per exemple, després de 30 dies), pots configurar la política de contrasenyes de la base de dades. Això es fa mitjançant l'atribut <code>PASSWORD_LIFE_TIME</code> del perfil d'usuari:</p>
+        <p>Per configurar que Oracle force el canvi de contrasenya automàticament després d'un cert temps
+           (per exemple, després de 30 dies), pots configurar la política de contrasenyes de la base de dades.
+            Això es fa mitjançant l'atribut <code>PASSWORD_LIFE_TIME</code> del perfil d'usuari:</p>
+            <p>Els perfils es veuen en esta unitat, un poc més endavant...</p>
     
         <pre><code>ALTER PROFILE &lt;nom_perfil&gt; LIMIT PASSWORD_LIFE_TIME &lt;dies&gt;;</code></pre>
     
         <h4>Exemple (per 30 dies):</h4>
         <pre><code>ALTER PROFILE DEFAULT LIMIT PASSWORD_LIFE_TIME 30;</code></pre>
     
-        <p>Això farà que les contrasenyes dels usuaris que tinguin aquest perfil caduquin després de 30 dies, forçant-los a canviar la contrasenya en el següent inici de sessió.</p>
-    
-        <h2>Resum</h2>
-        <ul>
-            <li><strong>Bloquejar un usuari</strong>: <code>ALTER USER &lt;nom_usuari&gt; ACCOUNT LOCK;</code></li>
-            <li><strong>Desbloquejar un usuari</strong>: <code>ALTER USER &lt;nom_usuari&gt; ACCOUNT UNLOCK;</code></li>
-            <li><strong>Forçar a canviar la contrasenya</strong>: <code>ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></li>
-            <li><strong>Configurar caducitat automàtica de contrasenyes</strong>: <code>ALTER PROFILE &lt;nom_perfil&gt; LIMIT PASSWORD_LIFE_TIME &lt;dies&gt;;</code></li>
-        </ul>
-    
-        <p>Aquests són els mecanismes bàsics per gestionar usuaris en Oracle, bloquejant-los i forçant-los a canviar les contrasenyes quan sigui necessari.</p>
+        <p>Això farà que les contrasenyes dels usuaris que tinguen aquest perfil caduquen després de 30 dies,
+           forçant-los a canviar la contrasenya en el següent inici de sessió.</p>
+      
+        <p>Aquests són els mecanismes bàsics per gestionar usuaris en Oracle, bloquejant-los i 
+          forçant-los a canviar les contrasenyes quan siga necessari.</p>
  
   </section>
 
@@ -398,9 +375,10 @@ SELECT * FROM user2.table1;</code></pre>
   
     <h3> Què és un rol?</h3>
     <p>
-      Un <strong>rol</strong> és un conjunt de permisos agrupats sota un nom. Serveix per simplificar la gestió de privilegis, especialment en entorns amb molts usuaris.
+      Un <strong>rol</strong> és un conjunt de permisos agrupats baix un nom.
+       Serveix per simplificar la gestió de privilegis, especialment en entorns amb molts usuaris.
     </p>
-    <p>En comptes d’assignar 10 permisos a cada usuari, es crea un rol amb aquests permisos i s’assigna el rol.</p>
+    <p>En compte d'assignar 10 permisos a cada usuari, es crea un rol amb aquests permisos i s'assigna el rol.</p>
   
     <h3> Tipus de rols</h3>
     <ul>
@@ -427,7 +405,7 @@ SELECT * FROM user2.table1;</code></pre>
     </pre>
   
     <h3> Activar i desactivar rols</h3>
-    <p>Un usuari pot tenir diversos rols assignats, però només alguns poden estar actius a la vegada.</p>
+    <p>Un usuari pot tindre diversos rols assignats, però potser alguns poden estar actius i altres no.</p>
     <pre>
   -- Activar un rol específic
   SET ROLE gestor_aula;
@@ -467,7 +445,7 @@ SELECT * FROM user2.table1;</code></pre>
       <li> Agrupa privilegis per rols segons la funcionalitat (ex: lectura, administració, desenvolupament)</li>
       <li> Documenta què fa cada rol i qui l’ha de tenir</li>
       <li> No afegeixis <code>ALL PRIVILEGES</code> dins d’un rol sense motiu justificat</li>
-      <li> Usa rols en lloc de donar permisos individuals sempre que sigui possible</li>
+      <li> Usa rols en lloc de donar permisos individuals sempre que siga possible</li>
     </ul>
   </section>
   
