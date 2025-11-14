@@ -301,6 +301,7 @@ ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></pre>
     <pre>
   -- Sistema
   GRANT CREATE SESSION TO joan;
+  GRANT CREATE TABLE TO joan;
   
   -- Objecte
   GRANT SELECT, INSERT ON alumnes TO joan;
@@ -346,12 +347,43 @@ ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></pre>
   -- es dona a marta permis per consultar taula alumnes de l'usuari joan
     </pre>
 
+   <h3>Permisos implícits</h3>
+    <p>Si l'usuari “joan” rep el permís CREATE TABLE en Oracle i després crea la seua pròpia taula anomenada 
+      “clients”, joan té automàticament permisos totals sobre eixa taula que acaba de crear (INSERT, SELECT, DELETE, UPDATE)</p>
+    <p>Si un usuari té CREATE TABLE, pot crear taules al seu esquema i, per defecte, té tots 
+        els permisos DML sobre les taules que ell mateix crea</p>
+    <p>Si vol accedir o manipular dades en taules d’un altre esquema, cal que l’altre propietari (o un administrador)
+           li concedeixca permisos com SELECT, INSERT, UPDATE, DELETE</p>
+
+    <h3>Accés a objectes d'un altre usuari</h3>
     <p>Si un usuari <code>'user1'</code> vol accedir a un objecte d'un altre usuari <code>'user2'</code>, haurà de anteposar al nom del objecte
       , el nom del schema del propietari del objecte en el moment d'utilitzar la sentència SQL adequada.  </p>
       <p>Per exemple</p>
       <pre><code>-- Des d'user1, suposant que user1 té permis sobre table1 de user2....
 SELECT * FROM user2.table1;</code></pre>
 
+    <h3>Permisos UPDATE i DELETE</h3>
+    <p>El permís que s'atorga sobre un objecte de ‘update’ d’Oracle, necessita anar aparellat 
+      al permís de ‘select’. (També passa amb el permís ‘delete’ )<br>
+        ❗ ORACLE no ho fa automàticament ❗</p>
+
+    <p>    Si a un usuari se li atorga (grant) permís d’actualització sobre una taula que no es seua.</p>
+    <pre><code>grant update on usuari1.taula1 to usuari2; </code></pre>
+i este usuari (usuari2) fa
+<pre><code>update usuari1.taula1 set columna1=valor;
+</code></pre>
+la sentència funcionarà. => L’actualització, s’aplica a <strong>tota la taula</strong> 
+<br><p>Però, si intenta fer</p>
+<pre><code>update usuari1.taula1 set columna1=valor where columna2=valor2;
+</code></pre>
+la sentència <strong>fallarà</strong>. <br>
+perquè? <br>
+<p>Oralce necessita saber les dades de columna2 per poder realitzar l’actualització, i per poder 
+  conéixer eixes dades necessita de permís de ‘select’
+</p>
+<p>Oracle Database necessita llegir les dades de la fila per a saber com modificar la fila per a
+   reflectir els canvis. Si no es tenen els permisos de SELECT, l'actualització no es pot dur a 
+   terme correctament. De la mateixa manera li passa a les sentències DELETE    </p>
   
     <h3>Consideracions importants</h3>
     <ul>
