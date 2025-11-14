@@ -185,7 +185,13 @@ SELECT * FROM user2.table1;</code></pre>
   QUOTA UNLIMITED ON tab_app
   PASSWORD EXPIRE;
   
-  GRANT CONNECT, RESOURCE TO enric;
+  GRANT CREATE SESSION, CREATE TABLE TO enric;
+    </pre>
+
+      <h3> Exemple complet MINIM ! </h3>
+    <pre>
+  CREATE USER enric IDENTIFIED BY secret QUOTA 10M ON USERS;
+  GRANT CREATE SESSION, CREATE TABLE TO enric;
     </pre>
   
     <h3>💬 Autenticació en multitenant (CDB/PDB)</h3>
