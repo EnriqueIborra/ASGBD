@@ -543,7 +543,7 @@ SELECT * FROM user2.table1;</code></pre>
     <h3>🔍 Esborrar perfils</h3>
 <pre>DROP PROFILE nom_perfil;
      o
-     DROP PROFILE nom_perfil [CASCADE]; </pre>
+DROP PROFILE nom_perfil [CASCADE]; </pre>
     <p>Especifiqueu CASCADE per desassignar el perfil dels usuaris a qui estigui assignat. Oracle Database assigna 
       automàticament el perfil DEFAULT a aquests usuaris. Heu d'especificar aquesta clàusula per eliminar un perfil
        que està assignat actualment als usuaris</p>
@@ -561,58 +561,85 @@ SELECT * FROM user2.table1;</code></pre>
   <section id="vistes">
 
     <h1>Vistes com a Element de Seguretat en Oracle</h1>
-    <p>Les <strong>vistes (views)</strong> en Oracle poden ser un element molt poderós per a la seguretat de les dades, ja que permeten controlar quines dades poden ser accessibles pels usuaris i com aquestes dades són presentades. Les vistes no emmagatzemen dades pròpiament dites, sinó que són definicions de consultes SQL que es poden utilitzar com si fossin taules normals. Això significa que les vistes permeten a l'administrador de bases de dades (DBA) establir un nivell de seguretat i restricció per a l'accés a la informació a través de consultes personalitzades.</p>
+    <p>Les <strong>vistes (views)</strong> en Oracle poden ser un element molt poderós per a la seguretat de les dades, 
+      ja que permeten controlar quines dades poden ser accessibles pels usuaris i com aquestes dades són presentades. 
+      Les vistes no emmagatzemen dades, sinó que són definicions de consultes SQL que es poden utilitzar 
+      com si foren taules normals. Això significa que les vistes permeten a l'administrador de bases de dades (DBA) 
+      establir un nivell de seguretat i restricció per a l'accés a la informació a través de consultes personalitzades.</p>
 
     <h2>Vistes com a element de seguretat a Oracle</h2>
-    <p>A continuació, explico algunes de les principals maneres en què les vistes poden ser utilitzades per millorar la seguretat en Oracle:</p>
+    <p>A continuació es poden vore algunes de les principals maneres en què les vistes poden ser utilitzades 
+      per millorar la seguretat en Oracle:</p>
 
     <h3>1. Restricció d'Accés a Dades Sensibles</h3>
-    <p><strong>Descripció</strong>: Les vistes permeten crear consultes personalitzades que poden ocultar certes columnes o taules que contenen dades sensibles. En lloc de permetre que un usuari accedeixi directament a una taula, es pot crear una vista que exposi només una part de les dades.</p>
+    <p><strong>Descripció</strong>: Les vistes permeten crear consultes personalitzades que poden ocultar 
+      certes columnes o taules que contenen dades sensibles. En lloc de permetre que un usuari accedeixi 
+      directament a una taula, es pot crear una vista que exposi només una part de les dades.</p>
     <pre><code>CREATE VIEW vista_clients_completa AS
 SELECT nom, adreca, telefon
 FROM clients;</code></pre>
-    <p><strong>Avantatge de seguretat</strong>: Limita l'exposició de dades sensibles a només la informació necessària, millorant la seguretat de la informació confidencial.</p>
+    <p><strong>Avantatge de seguretat</strong>: Limita l'exposició de dades sensibles a només la informació
+       necessària, millorant la seguretat de la informació confidencial.</p>
 
     <h3>2. Autenticació de Consultes</h3>
-    <p><strong>Descripció</strong>: Pots utilitzar vistes per garantir que només es poden realitzar consultes sobre un conjunt específic de dades segons el rol o els permisos d'un usuari. Això es fa mitjançant el control de permisos en les vistes.</p>
+    <p><strong>Descripció</strong>: Pots utilitzar vistes per garantir que només es poden realitzar consultes
+       sobre un conjunt específic de dades segons el rol o els permisos d'un usuari. Això es fa mitjançant el 
+       control de permisos en les vistes.</p>
     <pre><code>GRANT SELECT ON vista_clients_completa TO usuari_x;</code></pre>
-    <p><strong>Avantatge de seguretat</strong>: Aquesta tècnica permet controlar l'accés a les dades a nivell d'usuari, garantint que només els usuaris autoritzats tinguin accés a les vistes que exposen les dades filtrades o restringides.</p>
+    <p><strong>Avantatge de seguretat</strong>: Aquesta tècnica permet controlar l'accés a les dades a nivell 
+      d'usuari, garantint que només els usuaris autoritzats tinguin accés a les vistes que exposen les dades 
+      filtrades o restringides.</p>
 
     <h3>3. Control de Columnes</h3>
-    <p><strong>Descripció</strong>: Les vistes permeten ocultar columnes senceres d'una taula, cosa que és útil per amagar dades que no s'haurien de mostrar. Això és especialment útil quan les taules contenen dades sensibles, com ara contrasenyes, números de seguretat social, etc.</p>
+    <p><strong>Descripció</strong>: Les vistes permeten ocultar columnes senceres d'una taula, cosa que és útil
+       per amagar dades que no s'haurien de mostrar. Això és especialment útil quan les taules contenen dades 
+       sensibles, com ara contrasenyes, números de seguretat social, etc.</p>
     <pre><code>CREATE VIEW vista_usuaris AS
 SELECT id, nom, correu
 FROM usuaris;</code></pre>
-    <p><strong>Avantatge de seguretat</strong>: Permet amagar dades sensibles i garantir que només la informació necessària sigui accessible.</p>
+    <p><strong>Avantatge de seguretat</strong>: Permet amagar dades sensibles i garantir que només la informació 
+      necessària sigui accessible.</p>
 
     <h3>4. Control de les Consultes Realitzades</h3>
-    <p><strong>Descripció</strong>: Mitjançant la creació de vistes, es pot controlar exactament quines consultes són permeses i com són realitzades. Això permet als administradors establir regles de consulta que limitin l'accés a determinats conjunts de dades.</p>
+    <p><strong>Descripció</strong>: Mitjançant la creació de vistes, es pot controlar exactament quines 
+      consultes són permeses i com són realitzades. Això permet als administradors establir regles de consulta
+       que limitin l'accés a determinats conjunts de dades.</p>
     <pre><code>CREATE VIEW vista_transaccions_usuaris AS
 SELECT transaccio_id, data, import
 FROM transaccions
 WHERE usuari_id = :usuari_id;</code></pre>
-    <p><strong>Avantatge de seguretat</strong>: Pot restringir l'abast de les dades consultades i garantir que els usuaris només obtinguin informació rellevant i personalitzada.</p>
+    <p><strong>Avantatge de seguretat</strong>: Pot restringir l'abast de les dades consultades i garantir 
+      que els usuaris només obtinguin informació rellevant i personalitzada.</p>
 
     <h3>5. Vistes Amb Funcionalitat de Seguretat Basada en Rols</h3>
-    <p><strong>Descripció</strong>: Utilitzant vistes, pots aplicar seguretat a nivell de rols, permetent que només certs rols d'usuari puguin accedir a determinades dades. Per exemple, un DBA pot crear una vista per a usuaris normals que només mostri informació bàsica, mentre que un usuari amb un rol administratiu podria tenir accés a una vista més detallada.</p>
+    <p><strong>Descripció</strong>: Utilitzant vistes, pots aplicar seguretat a nivell de rols, permetent 
+      que només certs rols d'usuari puguin accedir a determinades dades. Per exemple, un DBA pot crear una 
+      vista per a usuaris normals que només mostri informació bàsica, mentre que un usuari amb un rol administratiu 
+      podria tenir accés a una vista més detallada.</p>
     <pre><code>CREATE VIEW vista_dades_normals AS
 SELECT nom, adreça FROM clients;
 
 CREATE VIEW vista_dades_administrador AS
 SELECT * FROM clients;</code></pre>
-    <p>L'usuari amb un rol normal només pot veure <code>vista_dades_normals</code>, mentre que l'usuari amb rol d'administrador té accés a <code>vista_dades_administrador</code>.</p>
-    <p><strong>Avantatge de seguretat</strong>: Permet controlar l'accés a les dades basat en rols d'usuari, garantint que els usuaris només tinguin accés a la informació que necessiten.</p>
+    <p>L'usuari amb un rol normal només pot veure <code>vista_dades_normals</code>, mentre que l'usuari amb 
+      rol d'administrador té accés a <code>vista_dades_administrador</code>.</p>
+    <p><strong>Avantatge de seguretat</strong>: Permet controlar l'accés a les dades basat en rols d'usuari, 
+      garantint que els usuaris només tinguin accés a la informació que necessiten.</p>
 
     <h3>6. Auditoria i Monitorització de Consultes</h3>
-    <p><strong>Descripció</strong>: Les vistes també poden ser útils per auditar i monitoritzar les consultes. Per exemple, pots crear una vista que permeti a l'usuari visualitzar només els canvis realitzats en la taula de transaccions en un període de temps determinat.</p>
+    <p><strong>Descripció</strong>: Les vistes també poden ser útils per auditar i monitoritzar les consultes. 
+      Per exemple, pots crear una vista que permeta a l'usuari visualitzar només els canvis realitzats en la taula
+       de transaccions en un període de temps determinat.</p>
     <pre><code>CREATE VIEW vista_transaccions_audit AS
 SELECT transaccio_id, data, import, operacio
 FROM transaccions_audit
 WHERE data > '2024-01-01';</code></pre>
-    <p><strong>Avantatge de seguretat</strong>: Això permet monitoritzar l'activitat de la base de dades i detectar possibles accessos no autoritzats o activitats sospitoses.</p>
+    <p><strong>Avantatge de seguretat</strong>: Això permet monitoritzar l'activitat de la base de dades i detectar
+       possibles accessos no autoritzats o activitats sospitoses.</p>
 
     <h2>Conclusions</h2>
-    <p>Les <strong>vistes en Oracle</strong> són una eina molt potent per millorar la seguretat de les dades en una base de dades. Algunes de les maneres en què es poden utilitzar com a element de seguretat són:</p>
+    <p>Les <strong>vistes en Oracle</strong> són una eina molt potent per millorar la seguretat de les dades en 
+      una base de dades. Algunes de les maneres en què es poden utilitzar com a element de seguretat són:</p>
     <ul>
         <li><strong>Restricció d'accés a dades sensibles</strong></li>
         <li><strong>Autenticació de consultes</strong> mitjançant l'assignació de permisos a les vistes.</li>
@@ -621,7 +648,8 @@ WHERE data > '2024-01-01';</code></pre>
         <li><strong>Seguretat basada en rols</strong> per restringir l'accés a vistes específiques segons els permisos d'usuari.</li>
         <li><strong>Auditoria i monitorització</strong> per fer seguiment de les operacions en la base de dades.</li>
     </ul>
-    <p>Les vistes permeten personalitzar l'accés a la informació i garantir que només els usuaris autoritzats tinguin accés a dades crítiques.</p>
+    <p>Les vistes permeten personalitzar l'accés a la informació i garantir que només els usuaris autoritzats 
+      tinguen accés a dades crítiques.</p>
   </section>  
 
 
@@ -629,7 +657,9 @@ WHERE data > '2024-01-01';</code></pre>
   <section id="synonym">
   <h1>Ús de Synonyms en Oracle</h1>
 
-  <p>Un <strong>synonym</strong> (sinònim) en Oracle és un àlies o nom alternatiu per a un objecte de base de dades com una taula, vista, seqüència, procediment, funció, paquet o altre objecte. Els synonyms s’utilitzen per simplificar l'accés als objectes i millorar la seguretat.</p>
+  <p>Un <strong>synonym</strong> (sinònim) en Oracle és un àlies o nom alternatiu per a un objecte de base de dades com 
+    una taula, vista, seqüència, procediment, funció, paquet o altre objecte. Els synonyms s’utilitzen per 
+    simplificar l'accés als objectes i millorar la seguretat.</p>
 
   <h2>Tipus de Synonyms</h2>
   <ul>
@@ -652,7 +682,7 @@ WHERE data > '2024-01-01';</code></pre>
 
   <h3>2. Crear un synonym públic</h3>
   <pre><code>CREATE PUBLIC SYNONYM emp FOR empresa.empleats;</code></pre>
-  <p>Tots els usuaris poden accedir a la taula <code>empleats</code> com <code>emp</code>, sempre que tinguin permisos.</p>
+  <p>Tots els usuaris poden accedir a la taula <code>empleats</code> com <code>emp</code>, sempre que tinguen permisos.</p>
 
   <h3>3. Eliminar un synonym</h3>
   <pre><code>DROP SYNONYM emp;
