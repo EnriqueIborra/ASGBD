@@ -270,7 +270,24 @@ ALTER USER &lt;nom_usuari&gt; PASSWORD EXPIRE;</code></pre>
       
         <p>Aquests són els mecanismes bàsics per gestionar usuaris en Oracle, bloquejant-los i 
           forçant-los a canviar les contrasenyes quan siga necessari.</p>
- 
+        <h2>5. Canvi de contraseña</h2>
+        <h3>5.1 Voluntariament</h3>
+        <pre>-- Desde usuari 'vicent'
+ALTER USER vicent IDENTIFIED BY novapass;          
+        </pre>
+        <h4>sql*plus i SQL Developer</h4>
+        <p>sql*plus accepta el comando <strong>PASSWORD</strong> que inicia un script/conversa per canviar la contrasenya</p>
+        <p>SQL Developer te una opció en el menú desplegable de la connexió anomenada 'Restablecer Contraseña...'</p>
+
+        <h3>5.2 No voluntariament ( contrasenya expirada )</h3>
+        <p>Si l'usuari encara està en periode de gràcia, en entrar, sql*plus dona un error i demana nova contrasenya</p>
+        <pre>ERROR:
+ORA-28001: the password has expired
+
+Cambiando la contrasenya para &lt;nom_usuari>
+        </pre>
+        <p>En SQL Developer, igual, ens demana posar una nova contrasenya, però utilitzant GUI</p>
+
   </section>
 
 
@@ -489,7 +506,7 @@ perquè? <br>
   
 
   <section id="perfils">
-    <h2>Perfils en Oracle</h2>
+    <h2>📐 Perfils en Oracle</h2>
   
     <h3> Què és un perfil?</h3>
     <p>
@@ -598,7 +615,7 @@ DROP PROFILE nom_perfil [CASCADE]; </pre>
 
   <section id="vistes">
 
-    <h1>Vistes com a Element de Seguretat en Oracle</h1>
+    <h1>👁️ Vistes com a Element de Seguretat en Oracle</h1>
     <p>Les <strong>vistes (views)</strong> en Oracle poden ser un element molt poderós per a la seguretat de les dades, 
       ja que permeten controlar quines dades poden ser accessibles pels usuaris i com aquestes dades són presentades. 
       Les vistes no emmagatzemen dades, sinó que són definicions de consultes SQL que es poden utilitzar 
@@ -693,7 +710,7 @@ WHERE data > '2024-01-01';</code></pre>
 
 
   <section id="synonym">
-  <h1>Ús de Synonyms en Oracle</h1>
+  <h1>👯‍♀️ Ús de Synonyms en Oracle</h1>
 
   <p>Un <strong>synonym</strong> (sinònim) en Oracle és un àlies o nom alternatiu per a un objecte de base de dades com 
     una taula, vista, seqüència, procediment, funció, paquet o altre objecte. Els synonyms s’utilitzen per 
@@ -741,13 +758,11 @@ DROP PUBLIC SYNONYM emp;</code></pre>
 
 
   <section id="altres-recursos">
-    <h2>Altres recursos</h2>
-    <h3>Usuaris NO admin en Windows</h3>
-       <a href="https://github.com/EnriqueIborra/ASGBD/blob/3110bfbccca9c294245e153db8cffb709ace32b0/UD3/ASGBD-UD3.1.1%20Usuaris%20NO%20admin%20en%20W10.pdf">link</a> 
-    <h3>Update i Select en ORACLE</h3>
-    <a href="https://github.com/EnriqueIborra/ASGBD/blob/3110bfbccca9c294245e153db8cffb709ace32b0/UD3/ASGBD-UD3.1.2%20Update%20i%20select%20en%20oracle.pdf">link</a>
-    <h3>Usuaris Comuns ORACLE</h3>
-    <a href="https://github.com/EnriqueIborra/ASGBD/blob/3110bfbccca9c294245e153db8cffb709ace32b0/UD3/ASGBD-UD3.1.3%20usuaris%20comuns%20en%20oracle.pdf">link</a>
+    <h2>🖊️ Altres recursos</h2>
+    <h3> <a href="https://github.com/EnriqueIborra/ASGBD/blob/3110bfbccca9c294245e153db8cffb709ace32b0/UD3/ASGBD-UD3.1.1%20Usuaris%20NO%20admin%20en%20W10.pdf">🎯 Usuaris NO admin en Windows</a> </h3>
+    <h3><a href="https://github.com/EnriqueIborra/ASGBD/blob/3110bfbccca9c294245e153db8cffb709ace32b0/UD3/ASGBD-UD3.1.2%20Update%20i%20select%20en%20oracle.pdf">🎯 Update i Select en ORACLE</a></h3>
+    <h3><a href="https://github.com/EnriqueIborra/ASGBD/blob/3110bfbccca9c294245e153db8cffb709ace32b0/UD3/ASGBD-UD3.1.3%20usuaris%20comuns%20en%20oracle.pdf">🎯 Usuaris Comuns ORACLE</a></h3>
+   
   </section>
  
   <section id="seguretat">
