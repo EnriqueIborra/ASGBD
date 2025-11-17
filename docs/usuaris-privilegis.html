@@ -173,9 +173,10 @@ SELECT * FROM user2.table1;</code></pre>
   
     <h3> Notes importants</h3>
     <ul>
-      <li> No es poden crear usuaris directament a <code>CDB$ROOT</code> sense permisos especials</li>
-      <li> Un usuari pot tindre <strong>un únic perfil</strong> i múltiples <strong>rols i privilegis</strong></li>
-      <li> S'ha de donar quota d'espai per a crear objectes</li>
+      <li> No es poden crear usuaris directament a <code>CDB$ROOT</code> sense permisos especials</li> 
+      <li> Els usuaris es habitual crear-los en les PDBs (no en la CDB)</li>
+      <li> NO CAL donar quota d'espai per a que un usuari puga crear objectes (p.e. taules)</li>
+      <li> SI CAL donar quota d'espai per a que un usuari puga 'omplir' objectes</li>
     </ul>
   
     <h3> Exemple complet: usuari operatiu</h3>
@@ -495,6 +496,10 @@ perquè? <br>
   GRANT aplicacio_web TO webapp;
     </pre>
   
+    <ul>
+      <li> Un usuari pot tindre múltiples <strong>rols i privilegis</strong></li>
+      <li> Un rol pot tindre múltiples <strong>rols i privilegis</strong></li>
+    </ul>
     <h3> Bones pràctiques</h3>
     <ul>
       <li> Agrupa privilegis per rols segons la funcionalitat (ex: lectura, administració, desenvolupament)</li>
@@ -609,9 +614,11 @@ DROP PROFILE nom_perfil [CASCADE]; </pre>
       Mitjançant la creació, modificació i assignació de perfils, es pot garantir que els usuaris compleixin amb les polítiques establertes, 
       tot assegurant un rendiment òptim i la protecció de la base de dades.
     </p>
-  </section>
+  <ul>
+    <li> Un usuari pot tindre <strong>un únic perfil</strong> i múltiples <strong>rols i privilegis</strong></li>
+  </ul>
 
-  
+  </section>
 
   <section id="vistes">
 
