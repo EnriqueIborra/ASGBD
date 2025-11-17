@@ -114,24 +114,24 @@ SELECT * FROM user2.table1;</code></pre>
     <h3> Creació, modificació i baixa d'usuaris</h3>
     <pre>
   -- Crear usuari en una PDB  (cas més usual)
-  CREATE USER joan IDENTIFIED BY '1234';
+  CREATE USER ausias IDENTIFIED BY '1234';
   
   -- Crear usuari comú (en CDB)
   CREATE USER C##admin IDENTIFIED BY 'secure' CONTAINER=ALL;
   
   -- Modificar contrasenya
-  ALTER USER joan IDENTIFIED BY 'nova_clau';
+  ALTER USER ausias IDENTIFIED BY 'nova_clau';
   
   -- Eliminar usuari
-  DROP USER joan CASCADE;
+  DROP USER ausias CASCADE;
   -- Borra usuari i tots els objectes del seu schema
-  DROP USER joan;   
-  -- Donarà error si joan te objectes en el seu schema
+  DROP USER ausias;   
+  -- Donarà error si ausias te objectes en el seu schema
     </pre>
   
     <h3> Atributs addicionals en la creació</h3>
     <pre>
-  CREATE USER enric IDENTIFIED BY secret
+  CREATE USER omar IDENTIFIED BY secret
   DEFAULT TABLESPACE users
   TEMPORARY TABLESPACE temp
   QUOTA UNLIMITED ON users
@@ -141,7 +141,7 @@ SELECT * FROM user2.table1;</code></pre>
     <h3>🔑 Donar permisos de connexió</h3>
     <p>Un usuari no pot connectar si no té el privilegi <code>CREATE SESSION</code>:</p>
     <p>(i inicialment, quan es crea l'usuari, no té el privilegi automaticament !!)</p>
-    <pre>GRANT CREATE SESSION TO joan;</pre>
+    <pre>GRANT CREATE SESSION TO omar;</pre>
   
     <h3> Estats dels comptes</h3>
     <ul>
@@ -154,9 +154,9 @@ SELECT * FROM user2.table1;</code></pre>
   
     <h4>Exemples de gestió:</h4>
     <pre>
-  ALTER USER joan ACCOUNT LOCK;
-  ALTER USER joan ACCOUNT UNLOCK;
-  ALTER USER joan PASSWORD EXPIRE;
+  ALTER USER omar ACCOUNT LOCK;
+  ALTER USER omar ACCOUNT UNLOCK;
+  ALTER USER omar PASSWORD EXPIRE;
     </pre>
   
     <h3>🔍 Consultes útils</h3>
@@ -181,18 +181,18 @@ SELECT * FROM user2.table1;</code></pre>
   
     <h3> Exemple complet: usuari operatiu</h3>
     <pre>
-  CREATE USER enric IDENTIFIED BY secret
+  CREATE USER pepe IDENTIFIED BY secret
   DEFAULT TABLESPACE tab_app
   QUOTA UNLIMITED ON tab_app
   PASSWORD EXPIRE;
   
-  GRANT CREATE SESSION, CREATE TABLE TO enric;
+  GRANT CREATE SESSION, CREATE TABLE TO pepe;
     </pre>
 
       <h3> Exemple complet MINIM ! </h3>
     <pre>
-  CREATE USER enric IDENTIFIED BY secret QUOTA 10M ON USERS;
-  GRANT CREATE SESSION, CREATE TABLE TO enric;
+  CREATE USER pepe IDENTIFIED BY secret QUOTA 10M ON USERS;
+  GRANT CREATE SESSION, CREATE TABLE TO pepe;
     </pre>
   
     <h3>💬 Autenticació en multitenant (CDB/PDB)</h3>
@@ -408,6 +408,28 @@ perquè? <br>
 <p>Oracle Database necessita llegir les dades de la fila per a saber com modificar la fila per a
    reflectir els canvis. Si no es tenen els permisos de SELECT, l'actualització no es pot dur a 
    terme correctament. De la mateixa manera li passa a les sentències DELETE    </p>
+
+    <h3>Privilegi SYSDBA</h3>
+    <p><strong>SYSDBA</strong> és el privilegi administratiu més alt que es pot tindre en una base de dades Oracle. No és un rol ordinari, sinó un <em>privilegi especial d'autenticació</em> que dona control total sobre la instància de la base de dades.</p>
+  <h4>Què permet fer <code>SYSDBA</code>?</h4>
+  <ul>
+    <li>Arrancar i aturar la base de dades (STARTUP / SHUTDOWN).</li>
+    <li>Connectar-se a la instància encara que la base de dades estiga apagada.</li>
+    <li>Accedir com l'usuari intern <code>SYS</code> (accés amb màxims privilegis).</li>
+    <li>Crear, esborrar i modificar qualsevol objecte de qualsevol esquema.</li>
+    <li>Realitzar còpies de seguretat i restauracions amb RMAN.</li>
+    <li>Executar tasques crítiques de manteniment i recuperació.</li>
+    <li>Canviar configuracions internes de la base de dades.</li>
+  </ul>
+  <h4>Com s'usa?</h4>
+  <pre>sqlplus usuari1@ip/freepdb1 as sysdba</pre>
+   <p><strong>SYSDBA té poder absolut:</strong> no té restriccions de seguretat normals. S'ha d'utilitzar només per a administració i tasques crítiques. Un usuari amb <code>SYSDBA</code> equival pràcticament a ser l'usuari <code>SYS</code>.</p>
+   <h4>Distinció entre <code>SYSDBA</code> i <code>SYSOPER</code></h4>
+  <ul>
+    <li><strong>SYSDBA</strong> → Control total: accés a totes les dades i operacions administratives completes.</li>
+    <li><strong>SYSOPER</strong> → Permisos més restringits: permet operacions bàsiques d'operació (arrencar/aturar, backups bàsics), però no totes les operacions que pot fer <code>SYSDBA</code>.</li>
+  </ul>
+  
   
     <h3>Consideracions importants</h3>
     <ul>
