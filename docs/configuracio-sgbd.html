@@ -632,6 +632,11 @@ sqlplus admin_pdb/1234 AS SYSDBA     </pre>
   ALTER DATABASE DEFAULT TABLESPACE dades001;   -- dades001 deu estar creat !!
   -- A partir d'este moment, qualsevol CREATE USER sense especificar DEFAULT TABLESPACE usarà "dades001".
     </pre>
+
+    <h3>Esborrar un tablespace</h3>
+    <pre>DROP TABLESPACE nom_tablespace INCLUDING CONTENTS AND DATAFILES;</pre>
+    <P>Esta oparació s'ha de fer amb molta cura, i tenint en compte tots els ususaris 
+      afectats, les taules i les claus alienes que poden referenciar taules del tablespace a esborrar</P>
   </section>
   
 

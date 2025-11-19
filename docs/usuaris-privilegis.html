@@ -136,7 +136,7 @@ SELECT * FROM user2.table1;</code></pre>
   TEMPORARY TABLESPACE temp
   QUOTA UNLIMITED ON users
   PROFILE default;     </pre>
-  <p class="alert">- QUOTA és obligatori si es volen crear objectes dins de l'schema</p>
+  <p class="alert">- QUOTA és obligatori si es volen inserir dades en les taules de dins de l'schema</p>
   
     <h3>🔑 Donar permisos de connexió</h3>
     <p>Un usuari no pot connectar si no té el privilegi <code>CREATE SESSION</code>:</p>
@@ -371,7 +371,7 @@ Cambiando la contrasenya para &lt;nom_usuari>
   -- es dona a marta permis per consultar taula alumnes de l'usuari joan
     </pre>
 
-   <h3>Permisos implícits</h3>
+   <hr> <h3>Permisos implícits</h3>
     <p>Si l'usuari “joan” rep el permís CREATE TABLE en Oracle i després crea la seua pròpia taula anomenada 
       “clients”, joan té automàticament permisos totals sobre eixa taula que acaba de crear (INSERT, SELECT, DELETE, UPDATE)</p>
     <p>Si un usuari té CREATE TABLE, pot crear taules al seu esquema i, per defecte, té tots 
@@ -386,7 +386,7 @@ Cambiando la contrasenya para &lt;nom_usuari>
       <pre><code>-- Des d'user1, suposant que user1 té permis sobre table1 de user2....
 SELECT * FROM user2.table1;</code></pre>
 
-    <h3>Permisos UPDATE i DELETE</h3>
+   <hr> <h3>Permisos UPDATE i DELETE</h3>
     <p>El permís que s'atorga sobre un objecte de ‘update’ d’Oracle, necessita anar aparellat 
       al permís de ‘select’. (També passa amb el permís ‘delete’ )<br>
         ❗ ORACLE no ho fa automàticament ❗</p>
@@ -409,7 +409,7 @@ perquè? <br>
    reflectir els canvis. Si no es tenen els permisos de SELECT, l'actualització no es pot dur a 
    terme correctament. De la mateixa manera li passa a les sentències DELETE    </p>
 
-    <h3>Privilegi SYSDBA</h3>
+   <hr> <h3>Privilegi SYSDBA</h3>
     <p><strong>SYSDBA</strong> és el privilegi administratiu més alt que es pot tindre en una base de dades Oracle. No és un rol ordinari, sinó un <em>privilegi especial d'autenticació</em> que dona control total sobre la instància de la base de dades.</p>
   <h4>Què permet fer <code>SYSDBA</code>?</h4>
   <ul>
@@ -430,8 +430,7 @@ perquè? <br>
     <li><strong>SYSOPER</strong> → Permisos més restringits: permet operacions bàsiques d'operació (arrencar/aturar, backups bàsics), però no totes les operacions que pot fer <code>SYSDBA</code>.</li>
   </ul>
   
-  
-    <h3>Consideracions importants</h3>
+   <hr> <h3>Consideracions importants</h3>
     <ul>
       <li> Els privilegis de sistema són molt potents: assigna només els necessaris</li>
       <li> Els privilegis d’objecte poden donar-se amb més flexibilitat</li>
