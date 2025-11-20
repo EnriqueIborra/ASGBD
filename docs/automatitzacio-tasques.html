@@ -102,9 +102,36 @@
       <li> És ideal per a proves o per a executar operacions puntuals.</li>
       <li> Pot incloure sentències SQL, declaracions de variables, control de flux, i gestió d’excepcions.</li>
     </ul>
-  
+     <hr>
+    <h4>En sqlplus es pot:</h4>
+    <ul>
+      <li>Es pot editar el contingut del buffer amb  <code>edit</code></li>
+      <li>Es pot executar el contingut del buffer amb  <code>run  o  /</code></li>
+      <li>Guardar el contingut del buffer en un arxiu ( posa nom + .sql )</li>
+      <ul>
+        <li>SQL> SAVE nom_fitxer.sql</li>
+        <li>SQL> SAVE nom_fitxer.sql REPLACE</li>
+      </ul>
+      <li>Carrega el contingut d'un fitxer en el buffer (però l'executa)</li>
+      <p>SQL> GET nom_fitxer.sql</p>
+      <li>Executa el contingut d'un fitxer</li>
+      <ul>
+        <li>SQL> @prova.sql</li>
+        <li>SQL> @/ruta/completa/prova.sql</li>
+        <li>SQL> START prova.sql</li>
+      </ul>
+    </ul>
+
+    <h4>En SQL Developer</h4>
+    <p>Es treballa amb WorkSheets (pestanya oberta). Cada pestanya és una connexió</p>
+    <p>Per executar una linia del WorkSheet, prem  Ctrl+Enter</p>
+    <p>Per executar TOTES les linies, prem F5</p>
+    <p>Per guardar el contingunt del WorkSeet, Ves a File → Save o Save As… </p>
+    <p>Per recuperar el text guardat en una fitxer, File → Open →  prova_bloc.sql</p>
+    <p>Per executar el contingut d'un fitxer directament => @/ruta/prova_bloc.sql  i prem F5  </p>
+     <hr>
     <h3> Estructura bàsica d’un bloc anònim</h3>
-    <pre>
+    <pre translate="no">
   SET SERVEROUTPUT ON;
   
   DECLARE
@@ -145,7 +172,7 @@
         </pre>
 
     <h3> Exemple senzill</h3>
-    <pre>
+    <pre translate="no">
   SET SERVEROUTPUT ON;
   
   DECLARE
