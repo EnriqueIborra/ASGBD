@@ -341,15 +341,20 @@ Cambiando la contrasenya para &lt;nom_usuari>
     </pre>
   
     <h3>🌐 Propagació amb GRANT OPTION</h3>
-    <p>Permet que un usuari que ha rebut un privilegi "sobre objecte" el pugui concedir a un altre: (i també pot concedir el GRANT OPTION)</p>
+    <p>Permet que un usuari que ha rebut un privilegi "sobre objecte" el puga concedir a un altre: (i també pot concedir el GRANT OPTION)</p>
     <pre>
   GRANT SELECT ON alumnes TO joan WITH GRANT OPTION;
     </pre>
     <p class="alert">👉 No es pot usar WITH GRANT OPTION amb privilegis de sistema 
       (com CREATE SESSION, CREATE TABLE, CREATE USER, etc.), WITH GRANT OPTION 
        només es pot usar per a privilegis sobre objectes (taules, vistes, procediments, etc.).  </p>
+    <h4>Els privilegis de sistema es poden propagar amb WITH ADMIN OPTION</h4>
+   <pre>
+  GRANT CREATE SESSION TO joan WITH ADMIN OPTION;
+    </pre>    
+   <p>Permet que un usuari que ha rebut un privilegi "de sistema" el puga concedir a un altre: (i també pot concedir el ADMIN OPTION)</p>    
   
-    <h3>👀 Consultes útils</h3>
+   <hr> <h3>👀 Consultes útils</h3>
     <pre>
   -- Privilegis de sistema atorgats
   SELECT * FROM dba_sys_privs WHERE grantee = 'JOAN';
