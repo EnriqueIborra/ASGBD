@@ -485,12 +485,22 @@ perquè? <br>
   
   -- Assignar el rol a un usuari
   GRANT gestor_aula TO marta;
+
+  -- Assignar un rol a un altre rol
+  GRANT altre_rol TO gestor_aula;
     </pre>
   
     <h3> Revocar rols</h3>
     <pre>
   REVOKE gestor_aula FROM marta;
     </pre>
+    <p>Quan s'afegixen privilegis a un rol, tots els usuaris que tenen eixe rol adquireixen el nou privilegi 
+      <strong>de seguida</strong>, encara que ja estigueren connectats, o tinguen sessions obertes des de fa temps,</p>
+      <p>Oracle no necessita tancar ni reiniciar la sessió perquè el privilegi faça efecte.</p>
+      <p>Els privilegis no es carreguen només en establir la sessió, sinó que Oracle: </p>
+<p style='margin-left: 3em'> Comprova els privilegis d’accés dinàmicament quan el codi SQL s’executa.</p>
+<p style='margin-left: 3em'>Mira els privilegis disponibles a través de roles actius en la sessió.</p>
+<p style='margin-left: 3em'>Si el rol ja està actiu, el nou privilegi del rol passa a estar disponible a l’instant. </p>
   
    <!-- <h3> Activar i desactivar rols</h3>
     <p>Un usuari pot tindre diversos rols assignats, però potser alguns poden estar actius i altres no.</p>
