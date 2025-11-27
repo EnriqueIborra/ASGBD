@@ -496,14 +496,26 @@ perquè? <br>
     <p>Un usuari pot tindre diversos rols assignats, però potser alguns poden estar actius i altres no.</p>
     <pre>
   -- Activar un rol específic
-  SET ROLE gestor_aula;
+  SET ROLE gestor_aula;     -- en esta sessió
   
   -- Activar tots els rols per defecte
-  SET ROLE ALL;
+  SET ROLE ALL;             -- en esta sessió
   
   -- Desactivar tots els rols
-  SET ROLE NONE;
-    </pre>     -->
+  SET ROLE NONE;            -- en esta sessió
+    </pre>   
+ Per defecte, Oracle activa automàticament tots els rols assignats, excepte:
+     Rols que necessiten password
+     Rols que necessiten auth externa (OSAUTH)
+     Rols que explícitament s’han desactivat del DEFAULT
+<pre>
+--  Per fer que en pròximes sessions, comencen actius o no_actius....
+ALTER USER usuari1 DEFAULT ROLE ALL;        -- activa tots els rols assignats
+ALTER USER usuari1 DEFAULT ROLE NONE;       -- desactiva tots per defecte
+ALTER USER usuari1 DEFAULT ROLE rol_x;      -- activa només aquest
+</pre>
+
+     -->
   
     <h3>🔍 Consultes útils</h3>
     <pre>
@@ -532,6 +544,14 @@ perquè? <br>
       <li> Un usuari pot tindre múltiples <strong>rols i privilegis</strong></li>
       <li> Un rol pot tindre múltiples <strong>rols i privilegis</strong></li>
     </ul>
+    <p>Si a un usuari li assignes diversos rols, l'usuari rep la suma de tots els privilegis
+       atorgats per cadascun d'eixos rols. i si un mateix privilegi està repetit en diversos rols, 
+       Oracle simplement detecta que el privilegi està concedit i l'usuari el té. No hi ha duplicació ni conflicte.</p>
+    <p>--- Quan s'assigna un rol a un usuari, l'usuari rep tots els privilegis del rol
+       i Oracle no permet fer REVOKE d'un privilegi que prové d'un rol.</p>
+       <p>Els rols són objectes de la base de dades a nivell global, igual que els usuaris.
+         No estan dins d’un esquema concret, sinó que existeixen a nivell de base de dades i 
+         qualsevol usuari els pot rebre.</p>
     <h3> Bones pràctiques</h3>
     <ul>
       <li> Agrupa privilegis per rols segons la funcionalitat (ex: lectura, administració, desenvolupament)</li>
