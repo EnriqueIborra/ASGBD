@@ -60,20 +60,21 @@
     <h3> DBMS_CRYPTO (manual)</h3>
     <p>Paquet per fer xifrat, hash i autenticació.</p>
     <ul>
-        <li><code>DBMS_CRYPTO.ENCRYPT()</code> / <code>DECRYPT()</code></li>
+        <li><code>STANDARD_HASH</code></li>
         <li><code>DBMS_CRYPTO.HASH()</code></li>
-        <li><code>DBMS_CRYPTO.MAC()</code></li>
+        <li><code>DBMS_CRYPTO.ENCRYPT()</code> / <code>DECRYPT()</code></li>
     </ul>
 
     <h4> Exemple: fer un hash SHA-1 d’una contrasenya</h4>
-    <pre>
-    SELECT DBMS_CRYPTO.HASH(
-    UTL_I18N.STRING_TO_RAW('contrasenya', 'AL32UTF8'), 
-    1) 
-    FROM dual;
-    </pre>
-
-    <p>També es pot fer servir <code>UTL_ENCODE.BASE64_ENCODE</code> per codificació (no segura).</p>
+    <pre>SELECT STANDARD_HASH('contrasenya', 'SHA1') FROM dual;   --molt dèbil actualment  
+-- altre tipus de hash  
+SELECT STANDARD_HASH('contrasenya', 'SHA256') FROM dual;        </pre>
+     <p>STANDARD_HASH soporta tots els algorismes moderns (MD5, SHA1, SHA256, SHA384, SHA512, SHA3_256, SHA3_512…)</p>
+     <p>També es pot fer amb la funcio HASH del paquet DBMS_CRYPTO</p>
+<pre>SELECT RAWTOHEX(  DBMS_CRYPTO.HASH(HEXTORAW('1231'),3) ) FROM dual;
+SELECT RAWTOHEX(  DBMS_CRYPTO.HASH(UTL_I18N.STRING_TO_RAW('SECRETA'),4) ) FROM dual;  
+-- On el num del segon parametre =>  type 3:SHA-1  type 4:SHA256  type 5:SHA384  type 6:SHA512
+</pre>
 
     <h4> Convertir entre formats:</h4>
     <ul>
@@ -98,22 +99,6 @@
         <li><strong>Tablespace-level TDE</strong>: totes les dades dins l’espai de taules</li>
     </ul>
 
-    <h3>📦 Exemple pràctic amb <code>DBMS_CRYPTO.ENCRYPT</code></h3>
-    <pre>
-    DECLARE
-    text_original VARCHAR2(100) := 'Hola món!';
-    text_raw RAW(2000);
-    clau RAW(32) := UTL_I18N.STRING_TO_RAW('clausecreta', 'AL32UTF8');
-    text_xifrat RAW(2000);
-    BEGIN
-    text_raw := UTL_I18N.STRING_TO_RAW(text_original, 'AL32UTF8');
-    text_xifrat := DBMS_CRYPTO.ENCRYPT(
-        text_raw,
-        DBMS_CRYPTO.ENCRYPT_AES256 + DBMS_CRYPTO.CHAIN_CBC,
-        clau);
-    DBMS_OUTPUT.PUT_LINE(RAWTOHEX(text_xifrat));
-    END;
-    </pre>
 
     <h3> Bones pràctiques</h3>
     <ul>
@@ -133,120 +118,120 @@
     </section>
          
 
-    <section id="auditoria">
-        <h2>🕵️ Auditoria en Oracle</h2>
+  <section id="auditoria">
+    <h2>🕵️ Auditoria en Oracle</h2>
+  
+    <h3>📘 Què és una auditoria?</h3>
+    <p>
+      L’auditoria és una funcionalitat dels sistemes gestors de bases de dades que permet <strong>registrar i controlar l’activitat dels usuaris</strong>.
+      És especialment útil per motius de seguretat, detecció d’errors, traçabilitat i compliment normatiu (ex. RGPD).
+    </p>
+  
+    <h3>🎯 Objectius de l’auditoria</h3>
+    <ul>
+      <li> Detectar accions no autoritzades</li>
+      <li> Rastrejar canvis o accés a dades sensibles</li>
+      <li> Monitorar l’activitat d’usuaris privilegiats</li>
+      <li> Complir amb auditories internes o externes</li>
+    </ul>
+  
+    <h3>⚙️ Tipus d’auditoria en Oracle</h3>
+    <ul>
+      <li><strong>Estàndard (traditional)</strong>: basada en ordres com <code>AUDIT</code></li>
+      <li><strong>Auditoria unificada (Unified Audit)</strong>: disponible des d’Oracle 12c</li>
+    </ul>
+  
+    <h4>🔎 Diferències:</h4>
+    <table border="1">
+      <thead><tr><th>Característica</th><th>Estàndard</th><th>Unificada</th></tr></thead>
+      <tbody>
+        <tr><td>Implementació</td><td>Bases separades (AUD$)</td><td>Totes les auditories integrades</td></tr>
+        <tr><td>Activa per defecte</td><td>No</td><td>Sí, des de 12c</td></tr>
+        <tr><td>Control granular</td><td>Limitat</td><td>Molt flexible</td></tr>
+        <tr><td>Millor rendiment</td><td>No</td><td>Sí</td></tr>
+      </tbody>
+    </table>
+  
+    <h3>🛠️ Activar auditoria estàndard</h3>
+    <pre>
+-- Activar l’auditoria global
+AUDIT TRAIL;
+      </pre>
+      <p>
+        S’ha de configurar el paràmetre:
+        <code>audit_trail = DB</code> al fitxer d’inici <code>init.ora</code> o via <code>ALTER SYSTEM</code>
+      </p>
+    
+      <h3> Exemples d'ordres <code>AUDIT</code></h3>
+      <pre>
+-- Audita l’accés a taula
+AUDIT SELECT ON alumnes;
+
+-- Audita connexions fallides
+AUDIT SESSION WHENEVER NOT SUCCESSFUL;
+
+-- Audita qualsevol modificació de taula
+AUDIT INSERT, UPDATE, DELETE ON alumnes;
+      </pre>
+    
+      <h3> Consultar resultats d’auditoria</h3>
+      <ul>
+        <li><code>DBA_AUDIT_TRAIL</code>: accés general</li>
+        <li><code>USER_AUDIT_TRAIL</code>: accés només al propi esquema</li>
+        <li><code>DBA_COMMON_AUDIT_TRAIL</code>: auditories unificades</li>
+      </ul>
+    
+      <pre>
+SELECT username, action_name, obj_name, timestamp
+FROM dba_audit_trail
+WHERE obj_name = 'ALUMNES';
+      </pre>
+    
+      <h3>🧹 Esborrar o buidar resultats (amb compte!)</h3>
+      <pre>
+DELETE FROM sys.aud$ WHERE obj$name = 'ALUMNES';
+-- o
+TRUNCATE TABLE sys.aud$;
+      </pre>
+    
+      <h3> Unified Audit (Oracle 12c+)</h3>
+      <p>
+        Unifica tots els registres d’auditoria: privilegis, ordres, errors, logons...  
+        S’activa amb <code>ENABLE_UNIFIED_AUDIT = TRUE</code> al paràmetre de sistema.
+      </p>
+    
+      <h4>Exemple de política unificada:</h4>
+      <pre>
+CREATE AUDIT POLICY acces_alumnes
+  ACTIONS SELECT ON alumnes;
+
+AUDIT POLICY acces_alumnes;
+      </pre>
+    
+      <h3>📦 Vistes d’auditoria unificada</h3>
+      <ul>
+        <li><code>UNIFIED_AUDIT_TRAIL</code></li>
+        <li><code>DBA_AUDIT_POLICIES</code></li>
+        <li><code>DBA_OBJ_AUDIT_OPTS</code></li>
+      </ul>
+    
+      <h3> Consells de seguretat i gestió</h3>
+      <ul>
+        <li> Activa l’auditoria per accions sensibles (login, esborrar, canviar permisos)</li>
+        <li> Revisa regularment els registres d’auditoria</li>
+        <li> No deixis l’auditoria oberta en producció sense revisar l’espai</li>
+        <li> Automatitza l’anàlisi amb scripts o informes</li>
+      </ul>
+    
+      <h3> Conclusió</h3>
+      <p>
+        L’auditoria és una eina potent per a la seguretat i el control de bases de dades Oracle.  
+        Permet identificar comportaments sospitosos, controlar accés no autoritzat i mantenir la traçabilitat de les operacions.
+        A més, és una pràctica recomanada per normatives legals i de qualitat.
+      </p>
+    </section>
       
-        <h3>📘 Què és una auditoria?</h3>
-        <p>
-          L’auditoria és una funcionalitat dels sistemes gestors de bases de dades que permet <strong>registrar i controlar l’activitat dels usuaris</strong>.
-          És especialment útil per motius de seguretat, detecció d’errors, traçabilitat i compliment normatiu (ex. RGPD).
-        </p>
-      
-        <h3>🎯 Objectius de l’auditoria</h3>
-        <ul>
-          <li> Detectar accions no autoritzades</li>
-          <li> Rastrejar canvis o accés a dades sensibles</li>
-          <li> Monitorar l’activitat d’usuaris privilegiats</li>
-          <li> Complir amb auditories internes o externes</li>
-        </ul>
-      
-        <h3>⚙️ Tipus d’auditoria en Oracle</h3>
-        <ul>
-          <li><strong>Estàndard (traditional)</strong>: basada en ordres com <code>AUDIT</code></li>
-          <li><strong>Auditoria unificada (Unified Audit)</strong>: disponible des d’Oracle 12c</li>
-        </ul>
-      
-        <h4>🔎 Diferències:</h4>
-        <table border="1">
-          <thead><tr><th>Característica</th><th>Estàndard</th><th>Unificada</th></tr></thead>
-          <tbody>
-            <tr><td>Implementació</td><td>Bases separades (AUD$)</td><td>Totes les auditories integrades</td></tr>
-            <tr><td>Activa per defecte</td><td>No</td><td>Sí, des de 12c</td></tr>
-            <tr><td>Control granular</td><td>Limitat</td><td>Molt flexible</td></tr>
-            <tr><td>Millor rendiment</td><td>No</td><td>Sí</td></tr>
-          </tbody>
-        </table>
-      
-        <h3>🛠️ Activar auditoria estàndard</h3>
-        <pre>
-      -- Activar l’auditoria global
-      AUDIT TRAIL;
-        </pre>
-        <p>
-          S’ha de configurar el paràmetre:
-          <code>audit_trail = DB</code> al fitxer d’inici <code>init.ora</code> o via <code>ALTER SYSTEM</code>
-        </p>
-      
-        <h3> Exemples d'ordres <code>AUDIT</code></h3>
-        <pre>
-      -- Audita l’accés a taula
-      AUDIT SELECT ON alumnes;
-      
-      -- Audita connexions fallides
-      AUDIT SESSION WHENEVER NOT SUCCESSFUL;
-      
-      -- Audita qualsevol modificació de taula
-      AUDIT INSERT, UPDATE, DELETE ON alumnes;
-        </pre>
-      
-        <h3> Consultar resultats d’auditoria</h3>
-        <ul>
-          <li><code>DBA_AUDIT_TRAIL</code>: accés general</li>
-          <li><code>USER_AUDIT_TRAIL</code>: accés només al propi esquema</li>
-          <li><code>DBA_COMMON_AUDIT_TRAIL</code>: auditories unificades</li>
-        </ul>
-      
-        <pre>
-      SELECT username, action_name, obj_name, timestamp
-      FROM dba_audit_trail
-      WHERE obj_name = 'ALUMNES';
-        </pre>
-      
-        <h3>🧹 Esborrar o buidar resultats (amb compte!)</h3>
-        <pre>
-      DELETE FROM sys.aud$ WHERE obj$name = 'ALUMNES';
-      -- o
-      TRUNCATE TABLE sys.aud$;
-        </pre>
-      
-        <h3> Unified Audit (Oracle 12c+)</h3>
-        <p>
-          Unifica tots els registres d’auditoria: privilegis, ordres, errors, logons...  
-          S’activa amb <code>ENABLE_UNIFIED_AUDIT = TRUE</code> al paràmetre de sistema.
-        </p>
-      
-        <h4>Exemple de política unificada:</h4>
-        <pre>
-      CREATE AUDIT POLICY acces_alumnes
-        ACTIONS SELECT ON alumnes;
-      
-      AUDIT POLICY acces_alumnes;
-        </pre>
-      
-        <h3>📦 Vistes d’auditoria unificada</h3>
-        <ul>
-          <li><code>UNIFIED_AUDIT_TRAIL</code></li>
-          <li><code>DBA_AUDIT_POLICIES</code></li>
-          <li><code>DBA_OBJ_AUDIT_OPTS</code></li>
-        </ul>
-      
-        <h3> Consells de seguretat i gestió</h3>
-        <ul>
-          <li> Activa l’auditoria per accions sensibles (login, esborrar, canviar permisos)</li>
-          <li> Revisa regularment els registres d’auditoria</li>
-          <li> No deixis l’auditoria oberta en producció sense revisar l’espai</li>
-          <li> Automatitza l’anàlisi amb scripts o informes</li>
-        </ul>
-      
-        <h3> Conclusió</h3>
-        <p>
-          L’auditoria és una eina potent per a la seguretat i el control de bases de dades Oracle.  
-          Permet identificar comportaments sospitosos, controlar accés no autoritzat i mantenir la traçabilitat de les operacions.
-          A més, és una pràctica recomanada per normatives legals i de qualitat.
-        </p>
-      </section>
-      
-      <section id="exercici-auditoria">
+ <!--     <section id="exercici-auditoria">
         <h2>🧪 Exercici interactiu de simulació d’auditoria Oracle</h2>
         <p>Introdueix ordres d’auditoria o consultes per veure què s’hauria registrat.</p>
       
@@ -292,7 +277,7 @@
             output.innerHTML = resposta;
           }
         </script>
-      </section>
+      </section>  -->
       
 
       <section id="integritat">
@@ -316,31 +301,27 @@
         <p>
           Es garanteix mitjançant l’ús de <code>PRIMARY KEY</code>, que assegura que cada fila sigui única i no nul·la.
         </p>
-        <pre>
-      CREATE TABLE alumnes (
-        id NUMBER PRIMARY KEY,
-        nom VARCHAR2(50)
-      );
-        </pre>
+        <pre>CREATE TABLE alumnes (
+  id NUMBER PRIMARY KEY,
+  nom VARCHAR2(50)
+);          </pre>
       
         <h3> Integritat referencial</h3>
         <p>
           Manté la coherència entre dues taules relacionades mitjançant una <code>FOREIGN KEY</code>.  
           Evita que una fila faci referència a un valor inexistent.
         </p>
-        <pre>
-      CREATE TABLE cursos (
-        id NUMBER PRIMARY KEY,
-        nom VARCHAR2(50)
-      );
-      
-      CREATE TABLE alumnes (
-        id NUMBER PRIMARY KEY,
-        nom VARCHAR2(50),
-        id_curs NUMBER,
-        FOREIGN KEY (id_curs) REFERENCES cursos(id)
-      );
-        </pre>
+        <pre>CREATE TABLE cursos (
+  id NUMBER PRIMARY KEY,
+  nom VARCHAR2(50)
+);
+
+CREATE TABLE alumnes (
+  id NUMBER PRIMARY KEY,
+  nom VARCHAR2(50),
+  id_curs NUMBER,
+  FOREIGN KEY (id_curs) REFERENCES cursos(id)
+);          </pre>
       
         <p>Amb això, no es pot assignar un <code>id_curs</code> a un alumne que no existeixi a la taula <code>cursos</code>.</p>
       
@@ -349,14 +330,12 @@
           Limita els valors permesos en una columna. Es pot implementar amb tipus de dades, restriccions <code>NOT NULL</code>, <code>CHECK</code> o <code>DEFAULT</code>.
         </p>
       
-        <pre>
-      CREATE TABLE alumnes (
-        id NUMBER PRIMARY KEY,
-        nom VARCHAR2(50) NOT NULL,
-        edat NUMBER CHECK (edat >= 16),
-        pais VARCHAR2(30) DEFAULT 'Espanya'
-      );
-        </pre>
+        <pre>CREATE TABLE alumnes (
+  id NUMBER PRIMARY KEY,
+  nom VARCHAR2(50) NOT NULL,
+  edat NUMBER CHECK (edat >= 16),
+  pais VARCHAR2(30) DEFAULT 'Espanya'
+);           </pre>
       
         <p>
           Això garanteix que <code>nom</code> sempre tindrà valor, <code>edat</code> sigui ≥ 16 i <code>pais</code> tindrà un valor per defecte.
@@ -412,33 +391,27 @@
         <p>
           Fa permanents tots els canvis realitzats en la transacció. No es poden desfer després.
         </p>
-        <pre>
-      INSERT INTO alumnes VALUES (10, 'Joan', 20);
-      COMMIT;
-        </pre>
+        <pre>INSERT INTO alumnes VALUES (10, 'Joan', 20);
+COMMIT;          </pre>
       
         <h4> <code>ROLLBACK</code></h4>
         <p>
           Desfà tots els canvis realitzats des del darrer <code>COMMIT</code>. Torna l’estat de la BD a com estava abans.
         </p>
-        <pre>
-      UPDATE alumnes SET edat = 30 WHERE id = 10;
-      ROLLBACK; -- Anul·la l'actualització
-        </pre>
+        <pre>UPDATE alumnes SET edat = 30 WHERE id = 10;
+ROLLBACK; -- Anul·la l'actualització            </pre> 
       
         <h4> <code>SAVEPOINT</code></h4>
         <p>
           Permet definir punts intermedis dins d’una transacció per fer <code>ROLLBACK</code> parcial.
         </p>
-        <pre>
-      SAVEPOINT punt1;
-      DELETE FROM alumnes WHERE edat &lt; 18;
-      
-      SAVEPOINT punt2;
-      UPDATE alumnes SET nom = 'Anònim' WHERE edat &gt; 25;
-      
-      ROLLBACK TO punt1; -- desfà només fins al punt1
-        </pre>
+        <pre>SAVEPOINT punt1;
+DELETE FROM alumnes WHERE edat &lt; 18;
+
+SAVEPOINT punt2;
+UPDATE alumnes SET nom = 'Anònim' WHERE edat &gt; 25;
+
+ROLLBACK TO punt1; -- desfà només fins al punt1           </pre>
       
         <h3> Transaccions automàtiques i manuals</h3>
         <ul>
@@ -506,6 +479,15 @@
           Les còpies de seguretat són essencials per garantir la <strong>continuïtat del servei</strong> i la <strong>protecció de la informació</strong>.  
           En cas de fallada del sistema, error humà, corrupció de dades o atacs, una bona estratègia de backup permet recuperar la base de dades sense pèrdues.
         </p>
+        <p>La qüestió de fer còpies de seguretat des de dins d’Oracle (usant eines com RMAN o exportacions lògiques com Data Pump) 
+          versus fer-les des de fora (copiant fitxers del sistema operatiu) és molt important perquè afecta 
+          la consistència i la recuperabilitat de la base de dades</p>
+        <p>Fer còpies de seguretat des de dins d’Oracle és crític perquè assegura que la base de dades es pugui recuperar correctament i 
+          sense pèrdua de dades, fins i tot si està en funcionament. Fer-ho des del sistema operatiu només és segur si la base està apagada,
+           cosa poc pràctica en entorns de producció</p>
+        <p>Problemes si es fan des de fora del SGBD: Inconsistència, Recuperació complicada, No registra transaccions </p>
+        <p>Avantatges si es fan des de dins del SGBD: Consistència de dades, Recuperació puntual, Gestió de logs automàtica, Còpies en calent, Automatització i verificació:</p>
+
       
         <h3>🎯 Objectius d’una còpia de seguretat</h3>
         <ul>
@@ -528,10 +510,74 @@
           <li><strong>Diferencial:</strong> totes les modificacions des del darrer backup complet</li>
           <li><strong>Continuada:</strong> amb redologs i archivelogs actius</li>
         </ul>
-      
-        <h3> Eines principals de backup en Oracle</h3>
-      
-        <h4>1. 🔄 RMAN (Recovery Manager)</h4>
+      <h3> Mecanismes d'Oralce</h3>
+        <ul>
+          <li><strong>Exportació:</strong> la còpia lògica es guarda en l’equip client</li>
+          <li><strong>DataPump:</strong> la còpia lògica es guarda en l’equip servidor</li>
+          <li><strong>RMAN:</strong> la còpia física o incremental es guarda en l’equip servidor</li>
+        </ul>
+
+        <hr><h3> Eines principals de backup en Oracle</h3>
+       <h4>1. 📤 Exportació i importació legacy (Original Export))</h4>
+        <pre>exp / imp</pre>
+        <ul>
+          <li>S'executa des de la línia de comandos/terminal</li>
+          <li>La còpia lògica es guarda en l’equip des d'on s'executa  (sol ser client)</li>
+          <li>Modes: full, user (esquema), tablespace, table, query</li>
+          <li>Es pot usar un fitxer de paràmetres parfile=</li>
+        </ul>
+        <pre>EXEMPLE
+exp username/password@ipAddress:portNumber/serviceName file=/recovery_area/export/prueba_export.dmp full=yes buffer=1000000          
+        </pre>
+        <p>Si volem fer un exp total (full=yes), l'usuari que l'execute necessita el rol EXP_FULL_DATABASE</p>
+        <pre>Per cridar amb sys
+exp \'username/password@instance AS SYSDBA\' parametres</pre>        
+
+
+        <hr><h4>2. 📤 Data Pump</h4>
+        <pre>expdp / impdp</pre>
+        <ul>
+          <li>S'executa des de la linea de comandos/terminal (però la còpia s'executa en el servidor)</li>
+          <li>També es pot executar des de dins de l'SGBD amb el paquet DBMS_DATAPUMP (pròxim tema )</li>
+          <li>La còpia lògica es guarda en l'equip servidor (o un lloc assolible des del servidor)</li>
+          <li>Més ràpid, més rendiment, diversos fils en paral·lel</li>
+          <li>Modes: full=Y, eschemas=esquema_1[, esquema_N], tablespaces=, tables=, QUERY=</li>
+          <li>Es pot usar un fitxer de paràmetres parfile=</li>
+        </ul>
+       <pre>
+-- EXEMPLE    
+-- Guardar tot un esquema (tots els objectes d'un usuari)
+expdp username/password@ipAddress:portNumber/serviceName directory=dumpdir dumpfile=export.dmp logfile=fichero.log
+expdp usuari/password SCHEMAS=usuari DUMPFILE=export.dmp LOGFILE=export.log   --No cal posar path físic !!
+
+-- Recuperar en una altra BD
+impdp usuari/password DUMPFILE=export.dmp LOGFILE=import.log           </pre>
+
+        <ul> Que es pot guardar / recuperar  (mode)
+          <li>Tot: FULL=Y</li>
+          <li>Una o més Tablespaces:  TABLESPACES=tb1[,...]</li>
+          <li>Un o més esquemes: SCHEMAS= usuari1 [,...] </li>
+          <li>Una o més taules: TABLE= taula1 [,...]</li>
+          <li>Una part d'una taula:  QUERY [usuari.taula:] WHERE ....</li>
+        </ul>
+
+        <p>Es necessari que el servidor tinga accés al lloc on farà (el servidor) les còpies</p>
+        <p>Primer: Definir un directori </p>
+        <pre>CREATE [OR REPLACE] DIRECTORY directory_name AS 'path_name';</pre>
+        <p>El path deu existir i tindre permisos d'escriptura</p>
+        <p>Els fitxers de destí NO deuen existir (o donarà error la còpia)</p>
+        <p>L'usuari que connecta ha de tindre permisos d'accés a les dades per fer còpies</p>
+        <p>Per fer una còpia completa es necessita un permís (ROL) concret</p>
+        <pre>DATAPUMP_EXP_FULL_DATABASE
+DATAPUMP_IMP_FULL_DATABASE    </pre>
+
+          <pre>EXEMPLE d'arxiu 'parfile'
+TABLESPACES=users
+DUMPFILE=exp2.dmp
+DIRECTORY=dirdump
+LOGFILE=exp2.log            </pre>
+
+       <hr> <h4>3. 🔄 RMAN (Recovery Manager)</h4>
         <p>
           Eina oficial d'Oracle per fer backups i recuperar dades. Pot treballar amb còpies incrementals, verificar integritat i automatitzar tasques.
         </p>
@@ -547,19 +593,23 @@
       RMAN> RECOVER DATABASE;
         </pre>
       
-        <h4>2. 📤 Exportació i importació (Data Pump)</h4>
-        <p>
-          <code>expdp</code> i <code>impdp</code> són utilitats per exportar i importar dades de forma lògica.
-        </p>
-      
+
+        <h3>📋 Exemple de procediment bàsic amb RMAN</h3>
         <pre>
-      -- Exportar tot un esquema
-      expdp usuari/password SCHEMAS=usuari DUMPFILE=export.dmp LOGFILE=export.log
+      -- Connexió
+      rman target /
       
-      -- Importar en una altra BD
-      impdp usuari/password DUMPFILE=export.dmp LOGFILE=import.log
+      -- Comprovació de còpia
+      VALIDATE DATABASE;
+      
+      -- Còpia
+      BACKUP AS BACKUPSET DATABASE PLUS ARCHIVELOG;
+      
+      -- Restauració
+      RESTORE DATABASE;
+      RECOVER DATABASE;
         </pre>
-      
+        <hr>
         <h3> Arxius implicats en la recuperació</h3>
         <ul>
           <li><strong>Datafiles:</strong> contenen les dades</li>
@@ -582,23 +632,7 @@
           <li> Fer proves periòdiques de recuperació</li>
           <li> Utilitzar <code>RMAN VALIDATE</code> per comprovar integritat</li>
           <li> Documentar el procediment de recuperació</li>
-        </ul>
-      
-        <h3>📋 Exemple de procediment bàsic amb RMAN</h3>
-        <pre>
-      -- Connexió
-      rman target /
-      
-      -- Comprovació de còpia
-      VALIDATE DATABASE;
-      
-      -- Còpia
-      BACKUP AS BACKUPSET DATABASE PLUS ARCHIVELOG;
-      
-      -- Restauració
-      RESTORE DATABASE;
-      RECOVER DATABASE;
-        </pre>
+        </ul>        
       
         <h3> Conclusió</h3>
         <p>
