@@ -115,6 +115,7 @@ SELECT RAWTOHEX(  DBMS_CRYPTO.HASH(UTL_I18N.STRING_TO_RAW('SECRETA'),4) ) FROM d
     <blockquote>
         🔐 Una bona gestió de claus, un ús moderat del xifrat i l’auditoria d’accés són claus per garantir seguretat real.
     </blockquote>
+
     </section>
          
 
@@ -372,7 +373,7 @@ CREATE TABLE alumnes (
         <h3>📘 Què és una transacció?</h3>
         <p>
           Una <strong>transacció</strong> és una seqüència d’operacions SQL (normalment de manipulació de dades: <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>) que es tracten com una <strong>unitat indivisible de treball</strong>.
-          L’objectiu d’una transacció és assegurar que les dades es mantinguin <strong>coherents</strong> i <strong>integrades</strong>.
+          L’objectiu d’una transacció és assegurar que les dades es mantinguin <strong>coherents</strong> i <strong>amb integritat</strong>.
         </p>
         <p>Una transacció, o es fa tota o no es fa res, però no pot en cap cas quedar a mitges, una part feta i una altra no.</p>
         <p>Totes les operacions que en formen part han de completar-se correctament. Si alguna falla, cap de les altres no ha de tenir efecte.</p>
@@ -518,7 +519,7 @@ ROLLBACK TO punt1; -- desfà només fins al punt1           </pre>
         </ul>
 
         <hr><h3> Eines principals de backup en Oracle</h3>
-       <h4>1. 📤 Exportació i importació legacy (Original Export))</h4>
+       <h3>1. 📤 Exportació i importació legacy (Original Export))</h3>
         <pre>exp / imp</pre>
         <ul>
           <li>S'executa des de la línia de comandos/terminal</li>
@@ -532,9 +533,14 @@ exp username/password@ipAddress:portNumber/serviceName file=/recovery_area/expor
         <p>Si volem fer un exp total (full=yes), l'usuari que l'execute necessita el rol EXP_FULL_DATABASE</p>
         <pre>Per cridar amb sys
 exp \'username/password@instance AS SYSDBA\' parametres</pre>        
+         
+        <br> <img src="imgs/copseg_exporta.png" alt="exportacio de dades" style="width: 60%" class="imatge-esquerra">
+      <p>Un mecanisme molt semblant i més còmode i intuitiu es pot trobar a SQL Developer, ama l'eina de Exportar. 
+          Des del menu Eines-Exportació de base de dades, llança unes finestres per indicar que, com , on fer una exportació.</p>
+        <p>Les dades es guardarn en la màquina client ( o un lloc on esta puga accedir )</p>
+         <pre><code>SQL Developer permet exportar / importar dades, esquemes i resultats de consultes a diversos formats </code></pre>
 
-
-        <hr><h4>2. 📤 Data Pump</h4>
+         <hr><h3>2. 📤 Data Pump</h3>
         <pre>expdp / impdp</pre>
         <ul>
           <li>S'executa des de la linea de comandos/terminal (però la còpia s'executa en el servidor)</li>
@@ -559,7 +565,14 @@ impdp usuari/password DUMPFILE=export.dmp LOGFILE=import.log           </pre>
           <li>Un o més esquemes: SCHEMAS= usuari1 [,...] </li>
           <li>Una o més taules: TABLE= taula1 [,...]</li>
           <li>Una part d'una taula:  QUERY [usuari.taula:] WHERE ....</li>
+          <li>No es poden combinar en una mateixa exportació, pero es poden fer executat diverses exportacions</li>
         </ul>
+        <img src="imgs/copseg_full.png" alt="dp full" style="width: 30%" >
+        <img src="imgs/copseg_tblspc.png" alt="dp tablespace" style="width: 30%" >
+        <img src="imgs/copseg_sch.png" alt="dp schema" style="width: 30%" >
+        <br>
+        <img src="imgs/copseg_table.png" alt="dp table" style="width: 40%" >
+        <img src="imgs/copseg_query.png" alt="dp query" style="width: 30%" >
 
         <p>Es necessari que el servidor tinga accés al lloc on farà (el servidor) les còpies</p>
         <p>Primer: Definir un directori </p>
@@ -577,7 +590,7 @@ DUMPFILE=exp2.dmp
 DIRECTORY=dirdump
 LOGFILE=exp2.log            </pre>
 
-       <hr> <h4>3. 🔄 RMAN (Recovery Manager)</h4>
+       <hr> <h3>3. 🔄 RMAN (Recovery Manager)</h3>
         <p>
           Eina oficial d'Oracle per fer backups i recuperar dades. Pot treballar amb còpies incrementals, verificar integritat i automatitzar tasques.
         </p>
@@ -594,7 +607,7 @@ LOGFILE=exp2.log            </pre>
         </pre>
       
 
-        <h3>📋 Exemple de procediment bàsic amb RMAN</h3>
+        <h4>📋 Exemple de procediment bàsic amb RMAN</h4>
         <pre>
       -- Connexió
       rman target /
@@ -610,6 +623,13 @@ LOGFILE=exp2.log            </pre>
       RECOVER DATABASE;
         </pre>
         <hr>
+
+      <hr><img src="imgs/copseg_SQL_loader.png" alt="sql loader" style="width: 20%" class="imatge-dreta" >
+      <p>SQL*Loader és una utilitat que permet la inserció de dades des d'un arxiu pla a una o més bases de dades. </p>
+      <p> Durant una sola de les seves execucions és possible omplir múltiples taules amb dades de múltiples arxius, 
+        manejar registres d'ample variable o fix, manipular les dades entrants per a tractar amb valors nuls, delimitadors 
+        i espais en blanc, obviar registres o encapçalats i reaccionar enfront de fallades del procés de carregat</p>
+
         <h3> Arxius implicats en la recuperació</h3>
         <ul>
           <li><strong>Datafiles:</strong> contenen les dades</li>
@@ -758,7 +778,21 @@ LOGFILE=exp2.log            </pre>
 
   <section id="altres-recursos">
     <h2>Altres recursos</h2>
+
+    <hr><h3>Repàs...</h3>
+    <div class="quiz-container">
+        <h4 id="pregunta-text"></h4>
+        <div id="options-container" class="options">
+        </div>
+
+        <p id="feedback"></p>
+    </div>
+
     
+  </section>
+  <section>
+
+    <h2>{  ======== }</h2>
   </section>
  
 </main>
@@ -782,6 +816,91 @@ LOGFILE=exp2.log            </pre>
     });
   });
 
+const bancDePreguntes = [
+    {
+        titol: "Quin tipus d'encriptació utilitzaries per guardar (sols) el sou de la taula d'empleats?",
+        opcions: [
+            { text: "Utilitzant xifrat transparent", correcte: false },
+            { text: "Utilitzant les funcions d'encriptar/desencriptar", correcte: true },
+            { text: "Utilitzant una funció HASH", correcte: false },
+            { text: "Cap de les anteriors", correcte: false }
+        ]
+    },
+    {
+        titol: "Quina funció és millor per guardar contrasenyes?",
+        opcions: [
+            { text: "Funció HASH", correcte: true },
+            { text: "Xifrat simètric", correcte: false },
+            { text: "Text pla", correcte: false },
+            { text: "Xifrat Cèsar", correcte: false }
+        ]
+    },
+    {
+        titol: "En oracle es pot encriptar informació amb funcions del DDL",
+        opcions: [
+            { text: "Fals", correcte: true },
+            { text: "Cert", correcte: false }
+        ]
+    },
+    {
+        titol: "Les transaccions son un mecanisme per a conseguir disponibilitat de la informació",
+        opcions: [
+            { text: "Fals", correcte: true },
+            { text: "Cert", correcte: false }
+        ]
+    },
+    {
+        titol: "L'aplicació exp d'oracle pot fer còpies totals i/o parcials ",
+        opcions: [
+            { text: "Cert", correcte: true },
+            { text: "Fals", correcte: false }
+        ]
+    }
+    // Pots afegir tantes preguntes com vulguis aquí...
+    
+];
+
+function carregarPreguntaAleatoria() {
+    // Triar una pregunta a l'atzar
+    const indexAleatori = Math.floor(Math.random() * bancDePreguntes.length);
+    const pregunta = bancDePreguntes[indexAleatori];
+
+    // Mostrar el títol
+    document.getElementById('pregunta-text').innerText = pregunta.titol;
+
+    // Netejar contenidor de botons
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    // Barrejar opcions (opcional) i crear botons
+    pregunta.opcions.forEach(opcio => {
+        const btn = document.createElement('button');
+        btn.innerText = opcio.text;
+        btn.onclick = function() { comprovaResposta(opcio.correcte, btn); };
+        container.appendChild(btn);
+    });
+}
+
+    function comprovaResposta(esCorrecte, element) {
+        const feedback = document.getElementById('feedback');
+        
+        // Reset de colors dels botons
+        const botons = document.querySelectorAll('button');
+        botons.forEach(btn => btn.style.background = "#fff");
+
+        if (esCorrecte) {
+            feedback.textContent = "✅ Correcte! Molt bé.";
+            feedback.className = "correct";
+            element.style.background = "#d4edda"; // Verd clar
+        } else {
+            feedback.textContent = "❌ Incorrecte. Torna-ho a provar.";
+            feedback.className = "incorrect";
+            element.style.background = "#f8d7da"; // Vermell clar
+        }
+    }  
+
+// Executar en carregar la pàgina
+window.onload = carregarPreguntaAleatoria;
 </script>
 
 </body>
