@@ -66,15 +66,28 @@
     </ul>
 
     <h4> Exemple: fer un hash SHA-1 d’una contrasenya</h4>
-    <pre>SELECT STANDARD_HASH('contrasenya', 'SHA1') FROM dual;   --molt dèbil actualment  
+    <p>(Les funcions HASH no xifren, sols resumeixen. No es poden desxifrar)</p>
+    <pre><code>SELECT STANDARD_HASH('contrasenya', 'SHA1') FROM dual;   --molt dèbil actualment  
 -- altre tipus de hash  
-SELECT STANDARD_HASH('contrasenya', 'SHA256') FROM dual;        </pre>
+SELECT STANDARD_HASH('contrasenya', 'SHA256') FROM dual;        </code></pre>
      <p>STANDARD_HASH soporta tots els algorismes moderns (MD5, SHA1, SHA256, SHA384, SHA512, SHA3_256, SHA3_512…)</p>
      <p>També es pot fer amb la funcio HASH del paquet DBMS_CRYPTO</p>
-<pre>SELECT RAWTOHEX(  DBMS_CRYPTO.HASH(HEXTORAW('1231'),3) ) FROM dual;
+<pre><code>SELECT RAWTOHEX(  DBMS_CRYPTO.HASH(HEXTORAW('1231'),3) ) FROM dual;
 SELECT RAWTOHEX(  DBMS_CRYPTO.HASH(UTL_I18N.STRING_TO_RAW('SECRETA'),4) ) FROM dual;  
--- On el num del segon parametre =>  type 3:SHA-1  type 4:SHA256  type 5:SHA384  type 6:SHA512
-</pre>
+-- On el num del segon parametre =>  type 3:SHA-1  type 4:SHA256  type 5:SHA384  type 6:SHA512  </code></pre>
+<h4>Exemple de xifrat amb AES</h4>
+<pre><code>SELECT RAWTOHEX(
+         DBMS_CRYPTO.ENCRYPT(
+           src => UTL_RAW.cast_to_raw('Text secret'),
+           typ => 4354, -- AES_CBC_PKCS5
+           key => UTL_RAW.cast_to_raw('0123456789ABCDEF0123456789ABCDEF'),
+           iv  => UTL_RAW.cast_to_raw('ABCDEF9876543210')
+         )
+       ) AS text_encriptat_hex
+FROM dual;
+</code></pre>
+<pre><code>Oracle determina automàticament quina versió d’AES s’ha d’aplicar segons la longitud del RAW 
+  que s'envie al paràmetre key (Clau 16 bytes → AES-128 , Clau 24 bytes → AES-192 , Clau 32 bytes → AES-256)</code></pre>
 
     <h4> Convertir entre formats:</h4>
     <ul>
@@ -100,7 +113,7 @@ SELECT RAWTOHEX(  DBMS_CRYPTO.HASH(UTL_I18N.STRING_TO_RAW('SECRETA'),4) ) FROM d
     </ul>
 
 
-    <h3> Bones pràctiques</h3>
+    <hr><hr><h3> Bones pràctiques</h3>
     <ul>
         <li>Xifra només les dades sensibles</li>
         <li>Evita BASE64 o ROT13 per contrasenyes</li>
@@ -377,6 +390,14 @@ CREATE TABLE alumnes (
         </p>
         <p>Una transacció, o es fa tota o no es fa res, però no pot en cap cas quedar a mitges, una part feta i una altra no.</p>
         <p>Totes les operacions que en formen part han de completar-se correctament. Si alguna falla, cap de les altres no ha de tenir efecte.</p>
+        <!--<p>Les transaccions tracte d'evitar: Actualitzacions parcials, concurrency problems, Pèrdua de dades a causa d’errors </p> -->
+        <p>Els interbloquejos ( <strong>deadlocks</strong>  ) són un problema que les transaccions i els mecanismes de control de concurrència intenten evitar o gestionar</p>
+        <p>Un interbloqueig passa quan dues o més transaccions es bloquegen mútuament, cadascuna esperant un recurs 
+          (normalment un registre o una taula) que l’altra té bloquejat.Comm que cap pot continuar, totes queden aturades indefinidament</p>
+        <pre><code>Exemple senzill:
+    Transacció A té bloquejada la fila 1 i vol la fila 2.
+    Transacció B té bloquejada la fila 2 i vol la fila 1.
+Cap pot continuar → deadlock</code></pre>
 
         <h3> Propietats d’una transacció (ACID)</h3>
         <ul>
@@ -437,14 +458,20 @@ ROLLBACK TO punt1; -- desfà només fins al punt1           </pre>
           <li> Integritat davant fallades del sistema</li>
           <li> Registre coherent en conjunció amb l’auditoria</li>
         </ul>
-      
+      <hr>
+      <p>Oracle té mecanismes per detectar deadlocks de manera automàtica:
+quan detecta que dues transaccions no poden continuar, avorta una de les dues i retorna un error:</p>
+        <pre><code>ORA-00060: deadlock detected while waiting for resource</code></pre>
+        <p>Així, almenys una pot continuar i el sistema no queda bloquejat.</p>
+        <p>Quan Oracle mata una transacció per deadlock, la seva part desada es desfà (rollback), mantenint la coherència.</p>
+
         <h3> Conclusió</h3>
         <p>
           El control de transaccions és una eina fonamental per garantir que el sistema de base de dades sigui <strong>segur, coherent i robust</strong>.
           Oracle proporciona instruccions clares per controlar de forma manual i segura l’execució de canvis en les dades.
         </p>
 
-        <h3> Exemple</h3>
+       <hr> <h3> Exemple (vore transacció per completar)</h3>
         <p>Obrim 2 sessions ( en SQL*PLUS ) amb usuari1 ( dos cmd diferents)   </p>
         <pre> 
     En la primera sessió (1er CMD)
@@ -468,6 +495,36 @@ ROLLBACK TO punt1; -- desfà només fins al punt1           </pre>
     ----------
     1
     </pre>
+
+    <hr><h4>Exemple ( de deadlock )</h4>
+    <p>Suposem que tenim una taula:</p>
+    <pre><code>CREATE TABLE comptes (
+    id NUMBER PRIMARY KEY,
+    saldo NUMBER
+    ); </code></pre>
+    <p>i dos files</p>
+    <pre><code>INSERT INTO comptes VALUES (1, 100);
+INSERT INTO comptes VALUES (2, 200);
+COMMIT; </code></pre>
+<p>Obri dos sessios sql diferents, Sessio A i Sessio B</p>
+<pre>Sessio A
+  -- Bloqueja la fila amb id = 1
+UPDATE comptes SET saldo = saldo + 10 WHERE id = 1;
+Sessio B
+-- Bloqueja la fila amb id = 2
+UPDATE comptes SET saldo = saldo + 20 WHERE id = 2;
+
+-- SESSION A intenta agafar la fila que té B
+UPDATE comptes SET saldo = saldo - 5 WHERE id = 2;
+--  → A queda esperant, perquè B té bloquejada la fila 2.
+
+SESSION B intenta agafar la fila que té A
+UPDATE comptes SET saldo = saldo - 5 WHERE id = 1;
+-- → B queda esperant, perquè A té bloquejada la fila 1.
+
+-- I ací és on Oracle detecta el deadlock
+-- Oracle trenca el bloqueig i dona error a una de les dues sessions (normalment la segona que entra al conflicte)
+</pre>
 
    </section>
       
@@ -792,7 +849,7 @@ LOGFILE=exp2.log            </pre>
   </section>
   <section>
 
-    <h2>{  ======== }</h2>
+    <h2>{  ==== ↺ Recarrega pàgina ↺ ==== }</h2>
   </section>
  
 </main>
@@ -816,6 +873,10 @@ LOGFILE=exp2.log            </pre>
     });
   });
 
+  //  Per fer test final
+  // Primer es crea un bancDePreguntes   const
+  // i desprès es carrega una pregunta aleatoria    function
+  // per ultim la funcio de comprobar resposta per a quan es polse un botó
 const bancDePreguntes = [
     {
         titol: "Quin tipus d'encriptació utilitzaries per guardar (sols) el sou de la taula d'empleats?",
@@ -855,8 +916,17 @@ const bancDePreguntes = [
             { text: "Cert", correcte: true },
             { text: "Fals", correcte: false }
         ]
+    },
+    {
+        titol: "Que succeix si es produeix un interbloqueig entre dos sessions? ",
+        opcions: [
+            { text: "Les dos sessions queden bloquejades i a més a més afecten a la resta de sessions", correcte: true },
+            { text: "Les dos sessions queden bloquejades però no afecten a la resta de sessions", correcte: false },
+            { text: "La segona sessió que agafà el bloqueig es queda bloquejada", correcte: false },
+            { text: "La primera sessió que agafà el bloqueig es queda bloquejada", correcte: false }
+        ]
     }
-    // Pots afegir tantes preguntes com vulguis aquí...
+    // Pots afegir tantes preguntes com vullgues ací... , no oblides la coma  ,  entre cada pregunta.
     
 ];
 
