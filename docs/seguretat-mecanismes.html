@@ -35,6 +35,9 @@
 
     <h3> Què és i per què encriptar?</h3>
     <p>L’encriptació converteix dades llegibles en format codificat (xifrat) que només pot ser desxifrat amb una clau. És essencial per protegir informació sensible.</p>
+    <p>Una altra manera d'encriptar és fer un HASH (Hashing). Objectiu: generar una empremta única i irreversible d’un text.
+      Ús típic: Guardar contrasenyes de forma segura,  Verificar integritat de fitxers, Firmes digitals.
+    </p>
 
     <h4> Raons per aplicar encriptació:</h4>
     <ul>
@@ -60,9 +63,9 @@
     <h3> DBMS_CRYPTO (manual)</h3>
     <p>Paquet per fer xifrat, hash i autenticació.</p>
     <ul>
+        <li><code>DBMS_CRYPTO.ENCRYPT()</code> / <code>DECRYPT()</code></li>
         <li><code>STANDARD_HASH</code></li>
         <li><code>DBMS_CRYPTO.HASH()</code></li>
-        <li><code>DBMS_CRYPTO.ENCRYPT()</code> / <code>DECRYPT()</code></li>
     </ul>
 
     <h4> Exemple: fer un hash SHA-1 d’una contrasenya</h4>
@@ -166,20 +169,29 @@ FROM dual;
       </tbody>
     </table>
   
-    <h3>🛠️ Activar auditoria estàndard</h3>
+    <h3>🛠️ Activar auditoria estàndard (tradicional)</h3>
+    <p>Des d'Oracle23ai no es pot fer servir.</p>
+  <!--  
     <pre>
 -- Activar l’auditoria global
-AUDIT TRAIL;
-      </pre>
+SHOW PARAMETER audit_trail;
+-- Si el valor és NONE, està desactivada.        </pre>
       <p>
         S’ha de configurar el paràmetre:
-        <code>audit_trail = DB</code> al fitxer d’inici <code>init.ora</code> o via <code>ALTER SYSTEM</code>
-      </p>
+        <code>audit_trail = DB</code> al fitxer d’inici <code>init.ora</code> o via <code>ALTER SYSTEM</code>        </p>
+      <p class="alert">En Oracle multitenant, l’auditoria estàndard es configura només al CDB$ROOT.</p>  
+     <pre>ALTER SYSTEM SET audit_trail='DB' SCOPE=SPFILE;
+--  Després reinicia la base de dades:      
+SHUTDOWN IMMEDIATE;   --  Des de sqlplus  !!
+STARTUP;              --  Des de sqlplus  !!
+     </pre> 
     
       <h3> Exemples d'ordres <code>AUDIT</code></h3>
-      <pre>
+      <pre>-- Audita logins d'usuaris
+AUDIT SESSION;
+
 -- Audita l’accés a taula
-AUDIT SELECT ON alumnes;
+AUDIT SELECT ON usu1.alumnes;
 
 -- Audita connexions fallides
 AUDIT SESSION WHENEVER NOT SUCCESSFUL;
@@ -188,7 +200,7 @@ AUDIT SESSION WHENEVER NOT SUCCESSFUL;
 AUDIT INSERT, UPDATE, DELETE ON alumnes;
       </pre>
     
-      <h3> Consultar resultats d’auditoria</h3>
+      <h3> Consultar resultats d’auditoria (vistes del DD)</h3>
       <ul>
         <li><code>DBA_AUDIT_TRAIL</code>: accés general</li>
         <li><code>USER_AUDIT_TRAIL</code>: accés només al propi esquema</li>
@@ -198,7 +210,8 @@ AUDIT INSERT, UPDATE, DELETE ON alumnes;
       <pre>
 SELECT username, action_name, obj_name, timestamp
 FROM dba_audit_trail
-WHERE obj_name = 'ALUMNES';
+WHERE obj_name = 'ALUMNES'
+ORDER BY timestamp DESC;
       </pre>
     
       <h3>🧹 Esborrar o buidar resultats (amb compte!)</h3>
@@ -207,27 +220,64 @@ DELETE FROM sys.aud$ WHERE obj$name = 'ALUMNES';
 -- o
 TRUNCATE TABLE sys.aud$;
       </pre>
-    
-      <h3> Unified Audit (Oracle 12c+)</h3>
+
+      <ul>
+        <li>Oracle impulsa Unified Auditing, però Standard Auditing encara és compatible.</li>
+        <li>Si Unified Auditing està en mode mixed mode, pots utilitzar Standard i Unified alhora.</li>
+      </ul>
+   --> 
+      <h3>🛠️ Unified Audit (Oracle 12c+)</h3>
       <p>
         Unifica tots els registres d’auditoria: privilegis, ordres, errors, logons...  
         S’activa amb <code>ENABLE_UNIFIED_AUDIT = TRUE</code> al paràmetre de sistema.
       </p>
+<pre>SELECT VALUE
+FROM V$OPTION
+WHERE PARAMETER = 'Unified Auditing';   -- per saber si esta activa</pre>      
+  <p>Modes de unified</p>
+    <p>Mixed Mode: pots usar AUDIT SESSION i Unified Auditing alhora <br>
+      Only Mode: només Unified Auditing funciona; els antics comandos AUDIT estan bloquejats</p>
     
       <h4>Exemple de política unificada:</h4>
       <pre>
+CREATE AUDIT POLICY aud_logins
+  ACTIONS LOGON;
+
+AUDIT POLICY aud_logins;    --   Audita logins d'usuaris
+
 CREATE AUDIT POLICY acces_alumnes
   ACTIONS SELECT ON alumnes;
 
-AUDIT POLICY acces_alumnes;
+AUDIT POLICY acces_alumnes;      --   Audita selects a una taula (de qualsevol usuari)
+
+AUDIT POLICY acces_alumnes BY usuari1,usuari2;  --   Audita selects a una taula (per part de usuari1 o usuari2)
       </pre>
-    
       <h3>📦 Vistes d’auditoria unificada</h3>
       <ul>
+        <li><code>AUDIT_UNIFIED_POLICIES</code></li>
+        <li><code>AUDIT_UNIFIED_ENABLED_POLICIES</code></li>
         <li><code>UNIFIED_AUDIT_TRAIL</code></li>
-        <li><code>DBA_AUDIT_POLICIES</code></li>
-        <li><code>DBA_OBJ_AUDIT_OPTS</code></li>
       </ul>
+
+      <h3>Com vore les regles creades </h3>
+      <pre>SELECT policy_name, audit_option, condition_eval_opt, audit_condition
+FROM audit_unified_policies 
+ORDER BY policy_name;</pre>
+<h3>Com vore les regles  actives</h3>
+<pre>SELECT * FROM AUDIT_UNIFIED_ENABLED_POLICIES;</pre>     
+    
+
+     <h3>Com vore els registres de l'auditoria</h3>
+      <pre>SELECT EVENT_TIMESTAMP, DBUSERNAME, USERHOST, ACTION_NAME
+      FROM UNIFIED_AUDIT_TRAIL
+      WHERE OBJECT_NAME = 'ALUMNES';
+      ORDER BY EVENT_TIMESTAMP DESC;   </pre>
+
+  <pre>-- Deshabilitar primer
+NOAUDIT POLICY acces_alumnes;
+
+-- Eliminar la política
+DROP AUDIT POLICY nom_politica;</pre>    
     
       <h3> Consells de seguretat i gestió</h3>
       <ul>
@@ -687,7 +737,8 @@ LOGFILE=exp2.log            </pre>
         manejar registres d'ample variable o fix, manipular les dades entrants per a tractar amb valors nuls, delimitadors 
         i espais en blanc, obviar registres o encapçalats i reaccionar enfront de fallades del procés de carregat</p>
 
-        <h3> Arxius implicats en la recuperació</h3>
+
+       <hr> <h3> Arxius implicats en la recuperació</h3>
         <ul>
           <li><strong>Datafiles:</strong> contenen les dades</li>
           <li><strong>Control file:</strong> descriu l'estructura de la BD</li>
@@ -716,6 +767,50 @@ LOGFILE=exp2.log            </pre>
           Disposar d’un pla de còpies de seguretat fiable i efectiu és <strong>fonamental per garantir la seguretat i continuïtat</strong> de qualsevol sistema basat en Oracle.
           Les eines com RMAN i Data Pump permeten adaptar-se a múltiples escenaris, i una bona estratègia de backup ha d’estar acompanyada d’una política de recuperació clara.
         </p>
+
+ <!--        <hr> <h3> Data Guard d'Oracle        </h3> 
+        <img src="imgs/dataguard1.png" alt="data guard" style="width: 30%" class="imatge-dreta" >
+        <p>Oracle Data Guard és una tecnologia d’Oracle Database que proporciona alta disponibilitat, protecció de dades i recuperació davant desastres (Disaster Recovery).</p>
+          <h4>Què fa Data Guard?</h4>
+        <p>Data Guard manté una o diverses bases de dades en espera (standby) sincronitzades amb la base de dades principal (primary).
+          Si la base principal falla, una base de dades standby pot assumir el seu rol i convertir-se en la nova primary, minimitzant 
+          el temps d’inactivitat i la pèrdua de dades.</p>
+
+          <h4>Components principals</h4>
+        <ul>
+          <li>Base de dades primary</li>
+            <p>-- La que es fa servir habitualment i rep les operacions de lectura i escriptura.</p>
+          <li>Bases de dades standby</li>
+            <p> -- Physical Standby - Còpia exacta a nivell físic. Aplica els fitxers redo.</p>
+            <p> -- Logical Standby  - Utilitza SQL Apply: permet consultes i alguns canvis estructurals.</p>
+            <p> -- Snapshot Standby - Standby en mode lectura/escriptura temporal per a proves.</p>
+          <li>Redo Transport & Apply</li>
+            <p> -- Transporta els fitxers redo des de la primary fins a la standby.</p>
+            <p> -- Els aplica per mantindre-les sincronitzades.</p>
+        </ul>
+
+        <ol>  <strong>Modes de protecció</strong>
+          <li>Maximum Protection -  Sense pèrdua de dades; requereix confirmació de la standby.</li>
+          <li>Maximum Availability  -  Sense pèrdua de dades però permet que la standby falle temporalment</li>
+          <li>Maximum Performance  -  Millor rendiment; pot haver-hi una mínima pèrdua de dades.</li>
+        </ol>
+
+        <ol> <strong>Funcionalitats importants</strong>
+          <li>SwitchOver: intercanvi de rols entre primary i standby de manera planificada.</li>
+          <li>FailOver: la standby es converteix en primary per una fallada inesperada.</li>
+          <li>Gap Resolution: recuperació de diferències entre primary i standby.</li>
+          <li>Fast-Start Failover (FSFO): failover automàtic mitjançant Data Guard Broker.</li>
+        </ol>
+
+        <ol> <strong> Beneficis</strong>
+          <li>Alta disponibilitat (HA).</li>
+          <li>Recuperació davant desastres (DR).</li>
+          <li>Protecció contra corrupció de dades.</li>
+          <li>Reducció del temps d’inactivitat.</li>
+          <li>Lectures en standby (segons el tipus).</li>
+        </ol>
+
+                 -->
       </section>
       
 
