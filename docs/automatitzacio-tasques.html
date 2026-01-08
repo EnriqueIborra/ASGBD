@@ -107,7 +107,7 @@ S’utilitza per crear programs dins de la base de dades.</p>
     </p>
     <ul>
       <li> No té nom ni es guarda a la base de dades.</li>
-      <li> S’executa una sola vegada i després desapareix.</li>
+      <li> S’executa directament des de la pestanya. Es pot guardar en un fitxer extern i després recuperar.</li>
       <li> És ideal per a proves o per a executar operacions puntuals.</li>
       <li> Pot incloure sentències SQL, declaracions de variables, control de flux, i gestió d’excepcions.</li>
     </ul>
@@ -140,18 +140,16 @@ S’utilitza per crear programs dins de la base de dades.</p>
     <p>Per executar el contingut d'un fitxer directament => @/ruta/prova_bloc.sql  i prem F5  </p>
      <hr>
     <h3> Estructura bàsica d’un bloc anònim</h3>
-    <pre translate="no">
-  SET SERVEROUTPUT ON;
-  
-  DECLARE
-     vNom VARCHAR2(20) := '&nom';
-  BEGIN
-     DBMS_OUTPUT.PUT_LINE('Hola ' || vNom);
-     DBMS_OUTPUT.PUT_LINE('Benvingut a la programació en PL/SQL');
-  END;
-  .  -- Només en SQL*Plus!
-    </pre>
-  
+    <p>El primer és activar l'eixida per pantalla. Esta sentència es pot executar una vegada al principi</p>
+    <pre translate="no">SET SERVEROUTPUT ON;</pre>
+    <pre translate="no">DECLARE
+    vNom VARCHAR2(20) := '&nom';
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Hola ' || vNom);
+    DBMS_OUTPUT.PUT_LINE('Benvingut a la programació en PL/SQL');
+END;
+.  -- Només en SQL*Plus!      </pre>
+ 
     <p>
       ⚠️ En <strong>SQL*Plus</strong> s’ha de posar un punt (<code>.</code>) al final per enviar-lo al buffer i després executar-lo amb <code>RUN</code>.  
       En <strong>SQL Developer</strong>, s’executa amb <kbd>F5</kbd> i <strong>no cal posar el punt</strong>.
@@ -168,6 +166,7 @@ S’utilitza per crear programs dins de la base de dades.</p>
     </ul>
   <p><strong>&nom</strong> Una variable de substitució és una variable que s'utilitza principalment en eines com SQL*Plus, SQL Developer o Toad, per a permetre que l’usuari introduïsca un valor en temps d’execució, abans que s'execute un bloc PL/SQL o una sentència SQL.
     No és part del llenguatge PL/SQL com a tal, sinó una funcionalitat d’aquestes eines per fer scripts més dinàmics i interactius.</p>
+    <p>S'usarà  '&NOM' amb cometes per demanar un STRING i &NOM sense cometes per demanar un NUMBER</p>
     <p><strong>PUT_LINE</strong> És un procediment del paquet <strong>DBMS_OUTPUT</strong> d'ORACLE.</p>
     <p><strong>PUT_LINE</strong> avalua !!  i imprimeix el resultat.</p>
     <pre>
