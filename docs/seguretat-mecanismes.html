@@ -932,28 +932,39 @@ LOGFILE=exp2.log            </pre>
     <h2>Altres recursos</h2>
 
     <hr><h3>Repàs...</h3>
+    <div id="progress-container">
+    <div id="progress-bar"></div>  </div>
+    <!-- <div id="percentatge-text">0%</div>  -->
+
     <div class="quiz-container">
         <h4 id="pregunta-text"></h4>
         <div id="options-container" class="options">
         </div>
 
         <p id="feedback"></p>
+        <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
+        <button onclick="carregarPreguntes()">🔁 Reiniciar</button>
+
+
     </div>
 
     
   </section>
-  <section>
+ 
+ <!--   <section>
 
-    <h2>{  ==== ↺ Recarrega pàgina ↺ ==== }</h2>
-  </section>
+    <h2>{ Nova pregunta ===> ↺ Recarrega pàgina ↺  o F5  }</h2>
+  </section> -->
  
 </main>
 
+
 <script>
 
-// Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
-      //  <div class="pre-container">
-      //    <button class="copy-button">Copia Codi !</button>
+    // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+    //  <div class="pre-container">
+    //    <button class="copy-button">Copia Codi !</button>
+
   document.addEventListener('DOMContentLoaded', function () {
     const buttons = document.querySelectorAll('.copy-button');
 
@@ -972,58 +983,53 @@ LOGFILE=exp2.log            </pre>
   // Primer es crea un bancDePreguntes   const
   // i desprès es carrega una pregunta aleatoria    function
   // per ultim la funcio de comprobar resposta per a quan es polse un botó
-const bancDePreguntes = [
-    {
-        titol: "Quin tipus d'encriptació utilitzaries per guardar (sols) el sou de la taula d'empleats?",
-        opcions: [
-            { text: "Utilitzant xifrat transparent", correcte: false },
-            { text: "Utilitzant les funcions d'encriptar/desencriptar", correcte: true },
-            { text: "Utilitzant una funció HASH", correcte: false },
-            { text: "Cap de les anteriors", correcte: false }
-        ]
-    },
-    {
-        titol: "Quina funció és millor per guardar contrasenyes?",
-        opcions: [
-            { text: "Funció HASH", correcte: true },
-            { text: "Xifrat simètric", correcte: false },
-            { text: "Text pla", correcte: false },
-            { text: "Xifrat Cèsar", correcte: false }
-        ]
-    },
-    {
-        titol: "En oracle es pot encriptar informació amb funcions del DDL",
-        opcions: [
-            { text: "Fals", correcte: true },
-            { text: "Cert", correcte: false }
-        ]
-    },
-    {
-        titol: "Les transaccions son un mecanisme per a conseguir disponibilitat de la informació",
-        opcions: [
-            { text: "Fals", correcte: true },
-            { text: "Cert", correcte: false }
-        ]
-    },
-    {
-        titol: "L'aplicació exp d'oracle pot fer còpies totals i/o parcials ",
-        opcions: [
-            { text: "Cert", correcte: true },
-            { text: "Fals", correcte: false }
-        ]
-    },
-    {
-        titol: "Que succeix si es produeix un interbloqueig entre dos sessions? ",
-        opcions: [
-            { text: "Les dos sessions queden bloquejades i a més a més afecten a la resta de sessions", correcte: true },
-            { text: "Les dos sessions queden bloquejades però no afecten a la resta de sessions", correcte: false },
-            { text: "La segona sessió que agafà el bloqueig es queda bloquejada", correcte: false },
-            { text: "La primera sessió que agafà el bloqueig es queda bloquejada", correcte: false }
-        ]
+
+let bancDePreguntes = [];
+let preguntesBarrejades = [];
+let indexPreguntaActual = 0;
+let puntuacio = 0;
+
+function barrejar(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
-    // Pots afegir tantes preguntes com vullgues ací... , no oblides la coma  ,  entre cada pregunta.
-    
-];
+}
+
+function actualitzarProgres() {
+    const percentatge =
+        (indexPreguntaActual / preguntesBarrejades.length) * 100;
+    document.getElementById('progress-bar').style.width =
+        percentatge + "%";
+}
+
+function actualitzarPercentatge() {
+    const percentatge = Math.round(
+        (puntuacio / preguntesBarrejades.length) * 100
+    );
+    document.getElementById('percentatge-text').innerText =""
+       // `Encerts: 🎯 ${percentatge}%`;
+}
+
+/*
+function carregarPreguntes() {
+    fetch('preguntes/preguntes.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("No s'han pogut carregar les preguntes");
+            }
+            return response.json();
+        })
+        .then(data => {
+            bancDePreguntes = data;
+            carregarPreguntaAleatoria();
+        })
+        .catch(error => {
+            console.error(error);
+            document.getElementById('pregunta-text').innerText =
+                "Error carregant les preguntes 😢";
+        });
+}  
 
 function carregarPreguntaAleatoria() {
     // Triar una pregunta a l'atzar
@@ -1044,9 +1050,66 @@ function carregarPreguntaAleatoria() {
         btn.onclick = function() { comprovaResposta(opcio.correcte, btn); };
         container.appendChild(btn);
     });
+}*/
+
+function carregarPreguntes() {
+    fetch('preguntes/preguntes32.json')
+        .then(res => res.json())
+        .then(data => {
+            bancDePreguntes = data;
+            preguntesBarrejades = [...bancDePreguntes];
+            barrejar(preguntesBarrejades);
+            puntuacio = 0;
+            indexPreguntaActual = 0;
+            mostrarPregunta();
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('pregunta-text').innerText =
+                "Error carregant les preguntes 😢";
+        });
+        //document.getElementById('percentatge-text').innerText = "0%";
+
 }
 
-    function comprovaResposta(esCorrecte, element) {
+function mostrarPregunta() {
+
+    // Si ja no queden preguntes
+    if (indexPreguntaActual >= preguntesBarrejades.length) {
+        document.getElementById('pregunta-text').innerText =
+            "🎉 Has acabat totes les preguntes!";
+        document.getElementById('options-container').innerHTML = "";
+        document.getElementById('feedback').innerHTML =
+        `Has encertat <strong>${puntuacio}</strong> de 
+        <strong>${preguntesBarrejades.length}</strong> preguntes.`;
+        document.getElementById('btn-seguent').disabled = true;
+        document.getElementById('progress-bar').style.width = "100%";
+        actualitzarProgres();
+        return;
+    }
+
+    const pregunta = preguntesBarrejades[indexPreguntaActual];
+
+    document.getElementById('pregunta-text').innerText = pregunta.titol;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    pregunta.opcions.forEach(opcio => {
+        const btn = document.createElement('button');
+        btn.innerText = opcio.text;
+        btn.onclick = () => comprovaResposta(opcio.correcte, btn);
+        container.appendChild(btn);
+    });
+
+    document.getElementById('feedback').textContent = "";
+    document.getElementById('btn-seguent').disabled = true;
+    actualitzarProgres();
+
+}
+
+
+  /*  function comprovaResposta(esCorrecte, element) {
         const feedback = document.getElementById('feedback');
         
         // Reset de colors dels botons
@@ -1062,10 +1125,42 @@ function carregarPreguntaAleatoria() {
             feedback.className = "incorrect";
             element.style.background = "#f8d7da"; // Vermell clar
         }
-    }  
+    }
+    
+  function seguentPregunta() {
+    carregarPreguntaAleatoria();
+}*/
+
+function comprovaResposta(esCorrecte, element) {
+    const feedback = document.getElementById('feedback');
+
+    document
+        .querySelectorAll('#options-container button')
+        .forEach(btn => btn.disabled = true);
+
+    if (esCorrecte) {
+        feedback.textContent = "✅ Correcte! Molt bé.";
+        element.style.background = "#d4edda";
+        puntuacio++;
+    } else {
+        feedback.textContent = "❌ Incorrecte.";
+        element.style.background = "#f8d7da";
+    }
+    //actualitzarPercentatge();
+    document.getElementById('btn-seguent').disabled = false;
+}
+
+function seguentPregunta() {
+    indexPreguntaActual++;
+    mostrarPregunta();
+}
+
+  
 
 // Executar en carregar la pàgina
-window.onload = carregarPreguntaAleatoria;
+window.onload = carregarPreguntes;
+// antes   window.onload = carregarPreguntaAleatoria;
+
 </script>
 
 </body>
