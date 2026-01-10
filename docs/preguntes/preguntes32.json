@@ -1,0 +1,51 @@
+[
+    {
+        "titol": "Quin tipus d'encriptació utilitzaries per guardar (sols) el sou de la taula d'empleats?",
+        "opcions": [
+            { "text": "Utilitzant xifrat transparent", "correcte": false },
+            { "text": "Utilitzant les funcions d'encriptar/desencriptar", "correcte": true },
+            { "text": "Utilitzant una funció HASH", "correcte": false },
+            { "text": "Cap de les anteriors", "correcte": false }
+        ]
+    },
+    {
+        "titol": "Quina funció és millor per guardar contrasenyes?",
+        "opcions": [
+            { "text": "Funció HASH", "correcte": true },
+            { "text": "Xifrat simètric", "correcte": false },
+            { "text": "text pla", "correcte": false },
+            { "text": "Xifrat Cèsar", "correcte": false }
+        ]
+    },
+    {
+        "titol": "En oracle es pot encriptar informació amb funcions del DDL",
+        "opcions": [
+            { "text": "Fals", "correcte": true },
+            { "text": "Cert", "correcte": false }
+        ]
+    },
+    {
+        "titol": "Les transaccions son un mecanisme per a conseguir disponibilitat de la informació",
+        "opcions": [
+            { "text": "Fals", "correcte": true },
+            { "text": "Cert", "correcte": false }
+        ]
+    },
+    {
+        "titol": "L'aplicació exp d'oracle pot fer còpies totals i/o parcials ",
+        "opcions": [
+            { "text": "Cert", "correcte": true },
+            { "text": "Fals", "correcte": false }
+        ]
+    },
+    {
+        "titol": "Que succeix si es produeix un interbloqueig entre dos sessions? ",
+        "opcions": [
+            { "text": "Les dos sessions queden bloquejades i a més a més afecten a la resta de sessions", "correcte": true },
+            { "text": "Les dos sessions queden bloquejades però no afecten a la resta de sessions", "correcte": false },
+            { "text": "La segona sessió que agafà el bloqueig es queda bloquejada", "correcte": false },
+            { "text": "La primera sessió que agafà el bloqueig es queda bloquejada", "correcte": false }
+        ]
+    }
+    
+]
