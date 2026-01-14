@@ -443,7 +443,7 @@ CREATE TABLE alumnes (
         <!--<p>Les transaccions tracte d'evitar: Actualitzacions parcials, concurrency problems, Pèrdua de dades a causa d’errors </p> -->
         <p>Els interbloquejos ( <strong>deadlocks</strong>  ) són un problema que les transaccions i els mecanismes de control de concurrència intenten evitar o gestionar</p>
         <p>Un interbloqueig passa quan dues o més transaccions es bloquegen mútuament, cadascuna esperant un recurs 
-          (normalment un registre o una taula) que l’altra té bloquejat.Comm que cap pot continuar, totes queden aturades indefinidament</p>
+          (normalment un registre o una taula) que l’altra té bloquejat.Comm que cap pot continuar, totes queden aturades indefinidament (i a més a més afecten a la resta de sessions)</p>
         <pre><code>Exemple senzill:
     Transacció A té bloquejada la fila 1 i vol la fila 2.
     Transacció B té bloquejada la fila 2 i vol la fila 1.
