@@ -182,6 +182,7 @@ END;
   DECLARE
      vData DATE := SYSDATE;
   BEGIN
+     DBMS_OUTPUT.PUT_LINE('La data actual és: ' ||  vData  );
      DBMS_OUTPUT.PUT_LINE('La data actual és: ' || TO_CHAR(vData, 'DD/MM/YYYY'));
   END;
     </pre>
@@ -323,7 +324,13 @@ BEGIN
 END; </code></pre>
     
       <h4>🛠️ Com assignar valors</h4>
-      <ul>
+        <h3>-- En el bloc DECLARE</h3>
+      <ul> 
+        <li><strong>Entrada de l’usuari (SQL Developer):</strong> <pre><code>v_nom := '&amp;nom_usuari';</code></pre></li>
+        <li>Utilitzant el <strong> DEFAULT</strong> <pre> v_code number default 100;</pre></li>
+      </ul>
+        <h3>-- En el bloc principal BEGIN</h3>
+      <ul> 
         <li><strong>Assignació directa:</strong> <code>v_edat := 25;</code></li>
         <li><strong>Amb SELECT INTO:</strong>
           <pre><code>SELECT sou INTO v_sou FROM empleats WHERE id = 5;
@@ -331,8 +338,7 @@ END; </code></pre>
 SELECT avg(sou) INTO v_mitjanasou FROM empleats WHERE departament=101;            
           </code></pre>
         </li>
-        <li><strong>Entrada de l’usuari (SQL Developer):</strong> <pre><code>v_nom := '&amp;nom_usuari';</code></pre></li>
-        <li>Utilitzant el <strong> DEFAULT</strong> <pre> v_code number default 100;</pre></li>
+        
       </ul>
     
       <h4>❗ Detalls importants</h4>
@@ -349,7 +355,7 @@ SELECT avg(sou) INTO v_mitjanasou FROM empleats WHERE departament=101;
       <p>Una vegada declarades, les variables en PL/SQL poden utilitzar-se per fer càlculs, tractament de text, dates i lògica condicional. Ací tens exemples clars i útils:</p>
     
       <h3>📐 1. Operacions aritmètiques</h3>
-      <p>Per fer sumes, restes, multiplicacions i divisions amb variables de tipus <code>NUMBER</code>:</p>
+      <p>Per fer sumes, restes, multiplicacions divisions i potències amb variables de tipus <code>NUMBER</code>:</p>
       <pre><code>DECLARE
     a NUMBER := 10;
     b NUMBER := 3;
@@ -366,10 +372,14 @@ BEGIN
 
     resultat := a / b;
     DBMS_OUTPUT.PUT_LINE('Divisió: ' || resultat);
+
+    resultat := a ** b;
+    DBMS_OUTPUT.PUT_LINE('Potència: ' || resultat);
 END; </code></pre>
+<p>Altres operacions aritmètiques amb funcions: ABS, ROUND, TRUNC, MOD, CEIL, FLOOR, SQRT, TO_CHAR </p>
     
-      <h3>🔤 2. Operacions amb cadenes de text</h3>
-      <p>Les cadenes (<code>VARCHAR2</code>) es concatenen amb <code>||</code>.</p>
+      <hr><h3>🔤 2. Operacions amb cadenes de text</h3>
+      <p>Les cadenes (<code>VARCHAR2</code>) es concatenen amb <code>||</code>  </p>
       <pre><code>DECLARE
     nom VARCHAR2(20) := 'Joan';
     cognom VARCHAR2(20) := 'Garcia';
@@ -378,9 +388,11 @@ BEGIN
     nom_complet := nom || ' ' || cognom;
     DBMS_OUTPUT.PUT_LINE('Nom complet: ' || nom_complet);
 END; </code></pre>
+<p>Altres operacions amb funcions: LENGTH, UPPER, LOWER, INITCAT, SUBSTR, INSTR, REPLACE, TRIM, LTRIM, RTRIM, TO_NUMBER</p>
     
-      <h3>📅 3. Operacions amb dates</h3>
-      <p>Les dates es poden restar o sumar, on 1 unitat és 1 dia:</p>
+      <hr><h3>📅 3. Operacions amb dates</h3>
+      <p>Les dates es poden restar o sumar, on 1 unitat és 1 dia: <br> 
+      <code>(i on per exemple, un  1.5 serà un dia i mig, es a dir 1 dia i 12 hores)</code></p>
       <pre><code>DECLARE
     data_naix DATE := TO_DATE('2000-01-01', 'YYYY-MM-DD');
     avui      DATE := SYSDATE;
@@ -391,12 +403,15 @@ BEGIN
 
     DBMS_OUTPUT.PUT_LINE('Demà serà: ' || (avui + 1));
 END; </code></pre>
+    <p>Al igual que TO_DATE, està el TO_CHAR, amb la posibilitat de usar màscara ('DD/MM/YY HH:MI PM')</p>
     <p class="tips"> ✔️ El tipus "DATE" pot emmagatzemar fins al minut i el segon. (Exemple d'un valor de tipus DATE: 23-MAI-2025 14:35:22)
        <br> Si es necessita més precisió, es pot utilitzar el tipus "TIMESTAMP", el qual
       pot emmagatzemar fins a milionèsima de segon (Exemple d'un valor de tipus TIMESTAMP: 23-MAI-2025 14:35:22.123456)
     </p>
+    <p class="alert"> S'ha d'anar amb cura en les operacions amb dates, perquè tots els mesos no tenen el mateix nombre
+      de dies, ni tots els anys tampoc tenen el mateix nombre de dies !! </p>
     
-      <h3> 4. Operacions lògiques</h3>
+      <hr><h3> 4. Operacions lògiques</h3>
       <p>Amb variables <code>BOOLEAN</code>, pots fer condicions:</p>
       <pre><code>DECLARE
     actiu BOOLEAN := TRUE;
@@ -579,7 +594,7 @@ END;    </pre>
     <ul>
       <li><strong>EXIT WHEN</strong> → surt d’un bucle en una condició</li>
       <li><strong>CONTINUE</strong> → salta a la següent iteració (a partir de Oracle 11g)</li>
-      <li>Els bucles poden ser <strong>anidats</strong> i combinen amb IF o CASE</li>
+      <li>Els bucles poden ser <strong>niats</strong> i combinen amb IF o CASE</li>
     </ul>
   
     <h3> Bon ús d’estructures</h3>
