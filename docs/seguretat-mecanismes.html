@@ -458,14 +458,17 @@ Cap pot continuar → deadlock</code></pre>
         </ul>
       
         <h3> Ordres bàsiques de control de transaccions</h3>
+        <p>ORACLE és un sistema de base de dades purament transaccional, de tal forma, que 
+          la instrucció BEGIN TRANSACTION no existeix</p>
+        <p>En una transacció les dades modificades <strong>no són visibles</strong> per la resta d'usuaris fins que es confirme la transacció</p>
       
         <h4> <code>COMMIT</code></h4>
         <p>
-          Fa permanents tots els canvis realitzats en la transacció. No es poden desfer després.
-        </p>
+          Fa permanents tots els canvis realitzats en la transacció. No es poden desfer després. En este moment les dades modificades ja son
+          visibles per la resta d'usuaris .       </p>
         <pre>INSERT INTO alumnes VALUES (10, 'Joan', 20);
 COMMIT;          </pre>
-      
+       <p>Les sentències de finalització de transacció són COMMIT i ROLLBACK</p>
         <h4> <code>ROLLBACK</code></h4>
         <p>
           Desfà tots els canvis realitzats des del darrer <code>COMMIT</code>. Torna l’estat de la BD a com estava abans.
@@ -487,8 +490,12 @@ ROLLBACK TO punt1; -- desfà només fins al punt1           </pre>
       
         <h3> Transaccions automàtiques i manuals</h3>
         <ul>
-          <li>En entorns interactius (SQL*Plus, Oracle SQL Developer), cada ordre és una transacció si s’executa amb <code>AUTOCOMMIT</code>.</li>
-          <li>En entorns de producció, es recomana el control manual mitjançant blocs <code>BEGIN</code> ... <code>END</code>.</li>
+          <li>DDL: Oracle Server <strong>executa</strong> un COMMIT implícit abans i després de cada instrucció DDL,</li>
+          <li>DCL: Oracle Server <strong>executa</strong> un COMMIT implícit abans i després de cada sentència DCL</li>
+          <li>DML: Aquestes sentències no executen un COMMIT implícit</li>
+          <li>Cridades a procediments o funcions: Aquestes sentències no executen un COMMIT implícit</li>
+          <li>ALTER SESSION i ALTER SYSTEM: Aquestes sentències no executen un COMMIT implícit</li>
+          <li>Els blocs <code>BEGIN</code> ... <code>END</code> no executen un COMMIT implícit.</li>
         </ul>
       
         <h3> Consells pràctics</h3>
@@ -509,8 +516,10 @@ ROLLBACK TO punt1; -- desfà només fins al punt1           </pre>
           <li> Registre coherent en conjunció amb l’auditoria</li>
         </ul>
       <hr>
-      <p>Oracle té mecanismes per detectar deadlocks de manera automàtica:
-quan detecta que dues transaccions no poden continuar, avorta una de les dues i retorna un error:</p>
+      <p>Oracle té mecanismes per detectar <strong>deadlocks</strong> de manera automàtica. Quan detecta que dos
+         transaccions no poden continuar, avorta una de les dues i retorna un error:</p>
+      <p>La transacció que Oracle sol avortar és la que porta menys treball fet (la que ha modificat menys dades), també coneguda 
+        com la “victim transaction”, per minimitzar la pèrdua de treball.</p>
         <pre><code>ORA-00060: deadlock detected while waiting for resource</code></pre>
         <p>Així, almenys una pot continuar i el sistema no queda bloquejat.</p>
         <p>Quan Oracle mata una transacció per deadlock, la seva part desada es desfà (rollback), mantenint la coherència.</p>
@@ -610,8 +619,16 @@ UPDATE comptes SET saldo = saldo - 5 WHERE id = 1;
           <li><strong>Físiques</strong>: còpies dels fitxers físics (datafiles, control files, logs...)</li>
           <li><strong>Lògiques</strong>: exportació d’esquemes, taules, usuaris o dades via utilitats com <code>expdp</code> i <code>impdp</code></li>
         </ul>
+        <hr><ul>
+          <li><strong>Totals</strong>: Una PDB sencera, o una CDB sencera</li>
+          <li><strong>Parcials</strong>: Part d'una BBDD, un Tablespace, Una taula concreta, Un esquema</li>
+        </ul>
+        <hr><ul>
+          <li><strong>Online</strong>: També s’anomena còpia de seguretat en calent. Es fa mentre la base de dades continua activa i els usuaris treballen.</li>
+          <li><strong>Offline</strong>: També s’anomena còpia de seguretat freda. Es realitza quan la base de dades està completament aturada</li>
+        </ul>
       
-        <h3> Estratègies de backup</h3>
+        <hr><h3> Estratègies de backup</h3>
         <ul>
           <li><strong>Completa:</strong> còpia total de la BD</li>
           <li><strong>Incremental:</strong> només les dades modificades des del darrer backup</li>
@@ -642,7 +659,7 @@ exp username/password@ipAddress:portNumber/serviceName file=/recovery_area/expor
 exp \'username/password@instance AS SYSDBA\' parametres</pre>        
          
         <br> <img src="imgs/copseg_exporta.png" alt="exportacio de dades" style="width: 60%" class="imatge-esquerra">
-      <p>Un mecanisme molt semblant i més còmode i intuitiu es pot trobar a SQL Developer, ama l'eina de Exportar. 
+      <p>Un mecanisme molt semblant i més còmode i intuitiu es pot trobar a SQL Developer, amb l'eina de Exportar. 
           Des del menu Eines-Exportació de base de dades, llança unes finestres per indicar que, com , on fer una exportació.</p>
         <p>Les dades es guardarn en la màquina client ( o un lloc on esta puga accedir )</p>
          <pre><code>SQL Developer permet exportar / importar dades, esquemes i resultats de consultes a diversos formats </code></pre>
@@ -923,6 +940,17 @@ LOGFILE=exp2.log            </pre>
         <blockquote>
           ⚖️ “Una base de dades segura no només és eficient, sinó també legalment responsable.”
         </blockquote>
+      </section>
+
+      <section>
+        <h1>Informe de bones pràctiques del CCN-CERT</h1>
+        <img src="imgs/logo-ccncert.png" alt="ccn-cert" width="25%" class="imatge-dreta">
+        <h3> <a href="https://www.ccn-cert.cni.es/es/pdf/informes-de-ciberseguridad-ccn-cert/informes-ccn-cert-buenas-practicas-bp/6257-ccn-cert-bp22-recomendaciones-de-seguridad-para-oracle-database-19c/file.html">
+           CCN-CERT BP/22 Recomendaciones de seguridad para Oracle Database 19C         </a>             </h3>
+        <p>CCN-CERT BP/22 és un document tècnic que ofereix recomanacions i bones pràctiques en ciberseguretat, 
+          elaborat pel CCN-CERT, amb l’objectiu d’ajudar les administracions públiques i altres organitzacions a millorar 
+          la protecció dels seus sistemes d’informació</p>
+
       </section>
             
 

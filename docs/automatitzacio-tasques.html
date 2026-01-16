@@ -38,7 +38,7 @@
 
   <section id="autom">
     <br><h2> Automatització</h2>
-    <p>L'automatització consisteix a fer tasques de manera sistemàtica i repetitiva 
+    <p>L'automatització consisteix en fer tasques de manera sistemàtica i repetitiva 
       sense que estiga involucrat un usuari en la seua execució</p>
     <h3>Avantatges Automatització</h3>
       <ul>
@@ -211,7 +211,8 @@ END;
     <h3> Ordres útils en SQL Developer</h3>
     <ul>
       <li><strong><code>F5</code></strong> → executa l'script de la sessió activa. Mostra el resultat en l’àrea de Script Output.</li>
-      <li><strong><code>F9</code></strong> → executa sentència (una). Mostra el resultat en l’àrea de Resultats.</li>
+      <li><strong><code>F9</code></strong> → executa sentència (una,, on està el cursor). Mostra el resultat en l’àrea de Resultats.</li>
+      <li>Ctrl+Intro  → Equivalent a F9</li>
       <li><code>.</code> → En SQL Developer no cal posar un punt al final</li>
       <li>Recorda posar <code>SET SERVEROUTPUT ON;</code> abans del bloc anònim</li>
       
@@ -250,7 +251,7 @@ END;
   <section id="variables">
     <h2> 🗃️ Comentaris, Variables i Operacions en PL/SQL</h2>
     <h2>Comentaris</h2>
-    <p>Lùs de comentaris és un recurs per poder documentar el codi. Com s'ha dit abans, és molt importat documentar el codi</p>
+    <p>L'ùs de comentaris és un recurs per poder documentar el codi. Com s'ha dit abans, és molt importat documentar el codi</p>
     <pre>
       --  En dos guionets es posa un comentari d'una línia.
       /*  En la barra i l'asterisc es pot
@@ -261,10 +262,13 @@ END;
     <h2>Variables</h2>
    
       <p>Una <strong>variable</strong> en PL/SQL és un espai de memòria per emmagatzemar dades temporals durant l'execució d’un bloc de codi. Pot contindre textos, números, dates, etc.</p>
-    
+      <p>En PL/SQL (Oracle), les variables s’han de declarar <strong>sempre</strong> abans d’utilitzar-les. Les variables 
+        es declaren a la secció DECLARE (o a la part de declaració d’un procediment, funció o paquet).</p>
       <h4> Estructura bàsica</h4>
       <pre><code>DECLARE
-    nom_variable tipus [:= valor_inicial];
+    nom_variable tipus ;                    -- Es declara però no s'inicialitza. Pren el valor NULL   
+    nom_variable tipus [:= valor_inicial];  -- Es declara i s'inicialitza amb un valor  
+    nom_variable tipus [DEFAULT valor_inicial];  -- DEFAULT és equivalent a  :=
 BEGIN
     -- ús de la variable
 END; </code></pre>
@@ -326,7 +330,10 @@ END; </code></pre>
       <h4>🛠️ Com assignar valors</h4>
         <h3>-- En el bloc DECLARE</h3>
       <ul> 
-        <li><strong>Entrada de l’usuari (SQL Developer):</strong> <pre><code>v_nom := '&amp;nom_usuari';</code></pre></li>
+        <li><strong>Entrada de l’usuari (SQL Developer):</strong> <pre><code>v_nom := '&amp;nom_usuari';</code>  -- Variable de substitució
+<code>/*  una variable de substitució és un valor que s’introdueix en temps d’execució
+   i que Oracle substitueix abans d’executar la sentència */</code></pre></li>
+        
         <li>Utilitzant el <strong> DEFAULT</strong> <pre> v_code number default 100;</pre></li>
       </ul>
         <h3>-- En el bloc principal BEGIN</h3>
@@ -403,7 +410,7 @@ BEGIN
 
     DBMS_OUTPUT.PUT_LINE('Demà serà: ' || (avui + 1));
 END; </code></pre>
-    <p>Al igual que TO_DATE, està el TO_CHAR, amb la posibilitat de usar màscara ('DD/MM/YY HH:MI PM')</p>
+    <p>Al igual que TO_DATE, està el TO_CHAR, amb la posibilitat d'usar màscara ('DD/MM/YY HH:MI PM')</p>
     <p class="tips"> ✔️ El tipus "DATE" pot emmagatzemar fins al minut i el segon. (Exemple d'un valor de tipus DATE: 23-MAI-2025 14:35:22)
        <br> Si es necessita més precisió, es pot utilitzar el tipus "TIMESTAMP", el qual
       pot emmagatzemar fins a milionèsima de segon (Exemple d'un valor de tipus TIMESTAMP: 23-MAI-2025 14:35:22.123456)
@@ -535,7 +542,7 @@ END CASE;   </pre>
   
     <h4> Exemple CASE  (🧪 Prova-ho!)</h4>
     <pre>DECLARE
-    nota NUMBER := 7;
+    nota NUMBER := &dismeNota;
 BEGIN
     CASE
       WHEN nota >= 9 THEN DBMS_OUTPUT.PUT_LINE('Excel·lent');
@@ -554,7 +561,7 @@ END LOOP;     </pre>
   
     <h4> Exemple LOOP (🧪 Prova-ho!)</h4>
     <pre>DECLARE
-    i NUMBER := 1;
+    i NUMBER := &dismeVoltes;
 BEGIN
     LOOP
       DBMS_OUTPUT.PUT_LINE('Iteració: ' || i);
@@ -570,7 +577,7 @@ END LOOP;     </pre>
   
     <h4> Exemple WHILE   (🧪 Prova-ho!)</h4>
     <pre>DECLARE
-    i NUMBER := 1;
+    i NUMBER := &dismeVoltes;
 BEGIN
     WHILE i <= 3 LOOP
       DBMS_OUTPUT.PUT_LINE('Valor: ' || i);
@@ -620,8 +627,8 @@ END;    </pre>
     <hr>
     <p> ❗ Un usuari necessita tindre permís per executar rutines, o per crear-les i executar-es !!</p>
     <pre>GRANT CREATE PROCEDURE, CREATE TRIGGER TO <usu>;
-      (si te permís de crear, també pot executar)
-      GRANT EXECUTE ON <esquema>.<procedim> TO <usu> [WITH GRANT OPTION];</pre>
+        -- (si té permís de crear, també pot executar)
+GRANT EXECUTE ON <esquema>.<procedim> TO <usu> [WITH GRANT OPTION];</pre>
     <p>El permís <strong>CREATE PROCEDURE</strong> val per procediments, I també per funcions</p>    
     <p>El permís <strong>CREATE TRIGGER</strong> val per disparadors</p>    
     <hr>
@@ -631,22 +638,26 @@ END;    </pre>
       Poden ser cridats des de dins d'un bloc anònim, directament des de linea d'ordres sqlplus o SQL Developer, 
       o des de dins d'un altre procediment o funció</p>
       <h4>Exemples</h4>
-      <pre>DBMS_OUTPUT.PUT_LINE('Suspès')
-afegir_client('Maria', 'Gonzalez', '123456789');  
-actualitzar_sou(101, 3000);  </pre>
+      <pre>BEGIN
+  DBMS_OUTPUT.PUT_LINE('Suspès')
+  afegir_client('Maria', 'Gonzalez', '123456789');  
+  actualitzar_sou(101, 3000); 
+END; </pre>
 
     <hr>
       <h3> FUNCTION – Funció</h3>
       <h4> Diferència clau:</h4>
     <p>Les funcions <strong>retornen un valor</strong> i poden ser cridades dins SELECT o expressions.</p>
     <h4>Exemples</h4>
-    <pre>data_actual := SYSDATE;
-valor_aleatori := DBMS_RANDOM.VALUE(1, 100);
-data_convertida := TO_DATE('2025-04-20', 'YYYY-MM-DD');
+    <pre>BEGIN
+  data_actual := SYSDATE;
+  valor_aleatori := DBMS_RANDOM.VALUE(1, 100);
+  data_convertida := TO_DATE('2025-04-20', 'YYYY-MM-DD');
 
-select upper(nom) , sysdate, sou from empleats;
-SELECT CONCAT(nom, ' ', cognom) FROM clients;
-select sysdate from dual;      </pre>
+  SELECT upper(nom) , sysdate, sou FROM empleats;
+  SELECT CONCAT(nom, ' ', cognom) FROM clients;
+  SELECT sysdate FROM dual;
+END;      </pre>
 
     <hr>
   
@@ -749,23 +760,21 @@ BEGIN
 EXCEPTION
    WHEN OTHERS THEN
       DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
-END;
-  </pre>
+END;    </pre>
 
   <h3> Esborrar un procediment</h3>
   <pre>
-  DROP PROCEDURE nom_proc;    </pre>
+DROP PROCEDURE nom_proc;    </pre>
 
   <h3> Formes de cridar / invocar un procediment</h3>
   <ul>
     <li>Notació posicional</li>
     <li>Notació nominal</li>
   </ul>
-  <pre>
-    afegir_client('Joan', 'García', '123456789');
-    afegir_client( p_nom => 'Joan', p_cognom => 'García', p_telefon => '123456789');
-    o
-    afegir_client(p_telefon => '123456789', p_nom => 'Joan', p_cognom => 'García');    </pre>
+  <pre><code>afegir_client('Joan', 'García', '123456789');
+afegir_client( p_nom => 'Joan', p_cognom => 'García', p_telefon => '123456789');
+o
+afegir_client(p_telefon => '123456789', p_nom => 'Joan', p_cognom => 'García');     </code>  </pre>
     <p>Totes són correctes</p>
 
 </section>
@@ -1434,7 +1443,7 @@ pause    </pre>
   <pre>#!/bin/bash
 sqlplus usuari/contrasenya@XE @informe.sql    </pre>
 
-  <h3>📆 Oracle SCHEDULER  -  JOBS </h3>
+  <hr><h3>📆 Oracle SCHEDULER  -  JOBS </h3>
   <p>
     Oracle incorpora un sistema per programar tasques directament des de la base de dades: <strong>DBMS_SCHEDULER</strong>.
   </p>
@@ -1492,7 +1501,7 @@ REPEAT_INTERVAL => 'FREQ=HOURLY; INTERVAL=6;' </pre>
   DBMS_SCHEDULER.DROP_JOB('JOB_INFORME');
 END;   </pre>
 
-  <h3> Triggers de sistema (a nivell de sessió)</h3>
+  <hr><h3> ⏰ Triggers de sistema (a nivell de sessió)</h3>
   <p>També pots utilitzar <strong>triggers de sistema</strong> per executar codi quan es produeixen accions específiques:</p>
   <pre>CREATE OR REPLACE TRIGGER t_inici_sessio
 AFTER LOGON ON DATABASE
