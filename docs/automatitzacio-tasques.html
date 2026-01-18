@@ -40,6 +40,8 @@
     <br><h2> Automatització</h2>
     <p>L'automatització consisteix en fer tasques de manera sistemàtica i repetitiva 
       sense que estiga involucrat un usuari en la seua execució</p>
+    <p>Quan parlem d’automatització en Oracle, generalment ens referim a processos que es programen per executar-se automàticament, 
+      sense necessitat d’intervenció manual. Oracle ofereix diverses eines i mètodes per fer això</p>
     <h3>Avantatges Automatització</h3>
       <ul>
         <li>Estalvi de temps</li>
@@ -60,7 +62,7 @@
         <li>Quan és creada rep un nom que permet que siga invocada tantes vegades com siga necessari</li>
         <li>Van ser introduïdes en la versió SQL3, o SQL:1999</li>
       </ul>
-      <p>Els guions o scripts donaren pas al PL/SQL ( que és diferent al SQL )</p>
+      <p>Els guions o scripts donaren pas al PL/SQL ( que és diferent del SQL )</p>
       <p><strong>SQL</strong> (Structured Query Language) és un llenguatge declaratiu. S’utilitza per gestionar i consultar bases de dades. 
         No té estructures de control com bucles o condicions complexes. SELECT (consultar dades), 
 INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i altres com DDL, DCL, TCL    </p>
@@ -82,12 +84,13 @@ S’utilitza per crear programs dins de la base de dades.</p>
         <li>Major seguretat</li>
       </ul>
       
+      <img src="imgs/important.png" class="imatge-dreta"  alt="stop" style="width: 15%">
       <h2>Les rutines: S’han de Documentar</h2>
-      <img src="imgs/important.png" class="imatge-dreta"  alt="stop" style="width: 20%">
+      
       <h2>QUE ??</h2><p>Descripció de la tasca, descripció de paràmetres d’entrada i eixida, Autor, Versió, Data d’última modificació, etc..</p>
       <h2>COM ??</h2> <p>** Fent servir comentaris en el codi de les rutines. Amb /* */ o  --</p>
       <pre>-- Esto es un comentario </pre>
-      <p>** Fent servir documentació institucional en qualsevol suport (docs,fulles de càlcul,diagrames,etc..)</p>
+      <p>** Fent servir documentació institucional en qualsevol suport (documents, fulls de càlcul, diagrames,etc..)</p>
        
   </section>
 
@@ -186,18 +189,20 @@ END;
      DBMS_OUTPUT.PUT_LINE('La data actual és: ' || TO_CHAR(vData, 'DD/MM/YYYY'));
   END;
     </pre>
-    <p><strong>SYSDATE</strong> és una <strong>funció</strong> d'ORACLE que torna la data/temps del instant actual</p>
+    <p>PL/SQL no és case-sensitive en general. Paraules clau, noms de variables, procediments i funcions no distingeixen entre majúscules i minúscules.
+      Els valors dels strings o de camps VARCHAR, SÍ que distingeixen. </p>
+    <p><strong>SYSDATE</strong> és una <strong>funció</strong> d'ORACLE que torna la data/hora de l'instant actual</p>
     <p><strong>TO_CHAR</strong> és una <strong>funció</strong> d'ORACLE que transforma de format DATA a format VARCHAR2 </p>
   
     <h3> Bones pràctiques</h3>
     <ul>
       <li> Documenta el codi amb comentaris (<code>--</code> per una línia, <code>/* */</code> per múltiples).</li>
-      <li> Fes servir blocs anònims per provar procediments o funcions abans de guardar-los.</li>
+      <li> Fes servir blocs anònims per a provar procediments o funcions abans de guardar-los.</li>
       <li> Prova condicions, bucles i excepcions dins blocs anònims abans d'incorporar-ho a rutines emmagatzemades.</li>
     </ul>
   
     <h3> Ordres útils en SQL*Plus</h3>
-    <ul>
+    <ul> Els comandos bàsics d'sqlplus no necessiten posar un ";" al final. No són comandos SQL, són propis de l'sqlplus
       <li><code>EDIT</code> → edita l’script actual</li>
       <li><code>LIST</code> → mostra el contingut del buffer</li>
       <li><code>RUN</code> → executa el bloc en el buffer (també  r  o  /)</li>
@@ -352,7 +357,7 @@ SELECT avg(sou) INTO v_mitjanasou FROM empleats WHERE departament=101;
       <ul>
         <li>Les variables només existeixen dins del bloc on es declaren.</li>
         <li>No pots fer <code>SELECT ...</code> sense <code>INTO</code> dins de PL/SQL.</li>
-        <li><code>BOOLEAN</code> només es pot usar dins de PL/SQL, no en SQL estàndard. ( ❗ si en oracle23 ❗)</li>
+        <li><code>BOOLEAN</code> només es pot usar dins de PL/SQL, no en SQL estàndard. (❗ sí en oracle23 ❗)</li>
       </ul>
   
 
@@ -362,7 +367,7 @@ SELECT avg(sou) INTO v_mitjanasou FROM empleats WHERE departament=101;
       <p>Una vegada declarades, les variables en PL/SQL poden utilitzar-se per fer càlculs, tractament de text, dates i lògica condicional. Ací tens exemples clars i útils:</p>
     
       <h3>📐 1. Operacions aritmètiques</h3>
-      <p>Per fer sumes, restes, multiplicacions divisions i potències amb variables de tipus <code>NUMBER</code>:</p>
+      <p>Per fer sumes, restes, multiplicacions, divisions i potències amb variables de tipus <code>NUMBER</code>:</p>
       <pre><code>DECLARE
     a NUMBER := 10;
     b NUMBER := 3;
@@ -383,6 +388,13 @@ BEGIN
     resultat := a ** b;
     DBMS_OUTPUT.PUT_LINE('Potència: ' || resultat);
 END; </code></pre>
+<p>No s'ha d'oblidar que no és el mateix 2 + 5 * 3  que  (2 + 5) * 3. La precedència o ordre de les operacions és crucial en el resultat</p>
+<p>En PL/SQL este ordre és el següent:  
+<table><tr> <td>( )</td>  <td>unaris</td> <td>** potència</td>  <td>* , /, mod</td> <td>+ i -</td> 
+  <td>comparació</td> <td>lògics (NOT AND OR)</td></tr></table>
+
+I els operadors lògics tenen precedència entre ells. NOT té més precedència que AND i AND més que OR, </p>
+<p>Encara que conegues la precedència, usa parèntesis per fer el codi: *més clar, *menys propens a errors, *més llegible per altres desenvolupadors</p>
 <p>Altres operacions aritmètiques amb funcions: ABS, ROUND, TRUNC, MOD, CEIL, FLOOR, SQRT, TO_CHAR </p>
     
       <hr><h3>🔤 2. Operacions amb cadenes de text</h3>
@@ -429,7 +441,7 @@ BEGIN
     END IF;
 END; </code></pre>
 
-     <p>Pots utilitzar variables <code>BOOLEAN</code> o fer comparacions entre nombres, textos o dates amb els operadors següents:</p>
+     <p>Es pot utilitzar variables <code>BOOLEAN</code> o fer comparacions entre nombres, textos o dates amb els operadors següents:</p>
 
     <ul>
       <li><code>=</code> igualtat</li>
@@ -486,7 +498,7 @@ BEGIN
 END; </code></pre>
    
       <h3> 5. Operacions combinades</h3>
-      <p>Pots combinar números i textos, per exemple per calcular salaris:</p>
+      <p>Es pot combinar números i textos, per exemple per calcular salaris:</p>
       <pre><code>DECLARE
     nom VARCHAR2(20) := 'Laura';
     hores NUMBER := 5;
@@ -497,7 +509,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE(nom || ' cobrarà ' || total_sou || ' euros.');
 END; </code></pre>
     
-      <p>✨ Pots provar aquests blocs en Oracle SQL Developer amb <strong>F5</strong> per veure el resultat a <em>DBMS Output</em>.</p>
+      <p class="tips">✨ Pots provar aquests blocs en Oracle SQL Developer amb <strong>F5</strong> per veure el resultat a <em>DBMS Output</em>.</p>
 
   </section>
 
@@ -507,7 +519,7 @@ END; </code></pre>
   <section id="estructures">
     <h2>🔁 Estructures de control en PL/SQL</h2>
   
-    <p>Les estructures de control són fonamentals per controlar el flux d'execució d’un bloc de codi PL/SQL. Oracle suporta múltiples tipus:</p>
+    <p>Les estructures de control són fonamentals per controlar el flux d'execució d’un bloc de codi PL/SQL. Oracle suporta els següents :</p>
   
     <h3> Condicionals</h3>
   
@@ -624,19 +636,25 @@ END;    </pre>
       <li><strong>Trigger:</strong> bloc de codi que s'executa automàticament <strong>quan es produeix un esdeveniment</strong> sobre una taula (INSERT, UPDATE, DELETE).</li>
     </ul>
   
-    <hr>
+    <hr><h3>Permisos necessaris</h3>
     <p> ❗ Un usuari necessita tindre permís per executar rutines, o per crear-les i executar-es !!</p>
-    <pre>GRANT CREATE PROCEDURE, CREATE TRIGGER TO <usu>;
+    <pre>GRANT CREATE PROCEDURE, CREATE TRIGGER TO &lt;usu>;
         -- (si té permís de crear, també pot executar)
-GRANT EXECUTE ON <esquema>.<procedim> TO <usu> [WITH GRANT OPTION];</pre>
+GRANT EXECUTE ON &lt;esquema>.&lt;procedim> TO &lt;usu>/&lt;rol> [WITH GRANT OPTION];</pre>
     <p>El permís <strong>CREATE PROCEDURE</strong> val per procediments, I també per funcions</p>    
     <p>El permís <strong>CREATE TRIGGER</strong> val per disparadors</p>    
-    <hr>
-  
-    <h3> PROCEDURE – Procediment</h3>
+
+    <h3>Vista del DD</h3>
+    <p>Per vore si un usuari té estos permisos</p>
+    <pre>SELECT *
+FROM DBA_SYS_PRIVS
+WHERE privilege IN ('CREATE PROCEDURE', 'CREATE TRIGGER');
+</pre>
+
+    <hr><h3> PROCEDURE – Procediment</h3>
     <p>Els procediments <strong>NO retornen valor</strong> i NO poden ser cridades dins SELECT o expressions. 
       Poden ser cridats des de dins d'un bloc anònim, directament des de linea d'ordres sqlplus o SQL Developer, 
-      o des de dins d'un altre procediment o funció</p>
+      , des de dins d'un altre procediment o funció, o des del <strong>DBMS_SCHEDULER</strong> amb un <strong>job</strong></p>
       <h4>Exemples</h4>
       <pre>BEGIN
   DBMS_OUTPUT.PUT_LINE('Suspès')
@@ -647,7 +665,7 @@ END; </pre>
     <hr>
       <h3> FUNCTION – Funció</h3>
       <h4> Diferència clau:</h4>
-    <p>Les funcions <strong>retornen un valor</strong> i poden ser cridades dins SELECT o expressions.</p>
+    <p>Les funcions <strong>retornen un valor</strong> i poden ser cridades des de dins de SELECT o expressions.</p>
     <h4>Exemples</h4>
     <pre>BEGIN
   data_actual := SYSDATE;
@@ -665,6 +683,12 @@ END;      </pre>
     <h4> Diferència clau:</h4>
     <p>Els trigger <strong>no retornen un valor, i no se'ls pot cridar</strong> Son blocs de codi amb nom que son cridats
        automaticament pel sistema quan passa algun esdeveniment.</p>
+    <ul> Com..
+      <li>Esdeveniment DML: INSERT, UPDATE, DELETE</li>
+      <li>Esdeveniment DDL: CREATE, ALTER, DROP, ...</li>
+      <li>Esdeveniments de base de dades: LOGON, LOGOFF, STARTUP, SHUTDOWN, etc.</li>
+    </ul>
+
     <h4>Exemples</h4>
    <pre>-- Al Inserir un nou empleat es disparara el trigger associat 
 -- al INSERT en la taula EMPLEATS
@@ -721,7 +745,7 @@ END;
   <P>O també amb  <code>execute</code></P>
   <pre>execute mostrar_salutacio('Ada');</pre>
 
-  <h3>🔍 Consultar procediments</h3>
+  <h3>📘 Consultar procediments</h3>
   <ul>
     <li> Llistar procediments de l’usuari:</li>
     <pre>
@@ -736,9 +760,9 @@ WHERE object_name = 'CALCULA_DOBLE';
     </pre>
   </ul>
 
-  <h3> Desar en fitxer i executar</h3>
-  <p>Pots escriure un procediment en un fitxer <code>.sql</code> i executar-lo amb:</p>
-  <pre>@proc_saluda.sql</pre>
+  <h3> 🧹 Esborrar un procediment</h3>
+  <pre>
+DROP PROCEDURE nom_proc;    </pre>  
 
   <h3> Bones pràctiques</h3>
   <ul>
@@ -762,11 +786,9 @@ EXCEPTION
       DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
 END;    </pre>
 
-  <h3> Esborrar un procediment</h3>
-  <pre>
-DROP PROCEDURE nom_proc;    </pre>
 
-  <h3> Formes de cridar / invocar un procediment</h3>
+
+  <h2> Formes de cridar / invocar un procediment</h2>
   <ul>
     <li>Notació posicional</li>
     <li>Notació nominal</li>
@@ -949,7 +971,7 @@ SELECT nom, calcula_irpf(salari) AS irpf
 FROM empleats;
   </pre>
 
-  <h3>🔍 Consultes útils</h3>
+  <h3>📘 Consultes útils al DD</h3>
   <pre>
 -- Veure procediments i funcions de l'usuari
 SELECT object_name, object_type
@@ -984,7 +1006,7 @@ WHERE object_type IN ('PROCEDURE', 'FUNCTION');   </pre>
     <li><strong>AFTER</strong>: després de l’esdeveniment</li>
     <li><strong>INSTEAD OF</strong>: per a vistes, substitueix l’acció</li>
   </ul>
-  <p>Segons el cas, es poden utilitzar valors d’una fila abans de la operació o després de l’operació: :new i :old</p>
+  <p>Segons el cas, es poden utilitzar valors d’una fila abans de la operació o després de l’operació: Per fer això s'usarà <code><strong>:NEW  o  :OLD</strong></code></p>
 
   <h3> Nivells d’actuació</h3>
   <ul>
@@ -1013,7 +1035,8 @@ BEGIN
 END;
   </pre>
   <p><code>:NEW</code> i <code>:OLD</code> representen els valors nous i antics respectivament per a cada fila.</p>
-  <h3> Exemple: impedir valors negatius</h3>
+
+  <h3> Exemple: trigger per a impedir valors negatius</h3>
   <pre>
 CREATE OR REPLACE TRIGGER evitar_negatius
 BEFORE INSERT OR UPDATE ON productes
@@ -1024,7 +1047,20 @@ BEGIN
    END IF;
 END;
   </pre>
-
+  <ul>
+    <li>
+      <p>RAISE_APPLICATION_ERROR és una funció de PL/SQL que serveix per llançar un error personalitzat dins d'una aplicació o procediment.
+        Quan es vol aturar l'execució i mostrar un missatge d'error clar i específic al teu codi, s'utilitzarà <code><strong>RAISE_APPLICATION_ERROR</strong></code>.
+        Això és molt útil per validar dades o controlar condicions especials</p>
+        <pre>RAISE_APPLICATION_ERROR(error_number, message[, {TRUE | FALSE}]); </pre>
+        <ul>
+          <li>error_number → un número d’error entre -20000 i -20999 (Oracle reserva aquests codis per errors definits per l’usuari).</li>
+          <li>message → el missatge que vols mostrar quan succeeix l’error.</li>
+          <li>TRUE / FALSE → opcional, indica si l’error es registrarà a l’alert log.</li>
+        </ul>
+    </li>
+  </ul>
+   <br>
   <h3> Exemple: trigger d’auditoria</h3>
   <p>Crear una taula d’auditoria:</p>
   <pre>
@@ -1052,13 +1088,13 @@ BEGIN
 END;
   </pre>
  
-  <h3>🔎 Consultes útils</h3>
+  <h3>📘 Consultes útils al DD</h3>
   <pre>
 -- Veure triggers de l’usuari actual
 SELECT trigger_name, table_name, triggering_event, status
 FROM user_triggers;
 
--- Consultar codi
+-- Consultar codi d'un trigger
 SELECT trigger_body FROM user_triggers WHERE trigger_name = 'LOG_INSERCIO';
   </pre>
 
@@ -1072,16 +1108,14 @@ SELECT trigger_body FROM user_triggers WHERE trigger_name = 'LOG_INSERCIO';
   </ul>
 
   <h3>🛠️ Activació i desactivació de triggers</h3>
-  <pre>
--- Desactivar
+  <pre>-- Desactivar
 ALTER TRIGGER log_insercio DISABLE;
 
 -- Activar
-ALTER TRIGGER log_insercio ENABLE;
+ALTER TRIGGER log_insercio ENABLE;    </pre>
 
--- Eliminar
-DROP TRIGGER log_insercio;
-  </pre>
+  <h3>🗑️ Eliminar un trigger</h3>
+  <pre>DROP TRIGGER log_insercio;</pre>
 </section>
 
 
@@ -1116,7 +1150,7 @@ seq_alumnes.NEXTVAL </pre>
   <h4> Exemple d’ús en una inserció</h4>
   <pre>INSERT INTO alumnes (id, nom, edat)  VALUES (seq_alumnes.NEXTVAL, 'Laia', 21);   </pre>
 
-  <h3>🔍 Consultar seqüències existents</h3>
+  <h3>📘 Consultar seqüències existents</h3>
   <pre>-- Seqüències de l’usuari
 SELECT sequence_name, min_value, max_value, increment_by
 FROM user_sequences;    </pre>
@@ -1224,7 +1258,7 @@ INSERT INTO factures (id, data_emissio) VALUES (seq_factura.NEXTVAL, SYSDATE);  
   <hr>
   <h3> Cursors implícits</h3>
   <p>No es declaren, sols tornen un resultat o fila:</p>
-  <pre> SELECT DESCRIPCION INTO vdescripcion from PAISES WHERE CO_PAIS = 'ESP';   </pre>
+  <pre>SELECT DESCRIPCION INTO vdescripcion from PAISES WHERE CO_PAIS = 'ESP';   </pre>
 
 <p>Els cursors implícits només poden retornar una única fila. En cas que es retorne més d'una fila 
   (o cap fila) es produirà una excepció: NO_DATA_FOUND o TOO_MANY_ROWS</p>
@@ -1339,7 +1373,11 @@ END;   </pre>
     <li><code>NO_DATA_FOUND</code> → no hi ha resultats</li>
     <li><code>TOO_MANY_ROWS</code> → SELECT retorna més d’una fila</li>
     <li><code>ZERO_DIVIDE</code> → divisió per zero</li>
+    <li>....</li>
   </ul>
+  <a href="https://docs.oracle.com/en/database/oracle/oracle-database/21/lnpls/plsql-error-handling.html#GUID-8C327B4A-71FA-4CFB-8BC9-4550A23734D6">
+    Es pot consultar la llista sencera en la documentació oficial d'oracle ací    </a> . I de la pròxima versió 26
+     <a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/lnpls/predefined-exceptions.html">_ací_</a>
 
   <h4> Exemple</h4>
   <pre>DECLARE
@@ -1408,7 +1446,7 @@ END;   </pre>
 
 
 <section id="tasques">
-  <h2> Tasques automatitzables en Oracle</h2>
+  <h2> 📅 Tasques automatitzables en Oracle</h2>
 
   <h3> Què podem automatitzar?</h3>
   <p>En un entorn Oracle, és habitual automatitzar tasques per millorar la gestió i el rendiment del sistema. Algunes de les tasques més comunes són:</p>
@@ -1438,19 +1476,29 @@ EXIT;  </pre>
   <pre>-- arxiu: llança_informe.bat
 sqlplus usuari/contrasenya@XE @informe.sql
 pause    </pre>
+<p>Una vegada creat el fitxer .bat, s'ha de crear una tasca programada. Panel de control → Tareas programadas → Agregar Tarea → ...   </p>
+<p>Consulta alguna guia de com usar el programador de tasques de Windows. <a href="https://www.adslzone.net/esenciales/windows-10/programar-tareas/"> guia1 </a>, 
+<a href="https://openwebinars.net/blog/programacion-de-tareas-desde-la-terminal-de-windows/">guia2</a></p>
 
   <h4>🐧 Script .sh (Linux)</h4>
   <pre>#!/bin/bash
 sqlplus usuari/contrasenya@XE @informe.sql    </pre>
-
+<p>En Linux, s'utilitza el CRON / CRONTAB per afegir tasques que s'executaran a determinades hores / dies () .  
+Consulta alguna guia de com usar CRON <a href="https://www.redeszone.net/tutoriales/servidores/cron-crontab-linux-programar-tareas/">guia1</a>, 
+<a href="https://www.arsys.es/blog/cron-jobs-una-guia-completa">guia2</a>, o <a href="https://www.hostinger.com/mx/tutoriales/sintaxis-crontab">guia3</a>, per a entendre les diferents opcions de programació horària.  </p>
   <hr><h3>📆 Oracle SCHEDULER  -  JOBS </h3>
   <p>
     Oracle incorpora un sistema per programar tasques directament des de la base de dades: <strong>DBMS_SCHEDULER</strong>.
   </p>
   <h4> Donar permís</h4>
-  <pre>  --  Un usuari necessita tindre permís per crear jobs (treballs) i executar-los !!
-  grant create job to usuari;
-  grant execute on dbms_scheduler to usuario;       </pre>
+  <pre>--  Un usuari necessita tindre permís per crear jobs (treballs) i executar-los !!
+GRANT CREATE JOB TO usuari;     -- crear i administrar els jobs seus
+GRANT EXECUTE ON dbms_scheduler TO usuario;   -- sols administrar els seus jobs
+ </pre>
+
+<!--  GRANT EXECUTE ON dbms_scheduler TO usuario;  -- ho pot fer SYSTEM
+GRANT CREATE ANY JOB TO usuario    crear jobs d'altres, i administrar-los (ho pot fer system)
+GRANT MANAGE SCHEDULER TO usuario;  -- admin jobs d'altres -- No ho pot fer SYSTEM !!, si ho pot fer SYS    -->
 
   <h4> Crear una tasca programada</h4>
   <pre>BEGIN
@@ -1464,20 +1512,33 @@ sqlplus usuari/contrasenya@XE @informe.sql    </pre>
   );
 END;    </pre>
 
+    <h4>Executar sense esperar al moment programat</h4>
+    <pre>BEGIN
+    DBMS_SCHEDULER.RUN_JOB('JOB_INFORME');
+END;</pre>
+
+   <h4>Habilitar o deshabilitar la programació</h4>
+   <pre>BEGIN
+  DBMS_SCHEDULER.DISABLE('JOB_INFORME');
+  DBMS_SCHEDULER.ENABLE('JOB_INFORME');
+END; </pre>
   <h4> Modificar una tasca programada</h4>
   <pre>BEGIN
-  dbms_scheduler.set_attribute_null( name=>’nom’, attribute=>’a’);
-  dbms_scheduler.set_attribute(name=>’nom’,attribute=>’a’,value=>’v’);
+  dbms_scheduler.set_attribute_null( name=>'nom', attribute=>'a');
+  dbms_scheduler.set_attribute(name=>'nom',attribute=>'a',value=>'v');
+  -- ES POT CANVIAR : job_action , repeat_interval , comments, job_type (PLSQL_BLOCK' 'STORED_PROCEDURE' 'EXECUTABLE')
 END;   </pre>  
 
 <h4> Paràmetre  <code>repeat_interval</code> </h4>
-<pre>  FREQ=MONTHLY → S'executa un cop al mes. (Defineix la repetició mensual)
-  BYMONTHDAY=1 El dia 1 de cada mes
-  BYDAY=TU → Els dimarts.
-  BYSETPOS=1 → Només el primer dimarts del mes.
-  BYHOUR=1; BYMINUTE=5 → A la 01:05 AM.    </pre>
-<p>FREQ={SECONDLY | MINUTELY | HOURLY | DAILY | WEEKLY | MONTHLY | YEARLY};
+<pre>FREQ=MONTHLY → S'executa un cop al mes. (Defineix la repetició mensual)
+BYMONTHDAY=1 El dia 1 de cada mes
+BYDAY=TU → Els dimarts.  ( abreviatures MO, TU, WE, TH, FR, SA i SU ).
+BYSETPOS=1 → Només el primer dimarts del mes.
+BYHOUR=1; BYMINUTE=5 → A la 01:05 AM.    </pre>
+<p>FREQ={ DAILY | HOURLY | MINUTELY | WEEKLY | MONTHLY | YEARLY};
   A partir d’aquí, pots afegir modificadors com BYSECOND, BYMINUTE, BYHOUR, BYDAY, BYMONTH, etc</p>
+  <p>FREQ és el paràmetre que indica la freqüència de repetició de la planificació</p>
+
 
 <h4>Exemples d'ús del paràmetre</h4>
 <pre>Cada dia a les 8:30 AM
@@ -1489,15 +1550,21 @@ REPEAT_INTERVAL => 'FREQ=MONTHLY; BYDAY=TU; BYSETPOS=1; BYHOUR=9; BYMINUTE=0;'
 L'últim divendres de cada mes a les 18:00
 REPEAT_INTERVAL => 'FREQ=MONTHLY; BYDAY=FR; BYSETPOS=-1; BYHOUR=18; BYMINUTE=0;'
 Cada 6 hores
-REPEAT_INTERVAL => 'FREQ=HOURLY; INTERVAL=6;' </pre>
+REPEAT_INTERVAL => 'FREQ=HOURLY; INTERVAL=6;'
+Cada tres mesos
+REPEAT_INTERVAL => 'FREQ=YEARLY; BYMONTH=JA,AP,JL,OC'  
+     (abreviatures dels mesos: JA, FE, MR, AP, MA, JU, JL, AU, SE, OC, NO , DE)   </pre>
+
+  <p class="alert">En Oracle DBMS_SCHEDULER, si no s’indica l’hora (BYHOUR, BYMINUTE, BYSECOND) en el REPEAT_INTERVAL, s’utilitza l’hora del START_DATE del job.</p>
 
 
-  <h4>🔍 Consultar jobs</h4>
-  <pre>SELECT job_name, state FROM user_scheduler_jobs;    </pre>
+  <h4>📘 Consultar jobs en el DD</h4>
+  <pre>SELECT job_name, state FROM user_scheduler_jobs;  
+SELECT * FROM user_scheduler_jobs;         </pre>
 
-  <h4> Aturar o eliminar un job</h4>
+  <h4> Aturar o Eliminar un job</h4>
   <pre>BEGIN
-  DBMS_SCHEDULER.DISABLE('JOB_INFORME');
+  DBMS_SCHEDULER.STOP_JOB('JOB_INFORME');  
   DBMS_SCHEDULER.DROP_JOB('JOB_INFORME');
 END;   </pre>
 
@@ -1506,8 +1573,11 @@ END;   </pre>
   <pre>CREATE OR REPLACE TRIGGER t_inici_sessio
 AFTER LOGON ON DATABASE
 BEGIN
-  INSERT INTO log_sessio(usuario, data)   VALUES (USER, SYSDATE); 
+  INSERT INTO log_sessio(usuario, data)   
+  VALUES (USER, SYSDATE); 
 END;   </pre>
+<pre>Altres accions que es poden emprar:
+     LOGON, LOGOFF, STARTUP, SHUTDOWN, ERRORLOGON</pre>
 
   <h3> Exemple complet d’automatització</h3>
   <ul>
@@ -1527,7 +1597,7 @@ END;   </pre>
   <h3> SQL dinàmic</h3>
   <p>En algunes tasques de manteniment, s’utilitzarà el diccionari de dades 
     (amb un cursor)- i per a cada objecte de DD s’aplicarà una sentència DDL</p>
-    <p>Si esta sentència correspon al DDL, no es pot executar directament dins d'un bloc de codi</p>
+    <p class="alert">Si esta sentència correspon al DDL, no es pot executar directament dins d'un bloc de codi</p>
     <p>En este cas, es farà ús de la sentència <code>execute immediate</code></p>
     <p><code>execute immediate</code> és una instrucció de PL/SQL que permet executar sentències SQL dinàmiques
        és a dir, sentències construïdes en temps d'execució com cadenes de text.</p>
@@ -1551,11 +1621,12 @@ end;   </pre>
 <section id="altres-recursos">
   <h2>Altres recursos</h2>
     <h3>Ús de Dates en Oracle</h3>
-       <a href="">link</a> 
+   <!--    <a href="">link</a> 
     <h3>AuithID en procedure</h3>
 
     <h3>FOR en procedure</h3>
-
+    <h3> doble & en variable de substitució  - &&dismeCodi</h3>
+    -->
 
 </section>
 
