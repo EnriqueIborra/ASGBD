@@ -1242,15 +1242,17 @@ INSERT INTO factures (id, data_emissio) VALUES (seq_factura.NEXTVAL, SYSDATE);  
   <h2> Cursors en PL/SQL</h2>
 
   <h3>📘 Què és un cursor?</h3>
+  <img src="imgs/cursor-gen.png" alt="cursor" width="30%" class="imatge-dreta">
   <p>
     Un <strong>cursor</strong> és un mecanisme de PL/SQL que permet <strong>recórrer múltiples files</strong>
-     retornades per una consulta <code>SELECT</code>.
+     retornades per una consulta <code>SELECT</code>. Un cursor és com un punter que apunta a un conjunt de resultats d'una SQL i 
+     deixa llegir-los u a u. 
   </p>
   <p>Serveix per treballar fila a fila amb el conjunt de resultats, com un bucle sobre una taula.</p>
 
   <h3> Tipus de cursors</h3>
   <ul>
-    <li><strong>Implícits:</strong> creats automàticament per Oracle per a sentències DML (INSERT, UPDATE...)</li>
+    <li><strong>Implícits:</strong> creats automàticament per Oracle per a sentències DML (SELECT .. INTO, INSERT, UPDATE...) )</li>
     <li><strong>Explícits:</strong> definits manualment per l’usuari per tractar SELECTs que tornen múltiples files</li>
     <li><strong>FOR cursors:</strong> simplificació de l’ús explícit</li>
   </ul>
@@ -1261,18 +1263,19 @@ INSERT INTO factures (id, data_emissio) VALUES (seq_factura.NEXTVAL, SYSDATE);  
   <pre>SELECT DESCRIPCION INTO vdescripcion from PAISES WHERE CO_PAIS = 'ESP';   </pre>
 
 <p>Els cursors implícits només poden retornar una única fila. En cas que es retorne més d'una fila 
-  (o cap fila) es produirà una excepció: NO_DATA_FOUND o TOO_MANY_ROWS</p>
+  (o cap fila) es produirà una <strong>excepció</strong>: NO_DATA_FOUND o TOO_MANY_ROWS.  Esta <strong>EXCEPCIÓ</strong> podrà ser capturada i tractada</p>
 
   <p>Si no sabem si va a tornar cap fila o més d'una, es pot comprobar abans amb</p>
   <pre>SELECT count(*) INTO vcant from factura WHERE idcli = 'V00923';</pre>
   <p>O utilitzar una EXCEPTION i preguntar per %FOUND</p>
 
+  
   <h3> Atributs útils</h3>
-  <ul>
-    <li><code>%FOUND</code> → si s’ha trobat almenys una fila</li>
-    <li><code>%NOTFOUND</code> → si no s’ha trobat cap fila</li>
-    <li><code>%ROWCOUNT</code> → nombre de files tractades</li>
-    <li><code>%ISOPEN</code> → indica si el cursor està obert</li>
+  <ul> Quan Oracle crea un cursor implícit, el seu nom lògic és SQL, i es pot consultar l’estat amb atributs:
+    <li><code>sql%FOUND</code> → si s’ha trobat almenys una fila</li>
+    <li><code>sql%NOTFOUND</code> → si no s’ha trobat cap fila</li>
+    <li><code>sql%ROWCOUNT</code> → nombre de files tractades</li>
+    <li><code>sql%ISOPEN</code> → indica si el cursor està obert</li>
   </ul>
 
   <hr>
@@ -1493,12 +1496,24 @@ Consulta alguna guia de com usar CRON <a href="https://www.redeszone.net/tutoria
   <h4> Donar permís</h4>
   <pre>--  Un usuari necessita tindre permís per crear jobs (treballs) i executar-los !!
 GRANT CREATE JOB TO usuari;     -- crear i administrar els jobs seus
-GRANT EXECUTE ON dbms_scheduler TO usuario;   -- sols administrar els seus jobs
+GRANT EXECUTE ON dbms_scheduler TO usuari;   -- sols administrar els seus jobs
  </pre>
+ <pre>GRANT CREATE ANY JOB TO usuari;    crear jobs d'altres, i administrar-los</pre>
+
 
 <!--  GRANT EXECUTE ON dbms_scheduler TO usuario;  -- ho pot fer SYSTEM
 GRANT CREATE ANY JOB TO usuario    crear jobs d'altres, i administrar-los (ho pot fer system)
-GRANT MANAGE SCHEDULER TO usuario;  -- admin jobs d'altres -- No ho pot fer SYSTEM !!, si ho pot fer SYS    -->
+GRANT MANAGE SCHEDULER TO usuario;  -- admin jobs d'altres -- No ho pot fer SYSTEM !!, si ho pot fer SYS   
+-- Dar permiso a otro usuario para ejecutar un job de tu esquema 
+BEGIN
+  DBMS_SCHEDULER.GRANT_PRIVILEGE(
+    privilege   => 'EXECUTE',
+    object_name => 'MI_JOB',
+    grantee     => 'OTRO_USUARIO'
+  );
+END;     altres permisos ALTER, DROP, MANAGE
+
+Altra forma :  DBMS_SCHEDULER.GRANT_PRIVILEGE('EXECUTE', 'MI_JOB', 'OTRO_USUARIO');   -->
 
   <h4> Crear una tasca programada</h4>
   <pre>BEGIN
