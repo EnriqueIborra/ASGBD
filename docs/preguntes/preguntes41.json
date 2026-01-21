@@ -1,0 +1,37 @@
+[
+    {
+  "titol": "Quin és un dels principals avantatges de l’automatització en una empresa?",
+  "opcions": [
+    { "text": "Augment del treball manual", "correcte": false },
+    { "text": "Estalvi de temps en els processos", "correcte": true },
+    { "text": "Increment dels errors humans", "correcte": false },
+    { "text": "Dependència exclusiva dels treballadors", "correcte": false }
+  ]
+} ,
+    {
+  "titol": "Quina eina s’utilitza habitualment a Linux per programar tasques externes?",
+  "opcions": [
+    { "text": "Task Scheduler", "correcte": false },
+    { "text": "Crontab", "correcte": true },
+    { "text": "SQL Job", "correcte": false },
+    { "text": "Trigger", "correcte": false }
+  ]
+},
+{
+  "titol": "PL/SQL",
+  "opcions": [
+    { "text": "És un llenguatge procedimental", "correcte": true },
+    { "text": "És un llenguatge declaratiu", "correcte": false },
+    { "text": "No té estructures de control com bucles o condicions complexes", "correcte": false },
+    { "text": "No permet utilitzar variables", "correcte": false }
+  ]
+},
+   {
+  "titol": "Dins d’un procediment no es poden executar sentències de DDL directament",
+  "opcions": [
+    { "text": "Fals", "correcte": false },
+    { "text": "Vertader", "correcte": true }
+  ]
+}
+    
+]
