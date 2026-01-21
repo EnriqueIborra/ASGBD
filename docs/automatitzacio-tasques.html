@@ -189,8 +189,8 @@ END;
      DBMS_OUTPUT.PUT_LINE('La data actual és: ' || TO_CHAR(vData, 'DD/MM/YYYY'));
   END;
     </pre>
-    <p>PL/SQL no és case-sensitive en general. Paraules clau, noms de variables, procediments i funcions no distingeixen entre majúscules i minúscules.
-      Els valors dels strings o de camps VARCHAR, SÍ que distingeixen. </p>
+    <p>PL/SQL no és case-sensitive en general. Paraules clau, noms de variables, procediments i funcions no distingueixen entre majúscules i minúscules.
+      ❗❗ Però, els valors dels strings o de camps VARCHAR, SÍ que distingeixen. </p>
     <p><strong>SYSDATE</strong> és una <strong>funció</strong> d'ORACLE que torna la data/hora de l'instant actual</p>
     <p><strong>TO_CHAR</strong> és una <strong>funció</strong> d'ORACLE que transforma de format DATA a format VARCHAR2 </p>
   
@@ -388,7 +388,7 @@ BEGIN
     resultat := a ** b;
     DBMS_OUTPUT.PUT_LINE('Potència: ' || resultat);
 END; </code></pre>
-<p>No s'ha d'oblidar que no és el mateix 2 + 5 * 3  que  (2 + 5) * 3. La precedència o ordre de les operacions és crucial en el resultat</p>
+<p><strong>Precedència</strong>: No s'ha d'oblidar que no és el mateix 2 + 5 * 3  que  (2 + 5) * 3. La precedència o ordre de les operacions és crucial en el resultat</p>
 <p>En PL/SQL este ordre és el següent:  
 <table><tr> <td>( )</td>  <td>unaris</td> <td>** potència</td>  <td>* , /, mod</td> <td>+ i -</td> 
   <td>comparació</td> <td>lògics (NOT AND OR)</td></tr></table>
@@ -1636,6 +1636,8 @@ end;   </pre>
 <section id="altres-recursos">
   <h2>Altres recursos</h2>
     <h3>Ús de Dates en Oracle</h3>
+    <h2> <a href="dates-en-oracle.html">Dates en ORACLE</a></h2>
+  
    <!--    <a href="">link</a> 
     <h3>AuithID en procedure</h3>
 

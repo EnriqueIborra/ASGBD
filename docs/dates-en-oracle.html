@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>📅 Dates en Oracle</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
+
+</head>
+<body>
+
+<header>
+  <a href="index.html">
+    <!--<img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo"> -->
+    <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
+</a>
+  <h1>ASGBD   -    Dates en Oracle</h1>
+</header>
+
+<nav class="dates">
+  <h3>Índex</h3>
+  <a href="#definicio">Definició</a>
+  <a href="#visualitza">Visualització</a>
+  <a href="#operacions">Operacions</a>
+  <a href="#conversio">Conversió</a>
+  <a href="#extraccio">Extracció</a>
+  <a href="#composicio">Composició</a>
+  <a href="#funcions">Funcions</a>
+  <a href="#traspas">Anys de traspàs</a>
+</nav>
+
+<main>
+     
+  <section id="definicio">
+    <h1>Tipus de dates</h1>
+    <p>En PL/SQL d’Oracle, els principals tipus de dades relacionats amb dates i temps són aquests</p>
+    <ul>
+      <li>DATE : Emmagatzema: data i hora (any, mes, dia, hora, minut i segon)</li>
+      <li>TIMESTAMP : emmagatzema: data + hora amb fraccions de segon. Precisió: fins a 9 decimals (nanosegons) </li>
+      <li>TIMESTAMP WITH TIME ZONE : Inclou la zona horària</li>
+      <li>TIMESTAMP WITH LOCAL TIME ZONE : Desa la data en UTC. Es mostra segons la zona horària de la sessió</li>
+      <li>INTERVAL YEAR TO MONTH : Per representar diferències de temps en anys i mesos.</li>
+      <li>INTERVAL DAY TO SECOND : Per diferències en dies, hores, minuts, segons i fraccions.</li>
+    </ul>
+    <img src="imgs/datetime-types.png" alt="datetime" width="50%">
+    <p>Depenent del tipus declarat, es podrà guardar més o menys precisió d'informació.</p>
+
+    <pre>SET SERVEROUTPUT ON
+DECLARE
+      vd1 DATE;       -- DATE és el TIPUS
+      vd2 TIMESTAMP;  -- TIMESTAMP és el TIPUS
+BEGIN
+   vd1 := SYSDATE;      -- SYSDATE és una funció que torna (<strong>fins al segon</strong> )
+                        -- la data/hora de hui en l'instant que s'executa
+   vd2 := SYSTIMESTAMP; -- SYSTIMESTAMP és una funció que torna la data/hora
+                        -- de hui, <strong>amb precisió</strong>, en l'instant que s'executa
+   dbms_output.put_line(vd1);
+   dbms_output.put_line(vd2);
+
+   vd1 := '7/7/26';    -- Assignació directa (si el format coincideix !!)
+   dbms_output.put_line(vd1);
+   vd1 := '7/7/2026';    -- També ho converteix bé
+
+END;
+    </pre>
+     
+  </section>
+
+  <section id="visualitza">
+    <h1>Visualització / Presentació de dates</h1>
+    <p>Encara que una data estiga en un format concret, per exemple DATE, es pot visualitzar de diferents formes. Una cosa es el valor i una altra com es mostra.</p>
+
+  <pre>select sysdate from dual;       
+            --  06/03/26   . Format de visualització per defecte 
+            --                 (la que estiga per defecte en la instal·lació)
+select to_char(sysdate,'dd-mm-yyyy hh:mi:ss') from dual;      
+                                    --  06/03/26 10:07:22    Així imposem el format d'eixida
+select to_char(sysdate,'dd-mm-yyyy hh:mi:ss am') from dual;   
+                                    --  06/03/26 10:07:22 PM
+select to_char(sysdate,'dd-mm-yyyy hh24:mi:ss am') from dual; 
+                                    --  06/03/26 22:07:22 PM
+
+alter session set nls_date_format='dd-mm-yyyy hh:mi';   
+                                    --  Es canvia el format de visualització
+select sysdate from dual;        
+                                    -- 06/03/26 10:07  </pre>
+<p>El posar am o pm en el format sols indica que s'ha de mostrar la franja que pertoque del valor mostrat.</p>
+<p>També es pot visualitzar amb DBMS_OUTPUT..</p>
+<pre>set SERVEROUTPUT on
+begin
+   dbms_output.put_line(sysdate);
+   dbms_output.put_line(to_char(sysdate,'dd-mm-yyyy hh:mi:ss'));
+   dbms_output.put_line(to_char(sysdate,'dd-mm-yyyy hh:mi:ss am'));
+   dbms_output.put_line(to_char(sysdate,'dd'));
+   dbms_output.put_line(to_char(sysdate,'d'));
+   dbms_output.put_line(to_char(sysdate,'ddd'));
+   dbms_output.put_line(to_char(sysdate,'day'));
+end;  </pre>
+
+<p>I també es poden canviar els caràcters de separació al gust del programador.</p>
+<pre>set SERVEROUTPUT on
+begin
+   dbms_output.put_line(to_char(sysdate,'dd-mm-yyyy hh:mi:ss'));
+   dbms_output.put_line(to_char(sysdate,'dd/mm/yyyy hh:mi:ss'));
+   dbms_output.put_line(to_char(sysdate,'dd.mm.yyyy hh:mi:ss'));
+   dbms_output.put_line(to_char(sysdate,'dd mm yyyy hh_mi-ss'));
+end;</pre>
+
+  </section>
+
+  <section id="operacions">
+    <h1>Operacions sobre dates</h1>
+
+    <pre>set SERVEROUTPUT on
+alter session set nls_date_format='dd-mm-yyyy hh24:mi:ss';
+declare    f1 date:= '31/01/2024';  f2 date;
+begin
+   f2:=sysdate;
+   dbms_output.put_line( f1);
+   dbms_output.put_line( f2);
+   dbms_output.put_line( f2+1);     -- Suma un dia a la data f2
+   dbms_output.put_line( f2 - f1);  -- Calcula la Diferència en dies(amb decimals) entre les dos dates
+   if f2>f1 then dbms_output.put_line('hui es després del '||f1); 
+   end if;
+   dbms_output.put_line( f2 - 1);     -- Resta un dia
+   dbms_output.put_line( f2 + 2/24);  -- Resta 2 hores !!
+end;      </pre>
+
+    <pre>to_char(valor_data, format)
+      --   D'una data, converteix a un strings
+
+to_date (valor_string, format)
+      --  Des d'un string, converteix a una data
+    </pre>
+
+    <p>Algunes conversions a tindre en compte..</p>
+    <pre>set SERVEROUTPUT on
+begin
+   dbms_output.put_line( 5 + '6' );     -- 11
+   dbms_output.put_line( '5' + '6' );   -- 11
+   dbms_output.put_line(' ');   
+   dbms_output.put_line( '3' || 7 );    --  '37'
+   dbms_output.put_line( 35 || 8 );     --  '358'
+end;</pre>
+
+  </section>
+
+  <section id="extraccio">
+    <h1>Extracció d'informació (parcial) d'una data</h1>
+    <pre>set SERVEROUTPUT on
+declare    f1 date:= sysdate;  dia number; mes number;
+begin
+   dia := to_char(f1,'dd');  mes := to_char(f1,'mm');
+   dbms_output.put_line( f1 );
+   dbms_output.put_line( dia );   -- 6
+   dbms_output.put_line( mes );   -- 3
+end;</pre>
+
+  </section>
+
+  <section id="composicio">
+    <h1>Composició de dates</h1>
+   <pre>set SERVEROUTPUT on
+alter session set nls_date_format='dd-mm-yyyy hh24:mi:ss';
+declare    f1 date;  dia number; mes number; anys number;
+begin
+   dia := 4 ;   mes := 6 ; anys :=2026;
+   f1 := to_date ( dia||'-'||mes||'-'||anys, 'dd-mm-yyyy');
+   dbms_output.put_line( f1 );
+end;</pre>
+
+  </section>
+
+  <section id="funcions">
+   <h1>Funcions de dates en Oracle</h1>
+    <pre>add_months(data, num ) compte amb l’últim dia del mes
+last_day(data)  l’últim dia del mes al que pertany la data
+next_day(data,dia) pròxim ‘dia’ després de data (eg dia=lunes)
+round(data[,mascara])  ..de data (year, month, 
+trunc(data[,mascara])  ..de data
+extract(part from data)  ..de data
+months_between(data1,data2)  num de mesos entre 2 dates</pre>
+
+<h3>add_months</h3>
+<pre>set SERVEROUTPUT on
+alter session set nls_date_format='dd/mm/yyyy';
+begin
+   dbms_output.put_line( add_months('15/01/2024',1) );
+   dbms_output.put_line( add_months('30/03/2024',1) );   
+   dbms_output.put_line( add_months('31/03/2024',1) );
+   dbms_output.put_line( add_months('28/02/2024',1) );
+   dbms_output.put_line( add_months('29/02/2024',1) );
+   dbms_output.put_line( add_months('29/02/2024',-1) );
+end;</pre>
+
+<h3>last_day i altres</h3>
+<pre>set SERVEROUTPUT on
+alter session set nls_date_format='dd/mm/yyyy';
+begin
+   dbms_output.put_line( last_day('15/01/2024'));
+   dbms_output.put_line( next_day('15/01/2024','Lunes') );
+   dbms_output.put_line( to_char( sysdate,'dd-mm-yyyy hh24:mi') );
+   dbms_output.put_line( round(sysdate) );
+   dbms_output.put_line( trunc(sysdate) );
+   dbms_output.put_line( months_between( sysdate, '31/3/2023') );
+   dbms_output.put_line( extract(day from sysdate) );
+end;</pre>
+<img src="imgs/camps-disponibles.png" alt="camps" width="40%">
+
+<h3>round</h3>
+<pre>set SERVEROUTPUT on
+alter session set nls_date_format='dd/mm/yyyy hh24:mi';
+begin
+      dbms_output.put_line( round( to_date('06/03/2026 11:00')) );       -- 06/03/2026 00:00
+      dbms_output.put_line( round( to_date('06/03/2026 14:00')) );       -- 07/03/2026 00:00
+      dbms_output.put_line('');
+      dbms_output.put_line( round( to_date('06/03/2026'),'month'  ) );   -- 01/03/26 00:00
+      dbms_output.put_line( round( to_date('16/03/2026'),'month'  ) );   -- 01/04/26 00:00
+      dbms_output.put_line('');
+      dbms_output.put_line( round( to_date('06/03/2026'),'year'  ) );    -- 01/01/26 00:00
+      dbms_output.put_line( round( to_date('16/07/2026'),'year'  ) );    -- 01/01/27 00:00
+end;</pre>
+==> &nbsp;<a href="https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/ROUND-and-TRUNC-Date-Functions.html#GUID-8E10AB76-21DA-490F-A389-023B648DDEF8">Models de formats per a round i trunc</a>
+des de la documentació oficial d'ORACLE
+<h3>localtimestamp</h3>
+<p>La funció <code>localtimestamp</code> torna data en tipus TIMESTAMP</p>
+<pre>set SERVEROUTPUT on
+declare
+  vd1 date := sysdate;
+  vd2 timestamp := localtimestamp;
+begin
+   dbms_output.put_line( to_char( 'DATE ' || vd1 ));
+   dbms_output.put_line( to_char( 'DATE ' || to_char( vd1,'hh24:mi:ss' )));
+   dbms_output.put_line( to_char( 'timestamp ' || vd2 ));
+   dbms_output.put_line( to_char( 'timestamp ' || to_char (vd2,'hh24:mi:ss.ff6' )));
+end;</pre>
+
+<pre>set SERVEROUTPUT on
+alter session set nls_date_format='dd--mm--yyyy'; 
+alter session set nls_timestamp_format='dd-mm-yyyy hh24_mi_ss.ff';
+declare
+  vd1 date := sysdate;
+  vd2 timestamp := localtimestamp;
+begin
+   dbms_output.put_line( to_char( 'DATE ' || vd1 ));
+   dbms_output.put_line( to_char( 'timestamp ' || vd2 ));
+end;
+</pre>
+
+<h3>systimestamp</h3>
+<p>La funció <code>systimestamp</code> torna data en tipus timestamp with time zone</p>
+<pre>set SERVEROUTPUT on
+alter session set nls_date_format='dd--mm--yyyy'; 
+alter session set nls_timestamp_format='dd-mm-yyyy hh24_mi_ss.ff';
+alter session set nls_timestamp_tz_format='dd/-mm/-yyy hh24::mi::ss.ff';
+declare
+  vd1 date := sysdate;
+  vd2 timestamp with time zone:= systimestamp;
+begin
+   dbms_output.put_line( to_char( 'DATE ' || vd1 ));
+   dbms_output.put_line( to_char( 'timestamp ' || vd2 ));
+end;</pre>
+<img src="imgs/datetime-functions.png" alt="datetime-functions" width="40%">
+ <p>Altres Consideracions</p>
+ <pre>SYSDATE 
+and SYSTIMESTAMP return the <strong>system</strong> date and time
+
+CURRENT_DATE 
+and LOCALTIMESTAMP   
+and CURRENT_TIMESTAMP return the current date and time <strong>in the session time zone</strong>.
+
+CURRENT_DATE returns a DATE value
+LOCALTIMESTAMP returns a TIMESTAMP value 
+CURRENT_TIMESTAMP returns a TIMESTAMP WITH TIME ZONE value  </pre>
+
+<pre>
+| Funció              | Tipus retornat             | Precisió          | Zona horària |
+| ------------------- | -------------------------- | ----------------- | ------------ |
+| `SYSDATE`           | `DATE`                     | Segons            | Servidor     |
+| `CURRENT_DATE`      | `DATE`                     | Segons            | Sessió       |
+| `LOCALTIMESTAMP`    | `TIMESTAMP`                | Fins a 9 decimals | Sessió       |
+| `SYSTIMESTAMP`      | `TIMESTAMP WITH TIME ZONE` | Fins a 9 decimals | Servidor     |
+| `CURRENT_TIMESTAMP` | `TIMESTAMP WITH TIME ZONE` | Fins a 9 decimals | Sessió       | </pre>
+<p>Si es necessita precisió TIMESTAMP però sense zona horària, a partir de l’hora del servidor:  <br>
+<code>SELECT CAST(SYSTIMESTAMP AS TIMESTAMP) FROM dual; </code> </p>
+
+  </section>
+
+  <section id="traspas">
+    <img src="imgs/gregori.png" alt="calendari-gregoria" width="40%" class="imatge-dreta">
+    <h2>Calendari JULIÀ</h2>
+   <p> Instaurat per Juli Cèsar l'any 46 a. C., que era una altra versió del  calendari egipci, el primer calendari solar conegut</p>
+   <p>El calendari julià tenia anys de traspàs cada 4 anys, <strong>sense execpció</strong>, (no com el calendari gregorià). L’any de traspàs tenia 366 dies.
+    Els altres anys tenien 365 dies. </p>
+    <p>Problema del calendari julià. L’any solar real dura aproximadament 365,2422 dies, però el calendari julià assumia 365,25 dies.
+ Diferència: Error d'uns 11 minuts i 14 segons per any. Amb el pas dels segles, això va provocar un desplaçament gradual de les estacions (uns 10 dies acumulats al segle XVI).
+Solució -> El calendari gregorià</p>
+
+   <h2>Calendari GREGORIÀ</h2>
+   <p>Aquest calendari va ser dissenyat per a corregir els errors introduïts pel calendari julià.
+El julià tenia un xicotet error, pel fet que establia la duració de l'any en 365 dies i 6 hores, 
+quan en realitat era de 365 dies, 5 hores, 48 minuts i 45 segons. D'aquesta manera, cada any la data oficial
+ s'endarreria 11 minuts i 15 segons respecte a l'astronòmica. La diferència era mínima, però va acumular un desfasament 
+ de quasi 10 dies en els més de 1.600 anys que va estar vigent.</p>
+ <p>Aquest calendari gregorià està dividit en tres tipus d'anys: l'any comú de 365 dies, l'any de traspàs amb 366 dies 
+  i l'any secular que és un any que tanca segle.</p>
+
+  <h2>Càlcul Any de traspàs amb 366 dies</h2>
+  <pre>
+ a es divisible per b si el resto de la divisió es 0
+
+1. Si l'any és divisible per 4, vaja al pas 2. En cas contrari, vaja al pas 5. (365d)
+2. Si l'any és divisible per 100, vaja al pas 3. En cas contrari, vaja al pas 4. (366d)
+3. Si l'any és divisible per 400, vaja al pas 4. (366d)  En cas contrari, vaja al pas 5. (365d)
+4. L'any és un any de traspàs (té 366 dies).
+5. L'any no és un any de traspàs (té 365 dies).</pre>
+
+
+  </section>
+ 
+</main>
+
+
+<script>
+
+    // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+    //  <div class="pre-container">
+    //    <button class="copy-button">Copia Codi !</button>
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+  //  Per fer test final
+  // Primer es crea un bancDePreguntes   const
+  // i desprès es carrega una pregunta aleatoria    function
+  // per ultim la funcio de comprobar resposta per a quan es polse un botó
+
+let bancDePreguntes = [];
+let preguntesBarrejades = [];
+let indexPreguntaActual = 0;
+let puntuacio = 0;
+
+function barrejar(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function actualitzarProgres() {
+    const percentatge =
+        (indexPreguntaActual / preguntesBarrejades.length) * 100;
+    document.getElementById('progress-bar').style.width =
+        percentatge + "%";
+}
+
+function actualitzarPercentatge() {
+    const percentatge = Math.round(
+        (puntuacio / preguntesBarrejades.length) * 100
+    );
+    document.getElementById('percentatge-text').innerText =""
+       // `Encerts: 🎯 ${percentatge}%`;
+}
+
+
+
+function carregarPreguntes() {
+    fetch('preguntes/preguntes42.json')
+        .then(res => res.json())
+        .then(data => {
+            bancDePreguntes = data;
+            preguntesBarrejades = [...bancDePreguntes];
+            barrejar(preguntesBarrejades);
+            puntuacio = 0;
+            indexPreguntaActual = 0;
+            mostrarPregunta();
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('pregunta-text').innerText =
+                "Error carregant les preguntes 😢";
+        });
+        //document.getElementById('percentatge-text').innerText = "0%";
+
+}
+
+function mostrarPregunta() {
+
+    // Si ja no queden preguntes
+    if (indexPreguntaActual >= preguntesBarrejades.length) {
+        document.getElementById('pregunta-text').innerText =
+            "🎉 Has acabat totes les preguntes!";
+        document.getElementById('options-container').innerHTML = "";
+        document.getElementById('feedback').innerHTML =
+        `Has encertat <strong>${puntuacio}</strong> de 
+        <strong>${preguntesBarrejades.length}</strong> preguntes.`;
+        document.getElementById('btn-seguent').disabled = true;
+        document.getElementById('progress-bar').style.width = "100%";
+        actualitzarProgres();
+        return;
+    }
+
+    const pregunta = preguntesBarrejades[indexPreguntaActual];
+
+    document.getElementById('pregunta-text').innerText = pregunta.titol;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    pregunta.opcions.forEach(opcio => {
+        const btn = document.createElement('button');
+        btn.innerText = opcio.text;
+        btn.onclick = () => comprovaResposta(opcio.correcte, btn);
+        container.appendChild(btn);
+    });
+
+    document.getElementById('feedback').textContent = "";
+    document.getElementById('btn-seguent').disabled = true;
+    actualitzarProgres();
+
+}
+
+
+function comprovaResposta(esCorrecte, element) {
+    const feedback = document.getElementById('feedback');
+
+    document
+        .querySelectorAll('#options-container button')
+        .forEach(btn => btn.disabled = true);
+
+    if (esCorrecte) {
+        feedback.textContent = "✅ Correcte! Molt bé.";
+        element.style.background = "#d4edda";
+        puntuacio++;
+    } else {
+        feedback.textContent = "❌ Incorrecte.";
+        element.style.background = "#f8d7da";
+    }
+    //actualitzarPercentatge();
+    document.getElementById('btn-seguent').disabled = false;
+}
+
+function seguentPregunta() {
+    indexPreguntaActual++;
+    mostrarPregunta();
+}
+
+
+// Executar en carregar la pàgina
+window.onload = carregarPreguntes;
+
+</script>
+
+</body>
+</html>
