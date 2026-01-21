@@ -164,7 +164,7 @@ END;
       <li><code><strong>.</strong></code>  (només en SQL*Plus) envia el bloc al buffer per executar-lo.</li>
     </ul>
   <p><strong>&nom</strong> Una variable de substitució és una variable que s'utilitza principalment en eines com SQL*Plus, SQL Developer o Toad, per a permetre que l’usuari introduïsca un valor en temps d’execució, abans que s'execute un bloc PL/SQL o una sentència SQL.
-    No és part del llenguatge PL/SQL com a tal, sinó una funcionalitat d’aquestes eines per fer scripts més dinàmics i interactius.</p>
+    <strong>No és part del llenguatge PL/SQL com a tal</strong>, sinó una funcionalitat d’aquestes eines per fer scripts més dinàmics i interactius.</p>
     <p>S'usarà  <strong>'&NOM'</strong> amb cometes per demanar un STRING i <strong>&NOM</strong> sense cometes per demanar un NUMBER</p>
     <p><strong>PUT_LINE</strong> És un procediment del paquet <strong>DBMS_OUTPUT</strong> d'ORACLE.</p>
     <p><strong>PUT_LINE</strong> avalua !!  i imprimeix el resultat.</p>
@@ -183,10 +183,10 @@ END;
   SET SERVEROUTPUT ON;
   
   DECLARE
-     vData DATE := SYSDATE;
+     vData DATE := SYSDATE;   -- DATE és el tipus i SYSDATE una funció 
   BEGIN
      DBMS_OUTPUT.PUT_LINE('La data actual és: ' ||  vData  );
-     DBMS_OUTPUT.PUT_LINE('La data actual és: ' || TO_CHAR(vData, 'DD/MM/YYYY'));
+     DBMS_OUTPUT.PUT_LINE('La data actual és: ' || TO_CHAR(vData, 'DD/MM/YYYY hh:mi am'));
   END;
     </pre>
     <p>PL/SQL no és case-sensitive en general. Paraules clau, noms de variables, procediments i funcions no distingueixen entre majúscules i minúscules.
@@ -335,7 +335,7 @@ END; </code></pre>
       <h4>🛠️ Com assignar valors</h4>
         <h3>-- En el bloc DECLARE</h3>
       <ul> 
-        <li><strong>Entrada de l’usuari (SQL Developer):</strong> <pre><code>v_nom := '&amp;nom_usuari';</code>  -- Variable de substitució
+        <li><strong>Entrada de l’usuari (Eina d'SQL Developer):</strong> <pre><code>v_nom varchar2(20) := '&amp;nom_usuari';</code>  -- Variable de substitució
 <code>/*  una variable de substitució és un valor que s’introdueix en temps d’execució
    i que Oracle substitueix abans d’executar la sentència */</code></pre></li>
         
@@ -389,7 +389,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Potència: ' || resultat);
 END; </code></pre>
 <p><strong>Precedència</strong>: No s'ha d'oblidar que no és el mateix 2 + 5 * 3  que  (2 + 5) * 3. La precedència o ordre de les operacions és crucial en el resultat</p>
-<p>En PL/SQL este ordre és el següent:  
+<p>En PL/SQL este ordre de precedència és el següent:  
 <table><tr> <td>( )</td>  <td>unaris</td> <td>** potència</td>  <td>* , /, mod</td> <td>+ i -</td> 
   <td>comparació</td> <td>lògics (NOT AND OR)</td></tr></table>
 
@@ -496,6 +496,15 @@ BEGIN
       DBMS_OUTPUT.PUT_LINE('Accés limitat');
   END IF;
 END; </code></pre>
+<p>En PL/SQL: 'admin' no és igual que 'ADMIN' <br>
+Es poden comparar amb < o > també de manera que les cadenes es comparen caràcter per caràcter, 
+segons l’ordre lexicogràfic (semblant a l’ordre del diccionari).</p>
+<pre>'Ana' < 'Berta'     -- TRUE
+'abc' < 'abd'       -- TRUE
+'Z' < 'a'           -- TRUE (perquè el codi ASCII de Z és menor)
+</pre>
+<p>Les cadenes de text també es poden comparar amb <code>LIKE</code>, usant '%'=>(qualsevol caracter) o '-'=>(un caracter)</p>
+<pre>IF nom LIKE 'Mar%' THEN</pre>
    
       <h3> 5. Operacions combinades</h3>
       <p>Es pot combinar números i textos, per exemple per calcular salaris:</p>
@@ -1571,6 +1580,7 @@ REPEAT_INTERVAL => 'FREQ=YEARLY; BYMONTH=JA,AP,JL,OC'
      (abreviatures dels mesos: JA, FE, MR, AP, MA, JU, JL, AU, SE, OC, NO , DE)   </pre>
 
   <p class="alert">En Oracle DBMS_SCHEDULER, si no s’indica l’hora (BYHOUR, BYMINUTE, BYSECOND) en el REPEAT_INTERVAL, s’utilitza l’hora del START_DATE del job.</p>
+  <p>Regla general: Quan no s’indica un component temporal al REPEAT_INTERVAL, Oracle el pren del START_DATE</p>
 
 
   <h4>📘 Consultar jobs en el DD</h4>
@@ -1579,9 +1589,19 @@ SELECT * FROM user_scheduler_jobs;         </pre>
 
   <h4> Aturar o Eliminar un job</h4>
   <pre>BEGIN
+  DBMS_SCHEDULER.DISABLE('JOB_INFORME');  
   DBMS_SCHEDULER.STOP_JOB('JOB_INFORME');  
   DBMS_SCHEDULER.DROP_JOB('JOB_INFORME');
 END;   </pre>
+<p>No és obligatòri fer els tres pasos abans d'eliminar (Oracle no dona error), però si molt recomanable, per assegurar-se de que no quede un job a mig acabar, Per
+  evitar processos “fantasma”, bloquejos inesperats o resultats incomplets. </p>
+  <pre>-- Si el job no respon, es pot forçar amb
+BEGIN
+  DBMS_SCHEDULER.STOP_JOB(
+    job_name => 'JOB_INFORME',
+    force    => TRUE
+  );
+END;    </pre>
 
   <hr><h3> ⏰ Triggers de sistema (a nivell de sessió)</h3>
   <p>També pots utilitzar <strong>triggers de sistema</strong> per executar codi quan es produeixen accions específiques:</p>
