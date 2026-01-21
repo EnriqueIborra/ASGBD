@@ -57,6 +57,11 @@
     color: white;
   }
 
+   .dates {
+    background: linear-gradient(180deg, #469438, #68ec8d);
+    color: white;
+  }
+
   nav h2 {
     font-size: 18px;
     margin-bottom: 20px;
