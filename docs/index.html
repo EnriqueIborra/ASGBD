@@ -7,7 +7,7 @@
   <!-- Millora SEO + compartició xarxes: Afegeix metaetiquetes Open Graph -->  
   <meta property="og:title" content="Curs ASGBD - ASIX" />
   <meta property="og:description" content="Aprèn a administrar sistemes gestors de bases de dades amb Oracle i PostgreSQL." />
-  <meta property="og:image" content="URL de la imatge de portada" />
+  <!--<meta property="og:image" content="URL de la imatge de portada" />
   <!-- <link rel="icon" href="favicon.ico" type="image/x-icon" />  -->
 
   
@@ -308,16 +308,17 @@ a:hover {
 
   <header>
     <div class="logo">Curs ASGBD - ASIX</div>
-    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    <div class="menu-btn" id="menuBtn">☰</div>
     <nav class="desktop-nav">
       <a href="#temari">Unitats Didàctiques</a>
     </nav>
     <nav class="mobile-nav" id="mobileMenu">
-      <a href="#temari" onclick="toggleMenu()">Temari</a>
+      <a href="#temari">Temari</a>
     </nav>
-    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+    <button class="dark-mode-toggle" id="darkModeBtn">🌙</button>
   </header>
 
+  
   <main>
     <section id="intro">
       <h2>Aprèn a administrar sistemes gestors de bases de dades</h2>
@@ -327,11 +328,11 @@ a:hover {
 
     <section id="temari">
         <div class="icons-top">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo" style="width: 90px; height: auto;">
-           <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 50px; height: 50px;">
-           <img src="https://cdn-icons-png.flaticon.com/512/5968/5968313.png" alt="Instal·lació SGBD" style="width: 40px; height: 40px;">
-           <img src="https://img.icons8.com/?size=100&id=zLAhu2EKh__p&format=png&color=000000" alt="Icono de base de datos" style="width: 40px; height: 40px;">
-           <img src="https://img.icons8.com/?size=100&id=23332&format=png&color=000000" alt="Icono de base de datos" style="width: 40px; height: 40px;">
+          <img src="imgs/Oracle_logo.svg" alt="Oracle Logo" style="width: 90px; height: auto;">
+           <img src="imgs/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 50px; height: 50px;">
+           <img src="imgs/mysql-icon.png" alt="Instal·lació SGBD" style="width: 40px; height: 40px;">
+           <img src="imgs/icono-bbdd.png" alt="Icono de base de datos" style="width: 40px; height: 40px;">
+           <img src="imgs/icono-pareja.png" alt="Icono de base de datos" style="width: 40px; height: 40px;">
            
         </div>
         <h2>Unitats didàctiques</h2>
@@ -446,70 +447,73 @@ a:hover {
   </footer>
 
   <script>
-// Comprova i aplica el tema preferit en carregar
+
+// Quan el DOM està carregat
 window.addEventListener('DOMContentLoaded', () => {
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-mode');
-    document.querySelector('header').classList.add('dark-mode');
-    document.querySelector('footer').classList.add('dark-mode');
-    document.querySelector('.dark-mode-toggle').textContent = '☀️';
-  }
-});
 
-    function toggleMenu() {
-      const menu = document.getElementById('mobileMenu');
-      menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-    }
-
-    // Animació quan es fa scroll
-    const sections = document.querySelectorAll('section');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-
-    sections.forEach(section => {
-      observer.observe(section);
-    });
-
-    function toggleDarkMode() {
-  // Alternar la classe dark-mode al body
-  document.body.classList.toggle('dark-mode');
-
-  // També podem alternar la classe dark-mode al header i al footer per aconseguir un canvi més complet
+  const menuBtn = document.getElementById('menuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const darkModeBtn = document.getElementById('darkModeBtn');
   const header = document.querySelector('header');
   const footer = document.querySelector('footer');
 
-  header.classList.toggle('dark-mode');
-  footer.classList.toggle('dark-mode');
-  
-  // Canviar l'icona del botó segons el mode
-  const icon = document.querySelector('.dark-mode-toggle');
-  if (document.body.classList.contains('dark-mode')) {
-    icon.textContent = '☀️';  // Icona de mode clar
-  } else {
-    icon.textContent = '🌙';  // Icona de mode fosc
+  /* ===== TEMA GUARDAT ===== */
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    header.classList.add('dark-mode');
+    footer.classList.add('dark-mode');
+    darkModeBtn.textContent = '☀️';
   }
 
-  // animar la icona després de canviar-la
-  icon.classList.add('animate');
-  setTimeout(() => icon.classList.remove('animate'), 500);
+  /* ===== MENU MÒBIL ===== */
+  menuBtn.addEventListener('click', () => {
+    mobileMenu.style.display =
+      mobileMenu.style.display === 'flex' ? 'none' : 'flex';
+  });
+
+  // Tancar menú quan es fa clic a un enllaç
+  mobileMenu.addEventListener('click', (e) => {
+    if (e.target.tagName === 'A') {
+      mobileMenu.style.display = 'none';
+    }
+  });
+
+  /* ===== DARK MODE ===== */
+  darkModeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    header.classList.toggle('dark-mode');
+    footer.classList.toggle('dark-mode');
+
+    if (document.body.classList.contains('dark-mode')) {
+      darkModeBtn.textContent = '☀️';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      darkModeBtn.textContent = '🌙';
+      localStorage.setItem('theme', 'light');
+    }
+
+    // animació icona
+    darkModeBtn.classList.add('animate');
+    setTimeout(() => darkModeBtn.classList.remove('animate'), 500);
+  });
+
+  /* ===== ANIMACIÓ SCROLL ===== */
+  const sections = document.querySelectorAll('section');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  sections.forEach(section => observer.observe(section));
+});
 
 
-  // Guarda en localstorage (browser) el tema per enrecordar-se d'ell
-  if (document.body.classList.contains('dark-mode')) {
-  localStorage.setItem('theme', 'dark');
-} else {
-  localStorage.setItem('theme', 'light');
-}
-
-}
-
-  </script>
+</script>
 </body>
 </html>
