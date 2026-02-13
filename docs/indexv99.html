@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Curs ASGBD per ASIX. Domina la gestió i administració de sistemes de bases de dades com Oracle i PostgreSQL.">
+  <!-- Millora SEO + compartició xarxes: Afegeix metaetiquetes Open Graph -->  
+  <meta property="og:title" content="Curs ASGBD - ASIX" />
+  <meta property="og:description" content="Aprèn a administrar sistemes gestors de bases de dades amb Oracle i PostgreSQL." />
+  <!--<meta property="og:image" content="URL de la imatge de portada" />
+  <!-- <link rel="icon" href="favicon.ico" type="image/x-icon" />  -->
+
+  
+  <title>Curs ASGBD - ASIX</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #ebf8ff, #ffffff);
+      color: #333;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    }
+    header {
+      background: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 10;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+    nav a {
+      text-decoration: none;
+      color: #333;
+      transition: color 0.3s;
+    }
+    nav a:hover {
+      color: #007BFF;
+    }
+    .menu-btn {
+      display: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      background: white;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .mobile-nav a {
+      padding: 1rem 2rem;
+      border-top: 1px solid #eee;
+    }
+    main {
+      max-width: 1000px;
+      margin: auto;
+      padding: 2rem;
+      flex: 1;
+    }
+    section {
+      margin-bottom: 3rem;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .card {
+      background: #fff;
+      color: #333;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      cursor: default;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+
+    .card:hover img {
+  transform: scale(1.1);
+  filter: none;
+  }
+    .card a {
+  text-decoration: none; /* Elimina l'efecte subratllat */
+  color: inherit; /* Manté el color del text original */
+}
+
+.card p {
+  margin: 0;
+}
+ 
+.card img {
+  filter: grayscale(20%);
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #777;
+      padding: 2rem 1rem;
+    }
+
+    /* ANIMACIÓ D'ENTRADA INICIAL */
+    #intro-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      animation: fadeOut 1s ease forwards;
+      animation-delay: 2.5s;
+    }
+
+    #intro-screen h1 {
+      font-size: 2.5rem;
+      opacity: 0;
+      transform: scale(0.9);
+      animation: fadeZoom 1.5s ease forwards;
+    }
+
+
+    @keyframes fadeZoom {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        display: none;
+      }
+      .menu-btn {
+        display: block;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+ 
+  .icons-top {
+  display: flex;
+  justify-content: center;
+  gap: 1rem; /* Espai entre els icones */
+  margin-bottom: 1rem; /* Espai abans del títol Temari */
+}
+
+.icons-top img {
+  width: 50px; /* Amplada estàndard per a tots els icones */
+  height: auto;
+}   
+
+
+
+/* Mode fosc */
+body.dark-mode {
+  background: #333;
+  color: #fff;
+}
+
+body.dark-mode .card {
+  background: #333; /* Fondo oscuro para el modo oscuro */
+  color: #ddd; /* Color de texto claro */
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.2); /* Sombra más suave en modo oscuro */
+}
+
+/* Efecto hover para las tarjetas en el modo oscuro */
+body.dark-mode .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3); /* Sombra más brillante en el modo oscuro */
+}
+
+header.dark-mode {
+  background: #222;
+}
+
+footer.dark-mode {
+  background: #222;
+  color: #aaa;
+}
+
+
+.dark-mode-toggle {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.dark-mode .dark-mode-toggle {
+  background: #222;
+  color: #fff;
+}
+
+.dark-mode-toggle:hover {
+  color: #ffcc00;
+}
+
+.dark-mode-toggle {
+  transition: transform 0.3s ease;
+}
+.dark-mode-toggle:hover {
+  transform: rotate(15deg);
+}
+
+
+.dark-mode-toggle:active {
+  transform: scale(0.95);
+  background: #ddd;
+}
+
+body.dark-mode .dark-mode-toggle:active {
+  background: #666;
+}
+
+
+.dark-mode-toggle.animate {
+  animation: rotateIcon 0.5s ease;
+}
+
+@keyframes rotateIcon {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+a {
+  color: #444; /* O #555, segons preferència */
+  text-decoration: underline;
+  transition: color 0.3s;
+}
+a:hover {
+  color: #007BFF; /* Blau una mica més suau */
+}
+
+@font-face {
+  font-family: 'CCSymbols';
+  src: url('fonts/CCSymbols.woff2') format('woff2'),
+       url('fonts/CCSymbols.woff') format('woff');
+  font-display: swap;
+  unicode-range: U+00A9, U+229C, U+1F10D-1F10F, U+1F16D-1F16F;
+}
+
+  </style>
+</head>
+<body>
+  <!-- PANTALLA D'ENTRADA -->
+  <div id="intro-screen">
+    <h1>Curs ASGBD - ASIX</h1>
+  </div>
+
+  <header>
+    
+  <!--  <div class="logo">Curs ASGBD - ASIX</div>
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    <nav class="desktop-nav">
+      <a href="#temari">Unitats Didàctiques</a>
+    </nav>
+    <nav class="mobile-nav" id="mobileMenu">
+      <a href="#temari" onclick="toggleMenu()">Temari</a>
+    </nav>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>   -->
+    <div class="logo">Curs ASGBD - ASIX</div>
+
+  <div class="menu-btn" id="menuBtn">☰</div>
+
+  <nav class="desktop-nav">
+    <a href="#temari">Unitats Didàctiques</a>
+  </nav>
+
+  <nav class="mobile-nav" id="mobileMenu">
+    <a href="#temari">Temari</a>
+  </nav>
+
+  <button class="dark-mode-toggle" id="darkModeBtn">🌙</button>
+    
+  </header>
+
+  <main>
+    <section id="intro">
+      <h2>Aprèn a administrar sistemes gestors de bases de dades</h2>
+      <p style="text-align: center; max-width: 600px; margin: 0 auto;">Domina les eines com ORACLE database, sql*plus, SQL Developer per administrar bases de dades amb seguretat i eficiència.</p>
+    </section>
+
+
+    <section id="temari">
+        <div class="icons-top">
+          <img src="imgs/Oracle_logo.svg" alt="Oracle Logo" style="width: 90px; height: auto;">
+           <img src="imgs/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 50px; height: 50px;">
+           <img src="imgs/mysql-icon.png" alt="Instal·lació SGBD" style="width: 40px; height: 40px;">
+           <img src="imgs/icono-bbdd.png" alt="Icono de base de datos" style="width: 40px; height: 40px;">
+           <img src="imgs/icono-pareja.png" alt="Icono de base de datos" style="width: 40px; height: 40px;">
+           
+        </div>
+        <h2>Unitats didàctiques</h2>
+        <div class="grid">
+           
+              <a href="instalacio-sgbd.html" class="card" title="Instal·lació de Sistemes de Gestió de Bases de Dades.
+                Conèixer els Elements d’un sistema gestor de bases de dades
+                Característiques dels principals sistemes gestors de bases de dades
+                Seleccionar el sistema gestor de bases de dades
+                Conèixer el Programari necessari per dur a terme la instal·lació
+                Conèixer i verificar els Requisits de maquinari
+                Realitzar la instal·lació de SGBD (SW i DADES)
+                Documentació del procés d'instal·lació
+                Fitxers de registre. Logs. Resolució d’incidències
+                Verificació del funcionament del sistema gestor de bases de dades
+              
+              ">
+                <p>UD 1 Instal·lació d'un SGBD</p>
+              </a>
+           
+         
+              <a href="configuracio-sgbd.html" class="card" title="Configuració bàsica dels SGBD per a un rendiment òptim.
+              Descriure les condicions d'inici i parada del sistema gestor
+              Seleccionar el motor de base de dades
+              Assegurar els comptes d'administració
+              Configurar les eines i programari client del sistema gestor
+              Configurar la connectivitat en xarxa del sistema gestor
+              Definir les característiques per defecte de les bases de dades
+              Definir els paràmetres relatius a les connexions (temps d'espera, nombre màxim de connexions, entre altres)
+              Documentar el procés de configuració
+              
+              " > 
+                <p>UD 2 Configuració d'un SGBD</p>
+              </a>
+           
+           
+              <a href="usuaris-privilegis.html" class="card" title="Gestió d'usuaris i permisos dins de l'entorn SGBD.
+              Definir i eliminar comptes d'usuari
+              Crear sinònims de taules i vistes
+              Identificar els privilegis sobre les bases de dades i els seus elements
+              Agrupar i desagrupar privilegis
+              Assignar i eliminar privilegis a usuaris
+              Assignar i eliminar grups de privilegis a usuaris
+              Crear vistes personalitzades per a cada tipus d'usuari
+              Garantir el compliment dels requisits de seguretat
+              Tractament de CID en BBDD
+              Confidencialitat => Encriptació . Auditoria
+              Integritat  =>  Restriccions . Transaccions
+              Disponibilitat  =>  Copies de seguretat . Recuperació
+              Normativa vigent en matèria de dades personals
+              
+              ">
+                <p>UD 3 Usuaris i Privilegis</p>
+              </a>
+       
+          
+              <a href="automatitzacio-tasques.html" class="card" title="Automatització de tasques dins del SGBD.
+              Reconéixer la importància d'automatitzar tasques administratives.
+              Descriure els diferents mètodes d'execució de guions.
+              Identificar les eines disponibles per redactar guions.
+              Definir i utilitzar guions per automatitzar tasques.
+              Identificar els esdeveniments susceptibles d'activar disparadors.
+              Definir disparadors.
+              Fer servir estructures de control de flux.
+              Adoptar mesures per mantenir la integritat i la consistència de la informació.
+              
+              ">
+                <p>UD 4 Automatització de Tasques</p>
+              </a>
+            
+              <a href="optimitzacio-sgbd.html" class="card" title="Optimització i millora del rendiment dels SGBD.
+              Identificar les eines de monitoratge disponibles per al sistema gestor.
+              Descriure els avantatges i inconvenients de la creació d'índexs.
+              Crear índexs en taules i vistes.
+              Optimitzar l'estructura de la base de dades.
+              Optimitzar els recursos del sistema gestor.
+              Obtindre informació sobre el rendiment de les consultes per a la seua optimització.
+              Programar alertes de rendiment.
+              Realitzar modificacions en la configuració del sistema operatiu per a millorar el rendiment del gestor. 
+              
+              
+              ">
+                <p>UD 5 Optimització del SGBD</p>
+              </a>
+           
+              <a href="disponibilitat-sgbd.html" class="card" title="Garantir la disponibilitat del sistema de gestió de bases de dades.
+              Reconeixer la utilitat de les bases de dades distribuïdes.
+              Descriure les diverses polítiques de fragmentació de la informació.
+              Implantar una base de dades distribuïda homogènia.
+              Crear una base de dades distribuïda mitjançant la integració d'un conjunt de bases de dades preexistents.
+              Configurar un node mestre i diversos esclaus per dur a terme la replicació del primer.
+              Configurar un sistema de replicació en cadena.
+              Comprovar l'efecte de la parada de determinats nodes sobre els sistemes distribuïts i els replicats.
+              
+              ">
+                <p>UD 6 Disponibilitat de SGBD</p>
+              </a>
+
+          </div>
+      </section>
+            
+      
+  </main>
+
+  <footer>
+  <p style="font-family: 'CCSymbols', sans-serif; font-size:larger;" >
+    2026 - Enrique Iborra - Llicència:
+     <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">&#x1F16D; &#x1F16F; &#x1F10E; &#x1F10F;</a> 
+     - Mòdul ASGBD - CFGS ASIX - Família Informàtica i Comunicacions 
+  </p>
+    
+  </footer>
+
+  <script>
+// Comprova i aplica el tema preferit en carregar
+window.addEventListener('DOMContentLoaded', () => {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    document.querySelector('header').classList.add('dark-mode');
+    document.querySelector('footer').classList.add('dark-mode');
+    document.querySelector('.dark-mode-toggle').textContent = '☀️';
+  }
+});
+
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    // Animació quan es fa scroll
+    const sections = document.querySelectorAll('section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    sections.forEach(section => {
+      observer.observe(section);
+    });
+
+    function toggleDarkMode() {
+  // Alternar la classe dark-mode al body
+  document.body.classList.toggle('dark-mode');
+
+  // També podem alternar la classe dark-mode al header i al footer per aconseguir un canvi més complet
+  const header = document.querySelector('header');
+  const footer = document.querySelector('footer');
+
+  header.classList.toggle('dark-mode');
+  footer.classList.toggle('dark-mode');
+  
+  // Canviar l'icona del botó segons el mode
+  const icon = document.querySelector('.dark-mode-toggle');
+  if (document.body.classList.contains('dark-mode')) {
+    icon.textContent = '☀️';  // Icona de mode clar
+  } else {
+    icon.textContent = '🌙';  // Icona de mode fosc
+  }
+
+  // animar la icona després de canviar-la
+  icon.classList.add('animate');
+  setTimeout(() => icon.classList.remove('animate'), 500);
+
+
+  // Guarda en localstorage (browser) el tema per enrecordar-se d'ell
+  if (document.body.classList.contains('dark-mode')) {
+  localStorage.setItem('theme', 'dark');
+} else {
+  localStorage.setItem('theme', 'light');
+}
+
+}
+
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const darkModeBtn = document.getElementById("darkModeBtn");
+
+  menuBtn.addEventListener("click", () => {
+    mobileMenu.classList.toggle("open");
+  });
+
+  darkModeBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+  });
+
+  // Tancar menú quan es fa clic a un link (opcional però elegant)
+  mobileMenu.addEventListener("click", (e) => {
+    if (e.target.tagName === "A") {
+      mobileMenu.classList.remove("open");
+    }
+  });
+
+  </script>
+</body>
+</html>

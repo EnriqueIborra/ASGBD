@@ -32,8 +32,7 @@
     <h2> Monitoratge del Sistema Gestor de Bases de Dades (SGBD)</h2>
   
     <h3> Què és el monitoratge?</h3>
-    <p>
-      El <strong>monitoratge</strong> és el procés de controlar el funcionament del sistema gestor, detectant 
+    <p>El <strong>monitoratge</strong> és el procés de controlar el funcionament del sistema gestor, detectant 
       possibles errors o situacions que puguin afectar el rendiment. 
       Ha de ser <strong>poc intrusiu</strong>, per tal de no interferir en el funcionament normal del sistema.
     </p>
@@ -64,8 +63,7 @@
     </ul>
   
     <h3>📝 Registre d’errors (fitxers de logs)</h3>
-    <p>
-      Registra activitats com arrencades, aturades, errors, consultes lentes, etc.
+    <p>  Registra activitats com arrencades, aturades, errors, consultes lentes, etc.
     </p>
     <ul>
       <li> <strong>Error</strong>: problemes greus</li>
@@ -82,8 +80,7 @@
     </ul>
   
     <h3>📚 Diccionari de Dades (DD)</h3>
-    <p>
-      Conjunt de vistes com <code>v$session</code>, <code>v$sqlarea</code>, <code>v$diag_info</code>, etc. que permeten:
+    <p> Conjunt de vistes com <code>v$session</code>, <code>v$sqlarea</code>, <code>v$diag_info</code>, etc. que permeten:
     </p>
     <ul>
       <li>Consultar qui està connectat i què executa</li>
@@ -92,11 +89,9 @@
     </ul>
   
     <p> Exemple:</p>
-    <pre>
-  SELECT * FROM v$session;
-  SELECT * FROM v$sqlarea;
-  SELECT * FROM v$diag_info;  -- Registre d'errors
-    </pre>
+    <pre>SELECT * FROM v$session;
+SELECT * FROM v$sqlarea;
+SELECT * FROM v$diag_info;  -- Registre d'errors      </pre>
   
     <h3>🖥️ Monitoratge gràfic (SQL Developer, TOAD...)</h3>
     <p>⚠️ Les ferramentes gràfiques consumeixen més recursos que les consultes al DD<br>
@@ -238,15 +233,13 @@
     </ul>
   
     <h3> Versions millorades</h3>
-    <pre>
-  -- Evitar funcions sobre columnes
-  WHERE data >= TO_DATE('01/01/2023', 'DD/MM/YYYY')
-  
-  -- Substituir subconsulta per JOIN
-  SELECT a.nom, c.nom_curs
-  FROM alumnes a
-  JOIN cursos c ON a.curs_id = c.id;
-    </pre>
+    <pre>-- Evitar funcions sobre columnes
+WHERE data >= TO_DATE('01/01/2023', 'DD/MM/YYYY')
+
+-- Substituir subconsulta per JOIN
+SELECT a.nom, c.nom_curs
+FROM alumnes a
+JOIN cursos c ON a.curs_id = c.id;      </pre>
   
     <h3> Altres consells d’optimització</h3>
     <ul>
@@ -272,8 +265,7 @@
     <h2> Optimització en Oracle</h2>
   
      <h3>📈 L'optimitzador</h3>
-    <p>
-      Oracle utilitza un component anomenat <strong>optimitzador</strong> per determinar el millor 
+    <p> Oracle utilitza un component anomenat <strong>optimitzador</strong> per determinar el millor 
       pla d’execució per a una consulta SQL.
       L’objectiu és minimitzar el temps d’execució i l’ús de recursos.
     </p>
@@ -284,14 +276,12 @@
       per decidir l’estratègia d’execució.     </p>
   
     <h4> Com generar estadístiques</h4>
-    <pre>
-    EXEC DBMS_STATS.GATHER_TABLE_STATS('USUARI', 'TAULA');
-    -- Actualitzar estadístiques
-    EXEC DBMS_STATS.GATHER_TABLE_STATS(ownname=>'USUARI', tabname=>'ALUMNES');
-    --
-    execute dbms_stats.gather_table_stats(‘esquema’.’taula’);
-    execute dbms_stats.gather_schema_stats(‘esquema’);  
-    </pre>
+    <pre>EXEC DBMS_STATS.GATHER_TABLE_STATS('USUARI', 'TAULA');
+-- Actualitzar estadístiques
+EXEC DBMS_STATS.GATHER_TABLE_STATS(ownname=>'USUARI', tabname=>'ALUMNES');
+--
+execute dbms_stats.gather_table_stats(‘esquema’.’taula’);
+execute dbms_stats.gather_schema_stats(‘esquema’);      </pre>
     
     <p><strong>⚠️ Per tant, és molt importat crear tasques programades que realitzen esta 
       actualització fora d'hores de càrrega de treball</strong></p>    
@@ -299,19 +289,16 @@
     <h4>També es poden automatitzar mitjançant tasques de manteniment o recollida automàtica de l’Oracle Scheduler.</h4>
   
     <h3>🧪 EXPLAIN PLAN</h3>
-    <p>
-      Aquesta ordre permet visualitzar el pla que Oracle seguirà per executar una consulta. 
+    <p> Aquesta ordre permet visualitzar el pla que Oracle seguirà per executar una consulta. 
       Mostra si s’utilitzen índexs, escaneigs complets, joins, etc.
       Ajuda a detectar consultes lentes o mal optimitzades.
     </p>
    
     <h4> Exemple d’ús</h4>
-    <pre>
-  EXPLAIN PLAN FOR
-  SELECT * FROM alumnes WHERE edat > 18;
-  
-  SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
-    </pre>
+    <pre>EXPLAIN PLAN FOR
+SELECT * FROM alumnes WHERE edat > 18;
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);      </pre>
   
     <h4> Resultats comuns:</h4>
     <ul>
@@ -354,16 +341,12 @@
   
     <h3> Exemple de consulta optimitzada</h3>
     <p>Consulta original (lenta):</p>
-    <pre>
-  SELECT * FROM alumnes WHERE TO_CHAR(data_naixement, 'YYYY') = '2005';
-    </pre>
+    <pre>SELECT * FROM alumnes WHERE TO_CHAR(data_naixement, 'YYYY') = '2005';      </pre>
   
     <p>Versió optimitzada:</p>
-    <pre>
-  SELECT * FROM alumnes
-  WHERE data_naixement BETWEEN TO_DATE('01/01/2005', 'DD/MM/YYYY')
-                          AND TO_DATE('31/12/2005', 'DD/MM/YYYY');
-    </pre>
+    <pre>SELECT * FROM alumnes
+WHERE data_naixement BETWEEN TO_DATE('01/01/2005', 'DD/MM/YYYY')
+                        AND TO_DATE('31/12/2005', 'DD/MM/YYYY');      </pre>
   
     <h3>💬 Conclusió</h3>
     <p>
@@ -377,22 +360,18 @@
     <h2> Eines d'optimització en Oracle</h2>
   
     <h3>🎯 Objectiu</h3>
-    <p>
-      Aquestes eines permeten <strong>analitzar el rendiment</strong> de consultes SQL, sessions i càrregues del sistema, ajudant a diagnosticar colls d’ampolla i a optimitzar els accessos a dades.
+    <p>      Aquestes eines permeten <strong>analitzar el rendiment</strong> de consultes SQL, sessions i càrregues del sistema, ajudant a diagnosticar colls d’ampolla i a optimitzar els accessos a dades.
     </p>
   
     <hr>
   
     <h3> 1. EXPLAIN PLAN</h3>
-    <p>
-      Mostra el pla d’execució previst per Oracle per a una consulta. Ajuda a detectar si s’utilitzen índexs o si es fa un escaneig complet de taula.
+    <p>      Mostra el pla d’execució previst per Oracle per a una consulta. Ajuda a detectar si s’utilitzen índexs o si es fa un escaneig complet de taula.
     </p>
-    <pre>
-  EXPLAIN PLAN FOR
-  SELECT * FROM alumnes WHERE edat > 18;
-  
-  SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
-    </pre>
+    <pre>EXPLAIN PLAN FOR
+SELECT * FROM alumnes WHERE edat > 18;
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);      </pre>
   
     <p><strong>Sortides habituals:</strong></p>
     <ul>
@@ -404,32 +383,22 @@
     <hr>
   
     <h3> 2. DBMS_XPLAN</h3>
-    <p>
-      Paquet que permet mostrar el pla d’execució amb més claredat, incloent cost, línies estimades, filtre aplicat, etc.
-    </p>
+    <p>      Paquet que permet mostrar el pla d’execució amb més claredat, incloent cost, línies estimades, filtre aplicat, etc.      </p>
   
     <h4> Exemple:</h4>
-    <pre>
-  SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
-    </pre>
+    <pre>SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);      </pre>
   
     <p>Per veure el pla real d’una consulta ja executada:</p>
-    <pre>
-  SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR(NULL, NULL, 'ALLSTATS LAST'));
-    </pre>
+    <pre>SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR(NULL, NULL, 'ALLSTATS LAST'));      </pre>
   
     <hr>
   
     <h3> 3. AUTOTRACE</h3>
-    <p>
-      Mostra automàticament el pla d’execució i estadístiques després d’executar una consulta.
-    </p>
+    <p>      Mostra automàticament el pla d’execució i estadístiques després d’executar una consulta.    </p>
   
     <h4> Activar AUTOTRACE a SQL*Plus:</h4>
-    <pre>
-  SET AUTOTRACE ON;
-  SELECT * FROM alumnes WHERE edat > 18;
-    </pre>
+    <pre>SET AUTOTRACE ON;
+SELECT * FROM alumnes WHERE edat > 18;      </pre>
   
     <p><strong>Resultat:</strong> mostra el cost, nombre de lectures, línies retornades i accés utilitzat.</p>
   
@@ -441,9 +410,7 @@
     </p>
   
     <h4>📝 Informes AWR:</h4>
-    <pre>
-  @$ORACLE_HOME/rdbms/admin/awrrpt.sql
-    </pre>
+    <pre>@$ORACLE_HOME/rdbms/admin/awrrpt.sql      </pre>
   
     <ul>
       <li>Comparativa entre snapshots</li>
@@ -460,11 +427,9 @@
     </p>
   
     <h4>🔍 Exemple de consulta ASH:</h4>
-    <pre>
-  SELECT sql_id, session_id, wait_class, event, sample_time
-  FROM v$active_session_history
-  WHERE sample_time > SYSDATE - 1/24;
-    </pre>
+    <pre>SELECT sql_id, session_id, wait_class, event, sample_time
+FROM v$active_session_history
+WHERE sample_time > SYSDATE - 1/24;      </pre>
   
     <p><strong>Requereix:</strong> llicència Oracle Enterprise Edition + Pack Diagnòstic</p>
   
@@ -521,30 +486,25 @@
   
     <h4>🧰 Com detectar la fragmentació</h4>
     <pre><code>ANALYZE TABLE nom_taula COMPUTE STATISTICS;</code></pre>
-    <pre><code>
-  SELECT table_name, blocks, empty_blocks, avg_space
-  FROM dba_tables
-  WHERE table_name = 'NOM_TAULA';
-    </code></pre>
+    <pre><code>SELECT table_name, blocks, empty_blocks, avg_space
+FROM dba_tables
+WHERE table_name = 'NOM_TAULA';      </code></pre>
     <p>També pots consultar les vistes <code>DBA_SEGMENTS</code> i <code>DBA_EXTENTS</code>.</p>
   
     <h4>🛠️ Solucions per reduir o eliminar la fragmentació</h4>
     <ul>
       <li>
         <strong>Reorganitzar la taula:</strong>
-        <pre><code>
-          ALTER TABLE nom_taula MOVE;
-          alter table nom_taula move [compress];   </code></pre>
+        <pre><code>ALTER TABLE nom_taula MOVE;
+alter table nom_taula move [compress];   </code></pre>
       </li>
       <li>
         <strong>Exportar i importar:</strong> amb <code>exp/imp</code> o <code>DataPump</code>.
       </li>
       <li>
         <strong>Shrink de taules:</strong>
-        <pre><code>
-  ALTER TABLE nom_taula ENABLE ROW MOVEMENT;
-  ALTER TABLE nom_taula SHRINK SPACE;
-        </code></pre>
+        <pre><code>ALTER TABLE nom_taula ENABLE ROW MOVEMENT;
+ALTER TABLE nom_taula SHRINK SPACE;           </code></pre>
       </li>
       <li>
         <strong>Rebuild d'índexs:</strong>
@@ -564,24 +524,19 @@
 <p>   Els <strong>índexs</strong> permeten accedir més ràpidament a dades. Cal usar-los correctament: </p>
  
 <h4>🔧 Crear un índex</h4>
-<pre>
-  CREATE INDEX idx_nom ON alumnes(nom);
-</pre>
+<pre>CREATE INDEX idx_nom ON alumnes(nom);  </pre>
 
-<pre>
-  create index nom_ind on nom_taula (camp1, camp2,..);
-  alter index nom_ind rebuild;</pre>
+<pre>create index nom_ind on nom_taula (camp1, camp2,..);
+alter index nom_ind rebuild;</pre>
 
   <p>Quan es crea una taula amb una clau primaria o unique, ORACLE crea un índex automàticament</p>
   <h4>Tipus índex</h4>
-  <pre>
-    create [bitmap | unique] index nom_ind on nom_taula (camp1, camp2,..);
-    alter index nom_ind rebuild;   </pre>
+  <pre>create [bitmap | unique] index nom_ind on nom_taula (camp1, camp2,..);
+alter index nom_ind rebuild;   </pre>
 
   <h4>Com explorar els índex (en DD)</h4>  
-  <pre>
-    select index_name , index_type ,table_name , tablespace_name , secondary 
-    from all_indexes where table_name = 'TAULA_A_CONSULTAR';      </pre>
+  <pre>select index_name , index_type ,table_name , tablespace_name , secondary 
+from all_indexes where table_name = 'TAULA_A_CONSULTAR';      </pre>
 
 <h2>Particionament</h2>
 <pre>create table ....( ) partition by range(nomcamp) (....);</pre>
@@ -593,7 +548,7 @@
 
     <h4> Per a què serveix?</h4>
 <p>Per exemple imaginem una taula de factures, on tenim el detall de la nostra facturació
-   al llarg de 6 anys, 2017, 2018… 2022, si volguérem fer:</p>
+   al llarg de 9 anys, 2017, 2018… 2025, si volguérem fer:</p>
 <p><code> SELECT SUM(total_fac) FROM facturacio WHERE any = 2019;</code></p>
 <p>En aquest exemple s'hauria de recórrer tota la taula (imaginem que parlem de 30 milions de registres en total,
    és molt no?), per aquest motiu un criteri possible per a particionar la taula seria per l'any de la

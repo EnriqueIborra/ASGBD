@@ -226,7 +226,7 @@ END;
 
     <h3> Diferència amb procediments</h3>
     <p>Els blocs anònims no es poden reutilitzar directament, ja que no tenen nom. (Si es poden guardar en un fitxer extern, i despres recuperar (obrir), i tornar a executar).
-      Per a reutilitzar codi, millor usar procediments o funcions.</p>
+      Per a reutilitzar codi, millor usar procediments o funcions, ja que queden emmagatzemats dins del SGBD.</p>
   
     <h3>🧪 Prova-ho!</h3>
     <p>
@@ -234,7 +234,7 @@ END;
     </p>
     <pre>
   DECLARE
-     vNom VARCHAR2(20) := 'Ada';
+     vNom VARCHAR2(20) := '&DimeNom';
   BEGIN
      DBMS_OUTPUT.PUT_LINE('Hola ' || vNom || '! Bon dia!');
   END;
@@ -256,7 +256,7 @@ END;
   <section id="variables">
     <h2> 🗃️ Comentaris, Variables i Operacions en PL/SQL</h2>
     <h2>Comentaris</h2>
-    <p>L'ùs de comentaris és un recurs per poder documentar el codi. Com s'ha dit abans, és molt importat documentar el codi</p>
+    <p>L'ùs de comentaris és un recurs per poder documentar el codi. Com s'ha dit abans, és molt important documentar el codi</p>
     <pre>
       --  En dos guionets es posa un comentari d'una línia.
       /*  En la barra i l'asterisc es pot
@@ -1556,7 +1556,7 @@ END;   </pre>
 <h4> Paràmetre  <code>repeat_interval</code> </h4>
 <pre>FREQ=MONTHLY → S'executa un cop al mes. (Defineix la repetició mensual)
 BYMONTHDAY=1 El dia 1 de cada mes
-BYDAY=TU → Els dimarts.  ( abreviatures MO, TU, WE, TH, FR, SA i SU ).
+BYDAY=TU → Els dimarts.  ( abreviatures MON, TUE, WED, THU, FRI, SAT i SUN ).
 BYSETPOS=1 → Només el primer dimarts del mes.
 BYHOUR=1; BYMINUTE=5 → A la 01:05 AM.    </pre>
 <p>FREQ={ DAILY | HOURLY | MINUTELY | WEEKLY | MONTHLY | YEARLY};
@@ -1577,11 +1577,11 @@ Cada 6 hores
 REPEAT_INTERVAL => 'FREQ=HOURLY; INTERVAL=6;'
 Cada tres mesos
 REPEAT_INTERVAL => 'FREQ=YEARLY; BYMONTH=JA,AP,JL,OC'  
-     (abreviatures dels mesos: JA, FE, MR, AP, MA, JU, JL, AU, SE, OC, NO , DE)   </pre>
+     (abreviatures dels mesos: JAN, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV , DEC)   </pre>
 
   <p class="alert">En Oracle DBMS_SCHEDULER, si no s’indica l’hora (BYHOUR, BYMINUTE, BYSECOND) en el REPEAT_INTERVAL, s’utilitza l’hora del START_DATE del job.</p>
   <p>Regla general: Quan no s’indica un component temporal al REPEAT_INTERVAL, Oracle el pren del START_DATE</p>
-
+  <p>==> Documentació oficial d'ORACLE per <a href="https://docs.oracle.com/en/database/oracle/oracle-database/21/arpls/DBMS_SCHEDULER.html#GUID-73622B78-EFF4-4D06-92F5-E358AB2D58F3">.Calendaring Syntax.</a></p>
 
   <h4>📘 Consultar jobs en el DD</h4>
   <pre>SELECT job_name, state FROM user_scheduler_jobs;  

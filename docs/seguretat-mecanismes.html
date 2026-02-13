@@ -60,16 +60,17 @@
         <li><strong>TDE (Transparent Data Encryption)</strong>: xifrat automàtic per columnes o tablespaces</li>
     </ul>
 
-    <h3> DBMS_CRYPTO (manual)</h3>
+    <h3> DBMS_CRYPTO (xifratge manual)</h3>
     <p>Paquet per fer xifrat, hash i autenticació.</p>
     <ul>
         <li><code>DBMS_CRYPTO.ENCRYPT()</code> / <code>DECRYPT()</code></li>
-        <li><code>STANDARD_HASH</code></li>
         <li><code>DBMS_CRYPTO.HASH()</code></li>
     </ul>
+    <p>Fora del paquet <code>DBMS_CRYPTO</code> la funció  <code>STANDARD_HASH </code> és una funció incorporada en PL/SQL, com SYSDATE, i permet calcular HASH més fàcilment </p>
 
     <h4> Exemple: fer un hash SHA-1 d’una contrasenya</h4>
     <p>(Les funcions HASH no xifren, sols resumeixen. No es poden desxifrar)</p>
+    <p>Exemple d'ús de la funció STANDARD_HASH, incorparada en PL/SQL </p>
     <pre><code>SELECT STANDARD_HASH('contrasenya', 'SHA1') FROM dual;   --molt dèbil actualment  
 -- altre tipus de hash  
 SELECT STANDARD_HASH('contrasenya', 'SHA256') FROM dual;        </code></pre>
@@ -78,6 +79,9 @@ SELECT STANDARD_HASH('contrasenya', 'SHA256') FROM dual;        </code></pre>
 <pre><code>SELECT RAWTOHEX(  DBMS_CRYPTO.HASH(HEXTORAW('1231'),3) ) FROM dual;
 SELECT RAWTOHEX(  DBMS_CRYPTO.HASH(UTL_I18N.STRING_TO_RAW('SECRETA'),4) ) FROM dual;  
 -- On el num del segon parametre =>  type 3:SHA-1  type 4:SHA256  type 5:SHA384  type 6:SHA512  </code></pre>
+<p>Per fer una bona gestió de hash de contrasenyes, cal combinar:   Usar SHA-512, Afegir salt, i Afegir iteracions (hash lento),
+  o utilitzar funcions externes, des de la capa d'aplicació , com bcrypt, scrypt, argon2 o PBKDF2. Funcions pensades especialment per contrasenyes !  </p>
+
 <h4>Exemple de xifrat amb AES</h4>
 <pre><code>SELECT RAWTOHEX(
          DBMS_CRYPTO.ENCRYPT(
@@ -95,11 +99,11 @@ FROM dual;
     <h4> Convertir entre formats:</h4>
     <ul>
         <li><code>UTL_I18N.STRING_TO_RAW</code> → text a RAW</li>
-        <li><code>RAWTOHEX</code> → RAW a hexadecimal</li>
+        <li><code>RAWTOHEX</code> → RAW a hexadecimal  ( i <code>HEXTORAW</code> al revés)</li>
         <li><code>UTL_I18N.RAW_TO_CHAR</code> → RAW a text</li>
     </ul>
 
-    <h3>💾 TDE – Transparent Data Encryption</h3>
+    <hr><h3>💾 TDE – Transparent Data Encryption</h3>
     <p>Xifrat automàtic a nivell de disc. No cal modificar el codi de les aplicacions.</p>
 
     <h4> Components:</h4>
@@ -170,7 +174,7 @@ FROM dual;
     </table>
   
     <h3>🛠️ Activar auditoria estàndard (tradicional)</h3>
-    <p>Des d'Oracle23ai no es pot fer servir.</p>
+    <p>Des d'Oracle23ai no es pot fer servir. (deprecated)</p>
   <!--  
     <pre>
 -- Activar l’auditoria global
@@ -363,7 +367,7 @@ DROP AUDIT POLICY nom_politica;</pre>
       
         <h3> Integritat d'entitat</h3>
         <p>
-          Es garanteix mitjançant l’ús de <code>PRIMARY KEY</code>, que assegura que cada fila sigui única i no nul·la.
+          Es garanteix mitjançant l’ús de <code>PRIMARY KEY</code>, que assegura que cada fila siga única i no nul·la.
         </p>
         <pre>CREATE TABLE alumnes (
   id NUMBER PRIMARY KEY,
@@ -402,7 +406,7 @@ CREATE TABLE alumnes (
 );           </pre>
       
         <p>
-          Això garanteix que <code>nom</code> sempre tindrà valor, <code>edat</code> sigui ≥ 16 i <code>pais</code> tindrà un valor per defecte.
+          Això garanteix que <code>nom</code> sempre tindrà valor, <code>edat</code> siga ≥ 16 i <code>pais</code> tindrà un valor per defecte.
         </p>
       
         <h3> Integritat d’usuari</h3>
@@ -420,7 +424,7 @@ CREATE TABLE alumnes (
       
         <h3> Conclusió</h3>
         <p>
-          Mantenir la integritat de les dades és essencial per garantir que el sistema sigui <strong>fiable, coherent i funcional</strong>.  
+          Mantenir la integritat de les dades és essencial per garantir que el sistema siga <strong>fiable, coherent i funcional</strong>.  
           Oracle ofereix múltiples mecanismes per implementar integritat a nivell físic, lògic i d’aplicació.
         </p>
       
@@ -526,7 +530,7 @@ ROLLBACK TO punt1; -- desfà només fins al punt1           </pre>
 
         <h3> Conclusió</h3>
         <p>
-          El control de transaccions és una eina fonamental per garantir que el sistema de base de dades sigui <strong>segur, coherent i robust</strong>.
+          El control de transaccions és una eina fonamental per garantir que el sistema de base de dades siga <strong>segur, coherent i robust</strong>.
           Oracle proporciona instruccions clares per controlar de forma manual i segura l’execució de canvis en les dades.
         </p>
 
@@ -714,10 +718,36 @@ DUMPFILE=exp2.dmp
 DIRECTORY=dirdump
 LOGFILE=exp2.log            </pre>
 
+<!--
+Connectat a la PDB
+expdp system@PDB1 FULL=YES
+👉 Exporta TOT el contingut lògic d’aquella PDB,  
+Tots els esquemes
+Tots els objectes
+Usuaris i privilegis dins la PDB
+
+❌ No inclou:
+Altres PDBs
+Objectes del CDB root
+Metadata comuna del CDB
+
+========================================================
+Connectat al CDB$ROOT
+expdp system@CDB FULL=YES
+👉 Exporta:
+TOT el CDB
+Root
+TOTES les PDBs
+Metadata comuna
+
+⚠️ Molt més pesat
+⚠️ Normalment només per migracions completes de CDB
+
+-->
+
        <hr> <h3>3. 🔄 RMAN (Recovery Manager)</h3>
-        <p>
-          Eina oficial d'Oracle per fer backups i recuperar dades. Pot treballar amb còpies incrementals, verificar integritat i automatitzar tasques.
-        </p>
+        <p>   Eina oficial d'Oracle per fer backups i recuperar dades. Pot treballar amb còpies incrementals, verificar integritat i automatitzar tasques.        </p>
+        <p class="alert">RMAN necessita ARCHIVELOG activat per funcionar correctament</p>
         <pre>
       -- Exemple: backup complet
       RMAN> BACKUP DATABASE;
@@ -922,7 +952,7 @@ LOGFILE=exp2.log            </pre>
       
         <h3>📊 Sancions per incompliment</h3>
         <p>
-          El RGPD preveu sancions de fins al <strong>4% del volum de negoci anual global</strong> o <strong>20 milions d’euros</strong>, segons quina sigui més elevada.
+          El RGPD preveu sancions de fins al <strong>4% del volum de negoci anual global</strong> o <strong>20 milions d’euros</strong>, segons quina siga més elevada.
         </p>
       
         <h3> Conclusió</h3>

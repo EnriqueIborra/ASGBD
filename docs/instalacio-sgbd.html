@@ -9,8 +9,7 @@
 <body>
 
 <header>
-  <a href="index.html">
-    <!--<img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo"> -->
+  <a href="index.html">  
     <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
   </a>
   <h1>ASGBD   -    Instal·lació Oracle</h1>
@@ -188,6 +187,7 @@
         <li><strong>OLAP (Online Analytical Processing) – Analítics / Data Warehouse</strong>
             <ul>
                 <li>Optimitzats per a consultes complexes i anàlisi de grans volums de dades.</li>
+                <li>Requereix gran quantitat de memòria</li>
                 <li>Suporten operacions com agregació, slicing, dicing, drill-down.</li>
                 <li>Usats en intel·ligència de negoci, informes, dashboards.</li>
                 <li>Exemples: Amazon Redshift, Snowflake, Google BigQuery, Microsoft Synapse, Teradata.</li>
@@ -426,7 +426,7 @@
       <li><strong>Express Edition (XE)</strong> – ✅ Gratuïta! Limitada en recursos (1 CPU, 2GB RAM, 12GB espai).</li>
       <li><strong>Personal Edition (PE)</strong> – Orientada a desenvolupadors, només disponible en Windows.</li>
       <li><strong>Lite Edition (LE)</strong> – Edició lleugera per a dispositius mòbils (molt poc utilitzada).</li>
-      <li><strong>Oracle Database 23ai Free</strong> – ✅ Versió moderna gratuïta per a educació i proves, successora de XE.</li>
+      <li><strong>Oracle Database 23ai/26ai Free</strong> – ✅ Versió moderna gratuïta per a educació i proves, successora de XE.</li>
     </ul>
   
     <h3>☁️ Edicions Cloud</h3>
@@ -487,6 +487,7 @@
       <li> <strong>Oracle 19c</strong> – Versió LTS (Long Term Support), molt estable i actual</li>
       <li> <strong>Oracle 21c</strong> – Exclusivament multitenant (no es permet el model tradicional)</li>
       <li> <strong>Oracle 23ai</strong> – Orientada a AI i machine learning, versió més moderna i gratuïta disponible com a “Oracle Free”</li>
+      <li> <strong>Oracle 26ai</strong> – Absorbeix a la 23ai, amb millores “Oracle Free”, amb suport a llarg termini (Long Term Support) fins al 2031.</li>
     </ul>
   
 
@@ -776,10 +777,10 @@
     <h3>📁 Exemples de rutes segons el sistema operatiu</h3>
   
     <p><strong>🖥️ En Windows:</strong></p>
-    <pre>C:\app\oracle\product\21.0.0\dbhome_1</pre>
+    <pre>C:\app\oracle\product\21.0.0.0\dbhome_1</pre>
   
     <p><strong>🐧 En Unix/Linux:</strong></p>
-    <pre>/u01/app/oracle/product/21.0.0/dbhome_1</pre>
+    <pre>/u01/app/oracle/product/21.0.0.0/dbhome_1</pre>
   
     <p>On:</p>
     <ul>
@@ -1082,7 +1083,7 @@ SELECT * FROM DBA_PDBS;     </pre>
       <li> Utilitzant SQL Developer</li>
       <li> Utilitzant  Visual Studio Code + Extensió SQL Developer</li>
       <li> Utilitzant DBeaver ( multi-SGBD sw lliure)</li>
-      <li> Utilitzant TOAD  (multi-SGBD propietari)</li>
+      <li> Utilitzant TOAD  (multi-SGBD propietari / privatiu)</li>
       <li> Utilitzant SQLcl</li>
       <li> Utilitzant ORDS</li>  
     </ul>
@@ -1236,12 +1237,6 @@ SELECT * FROM DBA_PDBS;     </pre>
       <li> Crear i configurar <strong>listeners</strong> amb <code>netca</code> i comprovar connexions</li>
     </ul>
   
-    <h3> Altres competències</h3>
-    <ul>
-      <li> Diferenciar entre <strong>Datawarehouse, RAC i base de dades d’instància única</strong></li>
-      <li> Localitzar fitxers principals: datafiles, logs, arxius de configuració</li>
-      <li> Comprendre el <strong>rol de l’usuari instal·lador</strong> i els permisos associats</li>
-    </ul>
   
     <p>🎓 Amb tots aquests coneixements, ja estàs preparat/ada per començar la unitat dos. Configuració d'un SGBD </p>
   </section>

@@ -144,13 +144,17 @@ source ~/.bashrc       </pre>
       EN EL CLIENT
       <li><code>%ORACLE_BASE%/homes/%ORACLE_HOME_NAME%/network/admin/tnsnames.ora</code></li>
     </ul>    
-     
+    <h3> Fitxer tnsnames.ora</h3>
+    <p>A qui connectar!. És un fitxer de configuració de text pla que utilitzen els clients de bases 
+      de dades Oracle per a saber com connectar-se a una base de dades específica.</p> 
+      <p>Podríem dir que és com la "llista de contactes" o l'agenda telefònica de la teva base de dades:
+         tu li dones un nom fàcil (un àlies) i el fitxer li diu a l'ordinador quina és l'adreça IP, el port i el nom del servei real.</p>
+
     <h3> Fitxer sqlnet.ora</h3>
-    <p>Defineix l'ordre de cerca per resoldre noms:</p>
-    <pre>
-  SQLNET.AUTHENTICATION_SERVICES = (NONE)
-  NAMES.DIRECTORY_PATH = (TNSNAMES, EZCONNECT)
-    </pre>
+    <p>Com connectar!. És el llibre de regles o el perfil de configuració de la xarxa d'Oracle. Es trova en el servidor i diu com s'ha 
+      de comportar el client o el servidor durant la connexió. Defineix paràmetres de seguretat, prioritats i temps d'espera. </p>
+    <pre>SQLNET.AUTHENTICATION_SERVICES = (NONE)
+NAMES.DIRECTORY_PATH = (TNSNAMES, EZCONNECT)      </pre>
   
     <h3>🛠️ Eines per configurar la xarxa</h3>
     <ul>

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>📦 Instal·lació PostgreSQL</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
+</head>
+<body>
+
+<header>
+  <a href="./index.html">
+    
+    <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
+  </a>
+  <h1>ASGBD   -    Instal·lació PostgreSQL 
+    <img src="imgs/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 40px; ">
+  </h1>
+</header>
+
+<nav>
+  <h3>Índex</h3>
+  <a href="#intro">Introducció</a>
+  <a href="#versions">Versions</a>
+  <a href="#edicions">Edicions</a>
+  <a href="#requisits">Requisits</a>
+  <a href="#instancia">Instància</a>
+  <a href="#arquitectura">Arquitectura</a>
+  <a href="#estruc">Estructura carpetes</a>
+  <a href="#instalacio">Instal·lació PostgreSQL</a>
+  <a href="#acces">Accés a PostgreSQL</a>
+  <!--<a href="#altres-recursos">Altres Recursos</a>-->
+</nav>
+
+<main>
+  <section id="intro">
+    <h1>Instal·lació d'un SGBD</h1> <hr>
+    <h2>Definicions</h2>
+
+    <h3>Què és un DBA</h3>
+    <p>
+        La figura del DBA fa referència a la persona o a l’equip de persones responsables d’assegurar 
+        la disponibilitat de les dades d’una organització i l’accés a les mateixes de manera òptima.
+         Serà el responsable de tot el cicle de vida del sistema d’informació.
+    </p>
+
+    <h4><u>Tasques d’un DBA</u></h4>
+    <ul>
+        <li>Configurar el maquinari on s’instal·larà el SGBD</li>
+        <li>Configurar el sistema operatiu</li>
+        <li>Instal·lar i mantindre el SGBD</li>
+        <li>Crear i configurar bases de dades</li>
+        <li>Control d’usuaris i permisos</li>
+        <li>Gestió de la seguretat</li>
+        <li>Monitorar i optimitzar el rendiment de les bases de dades</li>
+        <li>Realitzar tasques de còpies de seguretat i recuperació</li>
+    </ul>
+
+    <h3>Què és un SGBD</h3>
+    <p>
+        Un SGBD és un conjunt de programes que permeten l’emmagatzematge, modificació i extracció de la informació d’una base de dades, a més de proporcionar ferramentes per a explotar, administrar i gestionar les bases de dades. 
+    </p>
+    <p>
+        En anglés DBMS o RDBMS (Data Base Management System).
+    </p>
+
+    <p><strong>Ranking DBMS:</strong> <a href="https://db-engines.com/en/ranking" target="_blank">https://db-engines.com/en/ranking</a></p>
+    <p>Contesta a les preguntes ...</p>
+    <div class="preg"><ul >
+        <li>Quants SGBD hi ha al rànquing</li>
+        <li>Dels 5 primers, quants són de codi obert</li>
+        <li>Els dos primers, a quina empresa pertanyen</li>
+        <li>Dels 7 primers, quins sistemes operatius suporten (fes una graella o taula)</li>
+        <li>Dels 7 primers, quins models de dades suporten (fes una graella o taula)</li>
+    </ul></div>
+ <hr>
+
+    <h2>Classificacions dels SGBD</h2>
+    <p>
+        Les classificacions dels Sistemes de Gestió de Bases de Dades (SGBD) poden organitzar-se en diverses categories segons la seua arquitectura, nombre d’usuaris, model de dades i el seu propòsit o tipus de càrrega de treball.
+    </p>
+
+    <h3>1. Segons el nombre d’usuaris</h3>
+    <ul>
+        <li><strong>Monousuari</strong>
+            <ul>
+                <li>Dissenyats per a ser utilitzats per un únic usuari alhora.</li>
+                <li>Exemple: Microsoft Access (en entorns personals o d’escriptori).</li>
+            </ul>
+        </li>
+        <li><strong>Multiusuari</strong>
+            <ul>
+                <li>Permeten que múltiples usuaris accedisquen i treballen simultàniament amb la base de dades.</li>
+                <li>Controlen l’accés concurrent i la integritat de les dades.</li>
+                <li>Exemples: MySQL, PostgreSQL, Oracle Database, SQL Server.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>2. Segons la seua arquitectura</h3>
+    <ul>
+        <li><strong>Centralitzats</strong>
+            <ul>
+                <li>Tota la base de dades s’emmagatzema i gestiona en un únic servidor.</li>
+                <li>Els usuaris accedeixen al SGBD a través d’una xarxa, però tot el processament ocorre al servidor central.</li>
+                <li>Més fàcils de mantindre, però poden ser un coll de botella i un punt únic de fallada.</li>
+            </ul>
+        </li>
+        <li><strong>Distribuïts</strong>
+            <ul>
+                <li>La base de dades està repartida en múltiples nodes (servidors).</li>
+                <li>Les dades poden estar replicades o fragmentades entre diferents ubicacions.</li>
+                <li>Més complexos, però ofereixen major disponibilitat i escalabilitat.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>3. Segons el model de dades (o tipus de base de dades)</h3>
+    <p>Aquests SGBD es classifiquen segons la forma en què estructuren i accedeixen a les dades:</p>
+    <ul>
+        <li><strong>Relacionals</strong>
+            <ul>
+                <li>Basats en taules amb files i columnes.</li>
+                <li>Estructura fixa (esquema definit).</li>
+                <li>Usen SQL.</li>
+                <li>Exemples: MySQL, PostgreSQL, Oracle.</li>
+            </ul>
+        </li>
+        <li><strong>Documentals</strong>
+            <ul>
+                <li>Emmagatzemen dades en forma de documents (normalment JSON, BSON, etc.).</li>
+                <li>Flexibles, ideals per a dades semi-estructurades.</li>
+                <li>Exemples: MongoDB, CouchDB. Són part de NoSQL.</li>
+            </ul>
+        </li>
+        <li><strong>De grafs</strong>
+            <ul>
+                <li>Optimitzats per a representar relacions complexes entre dades.</li>
+                <li>Les dades s’emmagatzemen com a nodes i arestes.</li>
+                <li>Exemples: Neo4j, ArangoDB. També considerats NoSQL.</li>
+            </ul>
+        </li>
+        <li><strong>In-memory</strong>
+            <ul>
+                <li>Emmagatzemen les dades directament en la memòria RAM per a màxima velocitat.</li>
+                <li>Usats en temps real, memòries cau o aplicacions crítiques.</li>
+                <li>Exemples: Redis, SAP HANA.</li>
+            </ul>
+        </li>
+        <li><strong>De sèries temporals</strong>
+            <ul>
+                <li>Especialitzats en gestionar dades amb marques temporals (mètriques, logs, sensors).</li>
+                <li>Optimitzats per a inserir, consultar i analitzar dades cronològiques.</li>
+                <li>Exemples: InfluxDB, TimescaleDB.</li>
+            </ul>
+        </li>
+        <li><strong>Espacials</strong>
+            <ul>
+                <li>Dissenyats per a emmagatzemar i consultar dades geogràfiques i geomètriques.</li>
+                <li>Suporten operacions com intersecció de polígons, distàncies, coordenades.</li>
+                <li>Exemples: PostGIS (extensió de PostgreSQL), Oracle Spatial, MongoDB (suport geoespacial).</li>
+            </ul>
+        </li>
+        <li><strong>Altres models clàssics</strong>
+            <ul>
+                <li><em>Navegacionals</em>: Organitzats en arbres o xarxes jeràrquiques.</li>
+                <li><em>Orientats a objectes</em>: Emmagatzemen objectes complets.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <p><strong>Notes importants:</strong></p>
+    <ul>
+        <li>Alguns SGBD combinen múltiples models (per exemple, ArangoDB combina grafs, documents i claus-valor).</li>
+        <li>Molts motors relacionals moderns ofereixen extensions per a models no relacionals, com PostgreSQL amb PostGIS (espacial) o TimescaleDB (sèries temporals).</li>
+    </ul>
+
+    <h3>4. Segons el propòsit o tipus de càrrega de treball</h3>
+    <ul>
+        <li><strong>OLTP (Online Transaction Processing) – Transaccionals</strong>
+            <ul>
+                <li>Dissenyats per a gestionar moltes transaccions ràpides i concurrents.</li>
+                <li>Usats en sistemes operacionals: vendes, bancs, reserves, etc.</li>
+                <li>Requereixen alta integritat, concurrència i recuperació davant fallades.</li>
+                <li>Exemples: MySQL, PostgreSQL, Oracle, SQL Server.</li>
+            </ul>
+        </li>
+        <li><strong>OLAP (Online Analytical Processing) – Analítics / Data Warehouse</strong>
+            <ul>
+                <li>Optimitzats per a consultes complexes i anàlisi de grans volums de dades.</li>
+                <li>Suporten operacions com agregació, slicing, dicing, drill-down.</li>
+                <li>Usats en intel·ligència de negoci, informes, dashboards.</li>
+                <li>Exemples: Amazon Redshift, Snowflake, Google BigQuery, Microsoft Synapse, Teradata.</li>
+            </ul>
+        </li>
+    </ul>
+    <p>Alguns SGBD moderns (com PostgreSQL o SQL Server) poden realitzar funcions OLTP i OLAP híbrides, encara que no tan especialitzades com les eines pures.</p>
+
+    <h2>Tipus de connexió a una Base de Dades</h2>
+
+    <h3>1. Des de consola (CLI - Command Line Interface)</h3>
+    <ul>
+        <li><strong>In situ</strong>
+            <ul>
+                <li>Connexió local, des del mateix equip on està la base de dades.</li>
+                <li>Exemples:<br>
+                    <code>sqlplus usuari/pass@host/nombasedades</code>
+                    <code>mysql -u usuari -p</code><br>
+                    <code>psql -U usuari -d basedades</code>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Per SSH (Secure Shell)</strong>
+            <ul>
+                <li>Connexió remota i segura a través d’un túnel SSH al servidor on està la BD.</li>
+                <li>Útil per a mantindre la seguretat en entorns productius.</li>
+                <li>Exemples:<br>
+                    <code>ssh usuari@servidor</code><br>
+                    <code>mysql -u usuari -p</code>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>2. Des d’un entorn gràfic (GUI - Graphical User Interface)</h3>
+    <p>Ferramentes visuals que permeten gestionar bases de dades de manera amigable:</p>
+    <ul>
+        <li>Interfície intuïtiva, ideal per a usuaris no tècnics o per a tasques ràpides.</li>
+        <li>Exemples:
+            <ul>
+                <li>pgadmin</li>
+                <li>DBeaver</li>
+                <li>phpMyAdmin</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>3. Des d’un llenguatge de programació (via driver o API)</h3>
+    <p>Connexió programada des d’una aplicació o script.</p>
+    <ul>
+        <li><strong>PDO (PHP Data Objects)</strong>
+            <ul>
+                <li>Abstracció d’accés a base de dades en PHP.</li>
+                <li>Suporta múltiples motors (MySQL, SQLite, PostgreSQL, etc.).</li>
+                <li>Exemple:<br>
+                    <code>$pdo = new PDO("mysql:host=localhost;dbname=mi_bd", "usuari", "contrasenya");</code>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Altres drivers per llenguatge</strong>
+            <ul>
+                <li>JDBC (Java)</li>
+                <li>ODBC (multiplataforma)</li>
+                <li>psycopg2 (Python per a PostgreSQL)</li>
+                <li>SQLAlchemy (ORM per a Python)</li>
+                <li>etc...</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>Funcions d’un SGBD</h2>
+<ul>
+    <li><strong>DDL (Data Definition Language)</strong>: <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>, <code>TRUNCATE</code>, <code>COMMENT</code>, <code>RENAME</code></li>
+    <li><strong>DML (Data Manipulation Language)</strong>: <code>INSERT</code>, <code>DELETE</code>, <code>UPDATE</code>, <code>SELECT</code>
+        <br>↳ <strong>DQL (Data Query Language)</strong>: <code>SELECT</code>
+    </li>
+    <li><strong>DCL (Data Control Language)</strong>: <code>GRANT</code>, <code>REVOKE</code></li>
+    <li><strong>TCL (Transaction Control Language)</strong>: <code>COMMIT</code>, <code>ROLLBACK</code>, <code>SAVEPOINT</code></li>
+    <li><strong>Integritat referencial</strong>: Garantir la coherència entre taules relacionades (claus foranes, dependències, etc.).</li>
+    <li><strong>Auditoria</strong>: Registrar qui accedeix o modifica dades, i quan ho fa.</li>
+    <li><strong>Temps de resposta idoni</strong>: Proporcionar respostes ràpides i eficients a consultes i operacions.</li>
+    <li><strong>Independència física i lògica</strong>: Separar la manera com es veuen les dades de com estan emmagatzemades internament.</li>
+    <li><strong>Monitoratge del SGBD</strong>: Supervisar el rendiment, ús de recursos, sessions, etc.</li>
+    <li><strong>Connectivitat</strong>: Permetre accés des de diferents aplicacions, sistemes operatius i ubicacions.</li>
+    <li><strong>Còpia i recuperació</strong>: Fer còpies de seguretat i restaurar-les en cas de fallada o pèrdua de dades.</li>
+</ul>
+
+<h2>Elements d’un SGBD</h2>
+<p>Un Sistema Gestor de Bases de Dades (SGBD) està compost per diversos elements o components que treballen conjuntament per facilitar l’emmagatzematge, recuperació, manipulació i administració de dades.</p>
+
+<h3>1. Processador de consultes</h3>
+<p>És el component encarregat d’interpretar i executar les consultes realitzades pels usuaris (normalment en SQL). Les seues funcions inclouen:</p>
+<ul>
+    <li>Anàlisi lèxica i sintàctica de les consultes.</li>
+    <li>Optimització de consultes per millorar-ne el rendiment.</li>
+    <li>Generació del pla d’execució.</li>
+</ul>
+
+<h3>2. Gestor de la base de dades</h3>
+<p>És el nucli del SGBD. Controla l’accés a les dades i garanteix la seua integritat, seguretat i concurrència. Les seues responsabilitats són:</p>
+<ul>
+    <li>Control de transaccions.</li>
+    <li>Gestió de la concurrència (accés simultani).</li>
+    <li>Recuperació davant de fallades.</li>
+    <li>Control d’integritat.</li>
+</ul>
+
+<h3>3. Gestor d’arxius</h3>
+<p>Aquest component administra l’emmagatzematge físic de les dades en disc. Entre les seues funcions estan:</p>
+<ul>
+    <li>Lectura i escriptura de blocs de dades.</li>
+    <li>Organització i emmagatzematge eficient.</li>
+    <li>Manteniment d’índexs i estructures d’emmagatzematge.</li>
+</ul>
+
+<h3>4. Interfícies externes</h3>
+<p>Són els mecanismes que permeten als usuaris i aplicacions comunicar-se amb el SGBD. Poden incloure:</p>
+<ul>
+    <li>Interfícies gràfiques (GUI).</li>
+    <li>Interfícies de programació (API).</li>
+    <li>Consoles de comandes.</li>
+    <li>Connectors per a llenguatges de programació.</li>
+</ul>
+
+<h3>5. Preprocessador del llenguatge de manipulació de dades (DML)</h3>
+<p>Aquest component s’encarrega d’identificar les sentències DML (com <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>) dins del codi font d’una aplicació. Funcions clau:</p>
+<ul>
+    <li>Integrar sentències DML en llenguatges com C, Java, etc.</li>
+    <li>Traduir-les a crides al processador de consultes del SGBD.</li>
+</ul>
+
+<h3>6. Compilador del llenguatge de definició de dades (DDL)</h3>
+<p>Traduïx les sentències DDL (com <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>) que definixen l’estructura de la base de dades. La seua funció és:</p>
+<ul>
+    <li>Processar les definicions d’esquemes, taules, índexs, vistes, etc.</li>
+    <li>Actualitzar el diccionari de dades amb aquesta informació.</li>
+</ul>
+
+<h3>7. Gestor del diccionari</h3>
+<p>El diccionari (o catàleg) de dades és una base de dades interna que emmagatzema metadades. Aquest gestor:</p>
+<ul>
+    <li>Administra el diccionari de dades.</li>
+    <li>Proporciona informació sobre les estructures, restriccions, usuaris i permisos.</li>
+    <li>És consultat per quasi tots els altres components del SGBD.</li>
+</ul>
+<hr>
+
+<h2>Com seleccionar un SGBD</h2>
+<p>Una vegada es coneixen els elements d’un SGBD, els tipus de SGBD i els conceptes clau, ja s’està en posició de poder triar un SGBD tenint en compte els factors que determinaran l’elecció.</p>
+
+<h3>Factors per a l’elecció del SGBD</h3>
+<ul>
+    <li>Tipus de dades a tractar</li>
+    <li>Volum de dades</li>
+    <li>Nombre d’usuaris i necessitat de concurrència</li>
+    <li>Tipus de consultes</li>
+    <li>Cost (compra i manteniment), llicències</li>
+    <li>Velocitat de lectura/escriptura</li>
+    <li>Arquitectura i connectivitat (escalabilitat)</li>
+    <li>Recursos i política de l’empresa</li>
+    <li>Seguretat (compliment normatiu – <em>compliance</em>)</li>
+    <li>Requisits del sistema
+        <ul>
+            <li>Integració amb altres aplicacions</li>
+            <li>APIs</li>
+            <li>Migració de dades</li>
+        </ul>
+    </li>
+    <li>Tipologia de la base de dades (relacional, NoSQL, etc.)</li>
+    <li>Experiència de l’equip (comunitat, documentació disponible)</li>
+    <li>Suport tècnic</li>
+    <li>Actualitzacions del producte</li>
+</ul>
+
+<h2>Documentació</h2>
+<p>En cada instal·lació s’haurà d’elaborar o omplir una documentació amb la informació següent. Aquesta documentació <strong>no serà pública</strong> i es guardarà per a consultes tècniques.</p>
+
+<ul>
+    <li>Nom i contacte de la persona instal·ladora</li>
+    <li>Data de la instal·lació</li>
+    <li>Màquina, IP, DNS, port(s)</li>
+    <li>Característiques de la màquina</li>
+    <li>Com accedir a la màquina (física, virtual, núvol)</li>
+    <li>Sistema Operatiu / versió</li>
+    <li>Usuari administrador del sistema operatiu</li>
+    <li>Usuari que realitza la instal·lació</li>
+    <li>Producte i versió utilitzada del SGBD</li>
+    <li>Llocs/carpetes on s’instal·la el producte</li>
+    <li>Llocs/carpetes on s’instal·la la base de dades</li>
+    <li>Llocs/carpetes on estan els fitxers rellevants</li>
+    <li>Noms de les bases de dades (CDB, PDBs, ...)</li>
+    <li>... i qualsevol altra informació que es considere rellevant</li>
+</ul>
+<hr>
+<h2>Verificar els requisits d’instal·lació</h2>
+<p>En cada SGBD hi haurà uns requisits que podem trobar en la documentació de cada versió del producte concret ... ORACLE, PostgreSQL, MySQL, etc.</p>
+<p>Abans de començar la instal·lació, cal aconseguir i tindre disponibles aquests documents!</p>
+<p><strong>Verificar:</strong></p>
+<ul>
+    <li>Requisits de hardware</li>
+    <li>Kernel del sistema operatiu adequat</li>
+    <li>Comunicacions</li>
+    <li>Espai lliure (memòria i emmagatzematge)</li>
+    <li>Existència de paquets i versions</li>
+    <li>Variables d’entorn</li>
+    <li>Usuaris</li>
+</ul>
+
+<h2>Registre de la instal·lació (log de la instal·lació)</h2>
+<p>Tots els instal·ladors de sistemes gestors de bases de dades guarden un registre de les operacions 
+  realitzades durant la instal·lació. Aquest registre és útil en cas que es produeixi algun problema, 
+  per a diagnosticar-ne el motiu.</p>
+<p>L’estructura i ubicació del registre de la instal·lació dependrà del SGBD.</p>
+<h4>El DBA deu tindre localitzat este registre per poder consultar-lo en qualsevol moment i trobar incidències en cas d'haver-se produït</h4>
+
+
+  </section>
+
+
+    <section id="versions">
+    <h2>Versions de PostgreSQL </h2>
+  
+    <h3>🧾 Què és una versió?</h3>
+    <p>
+      La <strong>versió</strong> referència a la numeració del programari que indica les funcionalitats disponibles, el motor de base de dades i el model d’arquitectura utilitzat.
+      Exemples: <code>9.6</code>, <code>10</code>, <code>11</code>, <code>15</code>, <code>16</code>
+    </p>
+    <p>Estes són les versions majors. Cada versió: Introdueix canvis importants, Té 5 anys de support oficial, Requereix de dump/restore per actualitzar </p>
+    <p>Hi ha versions menors. Exemple 15.2 → 15.3 . Estes versions: Correcció de bugs, actualitzacions de seguretat, No trenquen compatibilitat, S'actualitzen facilment.</p>
+
+   
+
+   
+    <h3>⚠️ Consideracions importants</h3>
+    <ul>
+      <li>També es molt important tindre en consideració el fi de suport d'una versió (EOL, End of Life)</li>
+    </ul>
+  <p>El  Fi de vida útil, més conegut pel seu terme anglès End Of Life (EOL), és un terme que fa referència a 
+    la caducitat d'un producte de programari. És a dir, és el moment en què un programari deixa de tenir 
+    manteniment i suport.</p>
+
+    <div class="preg">
+   
+    </div>
+  </section>
+
+
+
+  
+  <section id="edicions">
+    <h2>Edicions de Postgresql</h2>
+      <p>       Postgres NO TÉ EDICIONS, tipus Enterprise, Standard, etc,  com fa ORACLE..    </p>
+      <p>En Postgress sempre és el mateix motor, sense funcions “capades” per llicència.</p>
+
+    <ul> El que si que canvia, és:
+        <li>Extensions:(PostGIS, pg_stat_statements, etc.) </li>
+        <li>Distribucions:(EnterpriseDB, Amazon RDS, Azure, etc.) </li>
+        <li>Configuració i suport comercial</li>
+    </ul>
+
+    <p class="tips">(Practica 🧪) <a href="https://github.com/EnriqueIborra/ASGBD/blob/b7846aed55ae7885701f8d88a42091aae52dfe0c/UD1/desplegar%20ORACLEdb23%20sobre%20Docker_simplif.pdf" target="_blank">
+       Primer contacte amb Postgresql </a></p>
+    
+</section>
+
+  
+
+
+  
+  <section id="requisits">
+    <h2>Requisits d’instal·lació</h2>
+      
+    <ul> <strong>Sistema Operatiu</strong>
+        <li>GNU/Linux (Ubuntu, Debian, Red Hat, CentOS, AlmaLinux, etc.)</li>
+        <li>Windows</li>
+        <li>macOS</li>
+        <li>Sistemes Unix (FreeBSD, OpenBSD…)</li>
+    </ul>
+ 
+ <ul> <strong>Maquinari mínims</strong>
+     <li>CPU: 1 nucli</li>
+     <li>Memòria RAM: 1 GB (2 GB o més recomanat)</li>
+     <li>Disc dur: Uns 100 MB per al programari. Espai addicional segons les dades i còpies de seguretat</li>
+ </ul>
+
+ <ul> <strong>Programari necessari</strong>
+    <li>En Linux, gestor de paquets (apt, dnf, yum, etc.)</li>
+    <li>Permisos d’administrador (root o sudo) per a la instal·lació</li>
+    <li>PostgreSQL crea un usuari propi del sistema: <code>postgres</code></li>
+    <li>Connexió a xarxa si: Hi haurà connexions remotes, El servidor no serà només local</li>
+    <li>Port disponible: Port per defecte: 5432</li>
+ </ul>
+
+ <ul> <strong> Requisits recomanats per a producció</strong>
+     <li>4–8 GB de RAM o més</li>
+     <li>Disc SSD</li>
+     <li>Sistema de còpies de seguretat</li>
+     <li>Connexions xifrades (SSL)</li>
+     <li>Tallafocs configurat</li>
+ </ul>
+
+  </section>
+  
+
+
+
+ 
+  <section id="instancia">
+    <h2>Clúster PostgreSQL (equivalent a una instància)</h2>
+
+<ul> Un clúster PostgreSQL és:
+    <li>Un conjunt de:Bases de dades, Usuaris (rols), Configuració</li>
+    <li>Gestionat per un sol procés servidor (postmaster / postgres)</li>
+    <li>Amb un únic port (normalment 5432)</li>
+    <li>Un únic directori de dades</li>
+</ul>
+
+    En PostgreSQL:
+    <li>Les bases de dades dins d’un clúster estan aïllades</li>
+    <li>No es poden fer joins directes entre BD</li>
+    <li>Compartits: Usuaris (rols), Extensions, Configuració</li>
+
+    <p>Si es necessita NO compartir Usuaris, extensions o configuració:
+    (Si es vol un altre “entorn”: Es crearà un altre clúster (altre port / altre directori))  </p>
+
+    <p>En PostgreSQL, la memòria i els paràmetres principals es veuen i es gestionen sobretot mitjançant paràmetres de configuració</p>    
+  
+    <p>Es poden consultar amb les següents ordres</p>
+    <pre>SHOW config_file;
+
+SHOW shared_buffers;
+SHOW work_mem;
+SHOW max_connections;
+    </pre>
+
+    <!--
+🛠️ Canviar paràmetres
+Temporal (sessió):
+SET work_mem = '64MB';
+
+Permanent:
+ALTER SYSTEM SET work_mem = '64MB';
+SELECT pg_reload_conf();
+
+
+(O editar postgresql.conf i reiniciar si cal)    
+    
+    -->
+  
+</section>
+  
+
+ 
+
+  <section id="arquitectura">
+    <h2>Arquitectura de Postgresql</h2>
+  <p>L’arquitectura de PostgreSQL és client–servidor i basada en processos (no en fils com altres SGBD).</p>
+  
+  <pre>
+Client
+   │
+   ▼
+postmaster (procés principal)
+   │
+   ├─ Procés backend (1 per connexió)
+   ├─ Procés autovacuum
+   ├─ Procés WAL writer
+   ├─ Procés checkpointer
+   ├─ Procés background writer
+   └─ Procés stats collector
+  </pre>
+  <p>Cada connexió = un procés.</p>
+  
+<!--
+2️⃣ Procés principal: postmaster / postgres
+    Arranca el servidor PostgreSQL
+    Escolta en un port (per defecte 5432)
+    Accepta connexions
+    Llança un procés backend per a cada client
+
+
+3️⃣ Processos backend (clients)
+    Un procés dedicat per connexió
+    Executa les consultes SQL
+    Accedeix a:
+        Memòria compartida
+        Fitxers de dades
+
+📌 Açò explica per què:
+Moltes connexions = més consum de memòria
+Es recomana pool de connexions
+
+4️⃣ Memòria en PostgreSQL
+🔹 Memòria compartida
+Compartida per tots els processos:
+    shared_buffers → caché de dades
+    wal_buffers → WAL
+    Taules de control i locks
+
+🔹 Memòria local (per procés)
+Cada backend té la seua:
+    work_mem
+    maintenance_work_mem
+
+
+5️⃣ Escriptura i recuperació (WAL)
+PostgreSQL usa WAL (Write-Ahead Logging):
+    Primer s’escriu al WAL
+    Després a les dades
+
+Processos implicats:
+    WAL writer
+    Checkpointer
+    Background writer
+
+📌 Garanteix:
+    ACID
+    Recuperació després de caigudes
+
+6️⃣ Autovacuum (clau en PostgreSQL)
+    Neteja versions antigues de files (MVCC)
+    Evita creixement excessiu de taules
+    Manté estadístiques
+➡️ Equivalent funcional a:
+Undo + manteniment automàtic d’Oracle
+
+7️⃣ Gestió de concurrència (MVCC)
+    No hi ha bloquejos de lectura
+    Cada transacció veu la seua versió de les dades
+    Les versions velles es netegen amb VACUUM
+📌 Gran avantatge en entorns concurrents.
+
+8️⃣ Emmagatzematge
+    Cada taula = fitxer (o conjunt de fitxers)
+    Índexs separats
+    Tablespaces disponibles
+📌 Més simple que Oracle, però molt flexible.
+
+9️⃣ Extensions (part clau de l’arquitectura)
+
+PostgreSQL permet extensions:
+    PostGIS
+    pg_stat_statements
+    citext
+
+➡️ Amplien el motor sense modificar el core.  
+-->
+
+  </section>
+  
+
+
+
+  <section id="estruc">
+    <h2>Estructura recomanada </h2>
+<pre>
+    
+📁 Binaris -  /usr/pgsql-16/bin
+
+📁 Dades (DATA DIRECTORY) - /pgdata/cluster01/data
+     (Conté: bases de dades , WAL,  catàlegs,  configuració)
+
+📁 WAL separat (molt recomanat) -  /pgdata/cluster01/wal
+      Configurat amb:  initdb --waldir=/pgdata/cluster01/wal
+
+📁 Tablespaces (com datafiles) - /pgdata/tablespaces/ts_dades
+                                 /pgdata/tablespaces/ts_indexos
+    Exemple: CREATE TABLESPACE ts_dades LOCATION '/pgdata/tablespaces/ts_dades';
+
+📁 Logs - /pglogs/cluster01
+
+📁 Backups - /pgbackups/cluster01
+      ⚠️ 👁️  Si pot ser , en altre disc físic, o altra ubicació
+</pre>
+
+
+  </section>
+  
+ 
+
+  <section id="instalacio">
+    <h2>🐘 Instal·lació de PostgreSQL</h2>
+    📌 PostgreSQL és lliure i gratuït.
+    <p>Es pot trobar més informació en la pàgina oficial  <a href="https://www.postgresql.org/download/">PostgreSQL/Downloads</a></p>
+      
+    <h3>Instal·lació en GNU/Linux (la més habitual)</h3>
+    Instal·lació amb gestor de paquets
+    <pre>sudo apt update
+sudo apt install postgresql postgresql-contrib
+</pre>
+    <p>Açò instal·la: El <strong>servidor</strong> PostgreSQL, Eines bàsiques,  Extensions comunes</p>
+    <ul> 🧰 Eines bàsiques de PostgreSQL
+        <li><code>psql</code> Client de línia de comandes. Serveix per connectar-te al servidor PostgreSQL, Executar consultes SQL, Administrar bases de dades i rols</li>
+        <li><code>createdb / dropdb</code> Crear i eliminar bases de dades des de la terminal</li>
+        <li> <code>createuser / dropuser</code>  Crear i eliminar usuaris (rols)</li>
+        <li> <code>pg_dump</code>  Fer còpies de seguretat (backups)</li>
+        <li><code>pg_restore</code> Restaurar còpies fetes amb pg_dump en format no-text</li>
+        <li><code>pg_isready / pg_ctl </code></li>
+    </ul>
+
+    <ul> Extensions comunes
+        <li> uuid-ossp (UUIDs)</li> 
+        <li>pg_trgm (cerques similars)</li>
+        <li>hstore (clau-valor en una columna)</li>
+        <li>citext  (sense diferenciar may-min)</li>
+        <li>tablefunc (pivotar dades)</li>
+        <li>unaccent (eliminar accents)</li>
+    </ul>
+    <p>S’activen dins la base de dades, no al sistema:</p>
+    <pre>CREATE EXTENSION pg_trgm; </pre>
+
+    <p>Durant la instal·lació: Es crea l’usuari del sistema: postgres , Es crea un clúster per defecte, 
+      El servei s’inicia,  Escolta pel port 5432</p>
+
+    <h4>  Comprovar que funciona</h4>
+    <pre>sudo systemctl status postgresql</pre>
+    <h4>Entrar en PostgreSQL</h4>
+    <pre>sudo -u postgres psql </pre>
+
+   <h3>Instal·lació en Windows</h3>
+   <h4>Instal·lador gràfic</h4>
+   <li>Es descarrega un instal·lador oficial</li>
+   <li>Durant la instal·lació: Tries la versió, Definixes la contrasenya de l’usuari postgres,
+        Tries el port (5432 per defecte),  S’inicialitza el clúster</li>
+    <li>Inclou: pgAdmin, psql, Servici de Windows</li>
+
+    <h3>Instal·lació en macOS</h3>
+    <p>Instal·lador oficial, Homebrew</p>
+    <pre>brew install postgresql
+brew services start postgresql  </pre>
+
+</section>
+
+  <section id="stop">
+    <img src="imgs/stop.png" class="imatge-esquerra"  alt="stop" style="width: 6%">
+    <h2>Abans de continuar.... </h2>
+    <h1>Realitzem la nostra primera instal·lació de POSTGRES</h1>
+
+    <br><br><h2>En altra màquina....</h2>
+    <h3>Instal·lació de client gràfic => pdadmin</h3>
+    <p>Des de la pàgina oficial de <a href="https://www.pgadmin.org/download/">pgadmin</a></p>
+
+  </section>
+
+
+
+  <section id="acces">
+    <h2>Accés a Postgresql</h2>
+    <p>Després de tindre acabada la instal·lació, hem de comprovar que es pot accedir al cluster.</p>
+    <h3> Des d'una terminal</h3>
+     <pre>sudo -u postgres psql </pre>
+
+
+    <p>Esta ordre ens connecta al cluster principal...     </p>
+
+    <h3>Configuració bàsica després d’instal·lar</h3>
+     Canviar contrasenya de postgres 🗝️
+     <pre>ALTER USER postgres WITH PASSWORD 'nova_contrasenya';</pre>
+ 
+    <h3>Permetre connexions remotes (opcional)</h3>
+     Editar: postgresql.conf
+     <li>Canviar:  listen_addresses = '*'  </li>
+     Editar : pg_hba.conf
+    <li>host all all 0.0.0.0/0 md5 </li>
+    Recarregar configuració:
+    <pre>SELECT pg_reload_conf(); </pre>
+
+    <h3>Crear BBDD i usuari</h3>
+    <pre>CREATE USER alumne WITH PASSWORD '1234';
+CREATE DATABASE bd_examen OWNER alumne;  </pre>
+
+        <h3>Arrancar i parar BBDD</h3>
+        <pre>sudo systemctl start postgresql
+sudo systemctl stop postgresql
+sudo systemctl restart postgresql </pre>
+
+   <h3>Connexió incial</h3>
+   <p>Per defecte, (i sinó s'indica altra cosa) PostgreSQL es connecta a una base de dades amb el mateix nom que l’usuari.</p>
+    <p>Quan fas:  <code>psql</code> : PostgreSQL intenta:
+        Usuari = usuari del sistema, Base de dades = mateix nom que l’usuari </p>
+    <p>Si la BD no existeix, S'obtindrà un error: 
+        <code>FATAL: database "nom_usuari" does not exist </code> </p>
+    <p>Després d’instal·lar PostgreSQL, hi ha sempre: <code> postgres  template0 template1 </code></p>
+
+    <h3>Connexió implícita</h3>
+    <pre>psql -U alumne -d bd_examen </pre>
+
+    <h3>Explorar cluster</h3>
+    <p>Una vegada connectats… com veure les altres BBDD en PostgreSQL</p>
+    <pre>\l
+\list
+\l+
+SELECT datname FROM pg_database;      </pre>
+
+    <p>I per canviar (connectar) a una altra BBDD</p>
+    <pre>\c nom_bbdd
+\connect nom_bbdd  </pre>
+
+
+    <h3> Altres maneres d'accedir a la instància:</h3>
+    <ul>
+      <li> Utilitzant  pgadmin</li>
+      <li> Utilitzant  Visual Studio Code + Extensió PostgreSQL O DBCode</li>
+      <li> Utilitzant DBeaver ( multi-SGBD sw lliure)</li>
+      <li> Utilitzant TOAD  (multi-SGBD propietari)</li>
+    </ul>
+
+    <p>🎓 Amb tots aquests coneixements, ja estàs preparat/ada per començar la unitat dos. Configuració d'un SGBD </p>
+
+  </section>
+  
+
+
+  <section id="altres-recursos">
+    
+    
+  </section>
+
+
+</main>
+
+<script>
+
+  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+      //  <div class="pre-container">
+      //    <button class="copy-button">Copia Codi !</button>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+</script>
+
+</body>
+</html>
