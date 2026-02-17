@@ -1,0 +1,65 @@
+[
+  {
+    "titol": "Que assegura la disponibilitat i l'accés al SGBD?",
+    "opcions": [
+      { "text": "SO", "correcte": false },
+      { "text": "APP", "correcte": false },
+      { "text": "EULA", "correcte": false },
+      { "text": "DBA", "correcte": true }
+    ]
+  },
+  {
+    "titol": "Com s'anomena la plantilla per defecte de les PDBs?",
+    "opcions": [
+      { "text": "pdb$template", "correcte": false },
+      { "text": "cdb$seed", "correcte": false },
+      { "text": "pdb$root", "correcte": false },
+      { "text": "pdb$seed", "correcte": true }
+    ]
+  },
+  {
+    "titol": "Per crear una nova pdb utilitzarem:",
+    "opcions": [
+      { "text": "rman", "correcte": false },
+      { "text": "dbmgr", "correcte": false },
+      { "text": "netca", "correcte": false },
+      { "text": "dbca", "correcte": true }
+    ]
+  },
+  {
+    "titol": "En una instància d'Oracle, la SGA es:",
+    "opcions": [
+      { "text": "Àrea de memòria compartida de cada procés", "correcte": false },
+      { "text": "Àrea de memòria privada de la instància", "correcte": false },
+      { "text": "Àrea de memòria privada de cada procés", "correcte": false },
+      { "text": "Àrea de memòria compartida de la instància", "correcte": true }
+    ]
+  },
+   {
+    "titol": "Sentència per borrar una BBDD de treball:",
+    "opcions": [
+      { "text": "DROP CONTAINER DATABASE nom_pdb INCLUDING DATAFILES;", "correcte": false },
+      { "text": "DROP DATABASE nom_pdb INCLUDING DATAFILES;", "correcte": false },
+      { "text": "ERASE PLUGGABLE DATABASE nom_pdb INCLUDING DATAFILES;", "correcte": false },
+      { "text": "DROP PLUGGABLE DATABASE nom_pdb INCLUDING DATAFILES;", "correcte": true }
+    ]
+  },
+  {
+    "titol": "sqlplus forma part dels serveis del SGBD d'oracle",
+    "opcions": [
+      { "text": "Vertader", "correcte": false },
+      { "text": "Fals", "correcte": true }
+    ]
+  },
+  {
+    "titol": "El codi es pot posar dins d'un fitxer .sql i executar-lo des de bash",
+    "opcions": [
+      { "text": "Fals", "correcte": false },
+      { "text": "Vertader", "correcte": true }
+    ]
+  }
+
+]
+
+
+ 

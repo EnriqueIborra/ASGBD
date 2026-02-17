@@ -1,0 +1,78 @@
+[
+  {
+    "titol": "Per a que els usuaris de una sede de una empresa no puguen vore tots els camps de la taula empleats i sols vegen els empleats dela seua propia sede, haurem d'usar:",
+    "opcions": [
+      { "text": "Revoke", "correcte": false },
+      { "text": "Perfils", "correcte": false },
+      { "text": "Una vista vertical", "correcte": false },
+      { "text": "Una vista mixta", "correcte": true }
+    ]
+  },
+  {
+    "titol": "Grant i Revoke son sentències del:",
+    "opcions": [
+      { "text": "DDL", "correcte": false },
+      { "text": "DML", "correcte": false },
+      { "text": "DCL", "correcte": true },
+      { "text": "TCL", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Permeten restringir l'us de recursos als usuaris:",
+    "opcions": [
+      { "text": "Rols", "correcte": false },
+      { "text": "Permisos", "correcte": false },
+      { "text": "Perfils", "correcte": false },
+      { "text": "Totes les respostes son correctes", "correcte": true }
+    ]
+  },
+  {
+    "titol": "Per a desbloquejar el compte d'un usuari que està bloquejat, s'usarà:",
+    "opcions": [
+      { "text": "UNLOCK USER nomusuari;", "correcte": false },
+      { "text": "ALTER USER nomusuari ACCOUNT UNLOCK;", "correcte": true },
+      { "text": "ALTER USER nomusuari ENABLE;", "correcte": false },
+      { "text": "ALTER USER nomusuari UNLOCK;", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Per canviar el password d'un usuari en Oracle, usarem:",
+    "opcions": [
+      { "text": "ALTER USER nomusuari IDENTIFIED BY '12345';", "correcte": true },
+      { "text": "ALTER USER nomusuari PASSWORD '12345';", "correcte": false },
+      { "text": "ALTER USER nomusuari SET PASSWORD '12345';", "correcte": false },
+      { "text": "UPDATE dba_users SET PASSWORD='12345' WHERE USER='nomusuari';", "correcte": false }
+    ]
+  },
+ {
+    "titol": "Per llevar un permís usarem la sentència:",
+    "opcions": [
+      { "text": "RELEASE", "correcte": false },
+      { "text": "DELETE", "correcte": false },
+      { "text": "DROP", "correcte": false },
+      { "text": "REVOKE", "correcte": true }
+    ]
+  },
+  {
+    "titol": "Per esborrar un rol usarem la sentència:",
+    "opcions": [
+      { "text": "ERASE", "correcte": false },
+      { "text": "DELETE", "correcte": false },
+      { "text": "REVOKE", "correcte": false },
+      { "text": "DROP", "correcte": true }
+    ]
+  },
+  {
+    "titol": "Quina de les següents operacions no està permesa en Oracle?",
+    "opcions": [
+      { "text": "Traure un permís a un rol", "correcte": false },
+      { "text": "Traure un rol a un usuari", "correcte": false },
+      { "text": "Assignar un rol a un altre rol", "correcte": false },
+      { "text": "Copiar permisos d'un usuari a un altre usuari", "correcte": true }
+    ]
+  }
+]
+
+
+
+ 

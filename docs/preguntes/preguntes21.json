@@ -1,0 +1,68 @@
+[
+  {
+    "titol": "On es guarden els parametres d'arrancada de l'SGBD?",
+    "opcions": [
+      { "text": "spfileSID.ora", "correcte": true },
+      { "text": "listener.ora", "correcte": false },
+      { "text": "tnsnames.ora", "correcte": false },
+      { "text": "sqlnet.ora", "correcte": false }
+    ]
+  },
+  {
+    "titol": "spfile és un fitxer binari",
+    "opcions": [
+      { "text": "Vertader", "correcte": true },
+      { "text": "Fals", "correcte": false }
+    ]
+  },
+  {
+    "titol": "En Oracle, quin usuari no es crea automaticament?",
+    "opcions": [
+      { "text": "sysdba", "correcte": true },
+      { "text": "sys", "correcte": false },
+      { "text": "system", "correcte": false },
+      { "text": "pdbadmin", "correcte": false }
+    ]
+  },
+  {
+    "titol": "En Oracle, com es crea una nova BBDD?",
+    "opcions": [
+      { "text": "Amb el comando del SO dbca", "correcte": true },
+      { "text": "CREATE DATABASE novadb;", "correcte": false },
+      { "text": "NEW DATABASE novadb;", "correcte": false },
+      { "text": "createdb novadb", "correcte": false }
+    ]
+  },
+  {
+    "titol": "El diccionari de dades es pot modificar directament per el DBA",
+    "opcions": [
+      { "text": "Fals", "correcte": true },
+      { "text": "Vertader", "correcte": false }
+    ]
+  },
+  {
+    "titol": "El sqlplus forma part del programari servidor del sistema gestor",
+    "opcions": [
+      { "text": "Fals", "correcte": true },
+      { "text": "Vertader", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Les dades del diccionari de dades estan en:",
+    "opcions": [
+      { "text": "majúscules", "correcte": true },
+      { "text": "minúscules", "correcte": false },
+      { "text": "no importa", "correcte": false }
+    ]
+  },
+  {
+  "titol": "L'ordre sqlplus sys@localhost/pdb1:",
+  "opcions": [
+    { "text": "Connecta com a super-usuari", "correcte": false },
+    { "text": "Funciona des del cmd", "correcte": false },
+    { "text": "Dona error", "correcte": true },
+    { "text": "Funciona des del sql>", "correcte": false }
+  ]
+}
+]
+
