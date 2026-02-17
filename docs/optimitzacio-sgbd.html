@@ -9,7 +9,7 @@
 <body>
 
 <header>
-  <a href="index.html">
+  <a href="./">
       <!--<img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo"> -->
       <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
   </a>
@@ -217,12 +217,14 @@ SELECT * FROM v$diag_info;  -- Registre d'errors      </pre>
 
     <h3> Pràctiques recomanades per a consultes</h3>
     <ul>
-      <li> Utilitza <code>EXPLAIN PLAN</code> per analitzar l'estratègia de consulta</li>
+      <li> Utilitza <code>EXPLAIN PLAN</code> per analitzar l'estratègia de consulta (s'explica en el següent punt)</li>
       <li> Evita <code><strong>SELECT *</strong> </code>: només demana les columnes necessàries</li>
       <li> Evita subconsultes correlacionades no indexades</li>
       <li> Fes ús de joins eficients (preferentment explícits)</li>
       <li> Controla l’ús de funcions sobre columnes indexades</li>
     </ul>
+
+
 
     <h3>🛑 Consultes ineficients</h3>
     <p>Exemples a evitar:</p>
@@ -289,17 +291,28 @@ execute dbms_stats.gather_schema_stats(‘esquema’);      </pre>
     <h4>També es poden automatitzar mitjançant tasques de manteniment o recollida automàtica de l’Oracle Scheduler.</h4>
   
     <h3>🧪 EXPLAIN PLAN</h3>
-    <p> Aquesta ordre permet visualitzar el pla que Oracle seguirà per executar una consulta. 
-      Mostra si s’utilitzen índexs, escaneigs complets, joins, etc.
-      Ajuda a detectar consultes lentes o mal optimitzades.
+    <p> Aquesta ordre permet visualitzar el pla que Oracle seguirà per executar una consulta (sense executar-la realment). 
+      Mostra si s’utilitzen índexs, escaneigs complets, joins, etc.    Ajuda a detectar consultes lentes o mal optimitzades.
     </p>
+    <ul> S'usa principalment per:
+      <li>Analitzar rendiment</li>
+      <li>Detectar colls de botella</li>
+      <li>Veure si s'estan usant index</li>
+      <li>Entendre perquè és lenta una consulta</li>
+      <li>Ajuda a optimitzar una SQL</li>
+    </ul>
    
     <h4> Exemple d’ús</h4>
-    <pre>EXPLAIN PLAN FOR
-SELECT * FROM alumnes WHERE edat > 18;
+    <pre>EXPLAIN PLAN FOR  SELECT * FROM alumnes WHERE edat > 18;
 
 SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);      </pre>
   
+      <p>En Oracle SQL Developer pots fer un EXPLAIN PLAN de manera molt senzilla: </p>
+      <li>1: Escriu la teva consulta al worksheet, selecciona la consulta (o deixa el cursor dins), Fes clic al botó “Explain Plan” (icona amb una lupa o arbre) o 
+        També pots prémer F10. ➜ ➜  SQL Developer mostrarà el pla d’execució en una pestanya inferior. ⚠️ Això no executa la consulta, només mostra el pla estimat.</li>
+      <li>2: Amb EXPLAIN PLAN manualment. (Com s'ha vist abans)</li>
+      <li>3: Veure el pla real (molt recomanat). Executa la consulta normalment (F9), Ves a la pestanya “Autotrace” (si està activada), (Si no la veus:View > Autotrace) </li>
+
     <h4> Resultats comuns:</h4>
     <ul>
       <li><code>TABLE ACCESS FULL</code> → Oracle escaneja tota la taula</li>

@@ -10,7 +10,7 @@
 <body>
 
 <header>
-  <a href="index.html">
+  <a href="./">
     <!--<img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo"> -->
     <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
   </a>
@@ -108,7 +108,7 @@ SELECT * FROM user2.table1;</code></pre>
     <ul>
       <li><strong>Predefinits</strong>: SYS, SYSTEM, SYSBACKUP, etc. (evitar-ne l'ús directe si no és estrictament necessari)</li>
       <li><strong>Comuns</strong>: disponibles a totes les PDBs (requereixen prefix <code>C##</code>)</li>
-      <li><strong>Locals</strong>: definits dins d’una PDB concreta</li>
+      <li><strong>Locals</strong>: definits dins d'una PDB concreta</li>
     </ul>
   
     <h3> Creació, modificació i baixa d'usuaris</h3>
@@ -167,7 +167,7 @@ SELECT * FROM user2.table1;</code></pre>
   -- Esquema actiu
   SELECT user FROM dual;
   
-  -- Paràmetres d’usuaris administratius
+  -- Paràmetres d'usuaris administratius
   SELECT * FROM v$pwfile_users;
     </pre>
   
@@ -289,6 +289,38 @@ Cambiando la contrasenya para &lt;nom_usuari>
         </pre>
         <p>En SQL Developer, igual, ens demana posar una nova contrasenya, però utilitzant GUI</p>
 
+
+<!--   -->      <h2>6. Desconnectar un usuari que està connectat</h2>
+        <p>Un usuari pot tindre varies connexions actives (que son les SESSIONS)</p>
+        <p>Hi ha dos maneres</p>
+        <h4>Matar una sessió des d’SQL*Plus o qualsevol client</h4>
+
+        <pre>SELECT sid, serial#, username, status, machine
+FROM v$session
+WHERE username = 'NOM_USUARI';   --esbrina sid i serial#
+
+ALTER SYSTEM KILL SESSION 'SID,SERIAL#';   -- Desconnecta
+o
+ALTER SYSTEM KILL SESSION 'SID,SERIAL#' IMMEDIATE;  </pre>
+<p>Si un usuari ha connectat amb el rol SYSDBA, no es visualitzarà el seu nom, sino SYSTEM</p>
+
+        <h4>Matar la sessió directament des del sistema operatiu</h4>
+        <p>Algunes vegades l’ordre anterior no desconnecta del tot (queda com KILLED). Llavors busques el procés OS:        </p>
+
+        <pre>SELECT s.sid, s.serial#, p.spid
+FROM v$session s
+JOIN v$process p ON s.paddr = p.addr
+WHERE s.username = 'NOM_USUARI';
+
+--  I al sistema operatiu (Unix/Linux):
+kill -9 PID    --  On PID = SPID del procés Oracle.</pre>
+
+<ul>ℹ️ Notes importants
+  <li>Necessites permisos DBA o ALTER SYSTEM.</li>
+  <li>Matar sessions pot afectar transaccions en curs (rollback llarg).</li>
+  <li>Només es recomana fer-ho si la sessió està bloquejant o penjada.</li>
+</ul>    
+
   </section>
 
 
@@ -305,17 +337,17 @@ Cambiando la contrasenya para &lt;nom_usuari>
     <h3> Tipus de permisos</h3>
     <ul>
       <li><strong>Privilegis de sistema</strong>: permeten executar accions globals (crear taules, accedir a sessions...)</li>
-      <li><strong>Privilegis d’objecte</strong>: permeten accedir o modificar objectes concrets (taules, vistes...)</li>
+      <li><strong>Privilegis d'objecte</strong>: permeten accedir o modificar objectes concrets (taules, vistes...)</li>
     </ul>
   
     <h4> Exemples de privilegis de sistema</h4>
     <ul>
       <li><code>CREATE SESSION</code> → accedir a Oracle</li>
       <li><code>CREATE TABLE</code> → crear taules</li>
-      <li><code>UNLIMITED TABLESPACE</code> → ús il·limitat d’espai</li>
+      <li><code>UNLIMITED TABLESPACE</code> → ús il·limitat d'espai</li>
     </ul>
   
-    <h4> Exemples de privilegis d’objecte</h4>
+    <h4> Exemples de privilegis d'objecte</h4>
     <ul>
       <li><code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code> sobre taules</li>
       <li><code>EXECUTE</code> sobre procediments i funcions</li>
@@ -359,7 +391,7 @@ Cambiando la contrasenya para &lt;nom_usuari>
   -- Privilegis de sistema atorgats
   SELECT * FROM dba_sys_privs WHERE grantee = 'JOAN';
   
-  -- Privilegis d’objecte
+  -- Privilegis d'objecte
   SELECT * FROM dba_tab_privs WHERE grantee = 'JOAN';
   
   -- Què puc fer?
@@ -384,7 +416,7 @@ Cambiando la contrasenya para &lt;nom_usuari>
       “clients”, joan té automàticament permisos totals sobre eixa taula que acaba de crear (INSERT, SELECT, DELETE, UPDATE)</p>
     <p>Si un usuari té CREATE TABLE, pot crear taules al seu esquema i, per defecte, té tots 
         els permisos DML sobre les taules que ell mateix crea</p>
-    <p>Si vol accedir o manipular dades en taules d’un altre esquema, cal que l’altre propietari (o un administrador)
+    <p>Si vol accedir o manipular dades en taules d'un altre esquema, cal que l'altre propietari (o un administrador)
            li concedeixca permisos com SELECT, INSERT, UPDATE, DELETE</p>
 
     <hr><h3>Accés a objectes d'un altre usuari</h3>
@@ -395,23 +427,23 @@ Cambiando la contrasenya para &lt;nom_usuari>
 SELECT * FROM user2.table1;</code></pre>
 
    <hr> <h3>Permisos UPDATE i DELETE</h3>
-    <p>El permís que s'atorga sobre un objecte de ‘update’ d’Oracle, necessita anar aparellat 
-      al permís de ‘select’. (També passa amb el permís ‘delete’ )<br>
+    <p>El permís que s'atorga sobre un objecte de ‘update' d'Oracle, necessita anar aparellat 
+      al permís de ‘select'. (També passa amb el permís ‘delete' )<br>
         ❗ ORACLE no ho fa automàticament ❗</p>
 
-    <p>    Si a un usuari se li atorga (grant) permís d’actualització sobre una taula que no es seua.</p>
+    <p>    Si a un usuari se li atorga (grant) permís d'actualització sobre una taula que no es seua.</p>
     <pre><code>grant update on usuari1.taula1 to usuari2; </code></pre>
 i este usuari (usuari2) fa
 <pre><code>update usuari1.taula1 set columna1=valor;
 </code></pre>
-la sentència funcionarà. => L’actualització, s’aplica a <strong>tota la taula</strong> 
+la sentència funcionarà. => L'actualització, s'aplica a <strong>tota la taula</strong> 
 <br><p>Però, si intenta fer</p>
 <pre><code>update usuari1.taula1 set columna1=valor where columna2=valor2;
 </code></pre>
 la sentència <strong>fallarà</strong>. <br>
 perquè? <br>
-<p>Oralce necessita saber les dades de columna2 per poder realitzar l’actualització, i per poder 
-  conéixer eixes dades necessita de permís de ‘select’
+<p>Oralce necessita saber les dades de columna2 per poder realitzar l'actualització, i per poder 
+  conéixer eixes dades necessita de permís de ‘select'
 </p>
 <p>Oracle Database necessita llegir les dades de la fila per a saber com modificar la fila per a
    reflectir els canvis. Si no es tenen els permisos de SELECT, l'actualització no es pot dur a 
@@ -441,7 +473,7 @@ perquè? <br>
    <hr> <h3>Consideracions importants</h3>
     <ul>
       <li> Els privilegis de sistema són molt potents: assigna només els necessaris</li>
-      <li> Els privilegis d’objecte poden donar-se amb més flexibilitat</li>
+      <li> Els privilegis d'objecte poden donar-se amb més flexibilitat</li>
       <li> No utilitzis <code>GRANT ALL</code> llevat que sigui imprescindible</li>
       <li> Revisa i revoca privilegis regularment</li>
     </ul>
@@ -471,7 +503,7 @@ perquè? <br>
     <h3> Tipus de rols</h3>
     <ul>
       <li><strong>Predefinits</strong> (creats per Oracle): <code>DBA</code>, <code>CONNECT</code>, <code>RESOURCE</code>, <code>SELECT_CATALOG_ROLE</code>, etc.</li>
-      <li><strong>Definits per l’usuari</strong>: creats per l’administrador segons les necessitats específiques</li>
+      <li><strong>Definits per l'usuari</strong>: creats per l'administrador segons les necessitats específiques</li>
       <li><strong>Rols actius/inactius</strong>: en una sessió es poden activar o desactivar rols</li>
     </ul>
   
@@ -498,9 +530,9 @@ perquè? <br>
       <strong>de seguida</strong>, encara que ja estigueren connectats, o tinguen sessions obertes des de fa temps,</p>
       <p>Oracle no necessita tancar ni reiniciar la sessió perquè el privilegi faça efecte.</p>
       <p>Els privilegis no es carreguen només en establir la sessió, sinó que Oracle: </p>
-<p style='margin-left: 3em'> Comprova els privilegis d’accés dinàmicament quan el codi SQL s’executa.</p>
+<p style='margin-left: 3em'> Comprova els privilegis d'accés dinàmicament quan el codi SQL s'executa.</p>
 <p style='margin-left: 3em'>Mira els privilegis disponibles a través de roles actius en la sessió.</p>
-<p style='margin-left: 3em'>Si el rol ja està actiu, el nou privilegi del rol passa a estar disponible a l’instant. </p>
+<p style='margin-left: 3em'>Si el rol ja està actiu, el nou privilegi del rol passa a estar disponible a l'instant. </p>
   
    <!-- <h3> Activar i desactivar rols</h3>
     <p>Un usuari pot tindre diversos rols assignats, però potser alguns poden estar actius i altres no.</p>
@@ -517,7 +549,7 @@ perquè? <br>
  Per defecte, Oracle activa automàticament tots els rols assignats, excepte:
      Rols que necessiten password
      Rols que necessiten auth externa (OSAUTH)
-     Rols que explícitament s’han desactivat del DEFAULT
+     Rols que explícitament s'han desactivat del DEFAULT
 <pre>
 --  Per fer que en pròximes sessions, comencen actius o no_actius....
 ALTER USER usuari1 DEFAULT ROLE ALL;        -- activa tots els rols assignats
@@ -526,6 +558,18 @@ ALTER USER usuari1 DEFAULT ROLE rol_x;      -- activa només aquest
 </pre>
 
      -->
+
+ <!--  Igual que en els usuaris, poden haver hi rols locals (a una PDB) 
+        o rols comuns (a moltes o a totes les PDB)          --> 
+        
+<!--  El rol PUBLIC en Oracle no és un “rol amb privilegis potents”, sinó un mecanisme perquè tots els usuaris rebin certs privilegis per defecte.
+És automàtic: tots els usuaris són membres del rol PUBLIC.  
+ots els usuaris tenen sempre el rol PUBLIC automàticament
+PUBLIC no es concedeix ni es revoca.
+És un rol “implícit”. Forma part del model de seguretat d’Oracle.
+no apareixerà a les vistes com:  DBA_ROLE_PRIVS    USER_ROLE_PRIVS    SESSION_ROLES
+Perquè Oracle no el llista: tots els usuaris el tenen sempre.
+-->        
   
     <h3>🔍 Consultes útils</h3>
     <pre>
@@ -535,7 +579,7 @@ ALTER USER usuari1 DEFAULT ROLE rol_x;      -- activa només aquest
   -- Rols definits al sistema
   SELECT * FROM dba_roles;
   
-  -- Privilegis d’un rol
+  -- Privilegis d'un rol
   SELECT * FROM role_sys_privs WHERE role = 'GESTOR_AULA';
     </pre>
   
@@ -560,13 +604,13 @@ ALTER USER usuari1 DEFAULT ROLE rol_x;      -- activa només aquest
     <p>--- Quan s'assigna un rol a un usuari, l'usuari rep tots els privilegis del rol
        i Oracle no permet fer REVOKE d'un privilegi que prové d'un rol.</p>
        <p>Els rols són objectes de la base de dades a nivell global, igual que els usuaris.
-         No estan dins d’un esquema concret, sinó que existeixen a nivell de base de dades i 
+         No estan dins d'un esquema concret, sinó que existeixen a nivell de base de dades i 
          qualsevol usuari els pot rebre.</p>
     <h3> Bones pràctiques</h3>
     <ul>
       <li> Agrupa privilegis per rols segons la funcionalitat (ex: lectura, administració, desenvolupament)</li>
-      <li> Documenta què fa cada rol i qui l’ha de tenir</li>
-      <li> No afegeixis <code>ALL PRIVILEGES</code> dins d’un rol sense motiu justificat</li>
+      <li> Documenta què fa cada rol i qui l'ha de tenir</li>
+      <li> No afegeixis <code>ALL PRIVILEGES</code> dins d'un rol sense motiu justificat</li>
       <li> Usa rols en lloc de donar permisos individuals sempre que siga possible</li>
     </ul>
   </section>
@@ -577,13 +621,14 @@ ALTER USER usuari1 DEFAULT ROLE rol_x;      -- activa només aquest
   
     <h3> Què és un perfil?</h3>
     <p>
-      En Oracle, un <strong>perfil</strong> és un conjunt de restriccions i paràmetres que s’apliquen als usuaris de la base de dades. 
-      Aquests paràmetres permeten controlar l’ús de recursos del sistema (com el nombre màxim de sessions, temps connectat, etc.) 
+      En Oracle, un <strong>perfil</strong> és un conjunt de restriccions i paràmetres que s'apliquen als usuaris de la base de dades. 
+      Aquests paràmetres permeten controlar l'ús de recursos del sistema (com el nombre màxim de sessions, temps connectat, etc.) 
       i establir polítiques de seguretat sobre les contrasenyes.
     </p>
     <p>En oracle hi ha un perfil predefinit. El perfil anomenat <strong>DEFAULT</strong></p>
     <p> Quan es crea un usuari, se li assigna un perfil per defecte -> DEFAULT</p>
-  <pre>SQL> select * from dba_profiles where profile=’DEFAULT’;   </pre>
+    <p class="tips"> => En oracle23 hi ha algun més ?? </p>
+  <pre>SQL> select * from dba_profiles where profile='DEFAULT';   </pre>
   <p>Un perfil té dos tipus/grups de paràmetres</p>
   <ul>
     <li>Paràmetres de recursos</li>
@@ -591,7 +636,7 @@ ALTER USER usuari1 DEFAULT ROLE rol_x;      -- activa només aquest
   </ul>
     <h3> Paràmetres de recursos</h3>
     <p>
-      Els paràmetres de recursos limiten l’ús que pot fer un usuari del sistema. Alguns dels més comuns són:
+      Els paràmetres de recursos limiten l'ús que pot fer un usuari del sistema. Alguns dels més comuns són:
     </p>
     <ul>
       <li><strong>SESSIONS_PER_USER</strong>: Número màxim de sessions que pot tenir un usuari.</li>
@@ -600,6 +645,7 @@ ALTER USER usuari1 DEFAULT ROLE rol_x;      -- activa només aquest
       <li><strong>CPU_PER_SESSION</strong> i <strong>CPU_PER_CALL</strong>: Límit de CPU (en centèsimes de segon).</li>
       <li><strong>LOGICAL_READS_PER_SESSION</strong> i <strong>LOGICAL_READS_PER_CALL</strong>: Límit de lectures lògiques en blocs.</li>
     </ul>
+    <p class="tips"> => Quin és el IDLE_TIME per defecte en Oralce23 ??</p>
   
     <h3> Paràmetres de contrasenya</h3>
     <p>
@@ -614,7 +660,9 @@ ALTER USER usuari1 DEFAULT ROLE rol_x;      -- activa només aquest
       <li><strong>PASSWORD_GRACE_TIME</strong>: Període de gràcia en què l'usuari pot canviar la contrasenya després que hagi expirat.</li>
       <li><strong>PASSWORD_VERIFY_FUNCTION</strong>: Funció de verificació de contrasenyes per aplicar polítiques de complexitat.</li>
     </ul>
-  
+  <p class="tips"> => Quin és el PASSWORD_LIFE_TIME per defecte en Oralce23 ?? <br>
+                    I el PASSWORD_GRACE_TIME ??</p>
+
     <h3> Crear i modificar perfils</h3>
     <p>Pots crear un perfil nou amb l'ordre <code>CREATE PROFILE</code> i modificar-lo amb <code>ALTER PROFILE</code>.</p>
     <pre>
@@ -647,7 +695,7 @@ ALTER USER usuari1 DEFAULT ROLE rol_x;      -- activa només aquest
     <ul>
       <li>Assigna perfils adaptats a la naturalesa dels usuaris (admins, desenvolupadors, operatius, etc.).</li>
       <li>Revisa periòdicament els paràmetres de recursos i contrasenya per garantir un equilibri entre rendiment i seguretat.</li>
-      <li>Assegura’t que els usuaris amb privilegis elevats tinguin polítiques de seguretat més estrictes.</li>
+      <li>Assegura't que els usuaris amb privilegis elevats tinguin polítiques de seguretat més estrictes.</li>
       <li>Utilitza el perfil DEFAULT com a punt de partida i modifica els paràmetres segons les necessitats específiques.</li>
     </ul>
   
@@ -672,12 +720,12 @@ DROP PROFILE nom_perfil [CASCADE]; </pre>
 
     <h3> Resum</h3>
     <p>
-      Els perfils en Oracle són eines fonamentals per controlar l’ús dels recursos i reforçar la seguretat dels comptes d’usuaris. 
+      Els perfils en Oracle són eines fonamentals per controlar l'ús dels recursos i reforçar la seguretat dels comptes d'usuaris. 
       Mitjançant la creació, modificació i assignació de perfils, es pot garantir que els usuaris compleixin amb les polítiques establertes, 
       tot assegurant un rendiment òptim i la protecció de la base de dades.
     </p>
   <ul>
-    <li> Un usuari pot tindre <strong>un únic perfil</strong> i múltiples <strong>rols i privilegis</strong></li>
+    <li> Un usuari pot tindre <strong>un únic perfil</strong> ( i múltiples <strong>rols i privilegis</strong> )</li>
   </ul>
 
   </section>
@@ -782,13 +830,13 @@ WHERE data > '2024-01-01';</code></pre>
   <h1>👯‍♀️ Ús de Synonyms en Oracle</h1>
 
   <p>Un <strong>synonym</strong> (sinònim) en Oracle és un àlies o nom alternatiu per a un objecte de base de dades com 
-    una taula, vista, seqüència, procediment, funció, paquet o altre objecte. Els synonyms s’utilitzen per 
+    una taula, vista, seqüència, procediment, funció, paquet o altre objecte. Els synonyms s'utilitzen per 
     simplificar l'accés als objectes i millorar la seguretat.</p>
 
   <h2>Tipus de Synonyms</h2>
   <ul>
     <li><strong>Public Synonym:</strong> Visible per a tots els usuaris de la base de dades.</li>
-    <li><strong>Private Synonym:</strong> Només visible per a l’usuari que el crea.</li>
+    <li><strong>Private Synonym:</strong> Només visible per a l'usuari que el crea.</li>
   </ul>
 
   <h2>Beneficis de Seguretat i Usabilitat</h2>
@@ -798,11 +846,11 @@ WHERE data > '2024-01-01';</code></pre>
     <li>Facilita la migració o canvi d'esquema sense afectar el codi SQL que fa servir el synonym.</li>
   </ul>
 
-  <h2>Exemples d’ús</h2>
+  <h2>Exemples d'ús</h2>
 
   <h3>1. Crear un synonym privat</h3>
   <pre><code>CREATE SYNONYM emp FOR empresa.empleats;</code></pre>
-  <p>Ara, en lloc de fer servir <code>empresa.empleats</code>, l’usuari pot fer servir simplement <code>emp</code>.</p>
+  <p>Ara, en lloc de fer servir <code>empresa.empleats</code>, l'usuari pot fer servir simplement <code>emp</code>.</p>
 
   <h3>2. Crear un synonym públic</h3>
   <pre><code>CREATE PUBLIC SYNONYM emp FOR empresa.empleats;</code></pre>
@@ -815,12 +863,12 @@ DROP PUBLIC SYNONYM emp;</code></pre>
   <h2>Consideracions de Seguretat</h2>
   <ul>
     <li>No atorga automàticament permisos sobre l'objecte. Cal fer un <code>GRANT</code> per separat.</li>
-    <li>Poden ser útils per limitar l’exposició d’esquemes i estructures internes.</li>
-    <li>Els synonyms públics han de ser usats amb precaució per evitar conflictes i exposició d’objectes no desitjats.</li>
+    <li>Poden ser útils per limitar l'exposició d'esquemes i estructures internes.</li>
+    <li>Els synonyms públics han de ser usats amb precaució per evitar conflictes i exposició d'objectes no desitjats.</li>
   </ul>
 
   <h2>Conclusió</h2>
-  <p>Els <strong>synonyms</strong> en Oracle són útils per simplificar noms d’objectes i ocultar detalls interns. Utilitzats correctament, poden millorar l’organització, la seguretat i la flexibilitat de les aplicacions que accedeixen a la base de dades.</p>
+  <p>Els <strong>synonyms</strong> en Oracle són útils per simplificar noms d'objectes i ocultar detalls interns. Utilitzats correctament, poden millorar l'organització, la seguretat i la flexibilitat de les aplicacions que accedeixen a la base de dades.</p>
 
   </section> 
 
