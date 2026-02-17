@@ -1,0 +1,50 @@
+[
+  {
+    "titol": "Quina de les següents no és una eina de monitoratge?",
+    "opcions": [
+      { "text": "El diccionari de dades", "correcte": false },
+      { "text": "El log d'execució", "correcte": false },
+      { "text": "El monitor de rendiment", "correcte": false },
+      { "text": "El pla d'execució", "correcte": true }
+    ]
+  },
+  {
+    "titol": "Quina de les següents no és una funció del monitor de rendiment?",
+    "opcions": [
+      { "text": "Detecció de bloquejos", "correcte": false },
+      { "text": "Detecció de processos acaparadors", "correcte": false },
+      { "text": "Seguiment de mètriques", "correcte": false },
+      { "text": "Generació del pla d'execució", "correcte": true }
+    ]
+  },
+  {
+    "titol": "En el diccionari de dades es pot comprovar les consultes (pesades) que se estan executant:",
+    "opcions": [
+      { "text": "Fals", "correcte": false },
+      { "text": "Vertader", "correcte": true }
+    ]
+  },
+  {
+    "titol": "En el diccionari de dades es pot comprovar els bloquejos actius:",
+    "opcions": [
+      { "text": "Fals", "correcte": false },
+      { "text": "Vertader", "correcte": true }
+    ]
+  },
+  {
+    "titol": "En el diccionari de dades es pot consultar qui està connectat i que executa:",
+    "opcions": [
+      { "text": "Fals", "correcte": false },
+      { "text": "Vertader", "correcte": true }
+    ]
+  },
+  {
+    "titol": "Per què és necessari actualitzar les estadístiques?",
+    "opcions": [
+      { "text": "S'usen per a comprimir les taules", "correcte": false },
+      { "text": "S'usen per a optimitzar les consultes", "correcte": false },
+      { "text": "S'usen per a optimitzar l'espai d'emmagatzemament", "correcte": false },
+      { "text": "S'usen per a crear el pla d'execució de les consultes", "correcte": true }
+    ]
+  }
+]
