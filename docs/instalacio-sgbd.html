@@ -939,7 +939,8 @@
       <pre>
   show user;
   show con_name;             -- Nom del contenidor actiu
-  select name from v$database;
+  select name from v$database;  -- Nom de la bbdd
+  select * from v$version;      --Versió de la instal·lació
   show pdbs;                -- Mostra les PDB disponibles
   conn system                -- Connecta com SYSTEM
   show sga;
