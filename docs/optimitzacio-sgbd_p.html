@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>📈 Monitoritzar Postgresql</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
+</head>
+<body>
+
+<header>
+  <a href="./">
+      <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
+  </a>
+  <h1>ASGBD   -    Monitorització i Optimització
+    <img src="imgs/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 40px; ">
+  </h1>
+</header>
+
+<nav>
+  <h3>Índex</h3>
+  <a href="#monitoratge">Monitoratge</a>
+  <a href="#optimitzacio">Optimització</a>
+  <a href="#optimitzacio-postgres">Optimització en PostgreSQL</a>
+  <a href="#eines-optimitzacio">Eines d'optimització</a>  
+  <a href="#optimitzacio-objectes">Optimització en objectes</a>  
+  <a href="#altres-recursos">Altres Recursos</a> 
+</nav>
+
+<main>
+
+  <section id="monitoratge">
+    <h2> Monitoratge del Sistema Gestor de Bases de Dades (SGBD)</h2>
+  
+    <h3> Què és el monitoratge?</h3>
+    <p>El <strong>monitoratge</strong> és el procés de controlar el funcionament del sistema gestor, detectant 
+      possibles errors o situacions que puguin afectar el rendiment. 
+      Ha de ser <strong>poc intrusiu</strong>, per tal de no interferir en el funcionament normal del sistema.
+    </p>
+    <p>S'ha de tractar que les tasques de monitoratge i diagnòstic del sistema siguen el menys intrusives possible 
+      perquè no penalitzen el rendiment del sistema gestor, i relegar les tasques que requerisquen un consum de 
+      recursos mitjà o elevat per a realitzar-les en moments de baixa càrrega</p>
+  
+    <h3>🧰 Eines principals de monitoratge</h3>
+    <ul> <strong>Vistes del sistema</strong>
+      <li>Activitat en temps real: <code>pg_stat_activity</code> </li>
+      <li>Estadistiques de taules: <code>pg_stat_user_tables</code></li>
+      <li>Bloquejos: <code>pg_locks</code></li>
+      <li>Consultes lentes: <code>pg_stat_statements</code> (extensió)</li>
+    </ul>
+
+    <ul> <strong> Extensions de monitoratge</strong>
+      <li>pg_stat_statements</li>
+      <li>auto_explain</li>
+      <li>pgstattuple</li>
+      <li>pgaudit</li>
+    </ul>
+
+    <ul> <strong>Eines gràfiques</strong>
+      <li>pgAdmin</li>
+      <li>Prometheus + Grafana</li>
+      <li>Zabbix / Nagios</li>
+    </ul>
+
+    <ul> <strong>Altres</strong>
+      <li>Logs del servidor</li>
+      <li>Plans d'execució</li>
+    </ul>
+  
+  <hr>  <h3>📝 Registre d’errors (fitxers de logs)</h3>
+    <p>  Registra activitats com arrencades, aturades, errors, consultes lentes, etc.
+    </p>
+    <ul>
+      <li> <strong>Error</strong>: problemes greus</li>
+      <li> <strong>Warning</strong>: advertències</li>
+      <li> <strong>Debug</strong>: informació detallada (en desenvolupament)</li>
+    </ul>
+
+  <hr>  <h3>🖥️ Monitoratge gràfic </h3>
+    <p>⚠️ Les ferramentes gràfiques consumeixen més recursos que les consultes al DD<br>
+      ⚠️ Les ferramentes gràfiques requereixen més permisos que les consultes al DD</p>
+ 
+  </section>
+  
+
+
+
+  <section id="optimitzacio">
+    <h2> Optimització</h2>
+  
+    <h3>🎯 Objectiu</h3>
+    <p>
+      L’objectiu de l’optimització és <strong>millorar el rendiment</strong> del sistema, tot reduint els temps de resposta, 
+      l’ús de recursos i l’impacte en l’usuari final. 
+      No es tracta només de fer que les consultes funcionen, sinó que siguen <strong>ràpides i eficients</strong>.
+    </p>
+  <h3>Nivells on optimitzar</h3>
+  <ul>
+    Entorn
+    <ul>  <li>a nivell de Sistema Operatiu</li>
+    <li>a nivell de Xarxa</li>
+    </ul>
+    Sistema Gestor
+    <ul>
+      <li>Grandària i ubicació de fitxers de dades</li>
+      <li>Grandària de l'emmagatzemament temporal</li>
+
+    </ul>
+    Base de Dades
+    <ul>
+      <li>Disseny de taules i tipus de dades (Ajustar al necessari)</li>
+      <li>Camps calculats (intentar mantindre els menys possibles)</li>
+      <li>Desnormalització (reduir JOIN a costa de augmentar redundància)</li>
+      <li>Desfragmentació: VACUUM, VACUUM FULL, AUTOVACUUM</li>
+      <li>Particionament </li>
+      <li>Crear, modificar o eliminar índex</li>
+      <li>Optimització de consultes </li>
+    </ul>
+  </ul>
+
+  <h3>Particionament</h3>
+  <li>S’evita processar tota una taula (sols es processa la partició)</li>
+  <li>Les dades poden ser accedides en paral·lel</li>
+  <li>Facilita operacions com p.e. el purgat de dades</li>
+
+  <h3>Creació d'índex</h3>
+  <ul>
+  <li>Sobre que columnes crear
+    <ul>
+      <li>Claus primaries i alienes ( normalment ja ho fa el SGBD)</li>
+      <li> Columnes que habitualment apareixen en SELECT i en WHERE</li> 
+      <li> Columnes amb bona selectivitat ( si poques files tenen el mateix valor)</li> </ul> 
+  </li>
+  <li>Sobre que columnes NO crear 
+    <ul>
+      <li>Taules amb poques dades</li>
+      <li>Columnes amb molts valors NULL</li> 
+      <li>Columnes amb valors que es modifiquen molt sovint </li> 
+      <li>Índex sobre moltes columnes</li>
+      <li>Molts índex per taula</li>
+    </ul> 
+  </li>
+
+  <li>Que tipus d’índex crear
+<ul>
+      <li>Índex B-tree</li>
+      <li>GIN</li>
+      <li>GiST</li>
+      <li>BRIN</li>
+     </ul>
+  </li>
+</ul>s
+
+<h3> Optimització de consultes</h3>
+    <ul>
+      <li>Usar taules derivades, subconsultes i joins </li>
+      <li>Cursors i funcions  </li>
+      
+    </ul>   
+    <hr><hr>
+       
+    <h3> Pràctiques recomanades per a índex</h3>
+    <ul>
+      <li> Columna freqüentment filtrada (WHERE)</li>
+      <li> Columnes utilitzades en JOINs</li>
+      <li>⚠️ No crear índexs per defecte a totes les columnes (consumeixen espai i poden alentir INSERT/UPDATE)</li>
+    </ul>
+
+    <h3> Pràctiques recomanades per a consultes</h3>
+    <ul>
+      <li> Utilitza <code>EXPLAIN </code> per analitzar l'estratègia de consulta (s'explica en el següent punt)</li>
+      <li> Evita <code><strong>SELECT *</strong> </code>: només demana les columnes necessàries</li>
+      <li> Evita subconsultes correlacionades no indexades</li>
+      <li> Fes ús de joins eficients (preferentment explícits)</li>
+      <li> Controla l’ús de funcions sobre columnes indexades</li>
+    </ul>
+
+
+
+    <h3>🛑 Consultes ineficients</h3>
+    <p>Exemples a evitar:</p>
+    <ul>
+      <li><code>SELECT * FROM taula;</code> → molt costós si té moltes columnes</li>
+      <li><code>WHERE TO_CHAR(data, 'YYYY') = '2023'</code> → trenca índexs</li>
+      <li><code>WHERE UPPER(nom) = 'JOAN'</code> → si no hi ha índex amb UPPER</li>
+    </ul>
+  
+    <h3> Versions millorades</h3>
+    <pre>-- Evitar funcions sobre columnes
+WHERE data >= TO_DATE('01/01/2023', 'DD/MM/YYYY')
+
+-- Substituir subconsulta per JOIN
+SELECT a.nom, c.nom_curs
+FROM alumnes a
+JOIN cursos c ON a.curs_id = c.id;      </pre>
+  
+    <h3> Altres consells d’optimització</h3>
+    <ul>
+      <li> Usa <code>BULK COLLECT</code> i <code>FORALL</code> per treballar amb grans volums en PL/SQL</li>
+      <li> Utilitza particions en taules molt grans</li>
+      <li> Evita bloquejos i transaccions llargues</li>
+    </ul>
+  
+    <h3> Resum de bones pràctiques</h3>
+    <ul>
+      <li> Coneix el model de dades i el volum</li>
+      <li> Usa EXPLAIN  sovint</li>
+      <li> Mantén estadístiques al dia</li>
+      <li> Indexa amb criteri</li>
+      <li> Millora consultes repetitives o lentes</li>
+    </ul>
+  </section>
+  
+
+
+
+  <section id="optimitzacio-postgres">
+    <h2> Optimització en PostgreSQL</h2>
+  
+     <h3>📈 L'optimitzador</h3>
+    <p> Postgres utilitza un component anomenat <strong>query planner/ optimizer</strong> per determinar el millor 
+      pla d’execució per a una consulta SQL.
+      L’objectiu és minimitzar el temps d’execució i l’ús de recursos.
+    </p>
+        
+    <h3>📊 Estadístiques</h3>
+    <p>Postgres utilitza un optimitzador basat en costos anomenat "planner"</p>
+    <p> L’optimitzador utilitza <strong>estadístiques</strong> sobre les taules, columnes i índexs 
+      per decidir l’estratègia d’execució.     </p>
+  
+    <h4> Com generar estadístiques</h4>
+    <pre>-- Es fan automaticament, però es poden fer manualment amb
+    ANALYZE;
+    ANALYZE alumnes;
+    ANALYZE alumnes(edat, nom);
+    VACUUM ANALYZE alumnes;
+    </pre>
+        <p><strong>⚠️ és molt importat crear tasques programades que realitzen esta 
+      actualització fora d'hores de càrrega de treball</strong></p> 
+
+    <h4>Com vore estadístiques</h4>
+    <pre>SELECT *  FROM pg_stats  WHERE tablename = 'alumnes';</pre>   
+  
+    <h4>També es poden automatitzar mitjançant tasques de manteniment o recollida automàtica.</h4>
+  
+    <h3>🧪 EXPLAIN </h3>
+    <p> Aquesta ordre permet visualitzar el pla que Postgres seguirà per executar una consulta (sense executar-la realment). 
+      Mostra si s’utilitzen índexs, escaneigs complets, joins, etc.    Ajuda a detectar consultes lentes o mal optimitzades.
+    </p>
+    <ul> S'usa principalment per:
+      <li>Analitzar rendiment</li>
+      <li>Detectar colls de botella</li>
+      <li>Veure si s'estan usant index</li>
+      <li>Entendre perquè és lenta una consulta</li>
+      <li>Ajuda a optimitzar una SQL</li>
+    </ul>
+   
+    <h4> Exemple d’ús</h4>
+    <pre>EXPLAIN SELECT * FROM alumnes WHERE edat > 18;
+o 
+EXPLAIN ANALYZE SELECT * FROM alumnes WHERE edat > 18;   </pre>
+
+<h4>EXPLAIN a pgAdmin (PostgreSQL)</h4>
+<ul> Usant el botó Explain
+  <li>Escriu la consulta al query tool (worksheet)</li>
+  <li>Selecciona la consulta o deixa el cursor dins</li>
+  <li>Fes clic al botó Explain (icona amb lupa o arbre)</li>
+  <li>Mostra el pla estimat sense executar la consulta</li>
+  <li>Opcionalment, fes clic a Explain Analyze per veure el pla real amb temps d’execució i files retornades</li>
+</ul>
+<p>Manualment amb SQL</p>
+<pre>
+-- Pla estimat
+EXPLAIN SELECT * FROM alumnes WHERE edat > 18;
+
+-- Pla amb execució real
+EXPLAIN ANALYZE SELECT * FROM alumnes WHERE edat > 18;  </pre>   
+
+  
+    <h3> Factors que afecten el pla d’execució</h3>
+    <ul>
+      <li>Disponibilitat d’índexs</li>
+      <li>Estadístiques actualitzades</li>
+      <li>Volum de dades</li>
+      <li>Condicions de filtre i joins</li>
+    </ul>
+  
+  
+    <h3> Recomanacions generals</h3>
+    <ul>
+      <li> Revisa les consultes lentes amb EXPLAIN </li>
+      <li> ANALYZE taula;  EXPLAIN ANALYZE;</li>
+      <li> Actualitza estadístiques sovint</li>
+      <li> Fes servir índexs de manera estratègica</li>
+      <li> Prova diferents opcions de joins segons el volum i condicions</li>
+      <li> Evita accessos complets si pots usar índexs</li>
+    </ul>
+  
+    <h3> Exemple de consulta optimitzada</h3>
+    <p>Consulta original (lenta):</p>
+    <pre>SELECT * FROM alumnes WHERE TO_CHAR(data_naixement, 'YYYY') = '2005';      </pre>
+  
+    <p>Versió optimitzada:</p>
+    <pre>SELECT * FROM alumnes
+WHERE data_naixement >= DATE '2005-01-01'
+  AND data_naixement < DATE '2006-01-01';                      </pre>
+  
+    <h3>💬 Conclusió</h3>
+    <p>
+      L’optimització en PostgreSQL es basa en la col·laboració entre el desenvolupador i l’optimitzador del sistema. 
+      Mantenir estadístiques actualitzades, evitar males pràctiques i revisar plans d’execució són claus per un rendiment òptim.
+    </p>
+  </section>
+  
+  
+  <section id="eines-optimitzacio">
+    <h2> Eines d'optimització en PostgreSQL</h2>
+  
+    <h3>🎯 Objectiu</h3>
+    <p>      Aquestes eines permeten <strong>analitzar el rendiment</strong> de consultes SQL, sessions i càrregues del sistema, ajudant a diagnosticar colls d’ampolla i a optimitzar els accessos a dades.
+    </p>
+  
+    <hr>
+  
+    <h3> 1. EXPLAIN </h3>
+    <p>      Mostra el pla d’execució previst per postgresql per a una consulta. 
+      Ajuda a detectar si s’utilitzen índexs o si es fa un escaneig complet de taula.
+    </p>
+    <pre>EXPLAIN; EXPLAIN ANALYZE;  
+EXPLAIN SELECT * FROM alumnes WHERE edat > 18;
+
+-- amb execució real
+EXPLAIN ANALYZE SELECT * FROM alumnes WHERE edat > 18;      </pre>
+  
+    <p><strong>Sortides habituals:</strong></p>
+    <ul> Mostra:
+      <li>cost estimat</li>
+      <li>temps d’execució (amb ANALYZE)</li>
+      <li>joins (Nested Loop, Hash Join, Merge Join)</li>
+    </ul>
+  
+    <hr>
+      <h3> 2. pg_stat_statements </h3>
+      <p>Extension que guarda estadístiques de totes les consultes executades.
+Permet identificar les consultes més pesades i el seu impacte en CPU, I/O i temps.</p>
+<pre>-- Top 10 consultes per temps total
+SELECT query, calls, total_time, rows
+FROM pg_stat_statements
+ORDER BY total_time DESC
+LIMIT 10;</pre>
+
+<h3> 3. pg_stat_activity </h3>
+<p>Permet veure l’estat de les sessions actives i quines consultes s’estan executant: </p>
+<pre>SELECT pid, usename, state, query, query_start
+FROM pg_stat_activity
+WHERE state = 'active';</pre>
+<ul>
+<li>Útil per detectar sessions que bloquegen recursos o provoquen càrrega elevada</li>
+<li>Combina amb pg_locks per veure bloquejos:</li>  </ul>
+<pre>SELECT * FROM pg_locks;</pre>
+
+<h3> 4. Estadístiques de taula </h3>
+<p>El planner de PostgreSQL utilitza estadístiques per decidir el millor pla.
+ANALYZE → actualitza estadístiques d’una taula o columnes concretes:</p>
+<pre>ANALYZE alumnes;
+ANALYZE alumnes(edat, nom);</pre>
+<p>VACUUM ANALYZE → neteja + actualització de estadístiques:</p>
+<pre>VACUUM ANALYZE alumnes;</pre>
+<p>AUTOVACUUM → automàtic, manté estadístiques actualitzades sense intervenció manual</p>
+
+<h3> 5. Altres eines gràfiques </h3>
+<ul>
+  <li>pgAdmin Dashboard → monitoratge de sessions, càrrega i consulta de plans</li>
+  <li>pgBadger → informes d’ús i rendiment basats en logs</li>
+  <li>Grafana + Prometheus → dashboards de rendiment avançats</li>
+</ul>
+
+<h3>Bones pràctiques d’optimització de consultes</h3>
+<ul>
+  <li>Evita SELECT *, només selecciona les columnes necessàries</li>
+  <li>Indexa columnes que apareixen en WHERE i JOIN</li>
+  <li>Evita subconsultes correlacionades no indexades</li>
+  <li>Avalua l’ús de EXPLAIN ANALYZE abans i després de canvis</li>
+  <li>Prova diferents tipus de joins segons volums de dades (Nested Loop, Hash Join)</li>
+</ul>
+
+
+  </section>
+  
+  
+  <section id="optimitzacio-objectes">
+
+<h1>Optimització dels objectes de la bbdd</h1>
+
+    <h2>Fragmentació de Taules en PostgreSQL</h2>
+  
+    <h4>🔍 Què és la fragmentació de taules?</h4>
+    <p>
+      La <strong>fragmentació (o bloat)</strong> fa referència a l'espai de memòria mal aprofitat dins d'una taula (o índex) a la base de dades.
+      Pot provocar que certes operacions, com escaneigs complets de taula o accés via índex, siguin menys eficients.
+    </p>
+  
+    <h4> Causes comunes de fragmentació en PostgreSQL</h4>
+    <ul>
+      <li><strong>Insercions i esborrats freqüents</strong>: deixen "forats" dins dels blocs que no es reomplen automàticament.</li>
+      <li><strong>Actualitzacions amb valors més grans</strong>: poden generar <em>row chaining</em>.</li>
+    </ul>
+  
+    <h4> Conseqüències de la fragmentació</h4>
+    <ul>
+      <li>Rendiment més lent en consultes.</li>
+      <li>Increment d'I/O.</li>
+    </ul>
+  
+    <h4>🧰 Com detectar la fragmentació</h4>
+<pre>
+-- mida aproximada de taula i índexs
+SELECT 
+    relname AS taula,
+    pg_total_relation_size(relid) AS mida_total_bytes,
+    pg_relation_size(relid) AS mida_taula_bytes,
+    pg_indexes_size(relid) AS mida_indexes_bytes
+FROM pg_stat_user_tables;
+
+-- mida real dels blocs i tuples buides
+SELECT *, 
+       (pg_total_relation_size(relid) - pg_relation_size(relid)) AS bloat_bytes
+FROM pg_stat_user_tables;
+</pre>
+<p>ambé es poden usar extensions com pgstattuple:</p>
+<pre>
+CREATE EXTENSION IF NOT EXISTS pgstattuple;
+SELECT * FROM pgstattuple('alumnes');  </pre>
+
+  
+    <h4>🛠️ Solucions per reduir o eliminar la fragmentació</h4>
+  <pre>
+VACUUM;          -- neteja bàsica
+VACUUM FULL;     -- recupera espai i compacta taula    </pre>
+<p>VACUUM → habitual i ràpid, manté estadístiques <br>
+VACUUM FULL → lent, bloqueja la taula, recupera espai físic</p>
+
+<pre>
+REINDEX TABLE alumnes;
+-- o per un índex concret
+REINDEX INDEX idx_nom;
+</pre>
+<p>Recomanat quan els índexs tenen bloat</p>
+
+<pre>
+CLUSTER alumnes USING idx_nom;  </pre>
+<p>Reorganitza físicament la taula segons un índex <br>
+Millora accessos seqüencials <br>
+Bloqueja la taula mentre s’executa</p>
+
+<pre>
+CREATE TABLE alumnes_nova AS SELECT * FROM alumnes;
+DROP TABLE alumnes;
+ALTER TABLE alumnes_nova RENAME TO alumnes;
+</pre>
+<p>Crear una taula nova i copiar dades:</p>
+
+<h2>📊 Índexs</h2>
+<p>   Els <strong>índexs</strong> permeten accedir més ràpidament a dades. Cal usar-los correctament: </p>
+ 
+<h4>🔧 Crear un índex</h4>
+<pre>CREATE INDEX idx_nom ON alumnes(nom);  </pre>
+
+<pre>create index nom_ind on nom_taula (camp1, camp2,..);
+REINDEX INDEX nom_ind ; </pre>
+
+  <p>Quan es crea una taula amb una clau primaria o unique, PostgreSQL crea un índex automàticament</p>
+  <p>Quan crees PRIMARY KEY o UNIQUE, PostgreSQL crea automàticament un índex B-tree</p>
+ 
+  <h4>Reconstruir índex</h4>
+<pre>REINDEX INDEX nom_ind ;   </pre>
+
+  <h4>Com explorar els índex (en DD)</h4>  
+  <pre>
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'alumnes';    </pre>
+
+<hr> <h2>Particionament</h2>
+<pre>create table ....( ) partition by range(nomcamp) (....);</pre>
+
+    <h4> En que consisteix el particionament?</h4>
+    <p>El particionament consisteix a <strong>dividir lògica i físicament una taula gran</strong> en parts més menudes 
+      anomenades <em>particions</em>, de manera que el sistema puga gestionar-les de forma més eficient.</p>
+  
+
+    <h4> Per a què serveix?</h4>
+<p>Per exemple imaginem una taula de factures, on tenim el detall de la nostra facturació
+   al llarg de 9 anys, 2017, 2018… 2025, si volguérem fer:</p>
+<p><code> SELECT SUM(total_fac) FROM facturacio WHERE any = 2019;</code></p>
+<p>En aquest exemple s'hauria de recórrer tota la taula (imaginem que parlem de 30 milions de registres en total,
+   és molt no?), per aquest motiu un criteri possible per a particionar la taula seria per l'any de la
+    data de la factura</p>
+
+    <ul>
+      <li> Millora del rendiment de consultes.</li>
+      <li> Facilita el manteniment (per exemple, eliminar o arxivar particions antigues).</li>
+      <li> Millor gestió de l'emmagatzematge.</li>
+      <li> Paral·lelisme en operacions.</li>
+    </ul>
+  
+    <h4> Tipus de particionament</h4>
+
+    <h4>1. Particionament per rang (<code>RANGE</code>)</h4>
+    <p>Divideix segons un valor dins d’un rang (ex: dates).</p>
+    <pre><code>CREATE TABLE vendes (
+    id SERIAL PRIMARY KEY,
+    data_venda DATE,
+    import NUMERIC
+) PARTITION BY RANGE (data_venda);
+
+-- Particions
+CREATE TABLE vendes_2019 PARTITION OF vendes
+    FOR VALUES FROM ('2019-01-01') TO ('2020-01-01');
+
+CREATE TABLE vendes_2020 PARTITION OF vendes
+    FOR VALUES FROM ('2020-01-01') TO ('2021-01-01');
+
+CREATE TABLE vendes_2021 PARTITION OF vendes
+    FOR VALUES FROM ('2021-01-01') TO ('2022-01-01');
+
+CREATE TABLE vendes_future PARTITION OF vendes
+    FOR VALUES FROM ('2022-01-01') TO ('9999-12-31');  </code></pre>
+
+    <h4>2. Particionament per llista (<code>LIST</code>)</h4>
+    <p>Divideix segons valors específics.</p>
+    <pre><code>
+CREATE TABLE clients (
+    id SERIAL PRIMARY KEY,
+    nom VARCHAR(50),
+    regio VARCHAR(20)
+) PARTITION BY LIST (regio);
+
+CREATE TABLE clients_nord PARTITION OF clients FOR VALUES IN ('NORD');
+CREATE TABLE clients_sud PARTITION OF clients FOR VALUES IN ('SUD');
+CREATE TABLE clients_est PARTITION OF clients FOR VALUES IN ('EST');
+CREATE TABLE clients_oest PARTITION OF clients FOR VALUES IN ('OEST');      </code></pre>
+
+<h4> Com saber quina estratègia escollir?</h4>
+<p>Depèn de:</p>
+<ul>
+  <li>El tipus de consultes habituals.</li>
+  <li>La mida de les dades.</li>
+  <li>El tipus de columna (distribució, cardinalitat).</li>
+  <li>Necessitats de manteniment i arxiu.</li>
+</ul>
+
+<h4> Altres operacions útils</h4>
+<pre><code>-- Afegir partició
+CREATE TABLE vendes_2022 PARTITION OF vendes
+    FOR VALUES FROM ('2022-01-01') TO ('2023-01-01');
+  
+
+-- Eliminar partició
+DROP TABLE vendes_2020;
+
+-- Consultar només una partició
+SELECT * FROM vendes
+WHERE data_venda >= '2021-01-01' AND data_venda < '2022-01-01';</code></pre>
+
+    <h4> Consultar si una taula està particionada</h4>
+    <pre><code>
+SELECT relname AS table_name,
+       relkind AS table_type
+FROM pg_class
+WHERE relname = 'vendes';    
+
+o 
+
+SELECT *
+FROM pg_partitioned_table pt
+JOIN pg_class c ON c.oid = pt.partrelid
+WHERE c.relname = 'vendes';   </code></pre>
+  
+
+<h2>Optimització de consultes</h2>
+
+<h3>Pla d'execució</h3>
+<p>PostgreSQL no emmagatzema els plans d’execució en una taula com Oracle, però el planner
+   calcula un pla cada vegada que s’executa una consulta (SELECT, UPDATE, INSERT, DELETE).</p>
+
+<ul>El pla indica:
+  <li>Com es llegiran les dades (seqüencialment o amb índex)</li>
+  <li>Quin tipus de join s’utilitzarà (Nested Loop, Hash Join, Merge Join)</li>
+  <li>L’ordre d’accés a les taules</li>
+  <li>El cost estimat i files estimades</li>
+</ul>
+
+<h4>Eines per vore el pla</h4>
+<pre>
+-- Pla estimat (no executa la consulta)
+EXPLAIN SELECT * FROM t_pedidos WHERE codpedido = 5;
+
+-- Pla amb execució real i temps real
+EXPLAIN ANALYZE SELECT * FROM t_pedidos WHERE codpedido = 5;  </pre>
+
+<li>PostgreSQL no requereix permisos especials per veure EXPLAIN</li>
+<li>En pgAdmin, es pot fer clic a Explain o Explain Analyze per veure-lo gràficament</li>
+
+<h3>Estadistiques</h3>
+<p>El planner utilitza estadístiques de taules i columnes (ANALYZE) per decidir el millor pla.</p>
+<pre>-- Exemple per vore estadístiques
+SELECT *
+FROM pg_stats
+WHERE tablename = 't_pedidos';  </pre>
+
+<h3>Monitoratge de consultes</h3>
+<li>pg_stat_activity → sessions actives i queries en execució</li>
+<li>pg_stat_statements → historial de consultes amb temps, I/O, número de crides</li>
+<pre>-- Consultes més lentes
+SELECT query, calls, total_time, rows
+FROM pg_stat_statements
+ORDER BY total_time DESC
+LIMIT 10;  </pre>
+
+<pre>-- Sessions actives
+SELECT pid, usename, state, query, query_start
+FROM pg_stat_activity
+WHERE state = 'active';</pre>
+
+<h3>Insercions massives i manipulació de taules</h3>
+<pre>-- carregar dades massives des de fitxers CSV:
+COPY t_pedidos FROM '/path/to/file.csv' CSV HEADER;  </pre>
+
+<pre>INSERT en bulk sense index temporalment 
+  → opcional: treure temporalment indexes per a càrregues molt grans i reconstruir-los després amb REINDEX.  </pre>
+
+<h4>TRUNCATE → eliminar totes les files ràpidament:</h4>
+<pre>TRUNCATE TABLE t_pedidos;</pre>
+
+<h4>Vistes materialitzades → PostgreSQL suporta MATERIALIZED VIEW:</h4>
+<pre>
+CREATE MATERIALIZED VIEW v_pedidos_totals AS
+SELECT cliente_id, SUM(total_fac) AS total
+FROM t_pedidos
+GROUP BY cliente_id;
+
+-- Actualitzar-la
+REFRESH MATERIALIZED VIEW v_pedidos_totals;   </pre>
+
+</section>
+
+
+
+
+<section id="altres-recursos">
+
+       <hr><h3>Repàs...</h3>
+    <div id="progress-container">
+    <div id="progress-bar"></div>  </div>
+    <!-- <div id="percentatge-text">0%</div>  -->
+
+    <div class="quiz-container">
+        <h4 id="pregunta-text"></h4>
+        <div id="options-container" class="options">
+        </div>
+
+        <p id="feedback"></p>
+        <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
+        <button onclick="carregarPreguntes()">🔁 Reiniciar</button>
+ 
+
+</section>
+
+
+</main>
+
+
+<script>
+
+  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+      //  <div class="pre-container">
+      //    <button class="copy-button">Copia Codi !</button>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+
+//  Per fer test final
+  // Primer es crea un bancDePreguntes   const
+  // i desprès es carrega una pregunta aleatoria    function
+  // per ultim la funcio de comprobar resposta per a quan es polse un botó
+
+let bancDePreguntes = [];
+let preguntesBarrejades = [];
+let indexPreguntaActual = 0;
+let puntuacio = 0;
+
+function barrejar(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function actualitzarProgres() {
+    const percentatge =
+        (indexPreguntaActual / preguntesBarrejades.length) * 100;
+    document.getElementById('progress-bar').style.width =
+        percentatge + "%";
+}
+
+function actualitzarPercentatge() {
+    const percentatge = Math.round(
+        (puntuacio / preguntesBarrejades.length) * 100
+    );
+    document.getElementById('percentatge-text').innerText =""
+       // `Encerts: 🎯 ${percentatge}%`;
+}
+
+
+function carregarPreguntes() {
+    fetch('preguntes/preguntes51.json')
+        .then(res => res.json())
+        .then(data => {
+            bancDePreguntes = data;
+            preguntesBarrejades = [...bancDePreguntes];
+            barrejar(preguntesBarrejades);
+            puntuacio = 0;
+            indexPreguntaActual = 0;
+            mostrarPregunta();
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('pregunta-text').innerText =
+                "Error carregant les preguntes 😢";
+        });
+        //document.getElementById('percentatge-text').innerText = "0%";
+
+}
+
+function mostrarPregunta() {
+
+    // Si ja no queden preguntes
+    if (indexPreguntaActual >= preguntesBarrejades.length) {
+        document.getElementById('pregunta-text').innerText =
+            "🎉 Has acabat totes les preguntes!";
+        document.getElementById('options-container').innerHTML = "";
+        document.getElementById('feedback').innerHTML =
+        `Has encertat <strong>${puntuacio}</strong> de 
+        <strong>${preguntesBarrejades.length}</strong> preguntes.`;
+        document.getElementById('btn-seguent').disabled = true;
+        document.getElementById('progress-bar').style.width = "100%";
+        actualitzarProgres();
+        return;
+    }
+
+    const pregunta = preguntesBarrejades[indexPreguntaActual];
+
+    document.getElementById('pregunta-text').innerText = pregunta.titol;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    pregunta.opcions.forEach(opcio => {
+        const btn = document.createElement('button');
+        btn.innerText = opcio.text;
+        btn.onclick = () => comprovaResposta(opcio.correcte, btn);
+        container.appendChild(btn);
+    });
+
+    document.getElementById('feedback').textContent = "";
+    document.getElementById('btn-seguent').disabled = true;
+    actualitzarProgres();
+
+}
+
+
+function comprovaResposta(esCorrecte, element) {
+    const feedback = document.getElementById('feedback');
+
+    document
+        .querySelectorAll('#options-container button')
+        .forEach(btn => btn.disabled = true);
+
+    if (esCorrecte) {
+        feedback.textContent = "✅ Correcte! Molt bé.";
+        element.style.background = "#d4edda";
+        puntuacio++;
+    } else {
+        feedback.textContent = "❌ Incorrecte.";
+        element.style.background = "#f8d7da";
+    }
+    //actualitzarPercentatge();
+    document.getElementById('btn-seguent').disabled = false;
+}
+
+function seguentPregunta() {
+    indexPreguntaActual++;
+    mostrarPregunta();
+}
+
+ 
+
+// Executar en carregar la pàgina
+window.onload = carregarPreguntes;
+
+
+</script>
+
+</body>
+</html>

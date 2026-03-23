@@ -678,8 +678,19 @@ PostgreSQL permet extensions:
     <pre>sudo apt update
 sudo apt install postgresql postgresql-contrib
 </pre>
-    <p>Açò instal·la: El <strong>servidor</strong> PostgreSQL, Eines bàsiques,  Extensions comunes</p>
-    <ul> 🧰 Eines bàsiques de PostgreSQL
+<p>Açò instal·la: El <strong>servidor</strong> PostgreSQL, Eines bàsiques,  Extensions comunes</p>
+    <p>Durant la instal·lació: Es crea l’usuari del sistema: postgres , Es crea un clúster per defecte, 
+      El servei s’inicia,  Escolta pel port 5432</p>
+
+    <h4>  Comprovar que el servidor / servei funciona</h4>
+    <pre>sudo systemctl status postgresql</pre>
+    <h4>Entrar en PostgreSQL. Amb client psql</h4>
+    <pre>sudo -u postgres psql </pre>
+      <h4>Eixir de psql</h4>
+    <pre>\q </pre>
+
+    <h4>🧰 Eines bàsiques de PostgreSQL</h4>
+    <ul> 
         <li><code>psql</code> Client de línia de comandes. Serveix per connectar-te al servidor PostgreSQL, Executar consultes SQL, Administrar bases de dades i rols</li>
         <li><code>createdb / dropdb</code> Crear i eliminar bases de dades des de la terminal</li>
         <li> <code>createuser / dropuser</code>  Crear i eliminar usuaris (rols)</li>
@@ -687,8 +698,8 @@ sudo apt install postgresql postgresql-contrib
         <li><code>pg_restore</code> Restaurar còpies fetes amb pg_dump en format no-text</li>
         <li><code>pg_isready / pg_ctl </code></li>
     </ul>
-
-    <ul> Extensions comunes
+    <h4> Extensions comunes</h4>
+    <ul>
         <li> uuid-ossp (UUIDs)</li> 
         <li>pg_trgm (cerques similars)</li>
         <li>hstore (clau-valor en una columna)</li>
@@ -699,14 +710,7 @@ sudo apt install postgresql postgresql-contrib
     <p>S’activen dins la base de dades, no al sistema:</p>
     <pre>CREATE EXTENSION pg_trgm; </pre>
 
-    <p>Durant la instal·lació: Es crea l’usuari del sistema: postgres , Es crea un clúster per defecte, 
-      El servei s’inicia,  Escolta pel port 5432</p>
-
-    <h4>  Comprovar que funciona</h4>
-    <pre>sudo systemctl status postgresql</pre>
-    <h4>Entrar en PostgreSQL</h4>
-    <pre>sudo -u postgres psql </pre>
-
+<hr>
    <h3>Instal·lació en Windows</h3>
    <h4>Instal·lador gràfic</h4>
    <li>Es descarrega un instal·lador oficial</li>
@@ -782,6 +786,15 @@ sudo systemctl restart postgresql </pre>
 \l+
 SELECT datname FROM pg_database;      </pre>
 
+<pre>Com saber a quina bbdd estem connectats…
+SELECT current_database();
+o 
+\conninfo
+o 
+Normalment el prompt mostra la base de dades:     testdb=#
+
+</pre>
+
     <p>I per canviar (connectar) a una altra BBDD</p>
     <pre>\c nom_bbdd
 \connect nom_bbdd  </pre>
@@ -795,10 +808,81 @@ SELECT datname FROM pg_database;      </pre>
       <li> Utilitzant TOAD  (multi-SGBD propietari)</li>
     </ul>
 
+  <h3>PgAdmin</h3>
+     <img src="./imgs/pgadmin1.png" alt="pgadmin1" class="imatge-esquerra" width="40%">
+  <p>Per accedir a una instància de postgresql es necessita:  </p>
+  <ul>
+    <li>IP o url</li>
+    <li>port</li>
+    <li>usuari / password</li>
+  </ul>
+
+   <pre> </pre>
     <p>🎓 Amb tots aquests coneixements, ja estàs preparat/ada per començar la unitat dos. Configuració d'un SGBD </p>
 
   </section>
   
+  <section>
+    <h2>Instal·lar més d'una instància en una mateixa màquina</h2>
+    <h3>Directoris de dades separats</h3>
+    <p>Cada instància necessita el seu PGDATA, és a dir, el directori on es guarden les dades, logs i configuracions.</p>
+<pre>
+# Instància 1
+mkdir -p /var/lib/postgresql/instance1
+# Instància 2
+mkdir -p /var/lib/postgresql/instance2
+</pre>
+
+<h3>Ports separats</h3>
+<p> PostgreSQL per defecte usa el port 5432. La segona instància ha de tenir un altre port, per exemple 5433.
+</p>
+<pre>
+# Al postgresql.conf de la segona instància
+port = 5433
+</pre>
+
+<h3>Configuració independent</h3>
+    <p>Cada instància té els seus fitxers: </p>
+<ul>
+    <li>postgresql.conf → configuració principal</li>
+    <li>pg_hba.conf → autenticació i permisos</li>
+    <li>pg_ident.conf → mapatge d’usuaris</li>
+</ul>
+
+<h3>Inicialitzar la/les base de dades</h3>
+<pre>
+# Instància 1
+initdb -D /var/lib/postgresql/instance1
+
+# Instància 2
+initdb -D /var/lib/postgresql/instance2    
+</pre>
+
+<h3>Executar instàncies separades</h3>
+<p>Opció A: com a serveis separats (Linux)</p>
+
+Crea serveis systemd independents apuntant a cada PGDATA i port.
+
+<pre>
+# Exemples 
+pg_ctl -D /var/lib/postgresql/instance1 -l logfile1 start
+pg_ctl -D /var/lib/postgresql/instance2 -l logfile2 start    
+</pre>
+
+<p>Opció B: manual amb diferents ports</p>
+<pre>
+postgres -D /var/lib/postgresql/instance1 -p 5432 &
+postgres -D /var/lib/postgresql/instance2 -p 5433 &    
+</pre>
+
+<h3>Connexió a cada instància</h3>
+<pre>
+psql -h localhost -p 5432 -U usuari -d db1   # instància 1
+psql -h localhost -p 5433 -U usuari -d db2   # instància 2    
+</pre>
+
+
+  </section>
 
 
   <section id="altres-recursos">

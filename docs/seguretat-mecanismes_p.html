@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>🔒 Seguretat en PostgreSQL</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
+
+</head>
+<body>
+
+<header>
+  <a href="./">
+    <!--<img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo"> -->
+    <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
+</a>
+  <h1>ASGBD   -    Mecanismes de Seguretat
+        <img src="imgs/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 40px; ">
+  </h1>
+</header>
+
+<nav class="segu">
+  <h3>Índex</h3>
+  <a href="#encripta">Encriptació en  PostgreSQL</a>
+  <a href="#auditoria">Auditoria en PostgreSQL</a>
+  <a href="#integritat">Integritat</a>
+  <a href="#transaccions">Transaccions (TCL)</a>
+  <a href="#backups">Backups</a>
+  <a href="#normativa-vigent">Normativa vigent</a>
+  <a href="#altres-recursos">Altres Recursos</a>
+</nav>
+
+<main>
+     
+    <section id="encripta">
+    <h2>🔐 Encriptació en PostgreSQL</h2>
+
+    <h3> Què és i per què encriptar?</h3>
+    <p>L’encriptació converteix dades llegibles en format codificat (xifrat) que només pot ser desxifrat amb una clau. És essencial per protegir informació sensible.</p>
+    <p>Una altra manera d'encriptar és fer un HASH (Hashing). Objectiu: generar una empremta única i irreversible d’un text.
+      Ús típic: Guardar contrasenyes de forma segura,  Verificar integritat de fitxers, Firmes digitals.
+    </p>
+
+    <h4> Raons per aplicar encriptació:</h4>
+    <ul>
+        <li>Protecció de dades sensibles (DNI, contrasenyes...)</li>
+        <li>Evitar robatori de dades en cas d’atac o accés indegut</li>
+        <li>Compliment legal (RGPD, LOPDGDD)</li>
+        <li>Requisits de seguretat corporativa o governamental (CCN-CERT)</li>
+    </ul>
+
+    <h4>⚠️ Possibles inconvenients:</h4>
+    <ul>
+        <li>Rendiment reduït si s’usa massivament</li>
+        <li>Augment de complexitat en la gestió</li>
+        <li>Pot limitar compatibilitats amb aplicacions</li>
+    </ul>
+
+    <h3>🛠️ Tipus d’encriptació a PostgreSQL</h3>
+    <ul>
+        <li><strong>A nivell d'aplicació / columnes</strong>: per programadors o xifrat personalitzat</li>
+        <li><strong>Encriptació en trànsit (SSL/TLS)</strong>: xifrat de dades mentres viatgen per la xarxa</li>
+    </ul>
+
+    <h3> pg_cripto (xifratge manual)</h3>
+    <p>Paquet per fer xifrat, hash i autenticació.</p>
+<pre>--Preparació
+CREATE EXTENSION pgcrypto;</pre>
+
+<pre>us
+INSERT INTO usuaris (nom, email)
+VALUES (
+  'Anna',
+  pgp_sym_encrypt('anna@email.com', 'clau_secreta')
+);
+</pre>
+<pre>Llegir dades / desxifrar
+SELECT nom,
+       pgp_sym_decrypt(email, 'clau_secreta')
+FROM usuaris;
+</pre>
+
+<pre>-- Generar HASH amb "bcrypt"
+INSERT INTO usuaris (nom, password)
+VALUES (
+  'anna',
+  crypt('contrasenya123', gen_salt('bf'))
+);
+--   bf >> bcrypt
+--  crypt('contrasenya123', gen_salt('bf',12))  >> incrementa el cost (12)
+</pre>
+
+<pre>--Verificar contrasenya
+SELECT *
+FROM usuaris
+WHERE nom = 'anna'
+  AND password = crypt('contrasenya123', password);
+-- Com en password està el salt i el cost, calcula el bcrypt de 'contrasenya123' amb este salt i cost
+</pre>
+<pre>--Altres opcions
+SELECT digest('text', 'sha256');
+</pre>
+
+    <hr><h3>Encriptació en trànsit (SSL/TLS)</h3>
+    <p>Xifrat automàtic a nivell xarxa.</p>
+<pre>-- Editar postgresql.conf:
+ssl = on  
+</pre>
+<pre>--  Afegir certificats
+server.crt   -- certificat
+server.key   -- clau privada
+</pre>
+<pre>-- Permisos importants
+chmod 600 server.key
+</pre>
+<pre>-- Reiniciar postgres
+pg_ctl restart  
+</pre>
+<pre>-- Configurar accés segur (pg_hba.conf)
+hostssl all all 0.0.0.0/0 md5
+</pre>
+<p>Connectar amb:</p>
+<pre>psql -h localhost -d empresa -U anna --set=sslmode=require
+o 
+psql "host=localhost dbname=empresa user=anna sslmode=verify-full"
+</pre>
+Modes SSL importants (ssl-mode)
+<table>
+<tr>
+  <th>Mode	</th><th> Significat</th>
+</tr>
+<tr>
+  <td>disable</td><td>	sense SSL</td>
+</tr>
+<tr>
+  <td>prefer </td><td>	usa SSL si pot</td>
+</tr>
+<tr>
+  <td>require </td><td>	obliga SSL</td>
+</tr>
+<tr>
+  <td>verify-ca	</td><td> valida certificat</td>
+</tr>
+<tr>
+  <td>verify-full </td><td>	valida certificat + host</td>
+</tr>
+</table>
+
+    
+    <hr><hr><h3> Bones pràctiques</h3>
+    <ul>
+        <li>Xifra només les dades sensibles</li>
+        <li>Evita BASE64 o ROT13 per contrasenyes</li>
+        <li>Usa funcions <code>HASH()</code> per emmagatzemar contrasenyes</li>
+    </ul>
+
+    <h3> Conclusió</h3>
+    <p>L’encriptació és essencial per a la protecció de dades en entorns reals i és un requisit legal i de bones pràctiques. 
+      PostgreSQL ofereix solucions potents que cobreixen necessitats tècniques i legals.</p>
+
+    <blockquote>
+        🔐 Una bona gestió de claus, un ús moderat del xifrat i l’auditoria d’accés són claus per garantir seguretat real.
+    </blockquote>
+
+    </section>
+         
+
+  <section id="auditoria">
+    <h2>🕵️ Auditoria en PostgreSQL</h2>
+  
+    <h3>📘 Què és una auditoria?</h3>
+    <p>
+      L’auditoria és una funcionalitat dels sistemes gestors de bases de dades que permet <strong>registrar i controlar l’activitat dels usuaris</strong>.
+      És especialment útil per motius de seguretat, detecció d’errors, traçabilitat i compliment normatiu (ex. RGPD).
+    </p>
+  
+    <h3>🎯 Objectius de l’auditoria</h3>
+    <ul>
+      <li> Detectar accions no autoritzades</li>
+      <li> Rastrejar canvis o accés a dades sensibles</li>
+      <li> Monitorar l’activitat d’usuaris privilegiats</li>
+      <li> Complir amb auditories internes o externes</li>
+    </ul>
+  
+    <h3>⚙️ Tipus d’auditoria en PostgreSQL</h3>
+    <h4>Auditoria bàsica (logs del servidor)</h4>
+    <pre>-- En fitxer postgresql.conf
+logging_collector = on
+log_statement = 'all'
+log_connections = on
+log_disconnections = on
+    </pre>
+    <p>Això registra: connexions, desconnexions, totes les consultes SQL</p>
+    <p>⚠️ Problema: Massa informació (pot saturar),  No és estructurat (difícil d’analitzar)</p>
+
+    
+<h4>Auditoria avançada amb extensió (pgAudit)</h4>
+<pre>-- Configuració
+shared_preload_libraries = 'pgaudit'
+pgaudit.log = 'read, write, ddl'
+</pre>
+<pre>
+-- aplicar canvis..
+sudo systemctl restart postgresql
+</pre>
+
+<pre>--  Instalació
+CREATE EXTENSION pgaudit;
+</pre>
+
+<p>==> La informació NO es guarda en una taula, sinó en els logs del servidor PostgreSQL.</p>
+<pre>El més habitual, i com estiga configurat en postgresql.conf 
+
+logging_collector = on
+log_directory = 'log'
+log_filename = 'postgresql-%Y-%m-%d.log'
+</pre>
+<p>En la ruta: /var/lib/postgresql/data/log/postgresql-2026-03-20.log</p>
+<p>Es podrà trobar informació en este format...</p>
+<pre>AUDIT: READ, SELECT, table=clients, user=anna</pre>
+
+<p>Si tens</p>
+<pre>log_destination = 'syslog'</pre>
+<p>👉 Els logs van a: /var/log/syslog,   /var/log/messages</p>
+
+
+
+<h4>Auditoria amb triggers (personalitzada)</h4>
+
+<h4>Auditoria d’accessos</h4>
+<li>intents de login (log_connections)</li>
+<li>fallades (log_failed_attempts indirectament)</li>
+
+
+     <h3>Com vore els registres de l'auditoria</h3>
+    
+      <h3> Consells de seguretat i gestió</h3>
+      <ul>
+        <li> Activa l’auditoria per accions sensibles (login, esborrar, canviar permisos)</li>
+        <li> Revisa regularment els registres d’auditoria</li>
+        <li> No deixis l’auditoria oberta en producció sense revisar l’espai</li>
+        <li> Automatitza l’anàlisi amb scripts o informes</li>
+      </ul>
+    
+      <h3> Conclusió</h3>
+      <p>
+        L’auditoria és una eina potent per a la seguretat i el control de bases de dades PostgreSQL.  
+        Permet identificar comportaments sospitosos, controlar accés no autoritzat i mantenir la traçabilitat de les operacions.
+        A més, és una pràctica recomanada per normatives legals i de qualitat.
+      </p>
+    </section>
+      
+
+    
+
+      <section id="integritat">
+        <h2>🧬 Integritat en bases de dades PostgreSQL</h2>
+      
+        <h3>📘 Què és la integritat?</h3>
+        <p>
+          La <strong>integritat</strong> d’una base de dades fa referència al conjunt de normes i restriccions que garanteixen que les dades emmagatzemades siguen <strong>coherents, correctes i fiables</strong>.
+          Aquesta integritat és fonamental per garantir la <strong>qualitat de la informació</strong> i el correcte funcionament de les aplicacions que la utilitzen.
+        </p>
+      
+        <h3> Tipus d’integritat</h3>
+        <ul>
+          <li><strong>Integritat d’entitat</strong> → cada fila ha de ser identificable de forma única (clau primària)</li>
+          <li><strong>Integritat referencial</strong> → assegura la coherència entre taules relacionades (claus foranes)</li>
+          <li><strong>Integritat de domini</strong> → les dades han de complir certs valors o formats (tipus de dades, CHECK...)</li>
+          <li><strong>Integritat d’usuari</strong> → validacions aplicacionals o de negoci imposades per l'usuari o aplicació</li>
+        </ul>
+      
+        <h3> Integritat d'entitat</h3>
+        <p>
+          Es garanteix mitjançant l’ús de <code>PRIMARY KEY</code>, que assegura que cada fila siga única i no nul·la.
+        </p>
+        <pre>CREATE TABLE alumnes (
+  id NUMBER PRIMARY KEY,
+  nom VARCHAR2(50)
+);          </pre>
+      
+        <h3> Integritat referencial</h3>
+        <p>
+          Manté la coherència entre dues taules relacionades mitjançant una <code>FOREIGN KEY</code>.  
+          Evita que una fila faci referència a un valor inexistent.
+        </p>
+        <pre>CREATE TABLE cursos (
+  id NUMBER PRIMARY KEY,
+  nom VARCHAR2(50)
+);
+
+CREATE TABLE alumnes (
+  id NUMBER PRIMARY KEY,
+  nom VARCHAR2(50),
+  id_curs NUMBER,
+  FOREIGN KEY (id_curs) REFERENCES cursos(id)
+);          </pre>
+      
+        <p>Amb això, no es pot assignar un <code>id_curs</code> a un alumne que no existeixi a la taula <code>cursos</code>.</p>
+      
+        <h3> Integritat de domini</h3>
+        <p>
+          Limita els valors permesos en una columna. Es pot implementar amb tipus de dades, restriccions <code>NOT NULL</code>, <code>CHECK</code> o <code>DEFAULT</code>.
+        </p>
+      
+        <pre>CREATE TABLE alumnes (
+  id NUMBER PRIMARY KEY,
+  nom VARCHAR2(50) NOT NULL,
+  edat NUMBER CHECK (edat >= 16),
+  pais VARCHAR2(30) DEFAULT 'Espanya'
+);           </pre>
+      
+        <p>
+          Això garanteix que <code>nom</code> sempre tindrà valor, <code>edat</code> siga ≥ 16 i <code>pais</code> tindrà un valor per defecte.
+        </p>
+      
+        <h3> Integritat d’usuari</h3>
+        <p>
+          No s’implementa a nivell de base de dades, sinó via aplicacions o triggers. Controla normes específiques com:
+        </p>
+        <ul>
+          <li>Un usuari no pot tenir dues reserves actives</li>
+          <li>Els horaris d’una aula no poden solapar-se</li>
+        </ul>
+      
+        <p>
+          Aquest tipus d’integritat sovint es basa en <code>PL/SQL</code> o lògica de negoci a l’aplicació.
+        </p>
+      
+        <h3> Conclusió</h3>
+        <p>
+          Mantenir la integritat de les dades és essencial per garantir que el sistema siga <strong>fiable, coherent i funcional</strong>.  
+          PostgreSQL ofereix múltiples mecanismes per implementar integritat a nivell físic, lògic i d’aplicació.
+        </p>
+      
+        <blockquote>
+          🔐 “La seguretat comença amb la confiança en les dades. I la confiança es construeix amb integritat.”
+        </blockquote>
+      </section>
+      
+
+      <section id="transaccions">
+        <h2> Transaccions en PostgreSQL</h2>
+      
+        <h3>📘 Què és una transacció?</h3>
+        <p>
+          Una <strong>transacció</strong> és una seqüència d’operacions SQL (normalment de manipulació de dades: <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>) que es tracten com una <strong>unitat indivisible de treball</strong>.
+          L’objectiu d’una transacció és assegurar que les dades es mantinguin <strong>coherents</strong> i <strong>amb integritat</strong>.
+        </p>
+        <p>Una transacció, o es fa tota o no es fa res, però no pot en cap cas quedar a mitges, una part feta i una altra no.</p>
+        <p>Totes les operacions que en formen part han de completar-se correctament. Si alguna falla, cap de les altres no ha de tenir efecte.</p>
+        <!--<p>Les transaccions tracte d'evitar: Actualitzacions parcials, concurrency problems, Pèrdua de dades a causa d’errors </p> -->
+        <p>Els interbloquejos ( <strong>deadlocks</strong>  ) són un problema que les transaccions i els mecanismes de control de concurrència intenten evitar o gestionar</p>
+        <p>Un interbloqueig passa quan dues o més transaccions es bloquegen mútuament, cadascuna esperant un recurs 
+          (normalment un registre o una taula) que l’altra té bloquejat.Comm que cap pot continuar, totes queden aturades indefinidament (i a més a més afecten a la resta de sessions)</p>
+        <pre><code>Exemple senzill:
+    Transacció A té bloquejada la fila 1 i vol la fila 2.
+    Transacció B té bloquejada la fila 2 i vol la fila 1.
+Cap pot continuar → deadlock</code></pre>
+
+        <h3> Propietats d’una transacció (ACID)</h3>
+        <ul>
+          <li><strong>Atomicitat:</strong> totes les operacions s’executen o cap (tot o res)</li>
+          <li><strong>Consistència:</strong> deixa la BD en un estat vàlid després de completar-se</li>
+          <li><strong>Aïllament:</strong> cada transacció s’executa com si fos l’única</li>
+          <li><strong>Durabilitat:</strong> un cop feta la transacció, els canvis són permanents</li>
+        </ul>
+      
+        <h3> Ordres bàsiques de control de transaccions</h3>
+        <p>PostgreSQL és un sistema de base de dades purament transaccional</p>
+<pre>-- Per indicar que comença una transacció
+BEGIN; </pre>
+        <p>En una transacció les dades modificades <strong>no són visibles</strong> per la resta d'usuaris fins que es confirme la transacció</p>
+      
+        <h4> <code>COMMIT</code></h4>
+        <p>
+          Fa permanents tots els canvis realitzats en la transacció. <strong> No es poden desfer després</strong>. En este moment les dades modificades ja son
+          visibles per la resta d'usuaris .       </p>
+        <pre>INSERT INTO alumnes VALUES (10, 'Joan', 20);
+COMMIT;          </pre>
+       <p>Les sentències de finalització de transacció són COMMIT i ROLLBACK</p>
+        <h4> <code>ROLLBACK</code></h4>
+        <p>
+          Desfà tots els canvis realitzats des del darrer <code>COMMIT</code>. Torna l’estat de la BD a com estava abans.
+        </p>
+        <pre>UPDATE alumnes SET edat = 30 WHERE id = 10;
+ROLLBACK; -- Anul·la l'actualització            </pre> 
+      
+        <h4> <code>SAVEPOINT</code></h4>
+        <p>
+          Permet definir punts intermedis dins d’una transacció per fer <code>ROLLBACK</code> parcial.
+        </p>
+        <pre>SAVEPOINT punt1;
+DELETE FROM alumnes WHERE edat &lt; 18;
+
+SAVEPOINT punt2;
+UPDATE alumnes SET nom = 'Anònim' WHERE edat &gt; 25;
+
+ROLLBACK TO punt1; -- desfà només fins al punt1           </pre>
+      
+        <h3> Transaccions automàtiques i manuals</h3>
+        <p>En PostgreSQL, Cap instrucció fa COMMIT implícit (excepte casos molt especials)</p>
+      <pre>
+BEGIN;
+CREATE TABLE prova (id int);
+ROLLBACK;        
+      </pre>
+      <p>Resultat: la taula NO existeix. DDL és totalment transaccional (a diferència de ORACLE)</p>
+    <p>⚠️ 5. Excepcions (IMPORTANT). Algunes instruccions NO poden anar dins d’una transacció: Com per Exemple:
+      <code> CREATE DATABASE test;</code> i altres com <code>TABLESPACE , CLUSTER, ALTER SYSTEM</code>
+</p>
+
+        <h3> Relació amb la seguretat</h3>
+        <p>
+          Una gestió acurada de les transaccions garanteix:
+        </p>
+        <ul>
+          <li> Traçabilitat i reversibilitat en cas d’error</li>
+          <li> Integritat davant fallades del sistema</li>
+          <li> Registre coherent en conjunció amb l’auditoria</li>
+        </ul>
+      <hr>
+      <p>PostgreSQL té mecanismes per detectar <strong>deadlocks</strong> de manera automàtica. Quan detecta que dos
+         transaccions no poden continuar, avorta una de les dues i retorna un error:</p>
+      <p>La transacció que PostgreSQL sol avortar és la que porta menys treball fet (la que ha modificat menys dades), també coneguda 
+        com la “victim transaction”, per minimitzar la pèrdua de treball.</p>
+        <pre><code>ERROR: deadlock detected</code></pre>
+        <p>Així, almenys una pot continuar i el sistema no queda bloquejat.</p>
+        <p>Quan PostgreSQL mata una transacció per deadlock, la seva part desada es desfà (rollback), mantenint la coherència.</p>
+
+        <h3> Conclusió</h3>
+        <p>
+          El control de transaccions és una eina fonamental per garantir que el sistema de base de dades siga <strong>segur, coherent i robust</strong>.
+          PostgreSQL proporciona instruccions clares per controlar de forma manual i segura l’execució de canvis en les dades.
+        </p>
+
+       <hr> <h3> Exemple (vore transacció per completar)</h3>
+        <p>Obrim 2 sessions ( en SQL*PLUS ) amb usuari1 ( dos cmd diferents)   </p>
+        <pre> 
+    En la primera sessió (1er CMD)
+    SQL> insert into prueba10 (id, nom) values (1000,’valor1 ’);
+    1 row created.
+        </pre>
+    <pre>
+    En la segon sessió  (2on cmd)    
+    SQL> select count(*) from prueba10;
+    COUNT(*)
+    ----------
+    0</pre>
+        <pre>
+    En la primera sessió (1er CMD)
+    SQL> commit;            
+        </pre>
+    <pre>
+    En la segon sessió (2on CMD)    
+    SQL> select count(*) from prueba10;
+    COUNT(*)
+    ----------
+    1
+    </pre>
+
+    <hr><h4>Exemple ( de deadlock )</h4>
+    <p>Suposem que tenim una taula:</p>
+    <pre><code>CREATE TABLE comptes (
+    id NUMBER PRIMARY KEY,
+    saldo NUMBER
+    ); </code></pre>
+    <p>i dos files</p>
+    <pre><code>INSERT INTO comptes VALUES (1, 100);
+INSERT INTO comptes VALUES (2, 200);
+COMMIT; </code></pre>
+<p>Obri dos sessios sql diferents, Sessio A i Sessio B</p>
+<pre>Sessio A
+  -- Bloqueja la fila amb id = 1
+UPDATE comptes SET saldo = saldo + 10 WHERE id = 1;
+Sessio B
+-- Bloqueja la fila amb id = 2
+UPDATE comptes SET saldo = saldo + 20 WHERE id = 2;
+
+-- SESSION A intenta agafar la fila que té B
+UPDATE comptes SET saldo = saldo - 5 WHERE id = 2;
+--  → A queda esperant, perquè B té bloquejada la fila 2.
+
+SESSION B intenta agafar la fila que té A
+UPDATE comptes SET saldo = saldo - 5 WHERE id = 1;
+-- → B queda esperant, perquè A té bloquejada la fila 1.
+
+-- I ací és on PostgreSQL detecta el deadlock
+-- PostgreSQL trenca el bloqueig i dona error a una de les dos sessions 
+-- Com decideix?. tria la transacció “més barata” de cancel·lar, normalment la que ha fet menys treball
+</pre>
+
+   </section>
+      
+
+      <section id="backups">
+        <h2>💾 Recuperació i còpies de seguretat en PostgreSQL</h2>
+      
+        <h3> Per què cal fer còpies de seguretat?</h3>
+        <p>
+          Les còpies de seguretat són essencials per garantir la <strong>continuïtat del servei</strong> i la <strong>protecció de la informació</strong>.  
+          En cas de fallada del sistema, error humà, corrupció de dades o atacs, una bona estratègia de backup permet recuperar la base de dades sense pèrdues.
+        </p>
+        <p>La qüestió de fer còpies de seguretat des de dins d’PostgreSQL (usant eines com <strong>pg_dump</strong> ) 
+          versus fer-les des de fora (copiant fitxers del sistema operatiu) és molt important perquè afecta 
+          la consistència i la recuperabilitat de la base de dades</p>
+        <p>Fer còpies de seguretat des de dins d’PostgreSQL és crític perquè assegura que la base de dades es puga recuperar correctament i 
+          sense pèrdua de dades, fins i tot si està en funcionament. Fer-ho des del sistema operatiu només és segur si la base està apagada,
+           cosa poc pràctica en entorns de producció</p>
+        <p>Problemes si es fan des de fora del SGBD: Inconsistència, Recuperació complicada, No registra transaccions </p>
+        <p>Avantatges si es fan des de dins del SGBD: Consistència de dades, Recuperació puntual, Gestió de logs automàtica, Còpies en calent, Automatització i verificació:</p>
+
+      
+        <h3>🎯 Objectius d’una còpia de seguretat</h3>
+        <ul>
+          <li>Restaurar les dades després d’un error</li>
+          <li>Permetre la recuperació puntual o total</li>
+          <li>Facilitar entorns de prova o migracions</li>
+          <li>Complir normatives legals (protecció de dades)</li>
+        </ul>
+      
+        <h3> Tipus de còpies de seguretat</h3>
+        <ul>
+          <li><strong>Físiques</strong>: còpies dels fitxers físics </li>
+          <li><strong>Lògiques</strong>: exportació de dades (a partir d'SQL)</code></li>
+        </ul>
+        <hr><ul>
+          <li><strong>Totals</strong>: Una BBDD sencera, o un cluster sencer</li>
+          <li><strong>Parcials</strong>: Part d'una BBDD, Una taula concreta, Un index, etc (SQL)</li>
+        </ul>
+        <hr><ul>
+          <li><strong>Online</strong>: També s’anomena còpia de seguretat en calent. Es fa mentre la base de dades continua activa i els usuaris treballen.</li>
+          <li><strong>Offline</strong>: També s’anomena còpia de seguretat freda. Es realitza quan la base de dades està completament aturada</li>
+          (No se sol contemplar esta forma normalment....) 
+        </ul>
+      
+        <hr><h3> Estratègies de backup</h3>
+        <ul>
+          <li><strong>Completa:</strong> còpia total de la BD</li>
+          <li><strong>Incremental:</strong> només les dades modificades des del darrer backup</li>
+          <li><strong>Diferencial:</strong> totes les modificacions des del darrer backup complet</li>
+          <li><strong>Continua:</strong> amb logs (WAL)</li>
+        </ul>
+      <h3> Mecanismes de Postgresql</h3>
+        <ul>
+          <li><strong>pg_dump:</strong> la còpia lògica </li>
+          <li><strong>pg_basebackup:</strong> la còpia física </li>
+          <li>WAL (Write Ahead Log)</li>
+        </ul>
+      <p>pg_dump i pg_basebackup guarden la còpia al sistema on s’executa la comanda, tot i que 
+        habitualment pg_dump s’executa en el client i pg_basebackup en un sistema remot per obtenir una còpia física.</p>
+
+        <hr><h3> Eines principals de backup en PostgreSQL</h3>
+       <h3>1. 📤 pg_dump</h3>
+      <p>pg_dump genera una còpia <strong>lògica</strong> en un fitxer. Exporta la BD en forma de sentències SQL. Conté CREATE TABLE, INSERT, etc.</p>
+       <pre>pg_dump empresa > backup.sql</pre>
+   
+       <p><strong>ONLINE</strong>: 👉 Funciona mentre la BD està en ús, No cal parar el servidor, Fa una còpia consistent gràcies a MVCC (snapshots)</p>
+
+      <ul> Característiques
+        <li>✔️ Selectiu (pots triar taules)</li>
+        <li>✔️ Portable (serveix entre versions)</li>
+        <li>✔️ Editable (és text)</li>
+        <li>❌ Lent en BD grans</li>
+        <li>❌ No inclou configuració interna</li>
+        <li>❌ No serveix per PITR</li>
+      </ul>
+
+<pre>-- Restauració:
+psql empresa < backup.sql
+</pre>
+
+       <h3>2. 📤 pg_basebackup</h3>
+           <p>pg_basebackup genera una còpia <strong>física</strong> en un directori amb l’estructura interna de PostgreSQL.</p>
+       <pre>pg_basebackup -D /backup</pre>
+      <p>Inclou dades, índexs, configuració, tot</p>
+      <p><strong>ONLINE</strong> Copia fitxers mentre la BD està activa. Es basa en: WAL (Write-Ahead Logs), consistència interna</p>
+      <pre>
+backup/
+ ├── base/
+ ├── global/
+ ├── pg_wal/
+ └── ...        
+      </pre>
+      <ul>Característiques
+        <li>✔️ Ràpid per BD grans</li>
+        <li>✔️ Base per PITR</li>
+        <li>✔️ Còpia exacta</li>
+        <li>❌ No selectiu</li>
+        <li>❌ No editable</li>
+        <li>❌ Depèn de versió/arquitectura</li>
+      </ul>
+  <pre>--Restauració:
+cp -r /backup/* /var/lib/postgresql/data/    
+  </pre>
+
+<hr><h3> Exemple típic d’ús</h3>
+<ul>
+  <strong>🔹 pg_dump</strong>
+  <li>migracions</li>
+  <li>còpies petites</li>
+  <li>export/import</li>
+  <strong>🔹 pg_basebackup</strong>
+  <li>replicació</li>
+  <li>backups complets</li>
+  <li>recuperació (PITR)</li>
+</ul>
+
+<h4>Detall important</h4>
+<li>pg_dump → pots copiar el fitxer a qualsevol lloc (USB, cloud…)</li>
+<li>pg_basebackup → millor en disc/servidor compatible amb PostgreSQL</li>
+<hr>
+   <h3>3. 📤  pg_backup_start()</h3>
+   <pre>
+SELECT pg_backup_start('backup');
+SELECT pg_backup_stop();
+SELECT pg_switch_wal();     </pre>
+   <p>Aquestes funcions NO fan el backup, sinó que preparen PostgreSQL perquè TU pugues fer una còpia física consistent</p>
+<p>Que fa: Marca l’inici d’un backup físic. Força que tot estigui consistent al disc. Comença a registrar informació especial als WAL</p>
+<p>Després s'ha de fer la còpia amb <strong>pg_basebackup</strong></p>
+            
+  <hr>  <h3> Escenaris de recuperació</h3>
+    <h4>PITR (Point-In-Time Recovery) = còpia base + WAL</h4>
+    <p>Restaurar còpia i aplicar WAL fins al moment. 👉 No només recuperes un backup , 👉 Recuperes fins a un moment concret</p>
+    <p>Per usar PITR cal: archive_mode = on,  archive_command configurat</p>
+<pre>--  Preparar WAL
+mkdir -p /var/lib/postgresql/wal_archive
+-- Edita postgresql.conf:
+archive_mode = on
+archive_command = 'cp %p /var/lib/postgresql/wal_archive/%f'
+--Reinicia postgres 
+pg_ctl restart
+</pre>
+        
+       <pre>--Exemple de PITR
+-- Parar postgres
+pg_ctl stop
+-- Esborra dades actuals i restaura:
+rm -rf /var/lib/postgresql/data/*
+tar -xzf /backup/base/base.tar -C /var/lib/postgresql/data
+-- Configurar recuperació (PITR)
+touch /var/lib/postgresql/data/recovery.signal
+-- Edita postgresql.conf:
+restore_command = 'cp /var/lib/postgresql/wal_archive/%f %p'
+recovery_target_time = '2026-03-20 10:59:59'
+--  Arrancar PostgreSQL
+pg_ctl start
+--  👉 PostgreSQL:
+--    carrega backup
+--    aplica WAL
+--    s’atura en el moment indicat
+       </pre>
+        <h3> Bones pràctiques de seguretat</h3>
+        <ul>
+          <li> Programar backups regulars</li>
+          <li> Mantenir còpies en ubicacions externes</li>
+          <li> Fer proves periòdiques de recuperació</li>
+          <li> Documentar el procediment de recuperació</li>
+        </ul>        
+      
+        <h3> Conclusió</h3>
+        <p>
+          Disposar d’un pla de còpies de seguretat fiable i efectiu és <strong>fonamental per garantir la seguretat i continuïtat</strong> de qualsevol sistema basat en PostgreSQL.
+          Les eines com RMAN i Data Pump permeten adaptar-se a múltiples escenaris, i una bona estratègia de backup ha d’estar acompanyada d’una política de recuperació clara.
+        </p>
+
+
+      </section>
+      
+
+      <section id="normativa-vigent">
+        <h2>⚖️ Normativa vigent en matèria de protecció de dades</h2>
+      
+        <h3>📘 Què és la normativa de protecció de dades?</h3>
+        <p>
+          És el conjunt de lleis i regulacions que tenen com a objectiu <strong>garantir la privadesa i la seguretat de les dades personals</strong> que gestionen les empreses i organitzacions.
+          Afecta directament la gestió dels sistemes d’informació, especialment els que contenen bases de dades amb informació de persones físiques.
+        </p>
+      
+        <h3>🇪🇺 Reglament General de Protecció de Dades (RGPD)</h3>
+        <ul>
+          <li><strong>Nom complet:</strong> Reglament (UE) 2016/679 del Parlament Europeu i del Consell</li>
+          <li><strong>Aplicació:</strong> obligatòria a tots els estats membres de la Unió Europea des del 25 de maig de 2018</li>
+          <li><strong>Objectiu:</strong> protegir els drets fonamentals de les persones pel que fa al tractament de les seves dades personals</li>
+        </ul>
+      
+        <h4> Principis bàsics del RGPD</h4>
+        <ul>
+          <li> Lícit, lleial i transparent</li>
+          <li> Finalitat determinada i legítima</li>
+          <li> Minimització de dades</li>
+          <li> Exactitud</li>
+          <li> Limitació de conservació</li>
+          <li> Integritat i confidencialitat</li>
+          <li> Responsabilitat proactiva</li>
+        </ul>
+      
+        <h4>👥 Drets de les persones usuàries</h4>
+        <ul>
+          <li> Dret d’accés</li>
+          <li> Dret de rectificació</li>
+          <li> Dret de supressió (“dret a l’oblit”)</li>
+          <li> Dret d’oposició</li>
+          <li> Dret a la limitació del tractament</li>
+          <li> Dret a la portabilitat de dades</li>
+        </ul>
+      
+        <h3>🇪🇸 LOPDGDD – Llei orgànica 3/2018</h3>
+        <p>
+          A Espanya, la normativa RGPD es complementa amb la LOPDGDD:
+        </p>
+        <ul>
+          <li><strong>Nom complet:</strong> Llei Orgànica 3/2018 de Protecció de Dades Personals i garantia dels drets digitals</li>
+          <li><strong>Objectiu:</strong> adaptar el RGPD a l’ordenament jurídic espanyol i afegir drets digitals</li>
+        </ul>
+      
+        <h4> Alguns punts destacats de la LOPDGDD</h4>
+        <ul>
+          <li> Designació d’un Delegat de Protecció de Dades (DPO) en determinades entitats</li>
+          <li> Mesures de seguretat segons el risc de les dades tractades</li>
+          <li> Registre d’activitats de tractament</li>
+          <li> Avaluació d’impacte quan hi ha risc elevat</li>
+          <li> Drets digitals: educació digital, neutralitat, desconnexió laboral, etc.</li>
+        </ul>
+      
+        <h3> Obligacions tècniques relacionades amb bases de dades</h3>
+        <ul>
+          <li> Control d’accés i permisos per rols</li>
+          <li> Auditories d’accés a dades personals</li>
+          <li> Registre de canvis i transaccions</li>
+          <li> Còpies de seguretat i plans de recuperació</li>
+          <li> Encriptació de dades sensibles</li>
+        </ul>
+
+        <h3>Drets ARCO</h3>
+        <ul>
+          <li> Accés</li>
+          <li> Rectificació</li>
+          <li> Cancel·lació</li>
+          <li> Oposició</li>
+        </ul>
+
+        <h3>Paper del SGBD</h3>
+        <ul>
+            <li> Gestió d’usuaris i permisos</li>
+            <li>Sistemes de recuperació</li>
+            <li>  RI</li>
+            <li>Encriptació (informació sensible)</li>
+            <li>   Auditoria </li>
+        </ul>
+
+        <h3>Classificar informació</h3>
+            <ul>
+                <li>Nivell bàsic</li>
+                <li> Nivell mig</li>
+                <li>Nivell alt </li>
+            </ul>
+        <h4 style="color:red">Els procediments han d’estar documentats i supervisats per poder garantir el compliment de la normativa i la llei.</h4>
+      
+        <h3>📊 Sancions per incompliment</h3>
+        <p>
+          El RGPD preveu sancions de fins al <strong>4% del volum de negoci anual global</strong> o <strong>20 milions d’euros</strong>, segons quina siga més elevada.
+        </p>
+      
+        <h3> Conclusió</h3>
+        <p>
+          Tant el <strong>RGPD</strong> com la <strong>LOPDGDD</strong> estableixen un marc normatiu estricte i necessari per protegir les dades personals.
+          A l’hora d’administrar bases de dades, cal assegurar-se que:
+        </p>
+        <ul>
+          <li>Les dades sensibles estan ben protegides</li>
+          <li>Només hi accedeix qui està autoritzat</li>
+          <li>Es poden traçar les operacions sobre dades personals</li>
+          <li>Es poden complir els drets dels usuaris</li>
+        </ul>
+      
+        <blockquote>
+          ⚖️ “Una base de dades segura no només és eficient, sinó també legalment responsable.”
+        </blockquote>
+      </section>
+
+      <section>
+        <h1>Informe de bones pràctiques del CCN-CERT</h1>
+        <img src="imgs/logo-ccncert.png" alt="ccn-cert" width="25%" class="imatge-dreta">
+        <h3> <a href="https://www.ccn-cert.cni.es/es/series-ccn-stic/informes-de-ciberseguridad-ccn-cert/informes-ccn-cert-buenas-practicas-bp/6353-ccn-cert-bp-24-recomendaciones-de-seguridad-en-bases-de-datos/file.html">
+           CCN-CERT BP/24 Recomendaciones de seguridad en bases de datos         </a>             </h3>
+        <p>CCN-CERT BP/24 és un document tècnic que ofereix recomanacions i bones pràctiques en ciberseguretat, 
+          elaborat pel CCN-CERT, amb l’objectiu d’ajudar les administracions públiques i altres organitzacions a millorar 
+          la protecció dels seus sistemes d’informació</p>
+        <h3><a href="https://www.postgresql.org/support/security/">Security Information in PostgreSQL</a></h3>
+
+      </section>
+            
+
+
+
+  <section id="altres-recursos">
+    <h2>Altres recursos</h2>
+
+    <hr><h3>Repàs...</h3>
+    <div id="progress-container">
+    <div id="progress-bar"></div>  </div>
+    <!-- <div id="percentatge-text">0%</div>  -->
+
+    <div class="quiz-container">
+        <h4 id="pregunta-text"></h4>
+        <div id="options-container" class="options">
+        </div>
+
+        <p id="feedback"></p>
+        <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
+        <button onclick="carregarPreguntes()">🔁 Reiniciar</button>
+
+
+    </div>
+
+    
+  </section>
+ 
+ <!--   <section>
+
+    <h2>{ Nova pregunta ===> ↺ Recarrega pàgina ↺  o F5  }</h2>
+  </section> -->
+ 
+</main>
+
+
+<script>
+
+    // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+    //  <div class="pre-container">
+    //    <button class="copy-button">Copia Codi !</button>
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+  //  Per fer test final
+  // Primer es crea un bancDePreguntes   const
+  // i desprès es carrega una pregunta aleatoria    function
+  // per ultim la funcio de comprobar resposta per a quan es polse un botó
+
+let bancDePreguntes = [];
+let preguntesBarrejades = [];
+let indexPreguntaActual = 0;
+let puntuacio = 0;
+
+function barrejar(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function actualitzarProgres() {
+    const percentatge =
+        (indexPreguntaActual / preguntesBarrejades.length) * 100;
+    document.getElementById('progress-bar').style.width =
+        percentatge + "%";
+}
+
+function actualitzarPercentatge() {
+    const percentatge = Math.round(
+        (puntuacio / preguntesBarrejades.length) * 100
+    );
+    document.getElementById('percentatge-text').innerText =""
+       // `Encerts: 🎯 ${percentatge}%`;
+}
+
+/*
+function carregarPreguntes() {
+    fetch('preguntes/preguntes.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("No s'han pogut carregar les preguntes");
+            }
+            return response.json();
+        })
+        .then(data => {
+            bancDePreguntes = data;
+            carregarPreguntaAleatoria();
+        })
+        .catch(error => {
+            console.error(error);
+            document.getElementById('pregunta-text').innerText =
+                "Error carregant les preguntes 😢";
+        });
+}  
+
+function carregarPreguntaAleatoria() {
+    // Triar una pregunta a l'atzar
+    const indexAleatori = Math.floor(Math.random() * bancDePreguntes.length);
+    const pregunta = bancDePreguntes[indexAleatori];
+
+    // Mostrar el títol
+    document.getElementById('pregunta-text').innerText = pregunta.titol;
+
+    // Netejar contenidor de botons
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    // Barrejar opcions (opcional) i crear botons
+    pregunta.opcions.forEach(opcio => {
+        const btn = document.createElement('button');
+        btn.innerText = opcio.text;
+        btn.onclick = function() { comprovaResposta(opcio.correcte, btn); };
+        container.appendChild(btn);
+    });
+}*/
+
+function carregarPreguntes() {
+    fetch('preguntes/preguntes32.json')
+        .then(res => res.json())
+        .then(data => {
+            bancDePreguntes = data;
+            preguntesBarrejades = [...bancDePreguntes];
+            barrejar(preguntesBarrejades);
+            puntuacio = 0;
+            indexPreguntaActual = 0;
+            mostrarPregunta();
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('pregunta-text').innerText =
+                "Error carregant les preguntes 😢";
+        });
+        //document.getElementById('percentatge-text').innerText = "0%";
+
+}
+
+function mostrarPregunta() {
+
+    // Si ja no queden preguntes
+    if (indexPreguntaActual >= preguntesBarrejades.length) {
+        document.getElementById('pregunta-text').innerText =
+            "🎉 Has acabat totes les preguntes!";
+        document.getElementById('options-container').innerHTML = "";
+        document.getElementById('feedback').innerHTML =
+        `Has encertat <strong>${puntuacio}</strong> de 
+        <strong>${preguntesBarrejades.length}</strong> preguntes.`;
+        document.getElementById('btn-seguent').disabled = true;
+        document.getElementById('progress-bar').style.width = "100%";
+        actualitzarProgres();
+        return;
+    }
+
+    const pregunta = preguntesBarrejades[indexPreguntaActual];
+
+    document.getElementById('pregunta-text').innerText = pregunta.titol;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    pregunta.opcions.forEach(opcio => {
+        const btn = document.createElement('button');
+        btn.innerText = opcio.text;
+        btn.onclick = () => comprovaResposta(opcio.correcte, btn);
+        container.appendChild(btn);
+    });
+
+    document.getElementById('feedback').textContent = "";
+    document.getElementById('btn-seguent').disabled = true;
+    actualitzarProgres();
+
+}
+
+
+  /*  function comprovaResposta(esCorrecte, element) {
+        const feedback = document.getElementById('feedback');
+        
+        // Reset de colors dels botons
+        const botons = document.querySelectorAll('button');
+        botons.forEach(btn => btn.style.background = "#fff");
+
+        if (esCorrecte) {
+            feedback.textContent = "✅ Correcte! Molt bé.";
+            feedback.className = "correct";
+            element.style.background = "#d4edda"; // Verd clar
+        } else {
+            feedback.textContent = "❌ Incorrecte. Torna-ho a provar.";
+            feedback.className = "incorrect";
+            element.style.background = "#f8d7da"; // Vermell clar
+        }
+    }
+    
+  function seguentPregunta() {
+    carregarPreguntaAleatoria();
+}*/
+
+function comprovaResposta(esCorrecte, element) {
+    const feedback = document.getElementById('feedback');
+
+    document
+        .querySelectorAll('#options-container button')
+        .forEach(btn => btn.disabled = true);
+
+    if (esCorrecte) {
+        feedback.textContent = "✅ Correcte! Molt bé.";
+        element.style.background = "#d4edda";
+        puntuacio++;
+    } else {
+        feedback.textContent = "❌ Incorrecte.";
+        element.style.background = "#f8d7da";
+    }
+    //actualitzarPercentatge();
+    document.getElementById('btn-seguent').disabled = false;
+}
+
+function seguentPregunta() {
+    indexPreguntaActual++;
+    mostrarPregunta();
+}
+
+  
+
+// Executar en carregar la pàgina
+window.onload = carregarPreguntes;
+// antes   window.onload = carregarPreguntaAleatoria;
+
+</script>
+
+</body>
+</html>

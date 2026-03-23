@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>🛠️ Configuració Postgresql</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
+</head>
+<body>
+
+<header>
+  <a href="./">
+      <!--<img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo"> -->
+      <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
+  </a>
+  <h1>ASGBD   -    Configuració Postgresql
+        <img src="imgs/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 40px; ">
+  </h1>
+</header>
+
+<nav>
+  <h3>Índex</h3>
+  <a href="#entorn">Conf. Entorn</a>
+  <a href="#connexions">Conf. Connexions</a>
+  <a href="#instancia">Conf. Instància</a>
+  <a href="#admin">Comptes administració</a>
+  <a href="#arrancada">Arrancada i Parada</a>
+  <a href="#emm">Conf. emmagatzemament</a>
+  <a href="#diccionari">Diccionari de dades </a>
+  <a href="#quadern">WAL de postgresql</a>
+  <a href="#logs">Fitxers LOG</a>
+  <a href="#altres-recursos">Altres Recursos</a>
+</nav>
+
+<main>
+
+  
+
+  <section id="entorn">
+    <h1>Configuració d'un SGBD</h1> <hr>
+    <h2>Configuració de l’entorn</h2>
+    <p>En postgresql la configuració es divideix en: </p>
+    <pre>Sistema Operatiu
+    ↓
+<strong>Variables d'entorn</strong>
+    ↓
+postgresql.conf
+    ↓
+Variables GUC
+    ↓
+Sessió
+</pre>
+<h3>Variables d’entorn del sistema operatiu</h3>
+<p>Aquestes no són pròpies de PostgreSQL sinó del SO. Les més importants:</p>
+<ul>
+  <li>PATH	Ruta on està el binari  (única obligatoria)</li>
+  <li>PGDATA	Directori de dades  (servidor)</li>
+  <li>PGPORT	Port (per defecte 5432) (en client)</li>
+  <li>PGHOST	Host per defecte (en client)</li>
+  <li>PGUSER	Usuari per defecte (en client)</li>
+  <li>PGPASSWORD	Password  (en client), no recomanada</li>
+</ul>
+<p>** PostgreSQL no necessita que aquestes variables estiguin definides per funcionar. Només faciliten l’ús de les eines.</p>
+<p>Inicialment, després de la instal·lació, cap variable està definida (excepte PATH). S'ha de posar manualment els valors si es vol fer ús d'alguna d'elles.</p>
+<p>Com es pot saber el valor que deuria tindre PGDATA: connectar a postgres,..   </p>
+  <pre>
+ sudo -i -u postgres
+ psql
+ show data_directory;
+  </pre>
+<p>També es pot saber, entrant en l'usuari <code>postgres</code> i anant al directori per defecte</p>
+<pre>
+sudo -i -u postgres
+cd
+pwd 
+</pre>
+
+<p>I com establir el/s valor/s:</p>
+   
+    <h3>🐧 En Linux</h3>
+<pre>Exemple Linux:
+export PGDATA=/var/lib/postgresql/16/main
+export PGPORT=5432
+</pre>
+<pre>Per fer permanent ( en este usuari ) els valors de PGDATA, etc 
+echo "export PGDATA=/var/lib/postgresql/16/main" >> ~/.bashrc
+source ~/.bashrc
+</pre>
+
+  <h3>🖥️ En Windows</h3>
+        <p>Pots modificar-les (el PATH) des de <em>Propietats del sistema → Variables d'entorn</em>.</p>
+      <p>Per vore les varibles d'entorn del SO de postgresql , amb el (REGEDIT) i dins buscar  postgres, per exemple</p>
+  <p>Pots modificar-les des del <strong>Registre (regedit)</strong></p>
+    
+<h3>On es troben els binaris  (psql)</h3>
+<pre>which psql
+/usr/bin/psql 
+    ==> /usr/bin  </pre>
+
+<h3>On es troben els fitxers de configuració</h3>
+<pre>find / -name postgresql.conf 2>/dev/null
+/etc/postgresql/16/main/postgresql.conf
+
+postgres@serverpg:/etc/postgresql/16/main$ ls
+conf.d	environment  pg_ctl.conf  pg_hba.conf  pg_ident.conf  postgresql.conf  start.conf
+
+</pre>
+
+    
+ <h3>🔧 Exercici pràctic suggerit</h3>   
+  
+  
+
+  </section>
+  
+
+
+
+  <section id="connexions">
+      <img src="imgs/5432.png" class="imatge-dreta"  alt="stop" style="width: 30%">
+    <h2>Configuració de les connexions</h2>
+<p>Postgres es un servei (daemon) de base de dades que corre habitualment al port TCP 5432. Es pot 
+  canviar editant el fitxer postgresql.conf, guardant, i reiniciant el servei (daemon)
+</p>
+
+<h3>Fitxer ->   postgresql.conf</h3>
+<p>En este fitxer es pot canviar el port on PostgreSQL escolta...</p>
+<pre>
+port = 5432                             # (change requires restart)
+max_connections = 100                   # (change requires restart)
+</pre>
+
+<h3>Fitxer ->   pg_hba.conf</h3>
+    <p>Inicialment, no es pot accedir des d'altre equip, i s'ha de configurar, donant expresament permís. Es pot especificar 
+      equips concrets, o xarxes concretes, o a tothom  0.0.0.0/0      </p>
+<pre>
+# Database administrative login by Unix domain socket
+local   all             postgres                                peer
+
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     peer
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            scram-sha-256
+# IPv6 local connections:
+host    all             all             ::1/128                 scram-sha-256
+# Allow replication connections from localhost, by a user with the
+# replication privilege.
+local   replication     all                                     peer
+host    replication     all             127.0.0.1/32            scram-sha-256
+host    replication     all             ::1/128                 scram-sha-256
+
+</pre>
+<p> Per afegir una xarxa des de la qual poder accedir...en la secció "# IPv4 local connections:"</p>
+    <pre>host  all  all  192.168.1.0/24      md5
+host  all  all  192.168.1.0/24      scram-sha-256
+</pre>
+<p>En PostgreSQL,<strong><code> md5 i scram-sha-256</code></strong> són mètodes d’autenticació que es configuren al fitxer: <code> pg_hba.conf </code></p>
+<p><strong>MD5</strong>: Què és? Mètode d’autenticació basat en hash MD5. PostgreSQL guarda la contrasenya com un hash MD5.</p>
+<p>Problemes : MD5 és un algorisme antic (1992). Vulnerable a atacs de col·lisió. Menys segur davant atacs moderns.
+No protegeix bé contra atacs de força bruta amb hash robat.</p>
+<p><strong>SCRAM-SHA-256</strong> :🔐 Què és? SCRAM = Salted Challenge Response Authentication Mechanism. Utilitza SHA-256. Introduït a PostgreSQL 10</p>
+<p>Configurar SCRAM correctament al postgresql.conf: <code>password_encryption = scram-sha-256</code></p>
+<p>I després, per regenerar la contrasenya...</p>
+<pre>ALTER USER usuari WITH PASSWORD 'nova_password';</pre>
+<pre>Mirar com s'està guardant
+SELECT rolname, rolpassword  FROM pg_authid;
+</pre>
+<p><strong>Recomanació actual</strong> : A PostgreSQL 14, 15, 16… sempre utilitza scram-sha-256 si els clients ho suporten.
+MD5 només per compatibilitat amb sistemes antics.</p>
+
+
+
+  </section>
+
+
+<section id="instancia">
+  <h2>Configuració de la instància</h2>
+  <p>Una instància de PostgreSQL és el programa en execució del servidor de base de dades juntament amb tot 
+    el que necessita per funcionar. No és només la base de dades, És tot el sistema que gestiona les bases de dades</p>
+    <p>Una instància de PostgreSQL inclou:
+
+<ul>
+  <li>El procés del servidor (postgres)</li>
+  <li>La memòria que utilitza</li>
+  <li>Els fitxers al disc (on es guarden les dades)</li>
+  <li>La configuració (ports, usuaris, etc.)</li>
+  <li>El conjunt de bases de dades</li>
+</ul>
+</p>
+<p>En un mateix ordinador pots tenir 1 instància (el més habitual) o Diverses instàncies
+   (per separar entorns: proves, producció…). Cada instància funciona de manera independent.</p>
+<h3>🔌 Què és una sessió en PostgreSQL?</h3>
+<p>Una sessió és la connexió activa entre un client (usuari o aplicació) i el servidor de base de dades.
+ Comença quan et connectes,  Acaba quan et desconnectes</p>
+ <p>Quan obris una sessió, Et connectes amb un usuari i Treballes sobre una base de dades concreta.</p>
+<p>Pots executar: consultes (SELECT), insercions (INSERT),
+actualitzacions (UPDATE), esborrats (DELETE), pots fer transaccions, etc..</p>
+<p>🔄 Cada usuari = una sessió. 1 usuari connectat → 1 sessió, 10 usuaris connectats → 10 sessions. 
+PostgreSQL gestiona moltes sessions alhora.</p>
+<p>✔ Cada sessió té: El seu estat, Les seves variables, Les seves transaccions.</p>
+<p>Les sessions són independents entre si,  Però poden interactuar (bloquejos, concurrència, etc.)</p>
+
+  <hr><h3>Tornem a la instància....</h3>
+   <h3>Fitxer:  postgresql.conf</h3>
+   <p>El fitxer postgresql.conf és el fitxer principal de configuració d’una instància de PostgreSQL.
+ Serveix per dir-li al servidor com ha de funcionar</p>
+
+<ul> És el fitxer principal. Defineix:
+  <li>Memòria (shared_buffers, work_mem, maintenance_work_mem)</li>
+  <li>Connexions (max_connections)</li>
+  <li>WAL (wal_buffers, checkpoint_timeout)</li>
+  <li>Logging (log_destination, log_min_duration_statement)</li>
+  <li>Planner (random_page_cost, effective_cache_size)</li>
+</ul>
+
+<pre>exemple:
+shared_buffers = 1GB
+work_mem = 16MB
+max_connections = 200
+</pre>
+
+<h3>Fitxer: pg_ident.conf</h3>
+<p>usuaris del sistema → usuaris PostgreSQL.</p>
+
+<h3>Variables del sistema (GUC - Grand Unified Configuration)</h3>
+<p>PostgreSQL té centenars de variables internes configurables (Aquestes no són variables d’entorn, sinó paràmetres de configuració del servidor.). Pots veure-les amb:</p>
+<pre>SHOW ALL;  </pre>
+<pre>O una concreta:
+SHOW work_mem;  </pre>
+<pre>O via vista del sistema
+SELECT name, setting FROM pg_settings;  
+</pre>
+
+
+<ul> Aquestes variables poden ser:
+  <li>🔹 Globals (configurades a postgresql.conf)</li>
+  <li>🔹 Per base de dades</li>
+  <li>🔹 Per usuari</li>
+  <li>🔹 Per sessió</li>
+  <li>🔹 Dinàmiques</li>
+</ul>
+<pre>Exemple: canviar variable només per Sessió
+SET work_mem = '64MB';
+  Només afecta la connexió actual.   </pre>
+<pre># Com saber de quin tipus és cada paràmetre:
+SELECT name, setting, context, vartype, source  FROM pg_settings ORDER BY name;</pre>
+<p>La columna context et diu quan i com es pot modificar el paràmetre.
+</p>
+<pre>
+context     Significat
+internal    Només intern, no modificable
+postmaster  Requereix reinici del servidor
+sighup      Requereix reload (pg_reload_conf())
+superuser   Només superusuari
+user        Qualsevol usuari pot canviar-lo per sessió
+backend	    Es pot canviar en iniciar sessió
+</pre>
+
+<p>Com saber quines variables pot canviar un usuari dins de la seua sessió ?</p>
+<pre>SELECT name FROM pg_settings WHERE context = 'user';</pre>
+
+<p>Saber d’on ve el valor (columna source)</p>
+<pre>SELECT name, source FROM pg_settings WHERE name = 'work_mem';</pre>
+
+<pre>source              Significat
+default	            Valor per defecte
+configuration file  postgresql.conf
+override            postgresql.auto.conf
+environment         Variable d’entorn
+session	            SET en sessió
+database            Definida per base de dades
+user                Definida per usuari</pre>
+
+
+   <h3>Variables per usuari o per base de dades</h3>
+<pre>
+PostgreSQL permet configurar paràmetres així:
+🔹 Per usuari
+ALTER ROLE usuari SET work_mem = '32MB';
+🔹 Per base de dades
+ALTER DATABASE basedades SET work_mem = '64MB';
+🔹 Global (per defecte)
+ALTER SYSTEM SET work_mem = '128MB';
+  Això escriu al fitxer:  postgresql.auto.conf  
+</pre>
+
+
+  <h3>Configuració de memòria</h3>
+
+
+  <h3> Reinici de la instància</h3>
+  <p>Alguns canvis requereixen recarregar la configuració (en calent), o reiniciar la instància</p>
+  <pre>🔁 pg_reload_conf() → recarrega configuració
+🔴 Reiniciar servei → per canvis estructurals (shared_buffers)     </pre>
+
+<p class="tips">Exercici: Quantes variables té actives la teua instal·lació?</p>
+<p class="tips">Exercici: Quanta memoria de treball té una sessió de la teua instal·lació?</p>
+<p class="tips">Exercici: Qin valor té el "log_destination" de la teua instal·lació?</p>
+ 
+</section>
+
+
+
+  <section id="admin">
+    <h2>Comptes d’administració</h2>
+  
+    <h3>👤 Comptes d'administració predeterminats</h3>
+    <p>Quan es crea una base de dades postgres es genera automaticament:</p>
+ 
+  <ul>  🔹 postgres  -  Usuari administrador per defecte (SUPERUSER)
+    <li>És el superusuari de la base de dades.</li>
+    <li>Té permisos totals (SUPERUSER)</li>
+    <li>Pot crear bases de dades</li>
+    <li>Pot crear rols/usuaris</li>
+    <li>Pot modificar qualsevol objecte</li>
+    <li>Pot canviar configuració</li>
+    <li>Aquest usuari es crea durant la inicialització amb initdb.</li>
+  </ul>
+  <p>⚠️ Important: Normalment coincideix amb l’usuari del sistema operatiu postgres
+És el compte equivalent a “SYS” a Oracle</p>
+
+<p>Altres comptes? : No es creen més usuaris per defecte.
+No existeixen comptes com: root  admin  system  guest...</p>
+<p>Si es creen uns rols inicials:
+   pg_database_owner
+ pg_read_all_data
+ pg_write_all_data
+ pg_monitor
+ pg_read_all_settings
+ pg_read_all_stats
+ pg_stat_scan_tables
+ pg_read_server_files
+ pg_write_server_files
+ pg_execute_server_program
+ pg_signal_backend
+ pg_checkpoint
+ pg_maintain
+ pg_use_reserved_connections
+ pg_create_subscription
+ pg_signal_autovacuum_worker
+</p>
+<p>Estos són els rols predefinits de PostgreSQL i són molt importants perquè eviten haver de donar permisos “a mà” un per un</p>
+<p>Són rols ja creats pel sistema,
+No tenen LOGIN → no són usuaris,
+Serveixen per agrupar privilegis específics, i, 
+Els pots assignar a usuaris</p>
+<hr>
+<p><strong>A nivell de sistema operatiu</strong>, quan instal·les PostgreSQL també es crea: </p>
+🔹 Usuari del SO: postgres
+
+<ul>  Aquest usuari:
+  <li>Executa el servei PostgreSQL</li>
+  <li>És propietari del directori PGDATA</li>
+  <li>S’utilitza per administrar el servidor</li>
+</ul>
+
+    <h3>📍 Ubicació dels comptes</h3>
+<p>Tots els usuaris i rols es troben a la base de dades postgres o qualsevol altra base de dades del cluster.
+Concretament, la informació està en les taules del diccionari de dades dins l’esquema <code>pg_catalog</code> </p>
+<p>La taula principal és: <code>pg_catalog.pg_authid </code> . 
+  També hi ha una vista més segura per a consultes normals:  <code>pg_catalog.pg_roles </code>   </p>
+  <p class="alert">⚠️ pg_authid conté les contrasenyes encriptades. Només els superusuaris poden llegir-la.</p>
+  <pre>Consultar rols/usuaris 
+SELECT rolname, rolsuper, rolcreatedb, rolcanlogin  FROM pg_roles;    </pre>
+<pre>Només superusuari
+SELECT rolname, rolpassword  FROM pg_authid;  
+    ## rolpassword conté la contrasenya en format md5 o scram-sha-256</pre>
+  <pre>
+$PGDATA/base/   → fitxers de bases de dades
+$PGDATA/global/ → informació global, incloent usuaris i rols
+  </pre>
+  
+    <h3> Canvi de contrasenya</h3>
+<h2>🔑 Canvi de contrasenya de l'usuari <code>postgres</code></h2>
+
+<div class="alert">
+<p>🟡 Important: Escull sempre una contrasenya segura. Després de canviar-la, actualitza les connexions d’aplicacions que utilitzen aquest usuari.</p>
+</div>
+
+<h3>1️⃣ Linux / Mac</h3>
+<ol>
+<li>Accedir a l’usuari <code>postgres</code> del sistema:</li>
+<pre><code>sudo -i -u postgres</code></pre>
+
+<li>Entrar a la consola de PostgreSQL:</li>
+<pre><code>psql</code></pre>
+
+<li>Canviar la contrasenya:</li>
+<pre><code>ALTER USER postgres WITH PASSWORD 'NovaContrasenyaSegura';</code></pre>
+
+<li>Sortir de la consola:</li>
+<pre><code>\q</code></pre>
+</ol>
+
+<h3>2️⃣ Linux / Mac (comanda directa sense entrar a psql)</h3>
+<pre><code>sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'NovaContrasenyaSegura';"</code></pre>
+
+<h3>3️⃣ Windows</h3>
+<ol>
+<li>Obrir Command Prompt amb permisos d’administrador.</li>
+<li>Accedir al directori bin de PostgreSQL (ajusta segons la teva instal·lació):</li>
+<pre><code>cd "C:\Program Files\PostgreSQL\16\bin"</code></pre>
+
+<li>Connectar a PostgreSQL:</li>
+<pre><code>psql -U postgres</code></pre>
+
+<li>Canviar la contrasenya:</li>
+<pre><code>ALTER USER postgres WITH PASSWORD 'NovaContrasenyaSegura';</code></pre>
+
+<li>Eixir de la consola:</li>
+<pre><code>\q</code></pre>
+</ol>
+
+<div class="alert">
+<p>⚠️ Notes addicionals:</p>
+<ul>
+<li>Si tens <code>pg_hba.conf</code> amb autenticació <code>peer</code>, només l’usuari del SO <code>postgres</code> pot connectar-se sense contrasenya.</li>
+<li>Canviar la contrasenya no modifica el mètode d’autenticació (<code>peer</code>, <code>md5</code>, <code>scram-sha-256</code>).</li>
+</ul>
+</div>
+
+    
+  <p>En altres SGBDs, l'usuari administrador varia...</p>
+    <table >
+  <caption >Comparativa d'usuaris administradors</caption>
+  <thead>
+    <tr>
+      <th >Sistema</th>
+      <th >Usuari administrador</th>
+      <th >Descripció breu</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td >Oracle</td>
+      <td ><code>SYS</code></td>
+      <td >Superusuari amb accés al diccionari de dades.</td>
+    </tr>
+    <tr>
+      <td >MySQL</td>
+      <td ><code>root</code></td>
+      <td >Superusuari amb tots els privilegis sobre el servidor.</td>
+    </tr>
+    <tr>
+      <td >PostgreSQL</td>
+      <td ><code>postgres</code></td>
+      <td >Superusuari creat per defecte durant la instal·lació.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+  </section>
+  
+
+  <section id="arrancada">
+    <h1>Arrancada i parada de la instància de postgresql</h1>
+
+
+<h2>Arrancada del servidor</h2>
+
+<h3> En Linux (systemd – el més habitual)</h3>
+<pre><code>sudo systemctl start postgresql</code></pre>
+
+<p>O si hi ha versions específiques:</p>
+<pre><code>sudo systemctl start postgresql-16</code></pre>
+
+<p>Comprovar estat:</p>
+<pre><code>sudo systemctl status postgresql</code></pre>
+
+<h3> Manualment amb pg_ctl</h3>
+<pre><code>pg_ctl -D /ruta/al/PGDATA start</code></pre>
+
+<p>Exemple:</p>
+<pre><code>pg_ctl -D /var/lib/postgresql/16/main start</code></pre>
+
+<h3> En Windows</h3>
+<p>PostgreSQL s’instal·la com a servei:</p>
+<pre><code>net start postgresql-x64-16</code></pre>
+
+<p>O des de:</p>
+<pre><code>Services → PostgreSQL → Start</code></pre>
+
+<hr>
+
+<h2>Parada del servidor</h2>
+
+<h3> En Linux (systemd)</h3>
+<pre><code>sudo systemctl stop postgresql</code></pre>
+
+<h3> Amb pg_ctl</h3>
+<pre><code>pg_ctl -D /ruta/al/PGDATA stop</code></pre>
+
+<h3>⚠️ Modes de parada (important)</h3>
+
+<p>PostgreSQL permet 3 modes de shutdown:</p>
+
+<h4>🟢 Smart (per defecte)</h4>
+<p>Espera que acaben les connexions actives.</p>
+<pre><code>pg_ctl stop -m smart</code></pre>
+
+<h4>🟡 Fast (més habitual en producció)</h4>
+<p>Cancela transaccions i fa checkpoint.</p>
+<pre><code>pg_ctl stop -m fast</code></pre>
+
+<h4>🔴 Immediate (forçat)</h4>
+<p>No fa checkpoint net → recuperació al proper inici.</p>
+<pre><code>pg_ctl stop -m immediate</code></pre>
+
+<p><strong>👉 Normalment s’utilitza fast.</strong></p>
+
+<hr>
+
+<h2> Reinici</h2>
+
+<pre><code>sudo systemctl restart postgresql</code></pre>
+
+<p>O:</p>
+
+<pre><code>pg_ctl restart -D /ruta/PGDATA</code></pre>
+
+<hr>
+
+<h2> Què passa internament quan arranca?</h2>
+
+<p>Quan arranca:</p>
+
+<ul>
+<li>Es crea el procés principal (postmaster)</li>
+<li>Es crea shared memory</li>
+<li>S’inicien processos background:
+    <ul>
+        <li>Checkpointer</li>
+        <li>WAL writer</li>
+        <li>Autovacuum</li>
+        <li>Background writer</li>
+    </ul>
+</li>
+<li>Es posa en escolta al port (5432 per defecte)</li>
+</ul>
+
+<hr>
+
+<h2> Com saber si està actiu?</h2>
+
+<p>Des de client:</p>
+
+<pre><code>psql -U postgres</code></pre>
+
+<p>O:</p>
+
+<pre><code>pg_isready</code></pre>
+
+  </section>
+  
+
+  <section id="emm">
+    <h1>Configuració de l’emmagatzematge</h1>
+  <h3>Arquitectura simplificada d’emmagatzematge en postgresql</h3>
+    <pre>Disc
+ ├── PGDATA
+ │    ├── base/
+ │    ├── global/
+ │    ├── pg_wal/
+ │    ├── pg_tblspc/
+ │    └── postgresql.conf
+</pre>
+    
+<p>La configuració de l’emmagatzematge a <strong>PostgreSQL</strong> fa referència a com i on es guarden
+   físicament les dades, WAL, índexs i fitxers interns dins del sistema.</p>
+
+<h2>📁 Directori de dades (PGDATA)</h2>
+
+<p>És el directori principal on PostgreSQL guarda:</p>
+<ul>
+<li>Bases de dades</li>
+<li>Taules</li>
+<li>Índexs</li>
+<li>WAL</li>
+<li>Fitxers de configuració</li>
+</ul>
+
+<p>Exemple típic en Linux:</p>
+<pre><code>/var/lib/postgresql/16/main</code></pre>
+
+<p>Aquest directori es defineix amb:</p>
+<pre><code>PGDATA</code></pre>
+
+<p>O en iniciar amb:</p>
+<pre><code>pg_ctl -D /ruta/PGDATA start</code></pre>
+
+<h2> Estructura interna del directori</h2>
+
+<p>Dins de PGDATA trobem:</p>
+
+<table>
+<tr>
+<th>Carpeta</th>
+<th>Funció</th>
+</tr>
+<tr>
+<td>base/</td>
+<td>Fitxers físics de les bases de dades</td>
+</tr>
+<tr>
+<td>global/</td>
+<td>Objectes globals (rols, tablespaces)</td>
+</tr>
+<tr>
+<td>pg_wal/</td>
+<td>Fitxers WAL (Write Ahead Log)</td>
+</tr>
+<tr>
+<td>pg_tblspc/</td>
+<td>Enllaços simbòlics a tablespaces</td>
+</tr>
+<tr>
+<td>pg_stat/</td>
+<td>Estadístiques</td>
+</tr>
+</table>
+
+<h2> Emmagatzematge físic de les taules</h2>
+
+<p>Cada taula en PostgreSQL és:</p>
+<ul>
+<li>Un o diversos fitxers físics</li>
+<li>Identificats per OID</li>
+<li>Emmagatzemats dins <code>base/&lt;OID_database&gt;/</code></li>
+</ul>
+
+<p>⚠️ No es guarda amb el nom de la taula, sinó amb un identificador intern.</p>
+
+<h2> Tablespaces (molt important)</h2>
+
+<p>Permeten distribuir dades en diferents discos.</p>
+
+<p>Exemple:</p>
+<pre><code>CREATE TABLESPACE dades_fast
+LOCATION '/mnt/ssd_postgres';</code></pre>
+
+<p>Després pots crear una taula en aquest espai:</p>
+<pre><code>CREATE TABLE clients (
+   id serial,
+   nom text
+) TABLESPACE dades_fast;</code></pre>
+
+<p>Útil per:</p>
+<ul>
+<li>Separar dades i WAL</li>
+<li>Utilitzar SSD per índexs</li>
+<li>Millorar rendiment I/O</li>
+</ul>
+
+
+
+
+<p>Paràmetres importants a <code>postgresql.conf</code>:</p>
+<pre><code>wal_level = replica
+checkpoint_timeout = 5min
+max_wal_size = 1GB</code></pre>
+
+<h2> Paràmetres importants d’I/O i emmagatzematge</h2>
+
+<p>Al <code>postgresql.conf</code>:</p>
+
+<h3> Checkpoints</h3>
+<pre><code>checkpoint_timeout
+max_wal_size</code></pre>
+
+<h3> Sincronització</h3>
+<pre><code>synchronous_commit
+fsync</code></pre>
+
+<p>⚠️ <code>fsync=off</code> millora rendiment però és perillós en producció.</p>
+
+<h2>Relació amb el sistema operatiu</h2>
+
+<p>PostgreSQL:</p>
+<ul>
+<li>Usa el sistema de fitxers del SO</li>
+<li>No gestiona discs directament</li>
+<li>Depèn del filesystem (ext4, xfs, zfs...)</li>
+</ul>
+
+<p>Bones pràctiques:</p>
+<ul>
+<li>Separar WAL i dades en discos diferents</li>
+<li>Usar SSD per índexs</li>
+<li>Configurar correctament I/O scheduler</li>
+</ul>
+
+
+
+  </section>
+  
+
+  <section id="diccionari">
+    <h1>Diccionari de dades</h1>
+      <h3>📘 Què és el diccionari de dades?</h3>
+  <p> El diccionari de dades a <strong>PostgreSQL</strong> és el conjunt de taules i vistes del sistema que emmagatzemen tota la informació sobre l’estructura de la base de dades. </p>
+
+<p><strong>📚 El diccionari de dades conté metadades (dades sobre les dades).</strong></p>
+
+<h3> Què guarda el diccionari de dades?</h3>
+
+<p>Conté informació sobre:</p>
+<ul>
+<li>Bases de dades</li>
+<li>Taules</li>
+<li>Columnes</li>
+<li>Índexs</li>
+<li>Constraints</li>
+<li>Usuaris i rols</li>
+<li>Permisos</li>
+<li>Tablespaces</li>
+<li>Funcions</li>
+<li>Vistes</li>
+<li>Extensions</li>
+</ul>
+
+<h2>🗂 On es troba?</h2>
+<p>En PostgreSQL, el “diccionari de dades” no és un únic objecte centralitzat,
+  sinó que està distribuït en diferents catàlegs del sistema.</p>
+
+  <p>El diccionari de dades està format principalment per:</p>
+
+  <h3> Esquema <code>pg_catalog</code></h3>
+  <p>Cada base de dades té els seus propis catàlegs del sistema (pg_catalog)</p>
+
+<p>És l’esquema intern del sistema.</p>
+
+<p>Conté taules com:</p>
+
+<table>
+<tr>
+<th>Taula</th>
+<th>Funció</th>
+</tr>
+<tr>
+<td>pg_class</td>
+<td>Taules i índexs</td>
+</tr>
+<tr>
+<td>pg_attribute</td>
+<td>Columnes</td>
+</tr>
+<tr>
+<td>pg_type</td>
+<td>Tipus de dades</td>
+</tr>
+
+</table>
+
+<p>Exemple:</p>
+
+<pre><code>SELECT * FROM pg_catalog.pg_tables;</code></pre>
+
+<p>A nivell de instància (cluster) hi ha alguns catàlegs globals (emmagatzemats a global/), com:
+<strong>rols/usuaris (pg_authid), bases de dades (pg_database) </strong> <br>
+👉 Aquests són compartits per totes les bases de dades.</p>
+<table>
+ <tr>
+<th>Taula</th>
+<th>Funció</th>
+</tr> 
+<tr>
+<td>pg_roles</td>
+<td>Rols/usuaris</td>
+</tr>
+<tr>
+<td>pg_authid</td>
+<td>Autenticació</td>
+</tr>
+<tr>
+<td>pg_database</td>
+<td>Bases de dades</td>
+</tr>
+<tr>
+<td>pg_tablespace</td>
+<td>Tablespaces</td>
+</tr>
+</table>
+
+
+<h3> Information Schema</h3>
+
+<p>PostgreSQL també implementa:</p>
+
+<pre><code>information_schema</code></pre>
+
+<p>És estàndard SQL (portable entre SGBD).</p>
+
+<p>Exemple:</p>
+
+<pre><code>SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public';</code></pre>
+
+<h2>🔎 Exemples pràctics</h2>
+
+<h3>🔹 Llistar taules</h3>
+
+<pre><code>SELECT tablename 
+FROM pg_tables 
+WHERE schemaname = 'public';</code></pre>
+
+<h3>🔹 Veure columnes d’una taula</h3>
+
+<pre><code>SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'clients';</code></pre>
+
+<h3>🔹 Veure índexs</h3>
+
+<pre><code>SELECT indexname 
+FROM pg_indexes 
+WHERE tablename = 'clients';</code></pre>
+
+<h2>🏗 Diferència entre pg_catalog i information_schema</h2>
+
+<table>
+<tr>
+<th>pg_catalog</th>
+<th>information_schema</th>
+</tr>
+<tr>
+<td>Intern PostgreSQL</td>
+<td>Estàndard SQL</td>
+</tr>
+<tr>
+<td>Més complet</td>
+<td>Més portable</td>
+</tr>
+<tr>
+<td>Pot canviar entre versions</td>
+<td>Més estable</td>
+</tr>
+</table>
+
+<h2>🔐 També guarda informació de seguretat</h2>
+
+<p>Exemple:</p>
+
+<pre><code>SELECT * FROM pg_roles;</code></pre>
+
+<p>Mostra:</p>
+
+<ul>
+<li>Qui és superusuari</li>
+<li>Qui pot crear BD</li>
+<li>Qui pot crear rols</li>
+</ul>
+  
+  
+  
+  
+  </section>
+  
+
+
+
+  <section id="quadern">
+  <h1> 🧾 Quadern de bitàcola (Redo Log Files)</h1>
+        en postgresql s'anomena WAL
+
+    <h2> WAL (Write Ahead Log)</h2>
+<p>El WAL (Write Ahead Log) a PostgreSQL és el mecanisme que garanteix la seguretat i consistència de les dades.
+WAL significa literalment: Write Ahead Log = Escriure primer al log abans que a la taula</p>
+
+<p>Ubicat a: <code>PGDATA/pg_wal/</code></p>
+
+<p>És essencial per:</p>
+<ul>
+<li>Recuperació en cas de fallada</li>
+<li>Replicació en temps real</li>
+<li>Propietats ACID</li>
+</ul>
+
+<p>Idea clau: Abans que PostgreSQL modifiqui físicament una taula al disc: Escriu el canvi al WAL, 
+Després aplica el canvi a la taula </p>
+
+<p>Això permet recuperar la base de dades si hi ha un error o tall elèctric. </p>
+
+<h3>Com funciona?</h3>
+
+<pre>Per una operació com :
+UPDATE comptes SET saldo = saldo - 100 WHERE id = 1;
+</pre>
+
+ <ol> El procés és:
+   <li>Es registra el canvi al WAL</li>
+   <li>El WAL es guarda a disc</li>
+   <li>Es confirma la transacció (COMMIT)</li>
+   <li>Més tard s’actualitza la taula real</li>
+ </ol>
+
+<p>Si el sistema falla abans del pas 4 →  PostgreSQL pot reconstruir el canvi utilitzant el WAL.</p>
+
+<h3>🔥 Recuperació després d’un crash</h3>
+
+<ul>Quan PostgreSQL arrenca després d’un error:
+  <li>Llegeix el WAL</li>
+  <li>Reprodueix les operacions que no s’havien escrit completament a disc</li>
+  <li>Deixa la base de dades en estat consistent</li>
+</ul>
+<p>Això s’anomena: <strong>Crash Recovery </strong>  </p>
+
+
+  
+
+
+ 
+</section>
+  
+
+
+
+  <section id="logs">
+    <h1>LOGS</h1>
+    <p>Els logs a PostgreSQL són fitxers de registre que documenten l’activitat del servidor (errors, connexions, 
+      consultes i esdeveniments interns) i serveixen per a diagnòstic, auditoria i anàlisi del rendiment</p>
+<h2>📁 Ubicació dels fitxers</h2>
+<p>Per defecte, PostgreSQL escriu missatges al stderr, no a fitxers. Per generar logs en fitxers,
+   cal activar el logging_collector i definir un directori amb log_directory, i log_filename:</p>
+
+<pre># Fitxer postgresql.conf (normalment a /etc/postgresql/16/main )
+logging_collector = on          # habilita la recollida de logs a fitxers
+log_directory = 'pg_log'        # nom del directori (pot ser relatiu a $PGDATA)
+log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'   # nom dels fitxers</pre>
+<p>En posgresql normalment es generen fitxers separats segons la configuració de log_filename. 
+  Això fa que cada reinici del servidor o cada interval de temps (segons configuració) genere un fitxer nou.</p>
+
+<!-- <p>La carpeta de logs no es crea automàticament dins de $PGDATA, s'ha de crear manualment, amb permisos per a usuari postgres</p>
+<pre>sudo -i -u postgres
+mkdir -p $PGDATA/pg_log      - crec que no cal, que si que es genera automaticament....
+chmod 700 $PGDATA/pg_log   
+sudo systemctl restart postgresql   </pre> -->
+
+<p>Per defecte:</p>
+<pre><code>$PGDATA/pg_log/          (Linux)
+%PGDATA%\pg_log\          (Windows)</code></pre>
+
+
+<p>PostgreSQL pot rotar els logs automàticament amb </p>
+<pre>
+log_truncate_on_rotation = on   # Esborra el fitxer antic si existeix
+log_rotation_age = 1d           # Rotar cada 1 dia
+log_rotation_size = 10MB        # Rotar quan el fitxer arriba a 10 MB  </pre>
+
+<p>Això evita fitxers enormes i permet tenir logs manejables.
+Si utilitzes log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log', cada rotació crearà fitxer nou automàticament.</p>
+
+<h2>🔍 Com consultar els logs</h2>
+<h3>Linux</h3>
+<pre><code># Logs recents en temps real
+tail -f $PGDATA/pg_log/postgresql-2026-02-19_120000.log
+
+# Buscar per error concret
+grep "ERROR" $PGDATA/pg_log/postgresql-2026-02-19_120000.log
+
+# Buscar per una data específica
+grep "2026-02-19" $PGDATA/pg_log/postgresql-2026-02-19_*.log</code></pre>
+
+<h3>Windows</h3>
+<p>Obrir els fitxers <code>.log</code> amb Notepad o Notepad++ i filtrar per errors o sentències.</p>
+
+<h2>🛠 Configuració clau a <code>postgresql.conf</code></h2>
+<pre><code># Habilitar recol·lecció de logs
+logging_collector = on
+
+# Destinació del log
+log_destination = 'stderr'
+
+# Carpeta i nom del fitxer
+log_directory = 'pg_log'
+log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+
+# Registrar consultes SQL llargues
+log_min_duration_statement = 1000   # ms
+
+# Registrar connexions i desconnexions
+log_connections = on
+log_disconnections = on
+
+# Nivell de gravetat mínim
+log_min_messages = warning</code></pre>
+ 
+
+
+    <h2>📋 Tipus de logs a PostgreSQL</h2>
+    <p>Dins del/s fitxers de logs, es poden trobar el events:</p>
+
+<div class="log-section">
+  <p class="log-title">🟢 Server log (equivalent a Alert log)</p>
+</div>
+<pre>exemple
+LOG:  database system is ready to accept connections
+LOG:  database system is shut down  
+</pre>
+
+<pre>Exemple Errors:
+ERROR:  relation "clients" does not exist
+STATEMENT: SELECT * FROM clients;
+</pre>
+
+
+<div class="log-section">
+  <p class="log-title">🟡 CSV log / File log</p>
+  <p>Logs en format CSV, útils per anàlisi automàtica o informes. Extensió: <code>.csv</code></p>
+</div>
+<pre>log_destination = 'csvlog'</pre>
+<p>Si s'activa, l'estructura d'emmagatzemament serà tipus .csv, per fer anàlisi posterior</p>
+
+<div class="log-section">
+  <p class="log-title">🔵 Log de connexions</p>
+  <p>Registra intents de connexió, autenticació fallida o correcta, i desconnexions. Configurat amb <code>log_connections</code> i <code>log_disconnections</code>.</p>
+</div>
+<p>Se s'activa:</p>
+<pre>log_connections = on
+log_disconnections = on</pre>
+<pre>Es podrà vore en els events:
+LOG:  connection authorized: user=postgres database=testdb
+LOG:  disconnection: session time: 0:01:23
+</pre>
+
+
+<div class="log-section">
+  <p class="log-title">🟣 Log de consultes</p>
+  <p>Registra sentències SQL, útil per a depuració i tuning. Configurat amb <code>log_statement</code> i <code>log_min_duration_statement</code>.</p>
+</div>
+<p>Se s'activa:</p>
+<pre>log_statement = 'all' 
+</pre>
+<pre>Es podrà vore en els events TOTES les consultes:
+Millor pràctica:
+log_min_duration_statement = 1000
+  Sols consultes que 'duren' molt...
+</pre>
+
+
+<div class="log-section">
+  <p class="log-title">🟠 Log de backups</p>
+  <p>Si s’utilitza <code>pg_dump</code>, <code>pg_restore</code> o <code>pg_basebackup</code>, els logs de les operacions de backup poden ser redirigits a fitxers específics.</p>
+</div>
+<pre>Des de client que llança el backup
+pg_dump -U postgres -d basedades > backup.sql 2> backup.log
+o 
+DATA=$(date +%Y-%m-%d_%H%M)
+pg_dump -U postgres basedades   > /backups/basedades_$DATA.sql  2> /backups/basedades_$DATA.log
+
+</pre>
+<pre>Des de servidor
+log_checkpoints = on
+log_connections = on
+log_replication_commands = on
+==>  Això farà que el server log mostre informació quan es fa un pg_basebackup.
+</pre>
+
+<div class="log-section">
+  <p class="log-title">⚪ Log d’instal·lació o updates</p>
+  <p>Durant la instal·lació del servidor PostgreSQL o d’extensions, es generen logs del sistema operatiu o scripts d’instal·lació.</p>
+</div>
+<p>Si s'instal·la amb sudo apt install postgresql-16, els logs no es configuren a PostgreSQL, sinó que els genera APT i dpkg. </p>
+<pre>
+📁 On es troben?
+/var/log/apt/history.log
+/var/log/apt/term.log
+
+També:
+
+/var/log/dpkg.log   </pre>
+
+<p>Configuració: No es configuren des de PostgreSQL. Es configuren des de: </p>
+<pre>/etc/apt/apt.conf.d/
+  *Configuració de rsyslog
+  * Rotació amb logrotate
+Exemple per vore instal·lació de PostgreSQL:
+grep postgresql /var/log/apt/history.log
+</pre>
+
+<p>Logs del servei de postgresql , una vegada en funcionament</p>
+<pre>
+Per veure logs:
+journalctl -u postgresql
+O en temps real:
+journalctl -u postgresql -f
+Aquests logs depenen de:
+/etc/systemd/journald.conf
+</pre>    
+
+<hr>
+
+
+<h2>🔍 Exemple d’Alert Log real (arrencada i errors)</h2>
+<pre><code>2026-02-19 12:00:01 UTC [12345] LOG:  database system was shut down at 2026-02-19 11:59:50 UTC
+2026-02-19 12:00:01 UTC [12345] LOG:  MultiXact member wraparound protections are now enabled
+2026-02-19 12:00:01 UTC [12345] LOG:  database system is ready to accept connections
+2026-02-19 12:05:02 UTC [12347] ERROR:  relation "clients" does not exist at character 15
+2026-02-19 12:05:02 UTC [12347] STATEMENT:  SELECT * FROM clients;</code></pre>
+
+
+
+<h2>⚙️ Configuració recomanada a <code>postgresql.conf</code></h2>
+<pre><code>logging_collector = on
+log_destination = 'stderr'
+log_directory = 'pg_log'
+log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+log_connections = on
+log_disconnections = on
+log_statement = 'all'
+log_min_duration_statement = 1000
+log_min_messages = warning</code></pre>
+
+<div class="alert">
+<p>🧪 Pràctica: Localitza els fitxers de log, obre’ls i filtra per errors o arrencades de la base de dades. Observa com PostgreSQL registra diferents esdeveniments com arrencada, errors SQL i connexions.</p>
+</div>
+
+ 
+</section>
+  
+
+  <section id="altres-recursos">
+    <h2>Recursos addicionals</h2>
+    
+
+
+     <hr><h3>Repàs...</h3>
+    <div id="progress-container">
+    <div id="progress-bar"></div>  </div>
+    <!-- <div id="percentatge-text">0%</div>  -->
+
+    <div class="quiz-container">
+        <h4 id="pregunta-text"></h4>
+        <div id="options-container" class="options">
+        </div>
+
+        <p id="feedback"></p>
+        <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
+        <button onclick="carregarPreguntes()">🔁 Reiniciar</button>
+ 
+
+  </section>
+ 
+
+</main>
+
+<script>
+
+  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+      //  <div class="pre-container">
+      //    <button class="copy-button">Copia Codi !</button>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+
+ //  Per fer test final
+  // Primer es crea un bancDePreguntes   const
+  // i desprès es carrega una pregunta aleatoria    function
+  // per ultim la funcio de comprobar resposta per a quan es polse un botó
+
+let bancDePreguntes = [];
+let preguntesBarrejades = [];
+let indexPreguntaActual = 0;
+let puntuacio = 0;
+
+function barrejar(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function actualitzarProgres() {
+    const percentatge =
+        (indexPreguntaActual / preguntesBarrejades.length) * 100;
+    document.getElementById('progress-bar').style.width =
+        percentatge + "%";
+}
+
+function actualitzarPercentatge() {
+    const percentatge = Math.round(
+        (puntuacio / preguntesBarrejades.length) * 100
+    );
+    document.getElementById('percentatge-text').innerText =""
+       // `Encerts: 🎯 ${percentatge}%`;
+}
+
+
+function carregarPreguntes() {
+    fetch('preguntes/preguntes21.json')
+        .then(res => res.json())
+        .then(data => {
+            bancDePreguntes = data;
+            preguntesBarrejades = [...bancDePreguntes];
+            barrejar(preguntesBarrejades);
+            puntuacio = 0;
+            indexPreguntaActual = 0;
+            mostrarPregunta();
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('pregunta-text').innerText =
+                "Error carregant les preguntes 😢";
+        });
+        //document.getElementById('percentatge-text').innerText = "0%";
+
+}
+
+function mostrarPregunta() {
+
+    // Si ja no queden preguntes
+    if (indexPreguntaActual >= preguntesBarrejades.length) {
+        document.getElementById('pregunta-text').innerText =
+            "🎉 Has acabat totes les preguntes!";
+        document.getElementById('options-container').innerHTML = "";
+        document.getElementById('feedback').innerHTML =
+        `Has encertat <strong>${puntuacio}</strong> de 
+        <strong>${preguntesBarrejades.length}</strong> preguntes.`;
+        document.getElementById('btn-seguent').disabled = true;
+        document.getElementById('progress-bar').style.width = "100%";
+        actualitzarProgres();
+        return;
+    }
+
+    const pregunta = preguntesBarrejades[indexPreguntaActual];
+
+    document.getElementById('pregunta-text').innerText = pregunta.titol;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    pregunta.opcions.forEach(opcio => {
+        const btn = document.createElement('button');
+        btn.innerText = opcio.text;
+        btn.onclick = () => comprovaResposta(opcio.correcte, btn);
+        container.appendChild(btn);
+    });
+
+    document.getElementById('feedback').textContent = "";
+    document.getElementById('btn-seguent').disabled = true;
+    actualitzarProgres();
+
+}
+
+
+function comprovaResposta(esCorrecte, element) {
+    const feedback = document.getElementById('feedback');
+
+    document
+        .querySelectorAll('#options-container button')
+        .forEach(btn => btn.disabled = true);
+
+    if (esCorrecte) {
+        feedback.textContent = "✅ Correcte! Molt bé.";
+        element.style.background = "#d4edda";
+        puntuacio++;
+    } else {
+        feedback.textContent = "❌ Incorrecte.";
+        element.style.background = "#f8d7da";
+    }
+    //actualitzarPercentatge();
+    document.getElementById('btn-seguent').disabled = false;
+}
+
+function seguentPregunta() {
+    indexPreguntaActual++;
+    mostrarPregunta();
+}
+
+ 
+
+// Executar en carregar la pàgina
+window.onload = carregarPreguntes;
+
+
+</script>
+
+</body>
+</html>

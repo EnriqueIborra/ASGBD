@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>👥 Usuaris Postgresql</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
+
+</head>
+<body>
+
+<header>
+  <a href="./">
+    <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
+  </a>
+  <h1>ASGBD   -    Usuaris i Permisos en postgresql
+        <img src="imgs/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 40px; ">
+  </h1>
+</header>
+
+<nav>
+  <h3>Índex</h3>
+  <a href="#cid">CID en postgresql</a>
+  <a href="#usuaris">Usuaris en postgresql</a>
+  <a href="#segusuaris">Seguretat en Usuaris</a>
+  <a href="#permisos">Permisos o Privilegis</a>
+  <a href="#rols">Rols en postgresql</a>
+  <a href="#perfils">Perfils en postgresql</a>
+  <a href="#vistes">Vistes com mecanisme de seguretat</a>
+  <a href="#altres-recursos">Altres Recursos</a>
+  <a href="#seguretat">2on Part - Seguretat en postgresql</a>
+</nav>
+
+<main>
+
+    
+  <section id="cid">
+        <h1>La Triada CID (Confidencialitat, Integritat, Disponibilitat) en postgresql</h1>
+        <img src="imgs/CID-ciber.png" class="imatge-esquerra"  alt="stop" style="width: 20%">
+    <p>La triada CID (Confidencialitat, Integritat i Disponibilitat) és un model de seguretat fonamental per garantir la protecció de la informació en qualsevol sistema informàtic, inclòs postgresql. Aquest model es fa servir per establir les bases de les polítiques de seguretat, i postgresql, com a sistema de gestió de bases de dades (SGBD), té diverses característiques i eines que permeten implementar-lo eficaçment.</p>
+
+    <h2>1. Confidencialitat (Confidentiality)</h2>
+    <p>La confidencialitat es refereix a la protecció de la informació per evitar que sigui accedida per usuaris no autoritzats. A postgresql, això es pot aconseguir mitjançant:</p>
+    <ul>
+        <li><strong>Autenticació i control d'accés</strong>: postgresql utilitza sistemes d'autenticació com l'usuari/contrassenya per garantir que només els usuaris autoritzats puguin accedir a la base de dades.</li>
+        <li><strong>Privilegis i rols</strong>: Els rols i privilegis d'postgresql defineixen els drets d'accés de cada usuari a les dades. Els privilegis poden ser assignats a rols específics i aquests rols assignats als usuaris.</li>
+        <li><strong>Xifrat de dades (Encryption)</strong>: postgresql permet xifrar tant les dades en repòs com les dades en trànsit. La funció de xifrat de bases de dades d'postgresql (TDE - Transparent Data Encryption) xifra les dades emmagatzemades, mentre que el xifrat SSL/TLS s'utilitza per protegir les dades durant la transmissió.</li>
+        <li><strong>Auditoria</strong>: postgresql ofereix eines per auditar l'accés a la base de dades i registrar les operacions realitzades. Això permet detectar accés no autoritzat a dades sensibles.</li>
+    </ul>
+
+    <h2>2. Integritat (Integrity)</h2>
+    <p>La integritat de les dades fa referència a la seva exactitud, coherència i fiabilitat al llarg del temps. Per garantir-la en postgresql, es poden utilitzar diversos mecanismes:</p>
+    <ul>
+        <li><strong>Restriccions (Constraints)</strong>: postgresql permet definir restriccions per garantir la coherència de les dades (per exemple, restriccions de clau primària, clau forana, unicitat i validesa).</li>
+        <li><strong>Comprovació de validesa (Validations)</strong>: Es poden utilitzar triggers o funcions per validar les dades abans d'introduir-les a la base de dades. Això ajuda a mantenir la qualitat i la integritat de la informació.</li>
+        <li><strong>Control de versions i còpies de seguretat</strong>: Les còpies de seguretat regulars i el control de versions ajuden a garantir que les dades puguin ser recuperades de manera fiable en cas de pèrdua o corrupció.</li>
+        <li><strong>Controls de transaccions (ACID)</strong>: postgresql utilitza el model ACID (Atomicitat, Consistència, Aïllament, Durabilitat) per assegurar-se que les transaccions són processades correctament i no alteren la integritat de les dades.</li>
+    </ul>
+
+    <h2>3. Disponibilitat (Availability)</h2>
+    <p>La disponibilitat fa referència a la capacitat de la base de dades per estar accessible i operativa en tot moment. Per assegurar la disponibilitat en postgresql, es poden utilitzar diversos mecanismes i tecnologies:</p>
+    <ul>
+        <li><strong>Clústers i alta disponibilitat</strong>: postgresql suporta diverses solucions d'alta disponibilitat, com postgresql Real Application Clusters (RAC), que permeten que múltiples instàncies de bases de dades treballin en conjunt per garantir que la base de dades estigui sempre disponible, fins i tot en cas de fallades del sistema.</li>
+        <li><strong>Recuperació davant de desastres (Disaster Recovery)</strong>: postgresql ofereix opcions de recuperació davant de desastres, com postgresql Data Guard, que permet replicar les dades en un lloc secundari per garantir que la base de dades estigui disponible en cas d'incidents importants.</li>
+        <li><strong>Còpies de seguretat i restauració</strong>: Utilitzar postgresql Recovery Manager (RMAN) per realitzar còpies de seguretat i restaurar les dades és essencial per garantir la disponibilitat dels serveis.</li>
+        <li><strong>Manteniment i monitorització</strong>: postgresql proporciona eines per monitoritzar la salut del sistema (postgresql Enterprise Manager) i per planificar el manteniment, per evitar aturades no desitjades i per identificar de manera proactiva possibles problemes de disponibilitat.</li>
+    </ul>
+
+    <h2>Resum</h2>
+    <p>Implementar la triada CID en postgresql implica la combinació de múltiples mecanismes i eines que permeten protegir la informació:</p>
+    <ul>
+        <li><strong>Confidencialitat</strong>: Autenticació, xifrat de dades, control d'accés i auditoria.</li>
+        <li><strong>Integritat</strong>: Restriccions de dades, control de transaccions i còpies de seguretat.</li>
+        <li><strong>Disponibilitat</strong>: Alta disponibilitat, recuperació davant de desastres i monitorització activa.</li>
+    </ul>
+
+    <p>Amb aquests mecanismes, postgresql permet als administradors de bases de dades protegir les dades i garantir que es compleixin les pràctiques de seguretat requerides per a una bona gestió de la informació.</p>
+
+
+  </section>
+  
+
+  <section id="usuaris">
+    <h2>👤 Usuaris en Postgresql</h2>
+   <p>Els usuaris permeten configurar el mecanisme de <strong>Confidencialitat</strong>, Identificant (nom d'usuari), 
+    autenticant (amb password, per exemple) i restringint l'accés a dades no permeses (amb els privilegis)</p>  
+    
+    <h3> Què és un usuari?</h3>
+    <p>Un <strong>usuari Postgresql</strong> identifica una entitat que accedeix a la base de dades.
+      Pot representar una persona, aplicació o procés.</p>
+
+
+    <h3>🔐 Autenticació d'usuaris</h3>
+    <p>Es configura en fitxer <code><strong>pg_hba.conf</strong></code></p>
+    <ul>
+      <li><strong>Local</strong>: usuari amb credencials dins de la base de dades. <strong>md5, scram-sha-256</strong></li>
+      <li><strong>peer, ldap, gss, sspi, pam</strong>: validació per S.O., LDAP, Kerberos, Radius</li>
+    </ul>
+    <p>L’autenticació es defineix per mètodes configurats al fitxer <code> pg_hba.conf </code></p>
+  
+    <h3> Tipus d'usuaris</h3>
+    <ul>
+      <li><strong>Predefinits</strong>: postgres , l'administrador del SGBD. "S'ha de protegir i intentar no usar"</li>
+      <li><strong>En instància</strong>: definits dins d'una instància</li>
+    </ul>
+    <p>Els usuaris (roles) es creen a nivell de tota la instància. Un usuari pot connectar-se a qualsevol base de dades (si té permisos)</p>
+  
+    <h3> Creació, modificació i baixa d'usuaris</h3>
+    <pre>
+  -- Crear usuari   (cas més usual)
+CREATE USER alumne WITH PASSWORD '1234';
+  
+CREATE USER profe  WITH PASSWORD 'abc123'  CREATEDB  CREATEROLE;
+--  CREATEDB → pot crear bases de dades
+--  CREATEROLE → pot crear altres usuaris
+
+-- Modificar contrasenya
+ALTER USER ausias WITH PASSWORD 'nova_pass';
+  
+  -- Eliminar usuari
+DROP USER alumne;
+DROP ROLE alumne;
+
+  -- Borra usuari i tots els objectes del seu schema
+DROP USER ausias;   
+  -- Donarà error si ausias te objectes o sessions obertes
+    </pre>
+    <p>⚠️ Important : No pots eliminar un usuari si: Té objectes (taules, esquemes…) o Té sessions actives</p>
+  <pre>  -- Cal fer primer..
+SELECT pg_terminate_backend(pid)  FROM pg_stat_activity  
+       WHERE usename = 'alumne'    AND pid <> pg_backend_pid();
+REASSIGN OWNED BY alumne TO altre_user;
+DROP OWNED BY alumne;
+DROP USER alumne;</pre>
+<pre>    -- Crear rol,  ==> equivalent a crear usuari
+CREATE ROLE alumne LOGIN PASSWORD '1234';
+  --  LOGIN indica que pot iniciar sessió
+</pre>  
+  
+    <h3>🔑 Donar permisos de connexió</h3>
+    <p>Depèn de com es cree, un usuari podrà connectar o no..</p>
+  <pre>
+CREATE USER alumne WITH PASSWORD '1234';  -- pot connectar
+CREATE ROLE alumne LOGIN PASSWORD '1234';  -- pot connectar, perquè té el LOGIN
+CREATE ROLE app_role NOLOGIN;  -- no pot connectar
+GRANT CONNECT ON DATABASE escola TO alumne;
+  </pre>
+  <p>Encara que: Quan es crea una base de dades nova, per defecte es fa un
+     <code>GRANT CONNECT ON DATABASE nom_bbdd TO PUBLIC;</code>
+    <br>Això significa que qualsevol usuari pot connectar encara que no se li donen permisos explícits de 
+  <br><code>GRANT CONNECT ON DATABASE .. TO ..</code></p>
+
+  <p>Si es desitja que, per defecte, cap usuari puga connectar a una BBDD, s'ha de revocar el permís després de crear-la 
+    amb, <code>REVOKE CONNECT ON DATABASE escola FROM PUBLIC;</code>, i sols donar permís als usuaris concrets amb 
+    <code>GRANT CONNECT ON DATABASE escola TO usuari;</code>
+  </p>
+  
+
+    <h3>🔍 Consultes útils</h3>
+    <pre>
+  -- Usuaris existents
+SELECT rolname, rolcanlogin, rolvaliduntil FROM pg_roles;
+  
+  -- Esquema actiu
+ SELECT current_user;
+-- o
+SELECT session_user;
+  
+  -- Paràmetres d'usuaris administratius
+SELECT rolname FROM pg_roles WHERE rolsuper = TRUE;
+    </pre>
+  
+  <h3>Connexió</h3>
+    <pre>
+psql -U system -h localhost -d escola  
+          usu      lloc        bbdd      </pre>
+  
+    <h3> Vistes relacionades amb usuaris</h3>
+    <ul>
+      <li><code>pg_roles</code></li>
+    </ul>
+  
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Canviar contrasenyes predefinides</li>
+      <li> No usar usuari postgres per a operacions del dia a dia</li>
+    </ul>
+
+    <hr>
+    <h3>schema</h3>
+    <p>A PostgreSQL, totes les taules han d’estar dins d’un esquema, i per defecte els usuaris treballen a l’esquema <strong>PUBLIC</strong>.</p>
+    <p>Un schema en PostgreSQL (i en molts altres SGBD) es pot entendre com un directori o carpeta dins d’una base de dades:</p>
+    <p>Quan es crea una bbdd , es crea una carpeta "public", on el propietari té accés concedit</p>
+    <p>El propietari del schema public és el mateix usuari que crea la base de dades. Aquest usuari té permisos de CREATE, USAGE 
+      dins del schema, per tant pot crear taules immediatament.</p>
+  <pre>  -- Crear un esquema addicional...
+CREATE SCHEMA schema1 AUTHORIZATION user1;  </pre>
+    <pre> -- Accés a objectes d'un schema
+SELECT * FROM schema1.taula;
+
+   -- Per evitar posar schema1.
+SET search_path TO schema1;
+
+   -- I després..
+SELECT * FROM taula;        </pre>
+   <h3>Per defecte, postgres fa</h3>
+   <pre>
+GRANT ALL ON SCHEMA public TO postgres;  -- per defecte a l’usuari que crea la base de dades
+GRANT CREATE, USAGE ON SCHEMA public TO PUBLIC;  
+   </pre>
+
+   <h3>Bones pràctiques</h3>
+   <pre>
+REVOKE CREATE ON SCHEMA public FROM PUBLIC; 
+CREATE SCHEMA pepe AUTHORIZATION pepe;   
+   </pre>
+
+   <h3>  Què és PUBLIC? </h3>
+<pre>
+PUBLIC no és un usuari real, ni es pot loguejar.
+És un rol especial virtual que inclou tots els usuaris existents i futurs de la base de dades.
+Serveix per donar permisos generals a tothom sense haver d’assignar-los un a un.  </pre>
+<p>Encara que, en moltes instal·lacions recents (especialment a PostgreSQL ≥ 14, i en sistemes Linux 
+  amb paquets de distribució) el CREATE sobre public s’ha revocat per defecte per seguretat:</p>
+
+  <h3>Saber quins permisos te PUBLIC</h3>
+  <pre>\dn+</pre>
+
+  <h3>Crear un usuari operatiu</h3>
+  <pre>
+CREATE USER nom_usuari WITH PASSWORD 'contrasenya';  -- Crear usuari
+GRANT CONNECT ON DATABASE nom_bd TO nom_usuari;      -- Permetre connectar a BBDD
+\c nom_bd                                          -- situar-se en la BBDD
+GRANT USAGE ON SCHEMA public TO nom_usuari;       
+GRANT SELECT, INSERT, UPDATE, DELETE  ON ALL TABLES IN SCHEMA public  TO nom_usuari;  -- per a taules existents
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nom_usuari;    --  per a taules futures
+GRANT CREATE ON SCHEMA public TO nom_usuari;        -- Si es vol que cree taules noves....s
+  </pre>
+
+  <h3>Permisos CREATE i USAGE</h3>
+  <pre>
+-- Donar permís d’usar el schema a l’usuari
+GRANT USAGE ON SCHEMA aula TO pepe;   
+-- Donar permís de crear objectes  el schema a l’usuari 
+GRANT CREATE ON SCHEMA aula TO pepe;
+  </pre>
+  <p>USAGE permet “fer servir” un objecte, però no permet modificar-lo ni crear dins seu.
+    S’aplica principalment a schemas, sequences i tipus.    </p>
+  <p>CREATE permet crear nous objectes dins d’un schema: taules, vistes, funcions, etc.</p>
+<p>Per crear objectes dins d’un schema, cal tenir USAGE + CREATE</p>
+<p>Només USAGE → pots llegir/consultar objectes amb permisos, però no crear res</p>
+<p>Només CREATE → no té sentit, perquè sense USAGE no pot referenciar el schema </p>
+
+
+  </section>
+  
+
+
+
+  <section id="segusuaris">
+        <h2>🔐 Bloquejar Usuaris en postgresql , i..  ¿¿ Forçar a Canviar Contrasenya??</h1>
+        
+        <p>Un usuari bloquejat NO POT accedir al sistema i no pot canviar el estat per si mateix. Ho ha de sol·licitar al DBA</p>  
+       
+        <h2>1. Bloquejar / desbloquejar un Usuari en postgresql</h2>
+    <pre>
+ALTER ROLE omar NOLOGIN;   --  Bloqueig compte
+ALTER ROLE omar LOGIN;     --  Desbloqueig compte      </pre>
+
+    <p>PostgreSQL no té període de gràcia ni avisos automàtics</p>
+        <h2>2. Forçar un Usuari a Canviar la Contrasenya</h2>
+
+
+        <p>postgresql NO permet forçar que un usuari canvie la seva contrasenya en el pròxim inici de sessió, 
+          o abans de que expire la validesa.
+        </p>
+        <p>En PostgreSQL, ALTER ROLE ... VALID UNTIL 'data'; serveix per establir la caducitat d’una contrasenya. 
+          Si la data ha passat, l’usuari no podrà connectar-se. PostgreSQL no permet forçar el canvi de contrasenya 
+          al següent login; això ho ha de fer un superuser</p>
+<pre> -- Caducitat de contrasenya
+ALTER ROLE omar VALID UNTIL '2020-01-01';
+</pre>
+  
+        <h2>3. Canvi de contrasenya</h2>
+    <p>PostgreSQL no dóna avisos automàtics.
+Es pot implementar amb scripts externs que consulten <code> (pg_roles.rolvaliduntil) </code> i avisen l’usuari abans de la caducitat.</p>
+        
+ 
+        <h4>Canvi des de pgsql  i pgadmin </h4>
+        <p>psql accepta el comando <strong>\password</strong> que inicia un script/conversa per canviar la contrasenya</p>
+        <p>Si eres superuser, \password pepe, incia un script per canviar la password de l'usuari pepe</p>
+        <p>pgadmin te una opció en el menú desplegable de la connexió anomenada 'Restablecer Contraseña...'</p>
+
+
+
+     <h2>6. Desconnectar un usuari que està connectat</h2>
+        <p>Un usuari pot tindre varies connexions actives (que son les SESSIONS), i es poden vore amb</p>
+        <pre>
+SELECT pid, usename, datname, client_addr, state  FROM pg_stat_activity;          </pre>
+    
+        <p>PostgreSQL ofereix la funció <strong>pg_terminate_backend()</strong> per finalitzar una sessió:</p>
+   <pre>
+-- Ex: desconnectar un usuari específic
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE usename = 'pepe'
+  AND pid <> pg_backend_pid();
+  -- pg_terminate_backend(pid) → tanca la sessió corresponent
+  -- pid <> pg_backend_pid() → evita desconnectar-te a tu mateix    
+   </pre>
+   <p>Només un superuser o propietari de la sessió pot fer això.
+La sessió s’interromp immediatament, i qualsevol transacció en curs es fa rollback</p>
+
+<p>hi ha <strong>pg_cancel_backend(pid)</strong>, que només cancela la consulta activa, sense tancar la sessió:</p>
+<pre>
+SELECT pg_cancel_backend(pid)
+FROM pg_stat_activity
+WHERE usename = 'pepe';  
+</pre>
+
+<h2>Avisos de caducitat</h2>
+
+<ol>Exemples
+  <li>Script en Bash + psql que s’executa cada dia amb cron i envia correus als usuaris amb contrasenya a punt de caducar.</li>
+  <li>Script en Python que consulta pg_roles.rolvaliduntil i genera notificacions.</li>
+</ol>
+<pre>
+ -- Bash
+ #!/bin/bash
+psql -U postgres -d postgres -t -c "
+SELECT rolname, rolvaliduntil
+FROM pg_roles
+WHERE rolvaliduntil < current_date + interval '7 days';
+" | while read user date; do
+    echo "Usuari $user: la contrasenya caducarà el $date" | mail -s "Avis contrasenya" $user@example.com
+done 
+</pre>
+
+
+  </section>
+
+
+
+  <section id="permisos">
+    <h2>🗝️ Permisos en postgresql</h2>
+  
+    <h3> Què són els permisos (privilegis)?</h3>
+    <p>
+      Els <strong>permisos</strong> o <strong>privilegis</strong> són drets que postgresql atorga als usuaris per fer determinades accions sobre la base de dades: 
+      accedir, modificar, crear, administrar objectes o usuaris.
+    </p>
+  
+    <h3> Tipus de permisos</h3>
+    <ul>
+      <li><strong>Privilegis de sistema</strong>: permeten executar accions globals (crear taules, accedir a sessions...)</li>
+      <li><strong>Privilegis d'objecte</strong>: permeten accedir o modificar objectes concrets (taules, vistes...)</li>
+    </ul>
+  
+    <h4> Exemples de privilegis de sistema</h4>
+    <ul>
+    <li>rolsuper	superusuari SUPERUSER NOSUPERUSER</li>
+    <li>rolcreaterole	pot crear rols  CREATEROLE NOCREATEROLE</li>
+    <li>rolcreatedb	pot crear BD CREATEDB NOCREATEDB</li>
+    <li>rolcanlogin	pot connectar-se LOGIN NOLOGIN</li>
+    <li>rolreplication	replicació REPLICATION NOREPLICATION</li>
+    <li>rolbypassrls	ignora seguretat RL BYPASSRLS  NOBYPASSRLS</li>
+    <li>rolinherit hereda automaticament INHERIT NOINHERIT</li>
+    <li>rolconnlimit	límit connexions </li>
+    <li>rolpassword</li>
+    <li>rolvaliduntil	caducitat </li>
+    <li>rolconfig</li>
+ 
+   </ul>
+
+<!-- SELECT rolname, rolpassword FROM pg_authid;   per vore les passwords, en hash   -->
+  
+    <h4> Exemples de privilegis d'objecte</h4>
+    <ul>
+      <li><code>GRANT SELECT, INSERT ON TABLE taula_client TO pepe;</code> sobre taules</li>
+      <li><code>GRANT EXECUTE ON FUNCTION calcula_impost(integer) TO pepe;</code> sobre procediments i funcions</li>
+    </ul>
+  
+    <h3>♻️ Revocar permisos</h3>
+    <pre>
+REVOKE SELECT ON TABLE taula_client FROM pepe;     </pre>
+  
+    <h3>🌐 Propagació amb GRANT OPTION</h3>
+    <p>Permet que un usuari que ha rebut un privilegi "sobre objecte" el puga concedir a un altre: (i també pot concedir el GRANT OPTION)</p>
+    <pre>
+GRANT SELECT ON alumnes TO joan WITH GRANT OPTION; </pre>
+   
+    <p class="alert">Els privilegis de sistema no es poden propagar per un usuari. Sols el <strong>superuser </strong> pot donar estos privilegis</p>
+ 
+   <hr> <h3>👀 Consultes útils</h3>
+    <pre>
+  -- Privilegis de sistema atorgats
+SELECT rolname,
+       rolsuper,
+       rolcreaterole,
+       rolcreatedb,
+       rolcanlogin,
+       rolreplication
+FROM pg_roles
+WHERE rolname = 'joan';
+  
+  -- Privilegis d'objecte
+  SELECT grantee,
+       table_schema,
+       table_name,
+       privilege_type,
+       is_grantable
+FROM information_schema.role_table_grants
+WHERE grantee = 'joan';
+
+  
+  -- Què puc fer?
+SELECT current_user, session_user;
+
+SELECT rolname, rolsuper, rolcreaterole, rolcreatedb
+FROM pg_roles
+WHERE rolname = current_user;
+
+SELECT grantee, table_schema, table_name, privilege_type
+FROM information_schema.role_table_grants
+WHERE grantee = current_user;
+
+    </pre>
+  
+    <h3>🧪 Exemple pràctic</h3>
+    <pre>
+  -- Crear usuari normal
+  CREATE USER alumne WITH PASSWORD '1234';
+    
+  -- Crear un usuari que puga crear BBDD
+  CREATE USER profe WITH PASSWORD '1234' CREATEDB;
+ 
+  -- Crear un usuari que puga crear altres usuaris
+  CREATE USER profe2 WITH PASSWORD '1234' CREATEROLE;
+
+ -- Crear un usuari ajudant de DBA
+  CREATE USER profe2 WITH PASSWORD '1234' SUPERUSER; 
+
+  -- Tots els CREATE USER porten implícit el LOGIN
+
+    </pre>
+
+   <hr> <h3>Permisos implícits</h3>
+    <p>Si l'usuari “joan” rep el permís CREATE  en postgresql i després crea la seua pròpia taula anomenada 
+      “clients”, joan té automàticament permisos totals sobre eixa taula que acaba de crear (INSERT, SELECT, DELETE, UPDATE)</p>
+    <p>Si un usuari té CREATE , pot crear taules al seu esquema i, per defecte, té tots 
+        els permisos DML sobre les taules que ell mateix crea</p>
+    <p>Si vol accedir o manipular dades en taules d'un altre esquema, cal que l'altre propietari (o un administrador)
+           li concedeixca permisos com SELECT, INSERT, UPDATE, DELETE</p>
+
+    <hr><h3>Accés a objectes d'un altre usuari</h3>
+    <p>Si un usuari <code>'user1'</code> vol accedir a un objecte d'un altre usuari <code>'user2'</code>, haurà de anteposar al nom del objecte
+      , el nom del schema del propietari del objecte en el moment d'utilitzar la sentència SQL adequada.  </p>
+      <p>Per exemple</p>
+      <pre><code>-- Des d'user1, suposant que user1 té permis sobre table1 de user2....
+SELECT * FROM user2.table1;</code></pre>
+
+   <hr> <h3>Permisos UPDATE i DELETE</h3>
+    <p>El permís que s'atorga sobre un objecte de ‘update' d'postgresql, necessita anar aparellat 
+      al permís de ‘select'. (També passa amb el permís ‘delete' )<br>
+        ❗ postgresql no ho fa automàticament ❗</p>
+
+    <p>    Si a un usuari se li atorga (grant) permís d'actualització sobre una taula que no es seua.</p>
+    <pre><code>grant update on usuari1.taula1 to usuari2; </code></pre>
+i este usuari (usuari2) fa
+<pre><code>update usuari1.taula1 set columna1=valor;
+</code></pre>
+la sentència funcionarà. => L'actualització, s'aplica a <strong>tota la taula</strong> 
+<br><p>Però, si intenta fer</p>
+<pre><code>update usuari1.taula1 set columna1=valor where columna2=valor2;
+</code></pre>
+la sentència <strong>fallarà</strong>. <br>
+perquè? <br>
+<p>postgres necessita saber les dades de columna2 per poder realitzar l'actualització, i per poder 
+  conéixer eixes dades necessita de permís de ‘select'
+</p>
+<p>postgresql Database necessita llegir les dades de la fila per a saber com modificar la fila per a
+   reflectir els canvis. Si no es tenen els permisos de SELECT, l'actualització no es pot dur a 
+   terme correctament. De la mateixa manera li passa a les sentències DELETE    </p>
+
+   <hr> <h3>Privilegi superuser</h3>
+    <p><strong>superuser</strong> és el privilegi administratiu més alt que es pot tindre en una base de dades postgresql. No és un rol ordinari, sinó un <em>privilegi especial d'autenticació</em> que dona control total sobre la instància de la base de dades.</p>
+  <h4>Què permet fer <code>superuser</code>?</h4>
+  <ul>
+    <li>Crear/ eliminar rols i usuaris (CREATEROLE)</li>
+    <li>Crear/ eliminar bases de dades (CREATEDB)</li>
+    <li>Modificar qualsevol objecte</li>
+    <li>Accedir a dades sense restriccions</li>
+    <li>Terminar qualsevol sessió (pg_terminate_backend)</li>
+    <li>Modificar configuracions globals</li>
+  </ul>
+  <pre>CREATE ROLE admin_superuser LOGIN SUPERUSER PASSWORD 'supersecret';</pre>
+
+  <h3>Comprovar qui és superuser</h3>
+  <pre>SELECT rolname
+FROM pg_roles
+WHERE rolsuper = TRUE;  
+  </pre>
+   <hr> <h3>Consideracions importants</h3>
+    <ul>
+      <li> Els privilegis de sistema són molt potents: assigna només els necessaris</li>
+      <li> Els privilegis d'objecte poden donar-se amb més flexibilitat</li>
+      <li> Revisa i revoca privilegis regularment</li>
+    </ul>
+
+   
+  </section>
+  
+
+  <section id="rols">
+    <h2>🎭 Rols en postgresql</h2>
+  
+    <h3> Què és un rol?</h3>
+    <p>
+      Un <strong>rol</strong> és un conjunt de permisos agrupats baix un nom.
+       Serveix per simplificar la gestió de privilegis, especialment en entorns amb molts usuaris.
+    </p>
+    <p>En compte d'assignar 10 permisos a cada usuari, es crea un rol amb aquests permisos i s'assigna el rol. Després, si 
+      es canvia algun privilegi del ROL, afecta a tots els usuaris que el tenen, sense tindre que anar u per u, canviant el privilegi     </p>
+  
+   <h3>Rols en postgresql</h3>
+   <p>En PostgreSQL, no hi ha diferència real entre “usuari” i “rol”: tot són rols. La diferència és com els utilitzes</p>
+<ul>
+  <li>Rols amb LOGIN (usuaris)</li>
+  <li>Rols sense LOGIN (grups)</li>
+  <li>Assignar rols a usuaris</li>
+</ul>
+
+<pre>
+**rols predefinits en postgres
+pg_read_all_data → pot llegir totes les taules
+pg_write_all_data → pot escriure a totes les taules
+pg_monitor → monitorització
+pg_database_owner → propietari BD
+ pg_read_all_settings
+ pg_read_all_stats
+ pg_stat_scan_tables
+ pg_read_server_files
+ pg_write_server_files
+ pg_execute_server_program
+ pg_signal_backend
+ pg_checkpoint
+ pg_maintain
+ pg_use_reserved_connections
+ pg_create_subscription
+ pg_signal_autovacuum_worker    </pre>
+
+  
+    <h3>🛠️ Crear i assignar rols</h3>
+    <pre>
+  -- Crear un nou rol
+CREATE ROLE nom_rol;
+
+  -- Crear rol amb privilegis
+CREATE ROLE rol_admin LOGIN CREATEDB CREATEROLE;
+
+  -- modificar privilegis d'un rol
+ALTER ROLE pepe NOCREATEDB;
+  
+  -- Concedir permisos al rol
+GRANT SELECT, INSERT ON TABLE clients TO nom_rol;
+  
+  -- Assignar el rol a un usuari
+GRANT nom_rol TO usuari;
+
+  -- Assignar un rol a un altre rol
+GRANT altre_rol TO gestor_aula;
+    </pre>
+  
+    <h3> Revocar rols a usuaris</h3>
+    <pre>
+REVOKE app_user FROM pepe;
+    </pre>
+    <p>Quan s'afegixen privilegis a un rol, tots els usuaris que tenen eixe rol adquireixen el nou privilegi 
+      <strong>de seguida</strong>, encara que ja estigueren connectats, o tinguen sessions obertes des de fa temps,</p>
+      <p>postgresql no necessita tancar ni reiniciar la sessió perquè el privilegi faça efecte.</p>
+      <p>Els privilegis no es carreguen només en establir la sessió, sinó que postgresql 
+        Comprova els privilegis d'accés dinàmicament quan el codi SQL s'executa.</p>
+  
+        
+<!--  El rol PUBLIC en postgresql no és un “rol amb privilegis potents”, sinó un mecanisme perquè tots els usuaris rebin certs privilegis per defecte.
+És automàtic: tots els usuaris són membres del rol PUBLIC.  
+ots els usuaris tenen sempre el rol PUBLIC automàticament
+PUBLIC no es concedeix ni es revoca.
+És un rol “implícit”. Forma part del model de seguretat d’postgresql.
+no apareixerà a les vistes com:  DBA_ROLE_PRIVS    USER_ROLE_PRIVS    SESSION_ROLES
+Perquè postgresql no el llista: tots els usuaris el tenen sempre.
+-->        
+  
+    <h3>🔍 Consultes útils</h3>
+    <pre>
+  -- Rols assignats a un usuari
+SELECT r.rolname AS usuari, m.roleid::regrole AS rol
+FROM pg_auth_members m   JOIN pg_roles r ON r.oid = m.member
+WHERE r.rolname = 'marta';
+  
+  -- Rols definits al sistema
+ SELECT rolname   FROM pg_roles;
+  
+  -- Privilegis d'un rol
+ SELECT rolname, rolsuper, rolcreatedb, rolcreaterole
+FROM pg_roles  WHERE rolname = 'gestor_aula';
+    </pre>
+  
+  
+    <ul>
+      <li> Un usuari pot tindre múltiples <strong>rols i privilegis</strong></li>
+      <li> Un rol pot tindre múltiples <strong>rols i privilegis</strong></li>
+    </ul>
+    <p>Si a un usuari li assignes diversos rols, l'usuari rep la suma de tots els privilegis
+       atorgats per cadascun d'eixos rols. i si un mateix privilegi està repetit en diversos rols, 
+       postgresql simplement detecta que el privilegi està concedit i l'usuari el té. No hi ha duplicació ni conflicte.</p>
+    <p>--- Quan s'assigna un rol a un usuari, l'usuari rep tots els privilegis del rol
+       i postgresql no permet fer REVOKE d'un privilegi que prové d'un rol.</p>
+       <p>Els rols són objectes de la base de dades a nivell global, igual que els usuaris.
+         No estan dins d'un esquema concret, sinó que existeixen a nivell de base de dades i 
+         qualsevol usuari els pot rebre.</p>
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Agrupa privilegis per rols segons la funcionalitat (ex: lectura, administració, desenvolupament)</li>
+      <li> Documenta què fa cada rol i qui l'ha de tenir</li>
+      <li> Usa rols en lloc de donar permisos individuals sempre que siga possible</li>
+    </ul>
+  </section>
+  
+
+  <section id="perfils">
+    <h2>📐 Perfils en postgresql</h2>
+  
+    <h3> Què és un perfil?</h3>
+    <p> Este concepte ve d'Oracle. En oracle, un <strong>perfil</strong> és un conjunt de restriccions i paràmetres que s'apliquen als usuaris de la base de dades. 
+      Aquests paràmetres permeten controlar l'ús de recursos del sistema (com el nombre màxim de sessions, temps connectat, etc.) 
+      i establir polítiques de seguretat sobre les contrasenyes.
+    </p>
+    <p>En postgres no existeix este mecanisme, però hi ha altres per conseguir estes restriccions</p>
+
+  
+  
+    <h3> Paràmetres de contrasenya</h3>
+    <pre>ALTER ROLE pepe VALID UNTIL '2026-12-31';</pre>
+    <h3>Limitació de connexions</h3>
+    <pre>ALTER ROLE pepe CONNECTION LIMIT 5;</pre>
+    <h3>Limitació de recursos a nivell de taules o esquema</h3>
+    <p>Control de recursos amb pg_resource_scheduler o cgroups externs</p>
+
+    <p>PostgreSQL no té perfils com Oracle. Els atributs de seguretat i limitació de recursos es defineixen 
+      directament al rol amb paràmetres com rolconnlimit i rolvaliduntil. No hi ha un DEFAULT PROFILE, 
+      cada usuari ha de tenir els seus atributs assignats al crear-lo.</p>
+
+
+
+  </section>
+
+  <section id="vistes">
+
+    <h1>👁️ Vistes com a Element de Seguretat en postgresql</h1>
+    <p>Les <strong>vistes (views)</strong> en postgresql poden ser un element molt poderós per a la seguretat de les dades, 
+      ja que permeten controlar quines dades poden ser accessibles pels usuaris i com aquestes dades són presentades. 
+      Les vistes no emmagatzemen dades, sinó que són definicions de consultes SQL que es poden utilitzar 
+      com si foren taules normals. Això significa que les vistes permeten a l'administrador de bases de dades (DBA) 
+      establir un nivell de seguretat i restricció per a l'accés a la informació a través de consultes personalitzades.</p>
+
+    <h2>Vistes com a element de seguretat a postgresql</h2>
+    <p>A continuació es poden vore algunes de les principals maneres en què les vistes poden ser utilitzades 
+      per millorar la seguretat en postgresql:</p>
+
+    <h3>1. Restricció d'Accés a Dades Sensibles</h3>
+    <p><strong>Descripció</strong>: Les vistes permeten crear consultes personalitzades que poden ocultar 
+      certes columnes o taules que contenen dades sensibles. En lloc de permetre que un usuari accedeixi 
+      directament a una taula, es pot crear una vista que exposi només una part de les dades.</p>
+    <pre><code>CREATE VIEW vista_clients_completa AS
+SELECT nom, adreca, telefon
+FROM clients;</code></pre>
+    <p><strong>Avantatge de seguretat</strong>: Limita l'exposició de dades sensibles a només la informació
+       necessària, millorant la seguretat de la informació confidencial.</p>
+
+    <h3>2. Autenticació de Consultes</h3>
+    <p><strong>Descripció</strong>: Pots utilitzar vistes per garantir que només es poden realitzar consultes
+       sobre un conjunt específic de dades segons el rol o els permisos d'un usuari. Això es fa mitjançant el 
+       control de permisos en les vistes.</p>
+    <pre><code>GRANT SELECT ON vista_clients_completa TO usuari_x;</code></pre>
+    <p><strong>Avantatge de seguretat</strong>: Aquesta tècnica permet controlar l'accés a les dades a nivell 
+      d'usuari, garantint que només els usuaris autoritzats tinguin accés a les vistes que exposen les dades 
+      filtrades o restringides.</p>
+
+    <h3>3. Control de Columnes</h3>
+    <p><strong>Descripció</strong>: Les vistes permeten ocultar columnes senceres d'una taula, cosa que és útil
+       per amagar dades que no s'haurien de mostrar. Això és especialment útil quan les taules contenen dades 
+       sensibles, com ara contrasenyes, números de seguretat social, etc.</p>
+    <pre><code>CREATE VIEW vista_usuaris AS
+SELECT id, nom, correu
+FROM usuaris;</code></pre>
+    <p><strong>Avantatge de seguretat</strong>: Permet amagar dades sensibles i garantir que només la informació 
+      necessària sigui accessible.</p>
+
+    <h3>4. Control de les Consultes Realitzades</h3>
+    <p><strong>Descripció</strong>: Mitjançant la creació de vistes, es pot controlar exactament quines 
+      consultes són permeses i com són realitzades. Això permet als administradors establir regles de consulta
+       que limitin l'accés a determinats conjunts de dades.</p>
+    <pre><code>CREATE VIEW vista_transaccions_usuaris AS
+SELECT transaccio_id, data, import
+FROM transaccions
+WHERE usuari_id = :usuari_id;</code></pre>
+    <p><strong>Avantatge de seguretat</strong>: Pot restringir l'abast de les dades consultades i garantir 
+      que els usuaris només obtinguin informació rellevant i personalitzada.</p>
+
+    <h3>5. Vistes Amb Funcionalitat de Seguretat Basada en Rols</h3>
+    <p><strong>Descripció</strong>: Utilitzant vistes, pots aplicar seguretat a nivell de rols, permetent 
+      que només certs rols d'usuari puguin accedir a determinades dades. Per exemple, un DBA pot crear una 
+      vista per a usuaris normals que només mostri informació bàsica, mentre que un usuari amb un rol administratiu 
+      podria tenir accés a una vista més detallada.</p>
+    <pre><code>CREATE VIEW vista_dades_normals AS
+SELECT nom, adreça FROM clients;
+
+CREATE VIEW vista_dades_administrador AS
+SELECT * FROM clients;</code></pre>
+    <p>L'usuari amb un rol normal només pot veure <code>vista_dades_normals</code>, mentre que l'usuari amb 
+      rol d'administrador té accés a <code>vista_dades_administrador</code>.</p>
+    <p><strong>Avantatge de seguretat</strong>: Permet controlar l'accés a les dades basat en rols d'usuari, 
+      garantint que els usuaris només tinguin accés a la informació que necessiten.</p>
+
+    <h3>6. Auditoria i Monitorització de Consultes</h3>
+    <p><strong>Descripció</strong>: Les vistes també poden ser útils per auditar i monitoritzar les consultes. 
+      Per exemple, pots crear una vista que permeta a l'usuari visualitzar només els canvis realitzats en la taula
+       de transaccions en un període de temps determinat.</p>
+    <pre><code>CREATE VIEW vista_transaccions_audit AS
+SELECT transaccio_id, data, import, operacio
+FROM transaccions_audit
+WHERE data > '2024-01-01';</code></pre>
+    <p><strong>Avantatge de seguretat</strong>: Això permet monitoritzar l'activitat de la base de dades i detectar
+       possibles accessos no autoritzats o activitats sospitoses.</p>
+
+    <h2>Conclusions</h2>
+    <p>Les <strong>vistes en postgresql</strong> són una eina molt potent per millorar la seguretat de les dades en 
+      una base de dades. Algunes de les maneres en què es poden utilitzar com a element de seguretat són:</p>
+    <ul>
+        <li><strong>Restricció d'accés a dades sensibles</strong></li>
+        <li><strong>Autenticació de consultes</strong> mitjançant l'assignació de permisos a les vistes.</li>
+        <li><strong>Control de columnes</strong> per amagar dades sensibles.</li>
+        <li><strong>Control de consultes</strong> per limitar l'abast de les dades consultades.</li>
+        <li><strong>Seguretat basada en rols</strong> per restringir l'accés a vistes específiques segons els permisos d'usuari.</li>
+        <li><strong>Auditoria i monitorització</strong> per fer seguiment de les operacions en la base de dades.</li>
+    </ul>
+    <p>Les vistes permeten personalitzar l'accés a la informació i garantir que només els usuaris autoritzats 
+      tinguen accés a dades crítiques.</p>
+  </section>  
+
+
+
+  <section id="altres-recursos">
+    <h2>🖊️ Altres recursos</h2>
+   
+  </section>
+ 
+  <section id="seguretat">
+    <h2> <a href="seguretat-mecanismes_p.html">Seguretat en postgresql</a></h2>
+  
+  </section>
+ 
+
+</main>
+
+<script>
+
+// Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+      //  <div class="pre-container">
+      //    <button class="copy-button">Copia Codi !</button>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+</script>
+
+</body>
+</html>
+

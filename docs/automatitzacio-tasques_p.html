@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>📝 Automatització PostgreSQL</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
+</head>
+<body>
+
+<header>
+  <a href="./">
+         <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
+  </a>
+  <h1>ASGBD   -    Automatització de tasques en PostgreSQL
+     <img src="imgs/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 40px; ">
+  </h1>
+</header>
+
+<nav>
+  <h3>Índex</h3>
+  <a href="#autom">Automatització: Conceptes</a>
+  <a href="#blocs">Blocs de codi</a>
+  <a href="#variables">Variables</a>
+  <a href="#estructures">Estructures de programació</a>
+  <a href="#proc-func">Procediments-Funcions</a>
+  <a href="#procediments">Procediments en Postgresql</a>
+  <a href="#funcions">Funcions en Postgresql</a>
+  <a href="#disparadors">Disparadors / triggers</a>
+  <a href="#seq">Seqüències</a>
+  <a href="#cursors">Cursors</a>
+  <a href="#excepcions">Excepcions</a>
+  <a href="#tasques">Tasques automatitzables</a>
+  <a href="#altres-recursos">Altres Recursos</a>
+</nav>
+
+<main>
+
+  <section id="autom">
+    <br><h2> Automatització</h2>
+    <p>L'automatització consisteix en fer tasques de manera sistemàtica i repetitiva 
+      sense que estiga involucrat un usuari en la seua execució</p>
+    <p>Quan parlem d’automatització en postgresql, generalment ens referim a processos que es programen per executar-se automàticament, 
+      sense necessitat d’intervenció manual. postgresql ofereix diverses eines i mètodes per fer això</p>
+    <h3>Avantatges Automatització</h3>
+      <ul>
+        <li>Estalvi de temps</li>
+        <li>Reducció costos administració</li>
+        <li>Reducció errors ( humà)</li>
+      </ul>
+
+      <h3>Tipus</h3>
+      <ul>
+        <li>Programa extern (al SGBD)</li>
+        <ul><li> Programador de Tasques de Windows, Crontab en Linux, etc..</li></ul>
+        <li>Programa intern : rutina de bbdd + job</li>
+      </ul>
+
+      <h3>Rutina</h3>
+      <ul>
+        <li>Script, guió, programa o seqüència de comandos que permeten dur a terme el processament d'unes certes accions</li>
+        <li>Quan és creada rep un nom que permet que siga invocada tantes vegades com siga necessari</li>
+        <li>Van ser introduïdes en la versió SQL3, o SQL:1999</li>
+      </ul>
+      <p>Els guions o scripts donaren pas al PL/SQL (Procedural Language, que és diferent del SQL )</p>
+      <p><strong>SQL</strong> (Structured Query Language) és un llenguatge declaratiu. S’utilitza per gestionar i consultar bases de dades. 
+        No té estructures de control com bucles o condicions complexes. SELECT (consultar dades), 
+INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i altres com DDL, DCL, TCL    </p>
+        <p><strong>PL/pgSQL</strong> (Procedural Language /PostgreSQL Structured Query Language). És una adaptacio de PL/SQL creada per Oracle, a Postgres. 
+          És un llenguatge procedimental. Permet utilitzar:  Variables, Condicions (IF), Bucles (LOOP, WHILE, FOR), Procediments i funcions.
+        S’utilitza per crear programs dins de la base de dades.</p>
+
+      <h3>El SGBD deu proporcionar:</h3>
+      <ul>
+        <li>Eines necessàries per a crear rutines</li>
+        <li>Eines per a executar les rutines automàticament</li>
+      </ul>
+ 
+      <h3>Avantatges rutina interna</h3>
+      <ul>
+        <li>Rendiment</li>
+        <li>Reutilització de codi</li>
+        <li>Encapsula regles de negoci</li>
+        <li>Major seguretat</li>
+      </ul>
+      
+      <img src="imgs/important.png" class="imatge-dreta"  alt="stop" style="width: 15%">
+      <h2>Les rutines: S’han de Documentar</h2>
+      
+      <h2>QUE ??</h2><p>Descripció de la tasca, descripció de paràmetres d’entrada i eixida, Autor, Versió, Data d’última modificació, etc..</p>
+      <h2>COM ??</h2> <p>** Fent servir comentaris en el codi de les rutines. Amb /* */ o  --</p>
+      <pre>-- Esta linea és un comentari </pre>
+      <p>** Fent servir documentació institucional en qualsevol suport (documents, fulls de càlcul, diagrames,etc..)</p>
+       
+  </section>
+
+
+
+  <section id="blocs">
+    <br>
+    <h2>🧾 DO Bloc en PL/pgSQL</h2>
+  
+    <h3> Què és un DO bloc?</h3>
+    <p>
+      Un <strong>DO bloc</strong> és una unitat de codi en PL/pgSQL que:
+    </p>
+    <ul>
+      <li> No té nom ni es guarda a la base de dades.</li>
+      <li> S’executa directament des de la pestanya. Es pot guardar en un fitxer extern i després recuperar.</li>
+      <li> És ideal per a proves o per a executar operacions puntuals.</li>
+      <li> Pot incloure sentències SQL, declaracions de variables, control de flux, i gestió d’excepcions.</li>
+    </ul>
+     <hr>
+    <h4>En plsql es pot:</h4>
+    <ul>
+      <li>Es pot editar el contingut del buffer amb  <code>\e</code></li>
+      <li>Es pot vore el contingut del buffer amb  <code>\p</code></li>
+      <li>Es pot executar el contingut del buffer amb  <code>\i</code></li>
+      <li>Guardar el contingut del buffer en un arxiu ( posa nom + .sql )</li>
+      <ul>         <li>postgres=# \w nom_fitxer.sql</li>       </ul>
+      <li>Carrega el contingut d'un fitxer en el buffer (però <strong>NO</strong> l'executa)</li>
+      <ul>   <li>postgres=# \e nom_fitxer.sql</li> </ul>
+      <li>Executa el contingut d'un fitxer</li>
+      <ul><li> postgres=# \i nom_fitxer.sql</li></ul>
+    </ul>
+
+    <h4>En pgAdmin</h4>
+    <img src="imgs/QueryToolWorkspace.png" class="imatge-dreta"  alt="QTW" style="width: 25%">
+    <p>Des de Query Tool Workspace. Es treballa amb WorkSheets (pestanya oberta). Cada pestanya és una connexió</p>
+    <p>Per executar una linia del WorkSheet, prem  Alt- F5</p>
+    <p>Per executar TOTES les linies(SCRIPT) , prem F5</p>
+    <p>Per guardar el contingunt del WorkSeet, Ves a icona per fer Ctrl-S (Save)  o  Save As… </p>
+    <p>Per recuperar el text guardat en una fitxer, → Open → o Ctrl-O </p>
+    <p>Una altra forma de obrir un QueryToolWorkspace, des del menu (estaguent situat en una bbdd concreta), Tools, Query Tools, o 
+      prement Atl-May-Q </p>
+      <hr>
+    <h3> Estructura bàsica d’un DO bloc </h3>
+    <pre translate="no">
+DO $$
+BEGIN
+    RAISE NOTICE 'Hola món';
+END;
+$$ LANGUAGE plpgsql;</pre>
+<p>Per executar este bloc DO, s'ha de fer amb F5 (script), en l'altre cas, en executar sentència, donarà un error: 
+  'ERROR: unterminated dollar-quoted string at or near "$$' perquè sols arriba fins al primer ";"  </p>
+
+<p>Exemple</p>
+    <pre>
+DO $$
+declare
+ i int;
+BEGIN
+    i := 445;
+    RAISE NOTICE 'Hola món';
+	RAISE NOTICE 'valor de i %', i;
+	RAISE NOTICE 'valor de i*i %', i*i ;
+	RAISE NOTICE 'hui es   %', current_date;
+END;
+$$ LANGUAGE plpgsql;          </pre>
+
+    <h3>PL/pgSQL és case-sensitive respecte als noms de variables, funcions i identificadors.</h3>
+   
+<pre>
+DO $$
+DECLARE
+    x_valor int := 10;
+    X_VALOR int := 20;
+BEGIN
+    RAISE NOTICE 'x_valor = %, X_VALOR = %', x_valor, X_VALOR;
+END;
+$$ LANGUAGE plpgsql;   </pre>
+
+  </section>
+
+  
+
+
+  <section id="variables">
+    <h2> 🗃️ Comentaris, Variables i Operacions en PL/pgSQL</h2>
+    <h2>Comentaris</h2>
+    <p>L'ùs de comentaris és un recurs per poder documentar el codi. Com s'ha dit abans, és molt important documentar el codi</p>
+    <pre>--  En dos guionets es posa un comentari d'una línia.
+/*  En la barra i l'asterisc es pot
+    posar comentaris de més d'una línia
+*/      </pre>
+
+    <h2>Variables</h2>
+   
+      <p>Una <strong>variable</strong> en PL/pgSQL és un espai de memòria per emmagatzemar dades temporals 
+        durant l'execució d’un bloc de codi. Pot contindre textos, números, dates, etc.</p>
+      <p>En PL/pgSQL, les variables s’han de declarar <strong>sempre</strong> abans d’utilitzar-les. Les variables 
+        es declaren a la secció DECLARE (o a la part de declaració d’un procediment, funció o paquet).</p>
+        <p><u>Per "crear" una variable</u> és necessari:  <br>Un nom  <br>Un tipus <br>Un valor (opcional)</p>
+        <p><u>Per "usar" una variable</u>, sols és necessari saber el <strong>nom</strong></p>
+      <h4> Estructura bàsica</h4>
+      <pre><code>DO $$
+DECLARE
+    nom_variable tipus ;        -- Es declara però no s'inicialitza. Pren el valor NULL   
+    nom_variable tipus := valor_inicial;  -- Es declara i s'inicialitza amb un valor  
+BEGIN
+    -- ús de la variable
+END; 
+$$ LANGUAGE plpgsql; </code></pre>
+<pre>-- Tipus de dades en PL/pgSQL
+int         (enter)
+text        (string sense límit)
+varchar(n)  (string amb límit)
+numeric(p,s)  (decimals amb límit)
+numeric       (permet qualsevol nombre de decimals (més flexible))
+boolean
+DATE         (any,mes,dia)
+TIMESTAMP    (any,mes,dia, hora, min, seg, part de segon)
+RECORD
+ROW         
+int[]         (ARRAY de ints)
+Tipus compostos personalitzats (TYPE)
+</pre>
+    
+      <h4> Tipus bàsics</h4>
+      <table>
+        <tr>
+          <th>Tipus</th>
+          <th>Descripció</th>
+          <th>Exemple</th>
+        </tr>
+        <tr>
+          <td><code>text<br>varchar(n)</code></td>
+          <td>Cadena de text de longitud variable</td>
+          <td>'Hola', 'Joan'</td>
+        </tr>
+        <tr>
+          <td><code>int<br>decimal<br>bigint</code></td>
+          <td>Números amb precisió i escala</td>
+          <td>123, 45.67</td>
+        </tr>
+        <tr>
+          <td><code>DATE <br> timestamp</code></td>
+          <td>Data i hora</td>
+          <td>now <br> current_date</td>
+        </tr>
+        <tr>
+          <td><code>BOOLEAN</code></td>
+          <td>TRUE, FALSE, NULL (només PL/pgSQL)</td>
+          <td>TRUE</td>
+        </tr>
+        <tr>
+          <td><code>%TYPE</code></td>
+          <td>Tipus igual al d’una columna o una altra variable</td>
+          <td>taula.columna%TYPE</td>
+        </tr>
+      </table>
+    
+      <h4>🧪 Exemple de declaració</h4>
+      <pre><code>DECLARE
+    v_nom       text := 'Anna';
+    v_edat      int := 30;
+    v_sou       numeric 8.27;
+    v_data_naix DATE := now();
+    v_es_actiu  BOOLEAN := TRUE;
+BEGIN
+    
+END; </code></pre>
+
+    
+      <h4>🛠️ Com assignar valors</h4>
+        <h3>-- En el bloc DECLARE</h3>
+<pre> v_nom       text := 'Anna';</pre>
+        <h3>-- En el bloc principal BEGIN</h3>
+      <ul> 
+        <li><strong>Assignació directa:</strong> <code>v_edat := 25;</code></li>
+        <li><strong>Amb SELECT INTO:</strong>
+          <pre><code>SELECT sou INTO v_sou FROM empleats WHERE id = 5;
+            o 
+SELECT avg(sou) INTO v_mitjanasou FROM empleats WHERE departament=101;            
+          </code></pre>
+        </li>
+        
+      </ul>
+    
+      <h4>❗ Detalls importants</h4>
+      <ul>
+        <li>Les variables només existeixen dins del bloc on es declaren.</li>
+        <li>No pots fer <code>SELECT ...</code> sense <code>INTO</code> dins de PL/pgSQL.</li>
+        <li><code>BOOLEAN</code> només es pot usar dins de PL/pgSQL, no en SQL estàndard.</li>
+      </ul>
+  
+
+    <h2>Operacions</h2>
+      <h3> Operacions amb Variables en PL/pgSQL</h3>
+    
+      <p>Una vegada declarades, les variables en PL/pgSQL poden utilitzar-se per fer càlculs, tractament de text, dates i lògica condicional. Ací tens exemples clars i útils:</p>
+    
+      <h3>📐 1. Operacions aritmètiques</h3>
+      <p>Per fer sumes, restes, multiplicacions, divisions i potències amb variables de tipus <code>NUMBER</code>:</p>
+      <pre><code>DECLARE
+    a int := 10;
+    b int := 3;
+    resultat1 int;
+BEGIN
+    resultat1 := a + b;
+    raise notice ' %' ,resultat1 ;	
+    resultat1 := a - b;
+    raise notice ' %' ,resultat1 ;	
+    resultat1 := a * b;
+    raise notice ' %' ,resultat1 ;	
+    resultat1 := a / b;
+    raise notice ' %' ,resultat1 ;	
+    resultat1 := a % b;
+    raise notice ' %' ,resultat1 ;
+END; </code></pre>
+<p><strong>Precedència</strong>: No s'ha d'oblidar que no és el mateix 2 + 5 * 3  que  (2 + 5) * 3. La precedència o ordre de les operacions és crucial en el resultat</p>
+<p>En PL/pgSQL este ordre de precedència és el següent:  
+<table><tr> <td>( )</td>  <td>unaris</td> <td>** potència</td>  <td>* , /, mod</td> <td>+ i -</td> 
+  <td>comparació</td> <td>lògics (NOT AND OR)</td></tr></table>
+
+I els operadors lògics tenen precedència entre ells. NOT té més precedència que AND i AND més que OR, </p>
+<p>Encara que conegues la precedència, usa parèntesis per fer el codi: *més clar, *menys propens a errors, *més llegible per altres desenvolupadors</p>
+<p>Altres operacions aritmètiques amb funcions: ABS, ROUND, MOD, CEIL, CEILING FLOOR, POWER, SQRT, TO_CHAR </p>
+    
+      <hr><h3>🔤 2. Operacions amb cadenes de text</h3>
+      <p>Les cadenes (<code>VARCHAR</code>) es concatenen amb <code>||</code>  </p>
+      <pre><code>DECLARE
+    nom VARCHAR(20) := 'Joan';
+    cognom VARCHAR(20) := 'Garcia';
+    nom_complet VARCHAR(50);
+BEGIN
+    nom_complet := nom || ' ' || cognom;
+    raise notice  'Nom complet: ' || nom_complet ;
+END; </code></pre>
+<p>Altres operacions amb funcions: LENGTH, UPPER, LOWER, INITCAP, SUBSTRING, POSITION, REPLACE, TRIM, LTRIM, RTRIM, TO_NUMBER</p>
+    
+
+      <hr><h3>📅 3. Operacions amb dates</h3>
+      <p>Les dates es poden restar per obtenir la diferència (resultat en dies, i hores/min) <br>   </p>
+      <p>També es poden sumar 'intervals'  </p>
+      
+      <pre><code>DO $$
+DECLARE
+  d1 date ;
+	d2 date;
+	resultat1 int;
+BEGIN
+  d1 := now();
+	d2 := date '2026-01-01';
+  resultat1 := d1 - d2 + 8;
+  raise notice ' %' ,resultat1 ;	
+END;
+$$ LANGUAGE plpgsql;    </code></pre>
+
+<pre>-- Exemples d'operacions amb dates
+SELECT CURRENT_DATE + 7 AS setmana_propera;
+SELECT date '2026-03-22' - date '2026-03-20' AS dies_diff;
+SELECT CURRENT_DATE + interval '1 month' AS mes_proper;
+SELECT CURRENT_DATE - interval '2 weeks' AS fa_dos_setmanes;  </pre>
+<pre>--Comparacions
+SELECT '2026-03-22'::date > '2026-03-20'::date;  -- true
+SELECT NOW() BETWEEN '2026-03-22 00:00' AND '2026-03-22 23:59';  </pre>
+
+    <p>Al igual que TO_DATE, està el TO_CHAR, amb la posibilitat d'usar màscara ('DD/MM/YY HH:MI PM')</p>
+    <p class="tips"> ✔️ El tipus "DATE" pot emmagatzemar fins al dia. (Any, mes, dia)
+       <br> Si es necessita més precisió, es pot utilitzar el tipus "TIMESTAMP", el qual
+      pot emmagatzemar fins a milionèsima de segon (Exemple d'un valor de tipus TIMESTAMP: 2026-03-22 15:57:59.811083)
+    </p>
+    <p class="alert"> S'ha d'anar amb cura en les operacions amb dates, perquè tots els mesos no tenen el mateix nombre
+      de dies, ni tots els anys tampoc tenen el mateix nombre de dies !! </p>
+    
+      <hr><h3> 4. Operacions lògiques</h3>
+      <p>Amb variables <code>BOOLEAN</code>, pots fer condicions:</p>
+      <pre><code>AND OR NOT </code></pre>
+
+     <p>Es pot utilitzar variables <code>BOOLEAN</code> o fer comparacions entre nombres, textos o dates amb els operadors següents:</p>
+
+    <ul>
+      <li><code>=</code> igualtat</li>
+      <li><code>&lt;&gt;</code> diferent</li>
+      <li><code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code></li>
+      <li><code>AND</code>, <code>OR</code>, <code>NOT</code></li>
+    </ul>
+
+ <hr><h3>CASE Sensitive</h3>
+<p>En PL/pgSQL: 'admin' no és igual que 'ADMIN' <br>
+Es poden comparar amb < o > també de manera que les cadenes es comparen caràcter per caràcter, 
+segons l’ordre lexicogràfic (semblant a l’ordre del diccionari).</p>
+<pre>'Ana' < 'Berta'     -- TRUE
+'abc' < 'abd'       -- TRUE
+'Z' < 'a'           -- TRUE (perquè el codi ASCII de Z és menor)
+</pre>
+<p>Les cadenes de text també es poden comparar amb <code>LIKE</code>, usant '%'=>(qualsevol caracter) o '-'=>(un caracter)</p>
+<p>També amb <code>ILIKE</code></p>
+<pre>IF nom LIKE 'Mar%' THEN</pre>
+   
+     
+      <p class="tips">✨ Pots provar aquests blocs en pgAdmin, en el Query Tool Workspace.</p>
+
+  </section>
+
+
+
+  
+  <section id="estructures">
+    <h2>🔁 Estructures de control en PL/pgSQL</h2>
+  
+    <p>Les estructures de control són fonamentals per controlar el flux d'execució d’un bloc de codi PL/pgSQL. 
+      Les principals són: Condicionals i Bucles     </p>
+  
+    <h3> Condicionals</h3>
+  
+    <h4> Estructura IF</h4>
+    <pre>IF condicio THEN
+    instruccions;
+ELSIF altra_condicio THEN
+    instruccions;
+ELSE
+    instruccions;
+END IF;     </pre>
+<p>El <code><strong>ELSE i ELSEIF</strong></code> són opcionals</p>
+  
+    <h4> Exemple IF (🧪 Prova-ho!)</h3>
+    <pre>
+DO $$
+DECLARE
+    x int := 3;
+BEGIN
+    IF x > 5 THEN
+        RAISE NOTICE 'x és major que 5';
+    ELSE
+        RAISE NOTICE 'x és menor o igual a 5';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;      
+    </pre>
+  <pre> -- Exemple amb ELSEIF
+DO $$
+DECLARE
+    x int := 5;
+BEGIN
+    IF x > 5 THEN
+        RAISE NOTICE 'Major que 5';
+    ELSIF x = 5 THEN
+        RAISE NOTICE 'Igual a 5';
+    ELSE
+        RAISE NOTICE 'Menor que 5';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;    
+  </pre>
+    
+
+
+    <h4> Estructura CASE</h4>
+    <pre>CASE expressio
+    WHEN valor1 THEN instruccions;
+    WHEN valor2 THEN instruccions;
+    ELSE instruccions;
+END CASE;   </pre>
+  
+    <h4> Exemple CASE  (🧪 Prova-ho!)</h4>
+    <pre>-- CASE amb expressions booleanes
+DO $$
+DECLARE
+    nota int := 7;
+BEGIN
+    CASE
+        WHEN nota >= 9 THEN
+            RAISE NOTICE 'Excel·lent';
+        WHEN nota >= 5 THEN
+            RAISE NOTICE 'Aprovat';
+        ELSE
+            RAISE NOTICE 'Suspès';
+    END CASE;
+END;
+$$ LANGUAGE plpgsql;
+        </pre>
+  
+<pre>-- CASE amb valors
+DO $$
+DECLARE
+    dia int := 3;
+BEGIN
+    CASE dia
+        WHEN 1 THEN RAISE NOTICE 'Dilluns';
+        WHEN 2 THEN RAISE NOTICE 'Dimarts';
+        WHEN 3 THEN RAISE NOTICE 'Dimecres';
+        ELSE RAISE NOTICE 'Altre dia';
+    END CASE;
+END;
+$$ LANGUAGE plpgsql;
+</pre>
+
+
+   <hr><hr> <h3>🔁 Bucles</h3>
+  
+    <h4>🔄 LOOP bàsic (amb sortida manual)</h4>
+    <pre>LOOP
+    instruccions;
+    EXIT WHEN condicio;
+END LOOP;     </pre>
+  
+    <h4> Exemple LOOP (🧪 Prova-ho!)</h4>
+    <pre>
+DO $$
+DECLARE
+    i int := 1;
+BEGIN
+    LOOP
+        RAISE NOTICE 'i = %', i;
+        i := i + 1;
+
+        EXIT WHEN i > 5;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;          </pre>
+  
+    
+<h4>LOOP amb WHILE</h4>
+    <pre>WHILE condicio LOOP
+    instruccions;
+END LOOP;     </pre>
+  
+    <h4> Exemple WHILE   (🧪 Prova-ho!)</h4>
+    <pre>
+DO $$
+DECLARE
+    i int := 1;
+BEGIN
+    WHILE i <= 5 LOOP
+        RAISE NOTICE 'i = %', i;
+        i := i + 1;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;           </pre>
+  
+    <h4> LOOP amb FOR</h4>
+    <pre>FOR variable IN inici..final LOOP
+    instruccions;
+END LOOP;     </pre>
+  
+    <h4> Exemple FOR</h4>
+    <pre>
+DO $$
+DECLARE
+    i int;
+BEGIN
+    FOR i IN 1..5 LOOP
+        RAISE NOTICE 'i = %', i;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;     </pre>
+
+<pre>
+DO $$
+DECLARE
+    i int;
+BEGIN
+    FOR i IN REVERSE 5..1 LOOP
+        RAISE NOTICE 'i = %', i;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql; </pre>
+
+
+  
+    <h3> Notes addicionals</h3>
+    <ul>
+      <li><strong>EXIT WHEN</strong> → surt d’un bucle en una condició</li>
+      <li><strong>EXIT </strong> → surt d’un bucle "directament"</li>
+      <li><strong>EXIT label</strong> → surt d’un bucle identificat amb una etiqueta. Útil si hi ha bucles niats</li>
+      <li><strong>EXIT label WHEN</strong> → surt d’un bucle identificat amb una etiqueta. Útil si hi ha bucles niats</li>
+      <li><strong>&lt;&lt;label>></strong> → Identifica un bucle , per deprés usar EXIT label </li>
+      <li><strong>CONTINUE</strong> → salta a la següent iteració </li>
+      <li>Els bucles poden ser <strong>niats</strong> i combinen amb IF o CASE</li>
+    </ul>
+  
+    <h3> Bon ús d’estructures</h3>
+    <ul>
+      <li> Usa `FOR` si saps quantes vegades vols repetir</li>
+      <li> Usa `WHILE` si depens d’una condició externa</li>
+      <li> Usa `IF` per bifurcar el comportament del codi</li>
+      <li>⚠️ Evita bucles infinits, assegura sempre una condició de sortida</li>
+    </ul>
+  </section>
+  
+
+  <section id="proc-func">
+    <h2>⚙️ Procediments, Funcions i Triggers</h2>
+  
+    <h3> Definicions ràpides</h3>
+    <ul>
+      <li><strong>Procediment:</strong> bloc PL/pgSQL que realitza una acció, pot tenir paràmetres però no retorna valor directament.</li>
+      <li><strong>Funció:</strong> com un procediment, però <strong>retorna un valor</strong> mitjançant <code>RETURN</code>.</li>
+      <li><strong>Trigger:</strong> bloc de codi que s'executa automàticament <strong>quan es produeix un esdeveniment</strong> sobre una taula (INSERT, UPDATE, DELETE).</li>
+    </ul>
+  
+    <hr><h3>Permisos necessaris</h3>
+    <p> ❗ Un usuari necessita tindre permís per executar rutines, o per crear-les i executar-es !!</p>
+<pre>-- Si sols necessita executar
+GRANT EXECUTE ON PROCEDURE nom_proc TO &lt;usuari>/&lt;rol> [WITH GRANT OPTION];</pre>
+
+ <pre>-- Per poder crear  ( i executar les seues)
+GRANT CREATE ON SCHEMA public to usuari [WITH GRANT OPTION];    </pre>
+   
+
+    <h3>Vista del DD</h3>
+    <p>Per vore si un usuari té estos permisos</p>
+    <pre>SELECT nspname
+FROM pg_namespace
+WHERE has_schema_privilege(current_user, oid, 'CREATE')   -- Sustituir current_user per 'nomusuari'
+  AND nspname NOT LIKE 'pg_%'
+  AND nspname <> 'information_schema';
+</pre>
+
+    <hr><h3> PROCEDURE – Procediment</h3>
+    <p>Els procediments <strong>NO retornen valor</strong> i NO poden ser cridades dins SELECT o expressions. 
+      Poden ser cridats des de dins d'un bloc DO, directament des de linea d'ordres plsql o pgAdmin, 
+          , des de dins d'un altre procediment o funció, o des del <strong>DBMS_SCHEDULER</strong> amb un <strong>job</strong></p>
+      <h4>Exemples</h4>
+      <pre>BEGIN
+      call nom_proc();
+END; </pre>
+
+    <hr>
+      <h3> FUNCTION – Funció</h3>
+      <h4> Diferència clau:</h4>
+    <p>Les funcions <strong>retornen un valor</strong> i poden ser cridades des de dins de SELECT o expressions.</p>
+    <h4>Exemples</h4>
+    <pre>DO $$
+DECLARE
+  data_actual TIMESTAMP;
+  valor_aleatori NUMERIC;
+  data_convertida DATE;
+BEGIN
+  data_actual := NOW();
+  valor_aleatori := RANDOM() * 99 + 1; -- equivalent a VALUE(1,100)
+  data_convertida := TO_DATE('2025-04-20', 'YYYY-MM-DD');
+  RAISE NOTICE '%', (SELECT UPPER(nom) FROM empleats LIMIT 1);
+  RAISE NOTICE '%', (SELECT NOW());
+  RAISE NOTICE '%', (SELECT sou FROM empleats LIMIT 1);
+  RAISE NOTICE '%', NOW();
+  RAISE NOTICE '%', data_convertida;
+END;
+$$ LANGUAGE plpgsql;    </pre>
+
+    <hr>
+  
+    <h3> TRIGGER – Disparador</h3>
+    <h4> Diferència clau:</h4>
+    <p>Els trigger <strong>no retornen un valor, i no se'ls pot cridar</strong> Son blocs de codi amb nom que son cridats
+       automaticament pel sistema quan passa algun esdeveniment.</p>
+    <ul> Com..
+      <li>Esdeveniment DML: INSERT, UPDATE, DELETE</li>
+      <li>Esdeveniment DDL: CREATE, ALTER, DROP </li>
+    </ul>
+
+    <h4>Exemples</h4>
+   <pre>-- Al Inserir un nou empleat es disparara el trigger associat 
+-- al INSERT en la taula EMPLEATS
+INSERT INTO empleats (id_empleat, nom, cognom, sou)   
+VALUES (101, 'Joan', 'García', 2500);
+-- En este moment, el sistema crida al trigger      </pre>
+    
+  </section>
+    
+
+
+<section id="procediments">
+  <h2>⚙️ Procediments en PL/pgSQL</h2>
+
+  <h3> Què és un procediment?</h3>
+  <p>
+    Un <strong>procediment</strong> és un bloc de codi PL/pgSQL <strong>emmagatzemat amb un nom</strong> que es pot cridar per executar una acció. 
+    Pot rebre paràmetres i fer servir sentències SQL, estructures de control, bucles, excepcions, etc.    </p>
+
+  <h3> Estructura bàsica</h3>
+  <pre>
+CREATE OR REPLACE PROCEDURE saludar()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RAISE NOTICE 'Hola!';
+END;
+$$;     </pre>
+
+<pre>
+Nota important (seguretat) - 👉 Un procediment pot executar-se amb:
+- SECURITY INVOKER (per defecte) → permisos de qui l’executa
+- SECURITY DEFINER → permisos del propietari
+</pre>
+
+   <h4>Procediment amb parametres</h4>
+   <pre>
+-- Definir procediment
+CREATE PROCEDURE suma(a int, b int)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RAISE NOTICE 'Suma: %', a + b;
+END;
+$$;
+
+--  Cridar a procediment
+CALL suma(3, 4);    
+   </pre>
+
+  <h4> Tipus de paràmetres:</h4>
+  <ul>
+    <li><code>IN</code>: entrada (per defecte)</li>
+    <li><code>OUT</code>: sortida</li>
+    <li><code>INOUT</code>: entrada i sortida</li>
+  </ul>
+  <p>Sols vorem els IN, que a més a més, no cal posar la paraula IN perquè és el tipus per defecte</p>
+  <pre>CREATE PROCEDURE obtenir_doble(IN x int, OUT resultat int)</pre>
+
+   <h4>Valors per defecte</h4>
+   <pre>CREATE PROCEDURE saludar(nom text DEFAULT 'Usuari')</pre>
+   
+  <h3>📘 Consultar procediments</h3>
+  <ul>
+    <li> Llistar procediments de l’usuari:</li>
+    <pre>
+SELECT routine_name, routine_schema, routine_type
+FROM information_schema.routines
+WHERE routine_type = 'PROCEDURE';
+    </pre>
+
+    <li>👀 Consultar paràmetres d’un procediment:</li>
+    <pre>
+SELECT pg_get_functiondef(p.oid)
+FROM pg_proc p
+WHERE p.proname = 'nom_procediment';
+    </pre>
+  </ul>
+  <pre>-- Des de psql
+\df 
+\dfP    
+\df+ nom_proc  </pre>
+
+  <h3> 🧹 Esborrar un procediment</h3>
+  <pre>
+DROP PROCEDURE nom_proc;    </pre>  
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Dona noms clars i significatius</li>
+    <li> Documenta el comportament i els paràmetres</li>
+    <li> Gestiona excepcions amb <code>EXCEPTION</code> per capturar errors</li>
+    <li>⚠️ Evita fer massa coses dins d’un sol procediment → separa funcionalitats</li>
+  </ul>
+
+  <h2> Formes de cridar / invocar un procediment</h2>
+  <ul>
+    <li>Notació posicional</li>
+    <li>Notació nominal</li>
+  </ul>
+  <pre><code>call afegir_client('Joan', 'García', '123456789');
+call afegir_client( p_nom => 'Joan', p_cognom => 'García', p_telefon => '123456789');
+o
+call afegir_client(p_telefon => '123456789', p_nom => 'Joan', p_cognom => 'García');     </code>  </pre>
+    <p>Totes són correctes</p>
+
+</section>
+
+
+<section id="funcions">
+  <h2> Funcions en PL/pgSQL</h2>
+
+  <h3>📘 Què és una funció?</h3>
+  <p>
+    Una <strong>funció</strong> és un bloc de codi PL/pgSQL que <strong>rep zero o més paràmetres</strong> i <strong>retorna un valor</strong>.
+    A diferència dels procediments, les funcions es poden cridar dins sentències SQL i expressions.   </p>
+    <pre>Exemple:
+SELECT nom, UPPER(nom) FROM alumnes;
+SELECT * FROM alumnes WHERE LENGTH(nom) > 5;           </pre>
+  <p>Al igual que en els procediments existeixen funcions predefinides que podem utilitzar en postgresql</p>
+
+  <table>
+    <thead>
+      <tr >
+        <th>Tipus de Funcions</th>
+        <th>Funcions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Funcions Numèriques</strong></td>
+        <td>ROUND, TRUNC, MOD, SQRT, POWER, SIGN, ABS, CEIL, FLOOR, RANDOM</td>
+      </tr>
+      <tr>
+        <td><strong>Funcions de Cadenes (Strings)</strong></td>
+        <td>LOWER, UPPER, TRIM, SUBSTRING, LENGTH, REPLACE, POSITION, TRANSLATE, CHR, ASCII, INITCAP,</td>
+      </tr>
+      <tr>
+        <td><strong>Funcions per treballar amb NULL</strong></td>
+        <td> NULLIF, COALESCE</td>
+      </tr>
+      <tr>
+        <td><strong>Funcions de Dates</strong></td>
+        <td>CURRENT_DATE, NOW(),  EXTRACT , CURRENT_TIMESTAMP, AGE </td>
+      </tr>
+      <tr>
+        <td><strong>Funcions de Conversió</strong></td>
+        <td>TO_NUMBER, TO_DATE, TO_CHAR</td>
+      </tr>
+      <tr>
+        <td><strong>Funcions de Sistema</strong></td>
+        <td>VERSION(), CURRENT_USER, PG_DATABASE_SIZE(), PG_TABLE_SIZE() </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <p>I, al igual que en els procediments , podem definir noves funcions (funcions definides per l'usuari)</p>
+  <p>Hem de tindre en compte, que una funció necessita <strong>saber</strong> quin tipus de dada va a retornar, i, 
+    a més a més, en algun punt del cos de la funció, ha de <strong>retornar</strong> una dada d'aquest tipus</p>
+
+  <h3> Estructura bàsica</h3>
+  <pre>
+CREATE [OR REPLACE] FUNCTION nom_func (  paràmetres  ) 
+RETURNS tipus AS $$ 
+BEGIN
+    -- codi
+    RETURN valor;
+END;
+$$ LANGUAGE plpgsql;    </pre>
+
+  <h3> Exemple simple</h3>
+  <pre>
+CREATE OR REPLACE FUNCTION suma(a integer, b integer)
+RETURNS integer AS $$
+BEGIN
+    RETURN a + b;
+END;
+$$ LANGUAGE plpgsql;    </pre>
+
+<pre>
+CREATE FUNCTION doble(x INT)
+RETURNS INT AS $$
+BEGIN
+  RETURN x * 2;
+END;
+$$ LANGUAGE plpgsql;  </pre>
+
+  <h4>Exemple Crida des de sentència SQL </h4>
+  <pre>SELECT doble(4);   </pre>
+
+  <h3> Tipus de paràmetres</h3>
+  <ul>
+    <li><code>IN</code>: entrada (per defecte)</li>
+    <li><code>OUT</code> i <code>IN OUT</code> no es poden fer servir a funcions que es cridin dins SQL</li>
+  </ul>
+
+  <h3>⚠️ Limitacions</h3>
+  <ul>
+    <li>Les funcions que es criden des de SQL <strong>no poden modificar dades</strong> (no poden fer INSERT, UPDATE o DELETE)</li>
+    <li>Han de ser deterministes: el resultat ha de dependre només dels valors d’entrada</li>
+  </ul>
+
+  <h3>📥 Consulta de funcions</h3>
+  <pre>
+-- Funcions de l’usuari
+SELECT proname
+FROM pg_proc
+WHERE pronamespace NOT IN (
+  SELECT oid FROM pg_namespace
+  WHERE nspname LIKE 'pg_%' OR nspname = 'information_schema'
+);
+
+-- Amb més informació
+SELECT n.nspname AS esquema,
+       p.proname AS funcio,
+       pg_get_function_result(p.oid) AS retorna,
+       pg_get_function_arguments(p.oid) AS arguments
+FROM pg_proc p
+JOIN pg_namespace n ON p.pronamespace = n.oid
+WHERE n.nspname NOT LIKE 'pg_%'
+  AND n.nspname &lt;> 'information_schema';    </pre>
+
+  <h3> Com cridar funcions:</h3>
+  <ul>
+    <li>✔️ Dins <code>SELECT</code>, <code>WHERE</code>, <code>ORDER BY</code></li>
+    <li>✔️ Assignant a una variable dins un bloc</li>
+    <li>❌ No es poden fer servir dins DML (si tenen codi que modifica dades)</li>
+  </ul>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Utilitza noms clars i descriptius</li>
+    <li> Fes servir <code>RETURN</code> només una vegada si és possible</li>
+    <li> Documenta què fa la funció i què retorna</li>
+    <li>⚠️ Evita fer INSERT/UPDATE dins funcions si s’han de cridar des de SQL</li>
+  </ul>
+
+
+
+<h3>🧹 Esborrar una funció</h3>
+<pre>DROP FUNCTION nom_de_la_funcio; </pre>
+<p>⚠️ Consideracions:</p>
+<ul>
+  <li>Assegura’t que no hi ha cap procediment, vista o altre objecte que depenga d’eixa funció abans d’eliminar-la.</li>
+  <li>Si la funció no existeix, Postgres donarà un error</li>
+</ul>
+
+</section>
+
+
+
+
+<section id="disparadors">
+  <h2>🚨 Disparadors (Triggers) en PostgreSQL</h2>
+
+  <h3>📘 Què és un trigger?</h3>
+  <p>
+    Un <strong>trigger</strong> és un bloc de codi PL/pgSQL que s’executa automàticament quan es produeix un <strong>esdeveniment</strong> 
+    (com un INSERT, UPDATE o DELETE) sobre una taula o vista.   </p>
+    <p>Un trigger en PostgreSQL no es pot cridar manualment com una funció o procediment. Sempre s’executa automàticament quan passa un esdeveniment.</p>
+
+  <h3> El bloc de codi del trigger s'executara:</h3>
+  <ul>
+    <li><strong>BEFORE</strong>: abans de l’esdeveniment</li>
+    <li><strong>AFTER</strong>: després de l’esdeveniment</li>
+  </ul>
+  <p>Segons el cas, dins del bloc de codi, es poden utilitzar valors d’una fila abans de la operació o després de l’operació: 
+   <br> Per fer això s'usarà <code><strong>NEW.  o  OLD.</strong></code></p>
+
+  <h3> Nivells d’actuació</h3>
+  <ul>
+    <li> <strong>Fila a fila</strong> → actua per cada fila afectada (s'indica posant FOR EACH ROW)</li>
+    <li> <strong>Per esdeveniment</strong> → actua una sola vegada per operació (s'indica no posant res)</li>
+  </ul>
+  
+  <h3> Sintaxi bàsica (fila a fila)</h3>
+  <pre>
+-- 1. Crear la funció del trigger
+CREATE OR REPLACE FUNCTION log_alumne_insert()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO log_alumnes(alumne_id, nom, data_insert)
+    VALUES (NEW.id, NEW.nom, now());
+    RETURN NEW;  -- IMPORTANT: RETURN NEW per triggers BEFORE/AFTER INSERT
+END;
+$$;
+
+-- 2. Crear el trigger.  Auditoria --
+CREATE TRIGGER trg_alumne_insert
+AFTER INSERT ON alumnes
+FOR EACH ROW
+EXECUTE FUNCTION log_alumne_insert();
+  </pre>
+  <p>En triggers BEFORE: Si NO retornes correctament: <code>RETURN NULL;</code> 👉 es cancel·la l’operació (no s’insereix / no s’actualitza / no s’elimina)</p>
+  <p>S'ha de retornar: 
+  <br>BEFORE DELETE  --> RETURN OLD;
+  <br>BEFORE INSERT  --> RETURN NEW;  
+  <br>BEFORE UPDATE  --> RETURN NEW; 
+  <br> En la resta, no importa, es pot retornar NULL   </p>
+
+  
+  <h3> Exemple: trigger per a impedir valors curts </h3>
+  <pre>
+CREATE OR REPLACE FUNCTION check_nom_length()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF char_length(NEW.nom) < 3 THEN
+        RAISE EXCEPTION 'El nom ha de tenir almenys 3 caràcters';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_nom    -- Impedix actualitzar si no es complix condició
+BEFORE UPDATE ON alumnes
+FOR EACH ROW
+EXECUTE FUNCTION check_nom_length();    </pre>
+  
+<p><code>NEW.</code> i <code>OLD.</code> representen els valors nous i antics respectivament per a cada fila.</p>
+
+ 
+<hr>  <h3>📘 Consultes útils al DD</h3>
+  <pre>
+SELECT trigger_name,
+       event_manipulation AS event,
+       event_object_table AS table_name,
+       action_timing AS timing,
+       action_statement AS function_call
+FROM information_schema.triggers
+WHERE trigger_schema = 'public';  -- posar l’esquema que t’interessa
+
+  </pre>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Usa noms clars i descripció funcional</li>
+    <li> Documenta el comportament del trigger</li>
+    <li> Evita codi complex o accions que modifiquin altres taules si no és necessari</li>
+    <li> Controla el rendiment: massa triggers poden degradar l’eficiència</li>
+    <li> Si cal registrar accions, fes servir una taula d’auditoria</li>
+  </ul>
+
+  <h3>🛠️ Activació i desactivació de triggers</h3>
+  <pre>-- Desactivar un trigger concret
+ALTER TABLE nom_taula DISABLE TRIGGER nom_trigger;
+
+-- Activar un trigger concret
+ALTER TABLE nom_taula ENABLE TRIGGER nom_trigger;  </pre>
+
+<pre>-- Desactivar tots els triggers de la taula
+ALTER TABLE alumnes DISABLE TRIGGER ALL;
+
+-- Tornar a activar tots els triggers
+ALTER TABLE alumnes ENABLE TRIGGER ALL;</pre>
+
+  <h3>🗑️ Eliminar un trigger</h3>
+  <pre>DROP TRIGGER log_insercio ON nom_taula;</pre>
+  <p>La funció associada (log_alumne_insert()) no s’esborra automàticament, només el trigger.</p>
+  <pre>-- Si vols eliminar també la funció del trigger (per neteja)
+DROP FUNCTION log_alumne_insert();    </pre>
+
+</section>
+
+
+
+
+<section id="seq">
+  <h2> Seqüències en Postgresql</h2>
+
+  <h3>📘 Què és una seqüència?</h3>
+  <p>
+    Una <strong>seqüència</strong> és un objecte de base de dades que genera una sèrie de valors numèrics consecutius, normalment 
+    usats per a claus primàries, codis únics o control d’identificadors.  
+    És l’equivalent a un <em>autoincrement</em> en altres SGBD.
+  </p>
+
+  <h3> Crear una seqüència</h3>
+  <pre>-- Donar permís a un usuari per crear seqüències (crear objectes)
+GRANT CREATE ON DATABASE empresa TO usuari;
+
+-- Crear seqüència
+CREATE SEQUENCE seq_alumnes
+    START 1        -- valor inicial
+    INCREMENT 1    -- increment
+    MINVALUE 1     -- mínim valor possible
+    MAXVALUE 10000 -- màxim valor (opcional)
+    CACHE 1;       -- opcional, per rendiment
+
+-- Esborrar seqüència
+DROP SEQUENCE seq_alumnes;  </pre>
+
+  <h3> Ús de la seqüència</h3>
+  <p>Per obtenir el següent valor (es pot fer servir a INSERTs):</p>
+  <pre>
+NEXTVAL('seq_alumnes') </pre>
+
+  <p>Per consultar el valor actual (després d'haver fet NEXTVAL com a mínim una vegada):</p>
+  <pre>CURRVAL('seq_alumnes')   </pre>
+
+  <h4> Exemple d’ús en una inserció</h4>
+  <pre>INSERT INTO alumnes (id, nom, edat)  VALUES (NEXTVAL('seq_alumnes'), 'Laia', 21);   </pre>
+
+  <h3>📘 Consultar seqüències existents</h3>
+  <pre>SELECT sequence_name
+FROM information_schema.sequences
+WHERE sequence_schema = 'public';  -- posar l’esquema desitjat    </pre>
+<pre> SELECT * FROM pg_sequences WHERE schemaname='public';   </pre>
+
+ 
+  <h3>🗑️ Eliminar una seqüència</h3>
+  <pre>
+DROP SEQUENCE seq_alumnes;   </pre>
+
+  <h3> Exemple complet</h3>
+  <pre>CREATE SEQUENCE seq_factura START WITH 1000 INCREMENT BY 10 ;
+-- Inserció amb NEXTVAL
+INSERT INTO factures (id, data_emissio) VALUES (NEXTVAL('seq_factura'), now() );   </pre>
+
+<hr><h3>Identity Column</h3>
+<p>Una <strong>identity column</strong>  és un altre mecanisme d’postgres per generar valors sencers seqüencials únics i
+   assignar-li'ls a camps numèrics; s'utilitzen generalment per a les claus primàries de les taules 
+   garantint que els seus valors no es repetisquen.</p>
+<pre>CREATE TABLE alumnes (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nom TEXT,
+  .......);</pre>
+  <li>GENERATED ALWAYS AS IDENTITY → PostgreSQL genera automàticament el valor i no permet inserir manualment un valor a la columna.</li>
+  <li>GENERATED BY DEFAULT AS IDENTITY → permet sobreescriure manualment el valor si cal.</li>
+
+  <table>
+    <thead style="background-color: #f2f2f2;">
+      <tr>
+        <th>Característica</th>
+        <th>SEQUENCE</th>
+        <th>IDENTITY Column</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Definició</strong></td>
+        <td>Objecte independent que genera valors numèrics seqüencials.</td>
+        <td>Columna d'una taula que genera automàticament valors únics.</td>
+      </tr>
+      <tr>
+        <td><strong>Ús principal</strong></td>
+        <td>Generar claus primàries o valors seqüencials a voluntat.</td>
+        <td>Generar automàticament un valor únic per fila nova.</td>
+      </tr>
+      <tr>
+        <td><strong>Com s'utilitza</strong></td>
+        <td>Cal cridar `nom_seq.NEXTVAL` explícitament en la inserció.</td>
+        <td>Postgres gestiona el valor automàticament (amb `GENERATED ALWAYS` o `BY DEFAULT`).</td>
+      </tr>
+      <tr>
+        <td><strong>Control de valor</strong></td>
+        <td>L'usuari decideix quan i com consumir el següent valor.</td>
+        <td>El valor s'incrementa automàticament amb cada inserció (segons la configuració).</td>
+      </tr>
+      <tr>
+        <td><strong>Flexibilitat</strong></td>
+        <td>Molt flexible: pot ser utilitzada per diferents taules o processos.</td>
+        <td>Està lligada a una sola taula i columna.</td>
+      </tr>
+      <tr>
+        <td><strong>Exemple de creació</strong></td>
+        <td><code>CREATE SEQUENCE seq_client_id START WITH 1 INCREMENT BY 1;</code></td>
+        <td><code>id NUMBER GENERATED BY DEFAULT AS IDENTITY</code></td>
+      </tr>
+      <tr>
+        <td><strong>Compartició entre taules</strong></td>
+        <td>Es pot usar en múltiples taules.</td>
+        <td>Només es pot usar en una taula específica.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3>Consultar informació de les Identity Columns</h3>
+  <pre>SELECT table_name, column_name, identity_generation, start_value, increment_by
+FROM information_schema.columns
+WHERE identity_generation IS NOT NULL;    </pre>
+    
+
+</section>
+
+
+
+
+<section id="cursors">
+  <h2> Cursors en PL/pgSQL</h2>
+
+  <h3>📘 Què és un cursor?</h3>
+  <img src="imgs/cursor-gen.png" alt="cursor" width="30%" class="imatge-dreta">
+  <p>
+    Un <strong>cursor</strong> és un mecanisme de PL/pgSQL que permet <strong>recórrer múltiples files</strong>
+     retornades per una consulta <code>SELECT</code>. Un cursor és com un punter que apunta a un conjunt de resultats d'una SQL i 
+     deixa llegir-los u a u. 
+  </p>
+  <p>Serveix per treballar fila a fila amb el conjunt de resultats, com un bucle sobre una taula.</p>
+
+  <h3> Tipus de cursors</h3>
+  <ul>
+    <li><strong>Implícits:</strong> creats automàticament per Postgres per a sentències DML (SELECT .. INTO, INSERT, UPDATE...) )</li>
+    <li><strong>Explícits:</strong> definits manualment per l’usuari per tractar SELECTs que tornen múltiples files</li>
+    <li><strong>FOR cursors:</strong> simplificació de l’ús explícit</li>
+  </ul>
+
+  <hr>
+  <h3> Cursors implícits</h3>
+  <p>No es declaren, i sols deurien tornar un resultat o fila:</p>
+  <pre>SELECT DESCRIPCION INTO vdescripcion from PAISES WHERE CO_PAIS = 'ESP';   </pre>
+
+<p>Els cursors implícits només poden retornar una única fila. En cas que es retorne més d'una fila 
+  (o cap fila) es produirà una <strong>excepció</strong>: Esta <strong>EXCEPCIÓ</strong> podrà ser capturada i tractada</p>
+
+  <p>Per salvar estes situacionses pot fer:</p>
+<pre>--  Ús de limit 1
+SELECT DESCRIPCION INTO vdescripcion from PAISES WHERE CO_PAIS = 'ESP' limit 1;
+  -- Això evita TOO_MANY_ROWS si hi ha més d’una coincidència 
+ --  Pero pot tornar un valor diferent del que es busca perquè hi han més d'u  </pre>
+<p>O fer primer un:</p>
+    <pre>SELECT count(*) INTO vcant from factura WHERE idcli = 'V00923';</pre>
+  <p>I preguntar si vcant es 1</p>
+  <pre>IF vcant=1 THEN </pre>
+
+  <p>I despres preguntar :</p>
+  <pre>IF vdescripcion IS NULL THEN</pre>
+
+  
+  <h3> Atributs útils</h3>
+  <ul> Quan Postgresql crea un cursor implícit, es pot consultar:
+    <li><code>var is null</code> → si no s’ha trobat cap fila</li>
+    <li><code>GET DIAGNOSTICS n = ROW_COUNT;</code> → nombre de files tractades</li>
+  </ul>
+
+  <hr>
+  <h3> Ús d’un cursor explícit</h3>
+  <p><strong>Passos:</strong></p>
+  <ol>
+    <li>Declarar el cursor</li>
+    <li>Obrir-lo</li>
+    <li>Llegir fila a fila</li>
+    <li>Tancar-lo</li>
+  </ol>
+
+
+  <h3> Cursor FOR – simplificat</h3>
+  <p>Postgresql gestiona automàticament l’obertura, lectura i tancament.</p>
+  <pre>
+DO $$
+DECLARE
+    v_alumne RECORD;
+BEGIN
+    -- Itera sobre totes les files de la taula
+    FOR v_alumne IN
+        SELECT id, nom FROM alumnes ORDER BY id
+    LOOP
+        -- Fer alguna cosa amb cada fila
+        RAISE NOTICE 'Alumne: %, Nom: %', v_alumne.id, v_alumne.nom;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;    </pre>
+<hr> <h4> Exemple cursor complet</h4>
+  <pre>
+DO $$
+DECLARE
+    -- Cursor explícit
+    c_alumnes CURSOR FOR
+        SELECT id, nom FROM alumnes ORDER BY id;
+
+    -- Variable per guardar cada fila
+    v_id alumnes.id%TYPE;
+    v_nom alumnes.nom%TYPE;
+BEGIN
+    -- Obrir cursor
+    OPEN c_alumnes;
+
+    LOOP
+        -- Agafar la següent fila
+        FETCH c_alumnes INTO v_id, v_nom;
+
+        -- Comprovar si s'ha trobat alguna fila
+        EXIT WHEN NOT FOUND;
+
+        -- Fer alguna cosa amb les dades
+        RAISE NOTICE 'Alumne: %, Nom: %', v_id, v_nom;
+    END LOOP;
+
+    -- Tancar cursor
+    CLOSE c_alumnes;
+END;
+$$ LANGUAGE plpgsql;      </pre>
+
+
+  <hr>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Sempre tanca els cursors després d’usar-los</li>
+    <li> Utilitza <strong>FOR cursors</strong> si només necessites llegir</li>
+    <li> Evita FETCHs sense <code>EXIT WHEN NOTFOUND</code></li>
+  </ul>
+
+</section>
+
+
+
+
+<section id="excepcions">
+  <h2>Gestió d’Excepcions en PL/pgSQL</h2>
+
+  <h3>📘 Què és una excepció?</h3>
+  <p>
+    Una <strong>excepció</strong> és una situació d’error que es produeix durant l’execució d’un bloc PL/pgSQL.
+    Postgresql permet capturar aquestes situacions per gestionar-les de manera controlada i evitar que el bloc falle de manera abrupta.
+  </p>
+
+  <h3> Estructura general amb excepcions</h3>
+  <pre>DO $$
+BEGIN
+    -- Codi normal
+    RAISE NOTICE 'Executant codi normal';
+    
+    -- Exemple: forçar error
+    -- RAISE EXCEPTION 'Error simul·lat';
+    
+EXCEPTION
+    WHEN division_by_zero THEN
+        RAISE NOTICE 'S’ha detectat una divisió per zero';
+    WHEN others THEN
+        RAISE NOTICE 'S’ha produït una altra excepció';
+END;
+$$ LANGUAGE plpgsql;</pre>
+
+  <h3> Tipus d’excepcions</h3>
+
+  <h4> Excepcions predefinides</h4>
+  <p>Postgresql les reconeix automàticament.</p>
+  <p>PostgreSQL té moltíssims tipus d’excepcions: division_by_zero, unique_violation, foreign_key_violation, etc.</p>
+    <a href="https://www.postgresql.org/docs/current/errcodes-appendix.html">
+    Es pot consultar la llista sencera en la documentació oficial ací    </a> 
+<br><br>
+  <p>Si vols capturar tots els errors, sempre pots posar WHEN others THEN ....</p>
+  <p>RAISE EXCEPTION 'Missatge' interromp el flux i llança error cap a fora; RAISE NOTICE només mostra missatge sense parar el bloc.</p>
+
+
+
+  <h4> Excepcions no predefinides</h4>
+  <p>Postgresql les pot capturar amb <code>SQLSTATE</code> i <code>SQLERRM</code>:</p>
+  <pre>
+DO $$
+BEGIN
+    -- Operació que pot fallar
+    RAISE NOTICE 'Intentant dividir per zero...';
+    PERFORM 10 / 0;  -- provoca error
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE NOTICE 'Error %: %', SQLSTATE, SQLERRM;
+END;
+$$ LANGUAGE plpgsql;    
+  </pre>
+
+  <h4>🔧 Excepcions personalitzades</h4>
+  <p>Es poden declarar amb <code>EXCEPTION</code> i cridar amb <code>RAISE EXCEPTION</code>:</p>
+  <pre>
+DO $$
+DECLARE
+    my_error EXCEPTION;  -- declara excepció personalitzada
+BEGIN
+    -- Llançar excepció personalitzada
+    RAISE EXCEPTION 'Això és un error personalitzat' USING ERRCODE = 'P0001';
+EXCEPTION
+    WHEN my_error THEN
+        RAISE NOTICE 'S’ha capturat la meva excepció personalitzada';
+    WHEN others THEN
+        RAISE NOTICE 'Error desconegut %: %', SQLSTATE, SQLERRM;
+END;
+$$ LANGUAGE plpgsql;       </pre>
+
+  <h3> Claus d’ús</h3>
+  <ul>
+    <li><code>RAISE EXCEPTION</code> → provoca una excepció</li>
+    <li><code>WHEN ... THEN</code> → captura una excepció</li>
+    <li><code>WHEN OTHERS THEN</code> → captura qualsevol error no gestionat abans</li>
+    <li><code>SQLERRM</code> → mostra el missatge d’error</li>
+    <li><code>SQLSTATE</code> → mostra el codi numèric de l’error</li>
+  </ul>
+
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Captura errors específics abans de fer servir <code>OTHERS</code></li>
+    <li> Informa l’usuari o registra l’error</li>
+    <li> No captures <code>OTHERS</code> sense mostrar cap missatge (silenciar errors és perillós)</li>
+    <li> Fes servir excepcions personalitzades quan tingues validacions pròpies</li>
+  </ul>
+</section>
+
+
+
+<section id="tasques">
+  <h2> 📅 Tasques automatitzables en PostgreSQL</h2>
+
+  <h3> Què es pot automatitzar?</h3>
+  <p>En un entorn Postgresql, és habitual automatitzar tasques per millorar la gestió i el rendiment del sistema. Algunes de les tasques més comunes són:</p>
+  <ul>
+    <li> Exportacions i còpies de seguretat</li>
+    <li> Importacions de dades</li>
+    <li> Execució d'informes</li>
+    <li> Neteja de logs i arxius antics</li>
+    <li> Tasques de manteniment periòdic</li>
+  </ul>
+
+  <h3>📄 Scripts SQL i .bat</h3>
+  <p>Pots crear scripts `.sql` amb comandes Postgresql i executar-los des de scripts `.bat` o `.sh` mitjançant <code>plsql</code>.</p>
+
+  <h4> Exemple: script SQL</h4>
+  <pre>-- arxiu: informe.sql
+-- informe.sql
+\pset pager off       -- desactiva el paginador
+\o informe_resultats.txt  -- envia la sortida a fitxer
+
+SELECT * FROM alumnes;
+
+\o                    -- torna la sortida a la consola
+\q                    -- surt de psql  </pre>
+
+  <h4> 🖥️ Script .bat (Windows)</h4>
+  <pre>-- arxiu: llança_informe.bat
+psql -d empresa -c "CALL el_meu_procediment();" 
+pause    </pre>
+<p>Una vegada creat el fitxer .bat, s'ha de crear una tasca programada. Panel de control → Tareas programadas → Agregar Tarea → ...   </p>
+<p>Consulta alguna guia de com usar el programador de tasques de Windows. <a href="https://www.adslzone.net/esenciales/windows-10/programar-tareas/"> guia1 </a>, 
+<a href="https://openwebinars.net/blog/programacion-de-tareas-desde-la-terminal-de-windows/">guia2</a></p>
+
+  <h4>🐧 Script .sh (Linux)</h4>
+  <pre>#!/bin/bash
+psql -d empresa -c "CALL el_meu_procediment();"    </pre>
+<p>En Linux, s'utilitza el CRON / CRONTAB per afegir tasques que s'executaran a determinades hores / dies () .  
+Consulta alguna guia de com usar CRON <a href="https://www.redeszone.net/tutoriales/servidores/cron-crontab-linux-programar-tareas/">guia1</a>, 
+<a href="https://www.arsys.es/blog/cron-jobs-una-guia-completa">guia2</a>, o <a href="https://www.hostinger.com/mx/tutoriales/sintaxis-crontab">guia3</a>, per a entendre les diferents opcions de programació horària.  </p>
+  
+<hr><h3>📆 pg_cron </h3>
+  <p>  Postgresql disposa d'una extensió del sistema per programar tasques directament des de <strong>DINS</strong> la base de dades: <strong>pg_cron</strong>.  </p>
+
+ <pre>-- En postgresql.conf
+shared_preload_libraries = 'pg_cron'
+ </pre>
+ <p>⚠️ IMPORTANT: Després de modificar shared_preload_libraries,  cal reiniciar el servidor, <code>
+sudo systemctl restart postgresql  </code> </p>
+ 
+ <h4>Usar extensió</h4>
+ <pre>CREATE EXTENSION IF NOT EXISTS pg_cron;</pre>
+ <p>pg_cron només permet que un superusuari cree jobs.</p>
+ <p>Els jobs s’executen amb els privilegis del rol que els crea.</p>
+ <p>Si cal més granularitat s'usarà una altra eina, com pgAgent de pgAdmin</p>
+
+ 
+  <h4> Crear una tasca programada</h4>
+  <pre>SELECT cron.schedule(
+    'job1',
+    '* * * * *',
+    $$CALL el_meu_procediment();$$
+);  </pre>
+<p>El rol que executa el job ha de tenir permisos per executar el SQL o procediment definit dins del job.</p>
+<li>GRANT EXECUTE ON PROCEDURE nom_procediment TO usuari;</li>
+<li>GRANT SELECT, INSERT, UPDATE, DELETE ON taula TO usuari;</li>
+<p>L’usuari 'usuari' no necessita ser superusuari per executar el job, només per cridar els procediments que té permís.</p>
+<hr>
+<p> * Les expressions cron segueixen el format Linux: min hora dia_mes mes dia_setmana</p>
+<p> * Els jobs s’executen dins de la BD, amb permisos del rol que crea el job.</p>
+<pre>
+ ┌───────────── min (0 - 59)
+ │ ┌────────────── hour (0 - 23)
+ │ │ ┌─────────────── day of month (1 - 31) or last day of the month ($)
+ │ │ │ ┌──────────────── month (1 - 12)
+ │ │ │ │ ┌───────────────── day of week (0 - 6) (0 to 6 are Sunday to
+ │ │ │ │ │                  Saturday, or use names; 7 is also Sunday)
+ │ │ │ │ │
+ │ │ │ │ │
+ * * * * *     </pre>
+
+<pre>-- Exemples
+'10 seconds'  # every 10 seconds
+* * * * *     # every minute
+*/5 * * * *   # every 5 minutes
+0 * * * *     # every hour
+0 0 * * *     # daily at 12AM
+0 0 * * 1-5   # 12AM every weekday
+0 1 * * 0     # 1AM every Sunday
+0 13 2 6 *    # 1PM on the 2nd of June    </pre>
+
+   <h4>Habilitar o deshabilitar la programació</h4>
+   <pre>
+-- Deshabilitar
+UPDATE cron.job
+SET active = false
+WHERE jobid = 1;
+
+-- Habilitar
+UPDATE cron.job
+SET active = true
+WHERE jobid = 1;    
+  </pre>
+  <p>Els jobs desactivats no s’executen però romanen a la taula cron.job.</p>
+
+  <h4>Modificar un job</h4>
+  <pre>
+-- change job's schedule
+SELECT cron.alter_job(42, '0 10 * * *');
+-- returns void    
+  </pre>
+
+  <h4> Esborrar un job</h4>
+  <pre>SELECT cron.unschedule(jobid);</pre>
+ 
+    <p>==> Documentació oficial de l'extensió <a href="https://github.com/citusdata/pg_cron">.What is pg_cron.</a></p>
+
+<hr><h3>📆 pgAgent , integrat en pgAdmin </h3>
+
+<hr><h3>📆 Extensions alternatives </h3>
+<h4>pg_timetable</h4>
+<h4>timescaledb background jobs</h4>
+
+ <hr> <h4>📘 Consultar jobs en el DD</h4>
+ <h4>Consultar el jobs</h4>
+<pre>SELECT * FROM cron.job;</pre>  
+  
+
+  <h3> Exemple complet d’automatització</h3>
+  <ul>
+    <li> <code>informe.sql</code>: genera un informe amb SELECTs</li>
+    <li> <code>informe.bat</code>: l’executa des del sistema</li>
+    <li> <strong>cron</strong>: programa la seva execució cada dia a les 8h</li>
+    <li> <strong>pg_cron</strong>: programa la seva execució cada dia a les 8h</li>
+  </ul>
+
+  <h3> Bones pràctiques</h3>
+  <ul>
+    <li> Guarda scripts en carpetes versionades (ex: GIT)</li>
+    <li> Documenta les tasques automatitzades</li>
+    <li> Revisa els permisos dels usuaris que executen les tasques</li>
+    <li>⚠️ Evita duplicar jobs o crear-ne de recurrents sense control</li>
+  </ul>
+
+<hr>  <h3> SQL dinàmic</h3>
+  <p>En algunes tasques de manteniment, s’utilitzarà el diccionari de dades 
+    (amb un cursor)- i per a cada objecte de DD s’aplicarà una sentència DDL</p>
+    <p class="alert">Si esta sentència correspon al DDL, no es pot executar directament dins d'un bloc de codi</p>
+    <p>En este cas, es farà ús de la sentència <code>EXECUTE </code></p>
+    <p><code>EXECUTE </code> és una instrucció de PL/pgSQL que permet executar sentències SQL dinàmiques
+       és a dir, sentències construïdes en temps d'execució com cadenes de text.</p>
+    <p>Exemple</p>
+<pre>
+CREATE OR REPLACE PROCEDURE defrag_taules(vschema text)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    x RECORD;
+    sql_cmd text;
+BEGIN
+    -- Recorre totes les taules de l'esquema
+    FOR x IN
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = vschema
+    LOOP
+        -- Construir sentència SQL dinàmica
+        sql_cmd := 'VACUUM FULL ' || quote_ident(vschema) || '.' || quote_ident(x.tablename) || ';';
+        
+        -- Executar SQL dinàmic
+        EXECUTE sql_cmd;
+        
+        -- Mostrar missatge
+        RAISE NOTICE 'Taula desfragmentada: %', x.tablename;
+    END LOOP;
+END;
+$$;   </pre>
+<p>PostgreSQL EXECUTE només funciona dins de PL/pgSQL, no pots executar DDL dinàmic directament dins de SQL normal.</p>
+<p>Sempre és recomanable utilitzar quote_ident() per evitar injeccions SQL o errors amb noms especials.</p>
+
+<pre>
+CALL defrag_taules('public');
+</pre>
+
+
+
+</section>
+
+
+<section id="altres-recursos">
+  <h2>Altres recursos</h2>
+    
+  <!--<h3>Ús de Dates en Postgres</h3>
+    <h2> <a href="dates-en-postgres.html">Dates en postgres</a></h2> -->
+  
+   <!--    <a href="">link</a> 
+    <h3>AuithID en procedure</h3>
+
+    <h3>FOR en procedure</h3>
+    <h3> doble & en variable de substitució  - &&dismeCodi</h3>
+    -->
+
+    <hr><h3>Repàs...</h3>
+    <div id="progress-container">
+    <div id="progress-bar"></div>  </div>
+    <!-- <div id="percentatge-text">0%</div>  -->
+
+    <div class="quiz-container">
+        <h4 id="pregunta-text"></h4>
+        <div id="options-container" class="options">
+        </div>
+
+        <p id="feedback"></p>
+        <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
+        <button onclick="carregarPreguntes()">🔁 Reiniciar</button>
+
+
+    </div>    
+
+</section>
+
+
+</main>
+
+<script>
+
+  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+      //  <div class="pre-container">
+      //    <button class="copy-button">Copia Codi !</button>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+
+  //  Per fer test final
+  // Primer es crea un bancDePreguntes   const
+  // i desprès es carrega una pregunta aleatoria    function
+  // per ultim la funcio de comprobar resposta per a quan es polse un botó
+
+let bancDePreguntes = [];
+let preguntesBarrejades = [];
+let indexPreguntaActual = 0;
+let puntuacio = 0;
+
+function barrejar(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function actualitzarProgres() {
+    const percentatge =
+        (indexPreguntaActual / preguntesBarrejades.length) * 100;
+    document.getElementById('progress-bar').style.width =
+        percentatge + "%";
+}
+
+function actualitzarPercentatge() {
+    const percentatge = Math.round(
+        (puntuacio / preguntesBarrejades.length) * 100
+    );
+    document.getElementById('percentatge-text').innerText =""
+       // `Encerts: 🎯 ${percentatge}%`;
+}
+
+
+function carregarPreguntes() {
+    fetch('preguntes/preguntes41.json')
+        .then(res => res.json())
+        .then(data => {
+            bancDePreguntes = data;
+            preguntesBarrejades = [...bancDePreguntes];
+            barrejar(preguntesBarrejades);
+            puntuacio = 0;
+            indexPreguntaActual = 0;
+            mostrarPregunta();
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('pregunta-text').innerText =
+                "Error carregant les preguntes 😢";
+        });
+        //document.getElementById('percentatge-text').innerText = "0%";
+
+}
+
+function mostrarPregunta() {
+
+    // Si ja no queden preguntes
+    if (indexPreguntaActual >= preguntesBarrejades.length) {
+        document.getElementById('pregunta-text').innerText =
+            "🎉 Has acabat totes les preguntes!";
+        document.getElementById('options-container').innerHTML = "";
+        document.getElementById('feedback').innerHTML =
+        `Has encertat <strong>${puntuacio}</strong> de 
+        <strong>${preguntesBarrejades.length}</strong> preguntes.`;
+        document.getElementById('btn-seguent').disabled = true;
+        document.getElementById('progress-bar').style.width = "100%";
+        actualitzarProgres();
+        return;
+    }
+
+    const pregunta = preguntesBarrejades[indexPreguntaActual];
+
+    document.getElementById('pregunta-text').innerText = pregunta.titol;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    pregunta.opcions.forEach(opcio => {
+        const btn = document.createElement('button');
+        btn.innerText = opcio.text;
+        btn.onclick = () => comprovaResposta(opcio.correcte, btn);
+        container.appendChild(btn);
+    });
+
+    document.getElementById('feedback').textContent = "";
+    document.getElementById('btn-seguent').disabled = true;
+    actualitzarProgres();
+
+}
+
+
+function comprovaResposta(esCorrecte, element) {
+    const feedback = document.getElementById('feedback');
+
+    document
+        .querySelectorAll('#options-container button')
+        .forEach(btn => btn.disabled = true);
+
+    if (esCorrecte) {
+        feedback.textContent = "✅ Correcte! Molt bé.";
+        element.style.background = "#d4edda";
+        puntuacio++;
+    } else {
+        feedback.textContent = "❌ Incorrecte.";
+        element.style.background = "#f8d7da";
+    }
+    //actualitzarPercentatge();
+    document.getElementById('btn-seguent').disabled = false;
+}
+
+function seguentPregunta() {
+    indexPreguntaActual++;
+    mostrarPregunta();
+}
+
+ 
+
+// Executar en carregar la pàgina
+window.onload = carregarPreguntes;
+
+
+</script>
+
+</body>
+</html>
