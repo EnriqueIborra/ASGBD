@@ -21,15 +21,16 @@
 <nav>
   <h3>Índex</h3>
   <a href="#intro">Introducció</a>
-  <a href="#versions">Versions</a>
-  <a href="#edicions">Edicions</a>
-  <a href="#requisits">Requisits</a>
-  <a href="#instancia">Instància</a>
+  <a href="#versions">Versions/Edicions</a>
+  <a href="#instancia">Cluster / Instància</a>
   <a href="#arquitectura">Arquitectura</a>
-  <a href="#estruc">Estructura carpetes</a>
+  <a href="#requisits">Requisits</a>
   <a href="#instalacio">Instal·lació PostgreSQL</a>
+  <a href="#estruc">Estructura carpetes</a>
   <a href="#acces">Accés a PostgreSQL</a>
-  <!--<a href="#altres-recursos">Altres Recursos</a>-->
+  <a href="#altres-recursos">Altres Recursos</a>
+  <a href="#multi">Multi instància</a>
+
 </nav>
 
 <main>
@@ -432,12 +433,8 @@
     <div class="preg">
    
     </div>
-  </section>
-
-
-
-  
-  <section id="edicions">
+ 
+    <hr><html></html>
     <h2>Edicions de Postgresql</h2>
       <p>       Postgres NO TÉ EDICIONS, tipus Enterprise, Standard, etc,  com fa ORACLE..    </p>
       <p>En Postgress sempre és el mateix motor, sense funcions “capades” per llicència.</p>
@@ -447,17 +444,210 @@
         <li>Distribucions:(EnterpriseDB, Amazon RDS, Azure, etc.) </li>
         <li>Configuració i suport comercial</li>
     </ul>
-
-    <p class="tips">(Practica 🧪) <a href="https://github.com/EnriqueIborra/ASGBD/blob/b7846aed55ae7885701f8d88a42091aae52dfe0c/UD1/desplegar%20ORACLEdb23%20sobre%20Docker_simplif.pdf" target="_blank">
-       Primer contacte amb Postgresql </a></p>
     
 </section>
 
   
+ 
+  <section id="instancia">
+    <h2>Clúster PostgreSQL (equivalent a una instància)</h2>
 
+     Un clúster PostgreSQL és:
+    <li>Un conjunt de: Bases de dades, Usuaris (rols), Configuració</li>
+    <li>Gestionat per un sol procés servidor (postmaster / postgres)</li>
+    <li>Amb un únic port (normalment 5432)</li>
+    <li>Un únic directori de dades,  PGDATA</li>
 
+<br>
+    En PostgreSQL:
+    <li>Les bases de dades dins d’un clúster estan aïllades</li>
+    <li>No es poden fer joins directes entre BD</li>
+    <li>Compartits: Usuaris (rols), Extensions, Configuració</li>
+
+    <p>Si es necessita NO compartir Usuaris, extensions o configuració:
+    (Si es vol un altre “entorn”: Es crearà un altre clúster (altre port / altre directori))  </p>
+
+    <p>En PostgreSQL, la memòria i els paràmetres principals es veuen i es gestionen sobretot mitjançant paràmetres de configuració</p>    
   
-  <section id="requisits">
+    <p>Es poden consultar amb les següents ordres, des de <strong>psql</strong>, (es vorà com accedir més endavant)</p>
+    <pre>SHOW config_file;
+SHOW shared_buffers;
+SHOW work_mem;
+SHOW max_connections;       </pre>
+
+    <!--
+🛠️ Canviar paràmetres
+Temporal (sessió):
+SET work_mem = '64MB';
+
+Permanent:
+ALTER SYSTEM SET work_mem = '64MB';
+SELECT pg_reload_conf();
+
+
+(O editar postgresql.conf i reiniciar si cal)    
+    
+    -->
+  
+</section>
+  
+
+ 
+
+  <section id="arquitectura">
+    <h2>Arquitectura de Postgresql</h2>
+  <p>L’arquitectura de PostgreSQL és client–servidor i basada en processos (no en fils com altres SGBD).</p>
+  
+1️⃣ Model client–servidor  
+  <pre>
+Client  (psql o aplicació)
+   │
+   ▼
+postmaster (procés principal)
+   │
+   ├─ Procés backend 1 (connexió client A, 1 per connexió)
+   ├─ Procés backend 2 (connexió client B)   
+   ├─ Procés backend ..   
+   ├─ Procés backend n   
+   ├─ Procés autovacuum
+   ├─ Procés WAL writer
+   ├─ Procés checkpointer
+   ├─ Procés background writer
+   └─ Procés stats collector
+  </pre>
+  <p>Cada connexió = un procés.</p>
+  
+<!--
+2️⃣ Procés principal: postmaster / postgres
+    S'inicia quan el servidor PostgreSQL arranca
+    Escolta en un port (per defecte 5432)
+    Accepta connexions
+    Llança un procés backend per a cada client
+    Supervisa els processos de manteniment (autovacuum, WAL, etc..)
+
+
+3️⃣ Processos backend (clients)
+    Un procés dedicat per connexió (connexió aïllada)
+    Executa les consultes 
+    Gestiona transaccions i bloquejos (locks)
+    Retorna resultats al client de bbdd (psql, pgAdmin,..)
+    Accedeix a:
+        Memòria compartida
+        Fitxers de dades
+
+📌 Açò explica per què:
+Moltes connexions = més consum de memòria
+Es recomana pool de connexions
+
+4️⃣ Memòria en PostgreSQL
+🔹 Memòria compartida
+Compartida per tots els processos:
+    shared_buffers → caché de dades
+    wal_buffers → WAL
+    Taules de control i locks
+
+🔹 Memòria local (per procés)
+Cada backend té la seua:
+    work_mem
+    maintenance_work_mem
+
+
+5️⃣ Escriptura i recuperació (WAL)
+    PostgreSQL usa WAL (Write-Ahead Logging):
+    Primer s’escriu al WAL
+    Després a les dades
+
+    Processos implicats:
+       WAL writer
+       Checkpointer
+       Background writer
+ 
+    📌 Garanteix:
+       ACID
+       Recuperació després de caigudes
+
+6️⃣ Autovacuum (clau en PostgreSQL)
+    Neteja versions antigues de files (MVCC)
+    Evita creixement excessiu de taules
+    Manté estadístiques
+
+7️⃣ Gestió de concurrència (MVCC)
+    No hi ha bloquejos de lectura
+    Cada transacció veu la seua versió de les dades
+    Les versions velles es netegen amb VACUUM
+📌 Gran avantatge en entorns concurrents.
+
+8️⃣ Emmagatzematge
+    Cada taula = fitxer (o conjunt de fitxers)
+    Índexs separats
+    Tablespaces disponibles
+📌 Més simple que Oracle, però molt flexible.
+
+9️⃣ Extensions (part clau de l’arquitectura)
+    Amplien el motor sense modificar el core. 
+    PostgreSQL permet extensions:
+      PostGIS
+      pg_stat_statements
+      citext
+
+   stats collector
+      Recull informació estadística de la base de dades.
+      Aquesta informació s’utilitza per optimitzar consultes amb el planner.
+
+-->
+
+<hr><h3>Components d'un SGBD Postgresql</h3>
+<h4>Arquitectura lògica (nivells)</h4>
+<pre>
+Clúster de PostgreSQL
+   │
+   ├─ Base de dades A
+   │    │
+   │    ├─ Schemas
+   │    │     │
+   │    │     ├─ Taules
+   │    │     ├─ Vistes
+   │    │     ├─ Índexs
+   │    │     └─ Funcions
+   │    │
+   │    └─ (usa tablespaces)
+   │
+   ├─ Base de dades B
+   │    └─ ...
+   │
+   ├─ Usuaris / Rols (globals)
+   │
+   └─ Tablespaces (emmagatzematge físic)
+</pre>
+<ul>
+    <li>Clúster: És tot el servidor PostgreSQL.</li>
+    <li>Base de dades: Contenidor lògic independent dins del clúster.</li>
+    <li>Schemas: Són com carpetes dins d’una base de dades.</li>
+    Serveixen per: Organitzar objectes, Evitar conflictes de noms
+    <li>Objectes (dins schema): Taules → dades, Vistes → consultes guardades, Índexs → milloren rendiment, Funcions → lògica programada</li>
+    <li>Usuaris / Rols: Són globals al clúster (no a una sola BD).</li>
+    <li>Tablespaces: Defineixen on es guarden físicament les dades al disc.</li>
+    Permet: Separar dades en diferents discos, Optimitzar rendiment
+</ul>
+<hr>
+
+<ul> <strong>Flux de treball</strong>
+    <li>El client es connecta</li>
+    <li>El postmaster crea un backend</li>
+    <li>El backend:</li>
+    <ul>
+        <li>Accedeix a una base de dades</li>
+        <li>Treballa dins d’un schema</li>
+        <li>Llegeix/escriu taules</li>
+        <li>Usa tablespaces (disc)</li>
+    </ul>
+</ul>
+
+</section>
+ 
+ 
+
+<section id="requisits">
     <h2>Requisits d’instal·lació</h2>
       
     <ul> <strong>Sistema Operatiu</strong>
@@ -489,183 +679,8 @@
      <li>Tallafocs configurat</li>
  </ul>
 
-  </section>
-  
-
-
-
- 
-  <section id="instancia">
-    <h2>Clúster PostgreSQL (equivalent a una instància)</h2>
-
-<ul> Un clúster PostgreSQL és:
-    <li>Un conjunt de:Bases de dades, Usuaris (rols), Configuració</li>
-    <li>Gestionat per un sol procés servidor (postmaster / postgres)</li>
-    <li>Amb un únic port (normalment 5432)</li>
-    <li>Un únic directori de dades</li>
-</ul>
-
-    En PostgreSQL:
-    <li>Les bases de dades dins d’un clúster estan aïllades</li>
-    <li>No es poden fer joins directes entre BD</li>
-    <li>Compartits: Usuaris (rols), Extensions, Configuració</li>
-
-    <p>Si es necessita NO compartir Usuaris, extensions o configuració:
-    (Si es vol un altre “entorn”: Es crearà un altre clúster (altre port / altre directori))  </p>
-
-    <p>En PostgreSQL, la memòria i els paràmetres principals es veuen i es gestionen sobretot mitjançant paràmetres de configuració</p>    
-  
-    <p>Es poden consultar amb les següents ordres</p>
-    <pre>SHOW config_file;
-
-SHOW shared_buffers;
-SHOW work_mem;
-SHOW max_connections;
-    </pre>
-
-    <!--
-🛠️ Canviar paràmetres
-Temporal (sessió):
-SET work_mem = '64MB';
-
-Permanent:
-ALTER SYSTEM SET work_mem = '64MB';
-SELECT pg_reload_conf();
-
-
-(O editar postgresql.conf i reiniciar si cal)    
-    
-    -->
-  
 </section>
-  
 
- 
-
-  <section id="arquitectura">
-    <h2>Arquitectura de Postgresql</h2>
-  <p>L’arquitectura de PostgreSQL és client–servidor i basada en processos (no en fils com altres SGBD).</p>
-  
-  <pre>
-Client
-   │
-   ▼
-postmaster (procés principal)
-   │
-   ├─ Procés backend (1 per connexió)
-   ├─ Procés autovacuum
-   ├─ Procés WAL writer
-   ├─ Procés checkpointer
-   ├─ Procés background writer
-   └─ Procés stats collector
-  </pre>
-  <p>Cada connexió = un procés.</p>
-  
-<!--
-2️⃣ Procés principal: postmaster / postgres
-    Arranca el servidor PostgreSQL
-    Escolta en un port (per defecte 5432)
-    Accepta connexions
-    Llança un procés backend per a cada client
-
-
-3️⃣ Processos backend (clients)
-    Un procés dedicat per connexió
-    Executa les consultes SQL
-    Accedeix a:
-        Memòria compartida
-        Fitxers de dades
-
-📌 Açò explica per què:
-Moltes connexions = més consum de memòria
-Es recomana pool de connexions
-
-4️⃣ Memòria en PostgreSQL
-🔹 Memòria compartida
-Compartida per tots els processos:
-    shared_buffers → caché de dades
-    wal_buffers → WAL
-    Taules de control i locks
-
-🔹 Memòria local (per procés)
-Cada backend té la seua:
-    work_mem
-    maintenance_work_mem
-
-
-5️⃣ Escriptura i recuperació (WAL)
-PostgreSQL usa WAL (Write-Ahead Logging):
-    Primer s’escriu al WAL
-    Després a les dades
-
-Processos implicats:
-    WAL writer
-    Checkpointer
-    Background writer
-
-📌 Garanteix:
-    ACID
-    Recuperació després de caigudes
-
-6️⃣ Autovacuum (clau en PostgreSQL)
-    Neteja versions antigues de files (MVCC)
-    Evita creixement excessiu de taules
-    Manté estadístiques
-➡️ Equivalent funcional a:
-Undo + manteniment automàtic d’Oracle
-
-7️⃣ Gestió de concurrència (MVCC)
-    No hi ha bloquejos de lectura
-    Cada transacció veu la seua versió de les dades
-    Les versions velles es netegen amb VACUUM
-📌 Gran avantatge en entorns concurrents.
-
-8️⃣ Emmagatzematge
-    Cada taula = fitxer (o conjunt de fitxers)
-    Índexs separats
-    Tablespaces disponibles
-📌 Més simple que Oracle, però molt flexible.
-
-9️⃣ Extensions (part clau de l’arquitectura)
-
-PostgreSQL permet extensions:
-    PostGIS
-    pg_stat_statements
-    citext
-
-➡️ Amplien el motor sense modificar el core.  
--->
-
-  </section>
-  
-
-
-
-  <section id="estruc">
-    <h2>Estructura recomanada </h2>
-<pre>
-    
-📁 Binaris -  /usr/pgsql-16/bin
-
-📁 Dades (DATA DIRECTORY) - /pgdata/cluster01/data
-     (Conté: bases de dades , WAL,  catàlegs,  configuració)
-
-📁 WAL separat (molt recomanat) -  /pgdata/cluster01/wal
-      Configurat amb:  initdb --waldir=/pgdata/cluster01/wal
-
-📁 Tablespaces (com datafiles) - /pgdata/tablespaces/ts_dades
-                                 /pgdata/tablespaces/ts_indexos
-    Exemple: CREATE TABLESPACE ts_dades LOCATION '/pgdata/tablespaces/ts_dades';
-
-📁 Logs - /pglogs/cluster01
-
-📁 Backups - /pgbackups/cluster01
-      ⚠️ 👁️  Si pot ser , en altre disc físic, o altra ubicació
-</pre>
-
-
-  </section>
-  
  
 
   <section id="instalacio">
@@ -678,15 +693,34 @@ PostgreSQL permet extensions:
     <pre>sudo apt update
 sudo apt install postgresql postgresql-contrib
 </pre>
-<p>Açò instal·la: El <strong>servidor</strong> PostgreSQL, Eines bàsiques,  Extensions comunes</p>
-    <p>Durant la instal·lació: Es crea l’usuari del sistema: postgres , Es crea un clúster per defecte, 
-      El servei s’inicia,  Escolta pel port 5432</p>
+<p>Açò instal·la: El <strong>servidor</strong> PostgreSQL, Eines bàsiques,  Extensions comunes, etc..</p>
+    <p>Durant la instal·lació:...   </p>
+      <ul>
+        <li>Es crea un clúster per defecte</li>
+        <li>El servei s’inicia (postmaster)</li>
+        <li>Escolta pel port 5432</li>
+        <li>Es crea l’usuari del sistema: <strong>postgres</strong></li>
+        <li>Es crea una base de dades : postgres</li>
+        <li>i altres coses....</li>
+      </ul>
 
     <h4>  Comprovar que el servidor / servei funciona</h4>
     <pre>sudo systemctl status postgresql</pre>
     <h4>Entrar en PostgreSQL. Amb client psql</h4>
+    <p>El client <strong>psql</strong> és una eina de línia de comandes que s’utilitza per interactuar amb bases de dades PostgreSQL. 
+    És, en resum, el programa que et permet enviar consultes SQL, veure resultats i gestionar la base de dades directament des del terminal.</p>
     <pre>sudo -u postgres psql </pre>
-      <h4>Eixir de psql</h4>
+    <ul> <strong>Esta comanda fa:</strong>
+        <li>El sistema canvia a l’usuari postgres.</li>
+        <li>Després arranca <strong>psql</strong> connectant-se al clúster predeterminat i a la base de dades amb el mateix nom que l’usuari (postgres).</li>
+        <li>Acabes en un prompt interactiu com:</li>
+        <li><pre>sql (16.13 (Ubuntu 16.13-0ubuntu0.24.04.1))
+Type "help" for help.
+
+postgres=#</pre></li>
+    </ul>
+
+    <hr>  <h4>Eixir de psql</h4>
     <pre>\q </pre>
 
     <h4>🧰 Eines bàsiques de PostgreSQL</h4>
@@ -722,19 +756,119 @@ sudo apt install postgresql postgresql-contrib
     <p>Instal·lador oficial, Homebrew</p>
     <pre>brew install postgresql
 brew services start postgresql  </pre>
+<hr>
+<h3>Logs d'instal·lació</h3>
+<p>Els paquets de PostgreSQL gestionats pel sistema deixen logs d’instal·lació al sistema de paquets.</p>
+<pre>
+/var/log/apt/history.log       # historial d'instal·lacions de paquets
+/var/log/apt/term.log          # sortida detallada de cada instal·lació
+</pre>
+<pre>
+-- per veure quan es va instal·lar PostgreSQL 
+grep postgresql /var/log/apt/history.log -B 1 -A 1
+grep postgresql /var/log/apt/term.log
+</pre>
+<p>Després de la instal·lació, el primer arranc del servidor
+     PostgreSQL sí que genera logs dins del directori del clúster, normalment:</p>
+<pre>
+/var/log/postgresql/postgresql-16-main.log   # log del servei PostgreSQL  </pre>
+
+<div class="preg">
+    🧪 Busca la data de la teua instal·lació del cluster <br>
+    🧪 Busca quantes vegades s'ha iniciat el servei de postgres
+</div>
 
 </section>
 
+
+
+
+  <section id="estruc">
+<h2>Estructura típica d’un servidor PostgreSQL</h2>
+<p>Segons la distribució del linux, la versió, el sistema operatiu, pot canviar....</p>
+<p>Per tindre una informació inicial, podem posar estes comandes</p>
+<pre>
+psql --version
+pg_config --bindir
+pg_config --help   </pre>
+<p>Estructura</p>
+<pre>
+/usr/lib/postgresql/16/bin/       → BINARIS
+/var/lib/postgresql/16/main       → DATA DIRECTORY
+/var/lib/postgresql/16/main/pg_wal   → WAL (separat)
+/etc/postgresql/16/main/             → Configuració
+/var/log/postgresql/     → LOGS
+/var/run/postgresql/    → SOCKETS
+/var/lib/postgresql/16/main/pg_tblspc  →  Enllaços simbòlics a tablespaces personalitzats
+
+</pre>
+<h4>BINARIS</h4>
+<p> Conté els executables de PostgreSQL: psql→client , postgres→server dbinit→server(config), </p>
+<p>Els pot vore i executar qualsevol usuari</p>
+ 
+<h4>DATA DIRECTORY</h4>
+<p>Sols pot accedir l'usuari/grup <code>postgres</code></p>
+<p>És el cor del clúster. Conté:
+Bases de dades (fitxers interns)
+Catàlegs del sistema
+Configuració (postgresql.conf, pg_hba.conf)
+WAL (si no el separes)</p>
+<p>no és recomanable modificar fitxers directament dins del clúster, perquè pots corrompre la base de dades. 
+Sempre que vulgues fer operacions sobre PostgreSQL, és millor fer-les amb l’usuari postgres 
+o via les eines de PostgreSQL (psql, pg_ctl, etc.).</p>
+
+<h4>WAL</h4>
+<p>Registra totes les transaccions abans d’escriure dades
+Serveix per:
+Recuperació en cas de fallada
+Replicació</p>
+<pre>-- Es configura:
+initdb --waldir=/pgdata/cluster01/wal    
+</pre>
+
+<h4>Configuració</h4>
+<p>postgresql.conf, pg_hba.conf</p>
+
+<h4>LOGS</h4>
+<p>Conté els logs del servidor: errors, connexions, consultes lentes</p>
+<p>Important per: Diagnòstic, Auditories, Debug</p>
+<p>Sempre millor separat del DATA</p>
+
+<h4>TABLESPACES</h4>
+<pre>Per vore els tablespaces:
+\db
+</pre>
+<p>pg_default i pg_global són els tablespaces predeterminats de PostgreSQL.
+No tenen ubicació específica mostrada a \db perquè estan dins del directori del clúster (/var/lib/postgresql/16/main/),
+ no en un directori separat.</p>
+ <pre>
+/var/lib/postgresql/16/main/
+├── base/       <- dades de cada base de dades (pg_default)
+├── global/     <- dades globals (pg_global)
+├── pg_tblspc/  <- enllaços a tablespaces externs (buits si no n'hi ha)
+ </pre>
+ <p>No existeis un lloc per defecte per posar TABLESPACES addicionals, els ha de definir el DBA. 
+    Permeten guardar dades en altres discos/directoris</p>
+<pre>CREATE TABLESPACE ts_dades LOCATION '/.../tablespaces/ts_dades';</pre>
+
+<h4>BACKUPS</h4>
+<p>No existeix un lloc per defecte, l'ha de definir el DBA. 
+    On es guarden còpies de seguretat: dumps (pg_dump), backups físics</p>
+
+  </section>
+
   <section id="stop">
     <img src="imgs/stop.png" class="imatge-esquerra"  alt="stop" style="width: 6%">
-    <h2>Abans de continuar.... </h2>
-    <h1>Realitzem la nostra primera instal·lació de POSTGRES</h1>
+    <h2>Abans de continuar.... </h2> <br>
+    <h2>En una màquina (virtual)</h2>
+    <h3>Realitzem la nostra primera instal·lació de POSTGRES</h3>
 
-    <br><br><h2>En altra màquina....</h2>
+    <br><h2>En altra màquina....</h2>
     <h3>Instal·lació de client gràfic => pdadmin</h3>
     <p>Des de la pàgina oficial de <a href="https://www.pgadmin.org/download/">pgadmin</a></p>
 
   </section>
+
 
 
 
@@ -761,9 +895,9 @@ brew services start postgresql  </pre>
 
     <h3>Crear BBDD i usuari</h3>
     <pre>CREATE USER alumne WITH PASSWORD '1234';
-CREATE DATABASE bd_examen OWNER alumne;  </pre>
+CREATE DATABASE alumne OWNER alumne;  </pre>
 
-        <h3>Arrancar i parar BBDD</h3>
+        <h3>Arrancar i parar <s>BBDD</s> Cluster</h3>
         <pre>sudo systemctl start postgresql
 sudo systemctl stop postgresql
 sudo systemctl restart postgresql </pre>
@@ -777,11 +911,11 @@ sudo systemctl restart postgresql </pre>
     <p>Després d’instal·lar PostgreSQL, hi ha sempre: <code> postgres  template0 template1 </code></p>
 
     <h3>Connexió implícita</h3>
-    <pre>psql -U alumne -d bd_examen </pre>
+    <pre>psql -U nom_usuari -d nom_ bbdd </pre>
 
     <h3>Explorar cluster</h3>
     <p>Una vegada connectats… com veure les altres BBDD en PostgreSQL</p>
-    <pre>\l
+    <pre>
 \list
 \l+
 SELECT datname FROM pg_database;      </pre>
@@ -789,7 +923,7 @@ SELECT datname FROM pg_database;      </pre>
 <pre>Com saber a quina bbdd estem connectats…
 SELECT current_database();
 o 
-\conninfo
+\conninfo    --També mostra usuari i altra informació
 o 
 Normalment el prompt mostra la base de dades:     testdb=#
 
@@ -800,9 +934,9 @@ Normalment el prompt mostra la base de dades:     testdb=#
 \connect nom_bbdd  </pre>
 
 
-    <h3> Altres maneres d'accedir a la instància:</h3>
+    <h3> Altres maneres d'accedir a la instància / cluster</h3>
     <ul>
-      <li> Utilitzant  pgadmin</li>
+      <li> Utilitzant  pgAdmin</li>
       <li> Utilitzant  Visual Studio Code + Extensió PostgreSQL O DBCode</li>
       <li> Utilitzant DBeaver ( multi-SGBD sw lliure)</li>
       <li> Utilitzant TOAD  (multi-SGBD propietari)</li>
@@ -821,8 +955,30 @@ Normalment el prompt mostra la base de dades:     testdb=#
     <p>🎓 Amb tots aquests coneixements, ja estàs preparat/ada per començar la unitat dos. Configuració d'un SGBD </p>
 
   </section>
-  
-  <section>
+
+  <section id="altres-recursos">
+ 
+     <hr><h3>Abans d'avançar, un poc de repàs...</h3>
+    <div id="progress-container">
+    <div id="progress-bar"></div>  </div>
+    <!-- <div id="percentatge-text">0%</div>  -->
+
+    <div class="quiz-container">
+        <h4 id="pregunta-text"></h4>
+        <div id="options-container" class="options">
+        </div>
+
+        <p id="feedback"></p>
+        <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
+        <button onclick="carregarPreguntes()">🔁 Reiniciar</button>
+
+    </div>       
+    
+  </section> 
+
+
+ <section id="multi">
+   <h2>(Ampliació ++)</h2>
     <h2>Instal·lar més d'una instància en una mateixa màquina</h2>
     <h3>Directoris de dades separats</h3>
     <p>Cada instància necessita el seu PGDATA, és a dir, el directori on es guarden les dades, logs i configuracions.</p>
@@ -885,12 +1041,6 @@ psql -h localhost -p 5433 -U usuari -d db2   # instància 2
   </section>
 
 
-  <section id="altres-recursos">
-    
-    
-  </section>
-
-
 </main>
 
 <script>
@@ -911,6 +1061,126 @@ psql -h localhost -p 5433 -U usuari -d db2   # instància 2
       });
     });
   });
+
+ //  Per fer test final
+  // Primer es crea un bancDePreguntes   const
+  // i desprès es carrega una pregunta aleatoria    function
+  // per ultim la funcio de comprobar resposta per a quan es polse un botó
+
+let bancDePreguntes = [];
+let preguntesBarrejades = [];
+let indexPreguntaActual = 0;
+let puntuacio = 0;
+
+function barrejar(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function actualitzarProgres() {
+    const percentatge =
+        (indexPreguntaActual / preguntesBarrejades.length) * 100;
+    document.getElementById('progress-bar').style.width =
+        percentatge + "%";
+}
+
+function actualitzarPercentatge() {
+    const percentatge = Math.round(
+        (puntuacio / preguntesBarrejades.length) * 100
+    );
+    document.getElementById('percentatge-text').innerText =""
+       // `Encerts: 🎯 ${percentatge}%`;
+}
+
+
+function carregarPreguntes() {
+    fetch('preguntes/preguntes11p.json')
+        .then(res => res.json())
+        .then(data => {
+            bancDePreguntes = data;
+            preguntesBarrejades = [...bancDePreguntes];
+            barrejar(preguntesBarrejades);
+            puntuacio = 0;
+            indexPreguntaActual = 0;
+            mostrarPregunta();
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('pregunta-text').innerText =
+                "Error carregant les preguntes 😢";
+        });
+        //document.getElementById('percentatge-text').innerText = "0%";
+
+}
+
+function mostrarPregunta() {
+
+    // Si ja no queden preguntes
+    if (indexPreguntaActual >= preguntesBarrejades.length) {
+        document.getElementById('pregunta-text').innerText =
+            "🎉 Has acabat totes les preguntes!";
+        document.getElementById('options-container').innerHTML = "";
+        document.getElementById('feedback').innerHTML =
+        `Has encertat <strong>${puntuacio}</strong> de 
+        <strong>${preguntesBarrejades.length}</strong> preguntes.`;
+        document.getElementById('btn-seguent').disabled = true;
+        document.getElementById('progress-bar').style.width = "100%";
+        actualitzarProgres();
+        return;
+    }
+
+    const pregunta = preguntesBarrejades[indexPreguntaActual];
+
+    document.getElementById('pregunta-text').innerText = pregunta.titol;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    pregunta.opcions.forEach(opcio => {
+        const btn = document.createElement('button');
+        btn.innerText = opcio.text;
+        btn.onclick = () => comprovaResposta(opcio.correcte, btn);
+        container.appendChild(btn);
+    });
+
+    document.getElementById('feedback').textContent = "";
+    document.getElementById('btn-seguent').disabled = true;
+    actualitzarProgres();
+
+}
+
+
+function comprovaResposta(esCorrecte, element) {
+    const feedback = document.getElementById('feedback');
+
+    document
+        .querySelectorAll('#options-container button')
+        .forEach(btn => btn.disabled = true);
+
+    if (esCorrecte) {
+        feedback.textContent = "✅ Correcte! Molt bé.";
+        element.style.background = "#d4edda";
+        puntuacio++;
+    } else {
+        feedback.textContent = "❌ Incorrecte.";
+        element.style.background = "#f8d7da";
+    }
+    //actualitzarPercentatge();
+    document.getElementById('btn-seguent').disabled = false;
+}
+
+function seguentPregunta() {
+    indexPreguntaActual++;
+    mostrarPregunta();
+}
+
+ 
+
+// Executar en carregar la pàgina
+window.onload = carregarPreguntes;
+
 
 </script>
 

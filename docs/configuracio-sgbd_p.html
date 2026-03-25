@@ -53,27 +53,18 @@ Sessió
 <h3>Variables d’entorn del sistema operatiu</h3>
 <p>Aquestes no són pròpies de PostgreSQL sinó del SO. Les més importants:</p>
 <ul>
-  <li>PATH	Ruta on està el binari  (única obligatoria)</li>
+  <li>PATH	Ruta on està el binari  ( <strong>única obligatoria</strong> )</li>
   <li>PGDATA	Directori de dades  (servidor)</li>
   <li>PGPORT	Port (per defecte 5432) (en client)</li>
   <li>PGHOST	Host per defecte (en client)</li>
   <li>PGUSER	Usuari per defecte (en client)</li>
   <li>PGPASSWORD	Password  (en client), no recomanada</li>
 </ul>
-<p>** PostgreSQL no necessita que aquestes variables estiguin definides per funcionar. Només faciliten l’ús de les eines.</p>
+<p>** PostgreSQL no necessita que aquestes variables estiguen definides per funcionar. Només faciliten l’ús de les eines.</p>
 <p>Inicialment, després de la instal·lació, cap variable està definida (excepte PATH). S'ha de posar manualment els valors si es vol fer ús d'alguna d'elles.</p>
 <p>Com es pot saber el valor que deuria tindre PGDATA: connectar a postgres,..   </p>
-  <pre>
- sudo -i -u postgres
- psql
- show data_directory;
-  </pre>
-<p>També es pot saber, entrant en l'usuari <code>postgres</code> i anant al directori per defecte</p>
-<pre>
-sudo -i -u postgres
-cd
-pwd 
-</pre>
+  <pre>sudo -u postgres psql -c "show data_directory;"    </pre>
+
 
 <p>I com establir el/s valor/s:</p>
    
@@ -95,21 +86,18 @@ source ~/.bashrc
 <h3>On es troben els binaris  (psql)</h3>
 <pre>which psql
 /usr/bin/psql 
-    ==> /usr/bin  </pre>
+    ==> /usr/bin
+Encara que en este directori es troben els links simbolics al directori real:
+/usr/lib/postgresql/16/bin/  </pre>
 
 <h3>On es troben els fitxers de configuració</h3>
 <pre>find / -name postgresql.conf 2>/dev/null
 /etc/postgresql/16/main/postgresql.conf
 
 postgres@serverpg:/etc/postgresql/16/main$ ls
-conf.d	environment  pg_ctl.conf  pg_hba.conf  pg_ident.conf  postgresql.conf  start.conf
-
-</pre>
-
-    
- <h3>🔧 Exercici pràctic suggerit</h3>   
-  
-  
+conf.d	environment  pg_ctl.conf  pg_hba.conf  
+pg_ident.conf  postgresql.conf  start.conf   </pre>
+ 
 
   </section>
   
@@ -122,6 +110,16 @@ conf.d	environment  pg_ctl.conf  pg_hba.conf  pg_ident.conf  postgresql.conf  st
 <p>Postgres es un servei (daemon) de base de dades que corre habitualment al port TCP 5432. Es pot 
   canviar editant el fitxer postgresql.conf, guardant, i reiniciant el servei (daemon)
 </p>
+<pre>Sistema Operatiu
+    ↓
+Variables d'entorn
+    ↓
+<strong>postgresql.conf  pg_hba</strong>
+    ↓
+Variables GUC
+    ↓
+Sessió
+</pre>
 
 <h3>Fitxer ->   postgresql.conf</h3>
 <p>En este fitxer es pot canviar el port on PostgreSQL escolta...</p>
@@ -197,7 +195,8 @@ MD5 només per compatibilitat amb sistemes antics.</p>
  <p>Quan obris una sessió, Et connectes amb un usuari i Treballes sobre una base de dades concreta.</p>
 <p>Pots executar: consultes (SELECT), insercions (INSERT),
 actualitzacions (UPDATE), esborrats (DELETE), pots fer transaccions, etc..</p>
-<p>🔄 Cada usuari = una sessió. 1 usuari connectat → 1 sessió, 10 usuaris connectats → 10 sessions. 
+<p>🔄 Cada connexió d'un usuari = una sessió. 1 usuari connectat → 1 sessió, 
+  10 usuaris connectats → 10 sessions. 1 usuari connectat 5 vegades → 5 sessions.: 
 PostgreSQL gestiona moltes sessions alhora.</p>
 <p>✔ Cada sessió té: El seu estat, Les seves variables, Les seves transaccions.</p>
 <p>Les sessions són independents entre si,  Però poden interactuar (bloquejos, concurrència, etc.)</p>
@@ -224,7 +223,17 @@ max_connections = 200
 <h3>Fitxer: pg_ident.conf</h3>
 <p>usuaris del sistema → usuaris PostgreSQL.</p>
 
-<h3>Variables del sistema (GUC - Grand Unified Configuration)</h3>
+<hr><hr><h3>Variables del sistema (GUC - Grand Unified Configuration)</h3>
+<pre>Sistema Operatiu
+    ↓
+Variables d'entorn
+    ↓
+postgresql.conf  pg_hba
+    ↓
+<strong>Variables GUC</strong>
+    ↓
+Sessió
+</pre>
 <p>PostgreSQL té centenars de variables internes configurables (Aquestes no són variables d’entorn, sinó paràmetres de configuració del servidor.). Pots veure-les amb:</p>
 <pre>SHOW ALL;  </pre>
 <pre>O una concreta:
@@ -233,23 +242,69 @@ SHOW work_mem;  </pre>
 SELECT name, setting FROM pg_settings;  
 </pre>
 
-
 <ul> Aquestes variables poden ser:
-  <li>🔹 Globals (configurades a postgresql.conf)</li>
-  <li>🔹 Per base de dades</li>
-  <li>🔹 Per usuari</li>
-  <li>🔹 Per sessió</li>
-  <li>🔹 Dinàmiques</li>
+  <li> Globals (configurades a postgresql.conf)</li>
+  <li> Per base de dades</li>
+  <li> Per usuari</li>
+  <li> Per sessió</li>
 </ul>
+
 <pre>Exemple: canviar variable només per Sessió
 SET work_mem = '64MB';
-  Només afecta la connexió actual.   </pre>
+  Només afecta la connexió actual. S'aplica immediatament.   </pre>
+  <p>En este cas, quan em desconnecte i després em torne a connectar, el valor "64MB" no estarà fixat.</p>
+<p>Per fer que el canvi siga per usuari (persistent) en lloc de només per sessió, has d’utilitzar:</p>
+<pre>ALTER ROLE nom_usuari SET work_mem = '64MB';
+      S'aplica quan es torne a connectar l'usuari.  </pre> 
+<ul>
+  <li>Cada vegada que l’usuari joan es connecte → tindrà work_mem = 64MB</li>
+  <li>És persistent (no es perd en tancar sessió)</li>
+  <li>No afecta altres usuaris</li>
+</ul>
+<hr><p>Un altre nivell més alt de canvi és el de BBDD</p>
+<pre>ALTER DATABASE nom_bbdd SET work_mem = '64MB';
+    A partir d'este moment, tindrà efecte en noves sessions que es connecten a eixa base de dades.  </pre>
+
+<ul> <strong>Això fa que:</strong>
+  <li>Qualsevol usuari que es connecte a la base de dades vendes → tindrà work_mem = 64MB</li>
+  <li>És persistent</li>
+  <li>Només afecta eixa base de dades</li>
+</ul>
+<p>El valor s’aplica en iniciar la sessió. Si ja estàs connectat → has de reconnectar per veure el canvi</p>
+
+<hr><p>I el nivell més alt, per tot el cluster</p>
+<pre>ALTER SYSTEM SET work_mem = '128MB';
+   i després
+SELECT pg_reload_conf();   
+   per aplicar canvis. si no fas pg_reload_conf() ni reinicies,
+   ... ni les sessions noves aplicaran el canvi
+</pre>
+<p>ALTER SYSTEM defineix el valor global per defecte per a tota la instància,
+   però pot ser sobrescrit per configuracions més específiques (usuari, base de dades o sessió).</p>
+
+   <hr> <p>I al mateix nivell que ALTER SYSTEM, seria modificar el fitxer <strong>postgresql.conf</strong></p>
+
+<p>PostgreSQL té una jerarquia de prioritat</p>
+<pre>
+SET (sessió)
+ALTER ROLE (usuari)
+ALTER DATABASE (bbdd)
+ALTER SYSTEM / postgresql.conf (global)  </pre>
+
+<p>Quan es fa "ALTER SYSTEM SET work_mem = '128MB';", PostgreSQL no modifica directament postgresql.conf
+El que fa és escriure el canvi a un fitxer separat:</p>
+<pre>/var/lib/postgresql/16/main/postgresql.auto.conf</pre>
+<p>Aquest fitxer és llegit després de postgresql.conf quan el servidor arrenca o fas pg_reload_conf()
+Per això, els canvis són persistents, però no toques manualment postgresql.conf</p>
+
+<hr>
 <pre># Com saber de quin tipus és cada paràmetre:
 SELECT name, setting, context, vartype, source  FROM pg_settings ORDER BY name;</pre>
-<p>La columna context et diu quan i com es pot modificar el paràmetre.
+<p>La columna context et diu quan i com es pot modificar el paràmetre (variable GUC).
 </p>
 <pre>
 context     Significat
+--------------------------------------------
 internal    Només intern, no modificable
 postmaster  Requereix reinici del servidor
 sighup      Requereix reload (pg_reload_conf())
@@ -264,7 +319,9 @@ backend	    Es pot canviar en iniciar sessió
 <p>Saber d’on ve el valor (columna source)</p>
 <pre>SELECT name, source FROM pg_settings WHERE name = 'work_mem';</pre>
 
-<pre>source              Significat
+<pre>
+valor de source     Significat
+--------------------------------------------
 default	            Valor per defecte
 configuration file  postgresql.conf
 override            postgresql.auto.conf
@@ -284,11 +341,11 @@ ALTER DATABASE basedades SET work_mem = '64MB';
 🔹 Global (per defecte)
 ALTER SYSTEM SET work_mem = '128MB';
   Això escriu al fitxer:  postgresql.auto.conf  
+     ❗ No aplica fins que fas: SELECT pg_reload_conf();  ( o reinici)
 </pre>
 
 
   <h3>Configuració de memòria</h3>
-
 
   <h3> Reinici de la instància</h3>
   <p>Alguns canvis requereixen recarregar la configuració (en calent), o reiniciar la instància</p>
@@ -308,7 +365,8 @@ ALTER SYSTEM SET work_mem = '128MB';
   
     <h3>👤 Comptes d'administració predeterminats</h3>
     <p>Quan es crea una base de dades postgres es genera automaticament:</p>
- 
+
+    <h4>A nivell de cluster</h4>
   <ul>  🔹 postgres  -  Usuari administrador per defecte (SUPERUSER)
     <li>És el superusuari de la base de dades.</li>
     <li>Té permisos totals (SUPERUSER)</li>
@@ -346,6 +404,7 @@ No existeixen comptes com: root  admin  system  guest...</p>
 No tenen LOGIN → no són usuaris,
 Serveixen per agrupar privilegis específics, i, 
 Els pots assignar a usuaris</p>
+
 <hr>
 <p><strong>A nivell de sistema operatiu</strong>, quan instal·les PostgreSQL també es crea: </p>
 🔹 Usuari del SO: postgres
@@ -356,7 +415,7 @@ Els pots assignar a usuaris</p>
   <li>S’utilitza per administrar el servidor</li>
 </ul>
 
-    <h3>📍 Ubicació dels comptes</h3>
+ <hr>   <h3>📍 Ubicació dels comptes</h3>
 <p>Tots els usuaris i rols es troben a la base de dades postgres o qualsevol altra base de dades del cluster.
 Concretament, la informació està en les taules del diccionari de dades dins l’esquema <code>pg_catalog</code> </p>
 <p>La taula principal és: <code>pg_catalog.pg_authid </code> . 
@@ -487,6 +546,9 @@ $PGDATA/global/ → informació global, incloent usuaris i rols
 <hr>
 
 <h2>Parada del servidor</h2>
+<p>En PostgreSQL no es pot parar el clúster directament des de dins de psql amb una comanda SQL estàndard.
+psql és només un client per executar consultes SQL, i parar el servidor és 
+una operació d’administració del sistema, no de SQL.</p>
 
 <h3> En Linux (systemd)</h3>
 <pre><code>sudo systemctl stop postgresql</code></pre>
@@ -550,7 +612,7 @@ $PGDATA/global/ → informació global, incloent usuaris i rols
 
 <pre><code>psql -U postgres</code></pre>
 
-<p>O:</p>
+<p>O des de Sistema Operariu:</p>
 
 <pre><code>pg_isready</code></pre>
 
@@ -633,6 +695,23 @@ $PGDATA/global/ → informació global, incloent usuaris i rols
 </ul>
 
 <p>⚠️ No es guarda amb el nom de la taula, sinó amb un identificador intern.</p>
+<p>PostgreSQL guarda les dades així:</p>
+<pre>
+/var/lib/postgresql/16/main/base/
+   ├── 16384/
+   │     ├── 1259
+   │     ├── 1247
+   │     └── ...
+</pre>
+<li>16384 → és l’OID de la base de dades</li>
+<li>1259, 1247, etc. → són fitxers de taules o índexs, identificats per OID</li>
+<li>No tenen noms “humans” (com clients, comandes, etc.)</li>
+
+<ul> <strong>Des del sistema operatiu:</strong>
+  <li>❌ No pots saber fàcilment quina taula és cada fitxer</li>
+  <li>❌ No pots llegir les dades (estan en format intern binari)</li>
+  <li>❌❌ <strong>Manipular-los directament pot corrompre la base de dades</strong></li>
+</ul>
 
 <h2> Tablespaces (molt important)</h2>
 
@@ -656,8 +735,6 @@ LOCATION '/mnt/ssd_postgres';</code></pre>
 </ul>
 
 
-
-
 <p>Paràmetres importants a <code>postgresql.conf</code>:</p>
 <pre><code>wal_level = replica
 checkpoint_timeout = 5min
@@ -677,26 +754,9 @@ fsync</code></pre>
 
 <p>⚠️ <code>fsync=off</code> millora rendiment però és perillós en producció.</p>
 
-<h2>Relació amb el sistema operatiu</h2>
-
-<p>PostgreSQL:</p>
-<ul>
-<li>Usa el sistema de fitxers del SO</li>
-<li>No gestiona discs directament</li>
-<li>Depèn del filesystem (ext4, xfs, zfs...)</li>
-</ul>
-
-<p>Bones pràctiques:</p>
-<ul>
-<li>Separar WAL i dades en discos diferents</li>
-<li>Usar SSD per índexs</li>
-<li>Configurar correctament I/O scheduler</li>
-</ul>
-
-
-
   </section>
   
+
 
   <section id="diccionari">
     <h1>Diccionari de dades</h1>
@@ -785,8 +845,8 @@ fsync</code></pre>
 </tr>
 </table>
 
-
-<h3> Information Schema</h3>
+<hr>
+<h2> Information Schema</h2>
 
 <p>PostgreSQL també implementa:</p>
 
@@ -880,7 +940,7 @@ WAL significa literalment: Write Ahead Log = Escriure primer al log abans que a 
 <li>Propietats ACID</li>
 </ul>
 
-<p>Idea clau: Abans que PostgreSQL modifiqui físicament una taula al disc: Escriu el canvi al WAL, 
+<p>Idea clau: Abans que PostgreSQL modifique físicament una taula al disc: Escriu el canvi al WAL, 
 Després aplica el canvi a la taula </p>
 
 <p>Això permet recuperar la base de dades si hi ha un error o tall elèctric. </p>
@@ -1202,7 +1262,7 @@ function actualitzarPercentatge() {
 
 
 function carregarPreguntes() {
-    fetch('preguntes/preguntes21.json')
+    fetch('preguntes/preguntes21p.json')
         .then(res => res.json())
         .then(data => {
             bancDePreguntes = data;

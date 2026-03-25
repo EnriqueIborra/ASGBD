@@ -106,25 +106,26 @@
     <p>Els usuaris (roles) es creen a nivell de tota la instància. Un usuari pot connectar-se a qualsevol base de dades (si té permisos)</p>
   
     <h3> Creació, modificació i baixa d'usuaris</h3>
+    <p class="tips">Des d'usuari DBA (postgres), o un usuari amb privilegi CREATEROLE</p>
     <pre>
-  -- Crear usuari   (cas més usual)
+  -- Crear usuari normal  (cas més usual)
 CREATE USER alumne WITH PASSWORD '1234';
   
+  -- Crear usuari administratiu 
 CREATE USER profe  WITH PASSWORD 'abc123'  CREATEDB  CREATEROLE;
---  CREATEDB → pot crear bases de dades
---  CREATEROLE → pot crear altres usuaris
+  --  CREATEDB → pot crear bases de dades
+  --  CREATEROLE → pot crear altres usuaris
 
--- Modificar contrasenya
+  -- Modificar contrasenya  (regenera/xifra contrasenya)
 ALTER USER ausias WITH PASSWORD 'nova_pass';
   
   -- Eliminar usuari
-DROP USER alumne;
-DROP ROLE alumne;
+DROP USER ausias;
 
   -- Borra usuari i tots els objectes del seu schema
 DROP USER ausias;   
-  -- Donarà error si ausias te objectes o sessions obertes
-    </pre>
+   -- Peeero, donarà error si ausias te objectes o sessions obertes !!   </pre>
+
     <p>⚠️ Important : No pots eliminar un usuari si: Té objectes (taules, esquemes…) o Té sessions actives</p>
   <pre>  -- Cal fer primer..
 SELECT pg_terminate_backend(pid)  FROM pg_stat_activity  
@@ -132,48 +133,53 @@ SELECT pg_terminate_backend(pid)  FROM pg_stat_activity
 REASSIGN OWNED BY alumne TO altre_user;
 DROP OWNED BY alumne;
 DROP USER alumne;</pre>
-<pre>    -- Crear rol,  ==> equivalent a crear usuari
+<hr><p>Alerta, spoiler ! . Un usuari en postgres és equivalent a un rol amb permís de connexió: Els rols es voran més endavant...</p>
+<pre>  -- Equivalent a crear usuari  ==>  Crear rol amb LOGIN
 CREATE ROLE alumne LOGIN PASSWORD '1234';
-  --  LOGIN indica que pot iniciar sessió
+  -- LOGIN indica que pot iniciar sessió
 </pre>  
   
-    <h3>🔑 Donar permisos de connexió</h3>
+  <hr>  <h3>🔑 Donar permisos de connexió</h3>
     <p>Depèn de com es cree, un usuari podrà connectar o no..</p>
   <pre>
 CREATE USER alumne WITH PASSWORD '1234';  -- pot connectar
 CREATE ROLE alumne LOGIN PASSWORD '1234';  -- pot connectar, perquè té el LOGIN
 CREATE ROLE app_role NOLOGIN;  -- no pot connectar
-GRANT CONNECT ON DATABASE escola TO alumne;
-  </pre>
+GRANT CONNECT ON DATABASE escola TO alumne;  -- Per defecte, no cal..    </pre>
   <p>Encara que: Quan es crea una base de dades nova, per defecte es fa un
-     <code>GRANT CONNECT ON DATABASE nom_bbdd TO PUBLIC;</code>
-    <br>Això significa que qualsevol usuari pot connectar encara que no se li donen permisos explícits de 
+    <pre>GRANT CONNECT ON DATABASE nom_bbdd TO PUBLIC;</pre>
+    Això significa que qualsevol usuari pot connectar encara que no se li donen permisos explícits de 
   <br><code>GRANT CONNECT ON DATABASE .. TO ..</code></p>
 
   <p>Si es desitja que, per defecte, cap usuari puga connectar a una BBDD, s'ha de revocar el permís després de crear-la 
-    amb, <code>REVOKE CONNECT ON DATABASE escola FROM PUBLIC;</code>, i sols donar permís als usuaris concrets amb 
+    amb, <pre>REVOKE CONNECT ON DATABASE escola FROM PUBLIC;</pre>, i sols donar permís als usuaris concrets amb 
     <code>GRANT CONNECT ON DATABASE escola TO usuari;</code>
   </p>
   
-
-    <h3>🔍 Consultes útils</h3>
+  <hr>  <h3>🔍 Consultes útils</h3>
     <pre>
   -- Usuaris existents
 SELECT rolname, rolcanlogin, rolvaliduntil FROM pg_roles;
+\du
   
-  -- Esquema actiu
- SELECT current_user;
--- o
+  -- Esquema / usuari actiu
+SELECT current_user;
+\echo :USER
+\conninfo
 SELECT session_user;
   
   -- Paràmetres d'usuaris administratius
 SELECT rolname FROM pg_roles WHERE rolsuper = TRUE;
-    </pre>
   
-  <h3>Connexió</h3>
+-- Base de dades on està la sessió actual
+SELECT current_database();      </pre>
+  
+<hr>  <h3>Connexió</h3>
     <pre>
-psql -U system -h localhost -d escola  
-          usu      lloc        bbdd      </pre>
+psql -U system -d escola   -- Intenta connectar com a peer
+
+psql -U system -h localhost -d escola   --  Com a host (amb contrasenya)  
+         usu      lloc        bbdd      </pre>
   
     <h3> Vistes relacionades amb usuaris</h3>
     <ul>
@@ -187,26 +193,48 @@ psql -U system -h localhost -d escola
     </ul>
 
     <hr>
-    <h3>schema</h3>
+    <h2>schema</h2>
     <p>A PostgreSQL, totes les taules han d’estar dins d’un esquema, i per defecte els usuaris treballen a l’esquema <strong>PUBLIC</strong>.</p>
-    <p>Un schema en PostgreSQL (i en molts altres SGBD) es pot entendre com un directori o carpeta dins d’una base de dades:</p>
-    <p>Quan es crea una bbdd , es crea una carpeta "public", on el propietari té accés concedit</p>
+    <p>Un schema en PostgreSQL (i en molts altres SGBD) es pot entendre com un directori o carpeta dins d’una base de dades: (No en el disc dur, ni en el SO, sinó dins d'una BBDD). 
+      És un concepte paregut al ESPAI DE NONS o namespaces. És com un contenidor lògic dins d'una BBDD      </p>
+    <p>Quan es crea una bbdd , es crea un <strong>schema</strong> "public", on el propietari de la BBDD té accés concedit</p>
     <p>El propietari del schema public és el mateix usuari que crea la base de dades. Aquest usuari té permisos de CREATE, USAGE 
       dins del schema, per tant pot crear taules immediatament.</p>
   <pre>  -- Crear un esquema addicional...
 CREATE SCHEMA schema1 AUTHORIZATION user1;  </pre>
-    <pre> -- Accés a objectes d'un schema
-SELECT * FROM schema1.taula;
+    <pre>-- Crear objectes en el nou schema
+CREATE TABLE schema1.novataula1 (id int, nom text);      
+-- Accés a objectes d'un schema
+SELECT * FROM schema1.novataula1;
 
    -- Per evitar posar schema1.
 SET search_path TO schema1;
+SET search_path TO schema1, schema2, public;  
 
-   -- I després..
-SELECT * FROM taula;        </pre>
+   -- I després si es fa ..
+SELECT * FROM taula;  -- Primer buscarà en schema1, si existeix taula, executa el SELECT 
+          -- Si no, buscarà en shema2, i si no existeix, buscarà en public.
+
+SHOW search_path;    -- Per vore el actual
+Per defecte  ==>  "$user", public  </pre>
+<p>$user és un placeholder que PostgreSQL substitueix pel nom de l’usuari actual de la connexió. 
+És només simbòlic, no crea automàticament un schema amb eixe nom. 
+Només si tu crees manualment un schema amb el mateix nom que l’usuari, aleshores $user apunta a aquest schema</p>
+<pre>Quan es fa CREATE TABLE nom_taula; sense prefix d’esquema,
+   PostgreSQL crea la taula al primer esquema del search_path 
+      on l’usuari té permisos de creació (CREATE).</pre>
+
    <h3>Per defecte, postgres fa</h3>
    <pre>
 GRANT ALL ON SCHEMA public TO postgres;  -- per defecte a l’usuari que crea la base de dades
-GRANT CREATE, USAGE ON SCHEMA public TO PUBLIC;  
+GRANT USAGE ON SCHEMA public TO PUBLIC;  
+al fer USAGE, l'usuari pot 'vore' l'esquema amb
+\dn
+\dt
+Però no pot vore el que hi ha 'dins' de les taules, (usar SELECT). No té permís.
+Pot vore taules, pero no pot crear noves  ( CRAETE TABLE)
+Per poder crear noves taules, necessita  GRANT CREATE ON SCHEMA
+
    </pre>
 
    <h3>Bones pràctiques</h3>
@@ -229,14 +257,20 @@ Serveix per donar permisos generals a tothom sense haver d’assignar-los un a u
   <h3>Crear un usuari operatiu</h3>
   <pre>
 CREATE USER nom_usuari WITH PASSWORD 'contrasenya';  -- Crear usuari
-GRANT CONNECT ON DATABASE nom_bd TO nom_usuari;      -- Permetre connectar a BBDD
-\c nom_bd                                          -- situar-se en la BBDD
-GRANT USAGE ON SCHEMA public TO nom_usuari;       
+GRANT CONNECT ON DATABASE nom_bd TO nom_usuari;  
+     -- Permetre connectar a BBDD (per defecte no cal, però si cal, s'ha de fer)
+\c nom_bd          -- situar-se en la BBDD nom_bd (si no estem ja)
+GRANT USAGE ON SCHEMA public TO nom_usuari;    -- Per poder usar,vore,accedir a l'esquema
+
 GRANT SELECT, INSERT, UPDATE, DELETE  ON ALL TABLES IN SCHEMA public  TO nom_usuari;  -- per a taules existents
+
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nom_usuari;    --  per a taules futures
-GRANT CREATE ON SCHEMA public TO nom_usuari;        -- Si es vol que cree taules noves....s
-  </pre>
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nom_usuari;    --  per a taules futures en schema public
+
+ALTER DEFAULT PRIVILEGES 
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nom_usuari;    --  per a taules futures en tots els schemes
+
+GRANT CREATE ON SCHEMA public TO nom_usuari;        -- Si es vol que cree taules noves....    </pre>
 
   <h3>Permisos CREATE i USAGE</h3>
   <pre>
@@ -281,16 +315,21 @@ ALTER ROLE omar LOGIN;     --  Desbloqueig compte      </pre>
 <pre> -- Caducitat de contrasenya
 ALTER ROLE omar VALID UNTIL '2020-01-01';
 </pre>
+<h3> Com pot saber un usuari la data de caducitat de la seua contrasenya</h3>
+<pre>SELECT rolname, rolvaliduntil 
+FROM pg_roles
+WHERE rolname = current_user;</pre>
   
         <h2>3. Canvi de contrasenya</h2>
     <p>PostgreSQL no dóna avisos automàtics.
 Es pot implementar amb scripts externs que consulten <code> (pg_roles.rolvaliduntil) </code> i avisen l’usuari abans de la caducitat.</p>
         
  
-        <h4>Canvi des de pgsql  i pgadmin </h4>
-        <p>psql accepta el comando <strong>\password</strong> que inicia un script/conversa per canviar la contrasenya</p>
-        <p>Si eres superuser, \password pepe, incia un script per canviar la password de l'usuari pepe</p>
-        <p>pgadmin te una opció en el menú desplegable de la connexió anomenada 'Restablecer Contraseña...'</p>
+    <h4>Canvi des de pgsql  i pgadmin </h4>
+    <p>psql accepta el comando <strong>\password</strong> que inicia un script/conversa per canviar la contrasenya</p>
+    <p>Si eres superuser, " <strong>\password pepe</strong> ", incia un script per canviar la password de l'usuari pepe</p>
+    <p>pgAdmin te una opció en les propietats de l'usuari, en la pestanya Definition. El primer camp, 
+      password, posar nova password i donar al botó SAVE</p>
 
 
 
@@ -320,24 +359,99 @@ WHERE usename = 'pepe';
 </pre>
 
 <h2>Avisos de caducitat</h2>
-
-<ol>Exemples
+<p>Postgres no té un mecanisme incorporat que avise d'esta situació, però es pot implementar manualment amb:</p>
+<ol>
   <li>Script en Bash + psql que s’executa cada dia amb cron i envia correus als usuaris amb contrasenya a punt de caducar.</li>
   <li>Script en Python que consulta pg_roles.rolvaliduntil i genera notificacions.</li>
 </ol>
 <pre>
- -- Bash
- #!/bin/bash
-psql -U postgres -d postgres -t -c "
+  -- Bash
+#!/bin/bash
+
+# Consulta usuaris amb contrasenya a punt de caducar en els pròxims 7 dies
+psql -U postgres -d postgres -At -F"," -c "
+SELECT rolname, to_char(rolvaliduntil,'YYYY-MM-DD') 
+FROM pg_roles 
+WHERE rolvaliduntil IS NOT NULL 
+  AND rolvaliduntil < current_date + interval '7 days';
+" | while IFS="," read -r user date; do
+    # Només enviar si user i date existeixen
+    if [[ -n "$user" && -n "$date" ]]; then
+        echo "Usuari $user: la contrasenya caducarà el $date" | mail -s "Avis contrasenya" "$user@example.com"
+    fi
+done
+</pre>
+<!--
+<pre>
+  -- python3
+#!/usr/bin/env python3
+import psycopg2
+from datetime import date, timedelta
+import smtplib
+from email.message import EmailMessage
+
+# --- Configuració ---
+DB_HOST = "localhost"
+DB_NAME = "postgres"
+DB_USER = "postgres"
+DB_PASS = "la_teua_contrasenya"
+
+SMTP_SERVER = "localhost"  # o el servidor SMTP que uses
+SMTP_PORT = 25
+
+# Llista mapeig usuari → email
+USER_EMAIL = {
+    "alumne": "alumne@example.com",
+    "professor": "professor@example.com",
+}
+
+# Nombre de dies abans de caducar per avisar
+AVIS_DIES = 7
+
+# --- Connexió a PostgreSQL ---
+conn = psycopg2.connect(
+    host=DB_HOST,
+    dbname=DB_NAME,
+    user=DB_USER,
+    password=DB_PASS
+)
+cur = conn.cursor()
+
+# --- Consulta usuaris amb contrasenya a punt de caducar ---
+query = """
 SELECT rolname, rolvaliduntil
 FROM pg_roles
-WHERE rolvaliduntil < current_date + interval '7 days';
-" | while read user date; do
-    echo "Usuari $user: la contrasenya caducarà el $date" | mail -s "Avis contrasenya" $user@example.com
-done 
-</pre>
+WHERE rolvaliduntil IS NOT NULL
+  AND rolvaliduntil < current_date + interval '%s days';
+""" % AVIS_DIES
 
+cur.execute(query)
+usuaris = cur.fetchall()
 
+cur.close()
+conn.close()
+
+# --- Enviar correus ---
+for rolname, validuntil in usuaris:
+    email = USER_EMAIL.get(rolname)
+    if not email:
+        continue  # Si no tenim correu, saltem usuari
+
+    msg = EmailMessage()
+    msg['From'] = "admin@example.com"
+    msg['To'] = email
+    msg['Subject'] = "Avis: contrasenya a punt de caducar"
+    msg.set_content(f"Hola {rolname},\n\nLa teua contrasenya caducarà el {validuntil}.\nSi us plau, canvia-la abans d'aquesta data.\n\nSalutacions,\nAdmin")
+
+    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as s:
+        s.send_message(msg)
+
+print(f"{len(usuaris)} avisos enviats.")  
+</pre> -->
+
+<p class="tips">O millor encara, utilitzar rutines internes d'automatització de postgres, per millorar la seguretat.
+   Es vorà en detall en el tema d'automatització de tasques </p>
+   
   </section>
 
 
@@ -377,8 +491,13 @@ done
   
     <h4> Exemples de privilegis d'objecte</h4>
     <ul>
-      <li><code>GRANT SELECT, INSERT ON TABLE taula_client TO pepe;</code> sobre taules</li>
+      <li><code>GRANT SELECT, INSERT, UPDATE, DELETE, ON TABLE taula_client TO pepe;</code> sobre taules</li>
+      <li><code>GRANT TRUNCATE, REFERENCES, TRIGGER ON TABLE taula TO usuari;</code></li>
       <li><code>GRANT EXECUTE ON FUNCTION calcula_impost(integer) TO pepe;</code> sobre procediments i funcions</li>
+      <li><code>GRANT USAGE, SELECT, UPDATE ON SEQUENCE seq TO usuari;</code></li>
+      <li><code>GRANT CONNECT, CREATE, TEMP ON DATABASE escola TO alumne; </code> sobre una BBDD</li>
+      <li><code>GRANT USAGE ON SCHEMA public TO nom_usuari;</code> sobre un schema</li>
+      <li><code>GRANT CREATE ON SCHEMA public TO nom_usuari;   </code> sobre un schema      </li>
     </ul>
   
     <h3>♻️ Revocar permisos</h3>
@@ -453,12 +572,12 @@ WHERE grantee = current_user;
     <p>Si vol accedir o manipular dades en taules d'un altre esquema, cal que l'altre propietari (o un administrador)
            li concedeixca permisos com SELECT, INSERT, UPDATE, DELETE</p>
 
-    <hr><h3>Accés a objectes d'un altre usuari</h3>
+  <!-- en ORACLE   !! <hr><h3>Accés a objectes d'un altre usuari</h3>
     <p>Si un usuari <code>'user1'</code> vol accedir a un objecte d'un altre usuari <code>'user2'</code>, haurà de anteposar al nom del objecte
       , el nom del schema del propietari del objecte en el moment d'utilitzar la sentència SQL adequada.  </p>
       <p>Per exemple</p>
       <pre><code>-- Des d'user1, suposant que user1 té permis sobre table1 de user2....
-SELECT * FROM user2.table1;</code></pre>
+SELECT * FROM user2.table1;</code></pre>    -->
 
    <hr> <h3>Permisos UPDATE i DELETE</h3>
     <p>El permís que s'atorga sobre un objecte de ‘update' d'postgresql, necessita anar aparellat 
@@ -479,6 +598,7 @@ perquè? <br>
 <p>postgres necessita saber les dades de columna2 per poder realitzar l'actualització, i per poder 
   conéixer eixes dades necessita de permís de ‘select'
 </p>
+<pre>GRANT SELECT (columna2) ON taula1 TO usuari2;</pre>
 <p>postgresql Database necessita llegir les dades de la fila per a saber com modificar la fila per a
    reflectir els canvis. Si no es tenen els permisos de SELECT, l'actualització no es pot dur a 
    terme correctament. De la mateixa manera li passa a les sentències DELETE    </p>
@@ -533,22 +653,22 @@ WHERE rolsuper = TRUE;
 
 <pre>
 **rols predefinits en postgres
+-- select rolname from pg_roles;
+pg_database_owner → propietari BD
 pg_read_all_data → pot llegir totes les taules
 pg_write_all_data → pot escriure a totes les taules
 pg_monitor → monitorització
-pg_database_owner → propietari BD
- pg_read_all_settings
- pg_read_all_stats
- pg_stat_scan_tables
- pg_read_server_files
- pg_write_server_files
- pg_execute_server_program
- pg_signal_backend
- pg_checkpoint
- pg_maintain
- pg_use_reserved_connections
- pg_create_subscription
- pg_signal_autovacuum_worker    </pre>
+pg_read_all_settings
+pg_read_all_stats
+pg_stat_scan_tables
+pg_read_server_files
+pg_write_server_files
+pg_execute_server_program
+pg_signal_backend
+pg_checkpoint
+pg_use_reserved_connections
+pg_create_subscription
+postgres  </pre>
 
   
     <h3>🛠️ Crear i assignar rols</h3>
@@ -556,7 +676,7 @@ pg_database_owner → propietari BD
   -- Crear un nou rol
 CREATE ROLE nom_rol;
 
-  -- Crear rol amb privilegis
+  -- Crear rol amb privilegis (equiv a crear usuari amb privilegis)
 CREATE ROLE rol_admin LOGIN CREATEDB CREATEROLE;
 
   -- modificar privilegis d'un rol
@@ -569,17 +689,16 @@ GRANT SELECT, INSERT ON TABLE clients TO nom_rol;
 GRANT nom_rol TO usuari;
 
   -- Assignar un rol a un altre rol
-GRANT altre_rol TO gestor_aula;
-    </pre>
+GRANT altre_rol TO gestor_aula;      </pre>
   
     <h3> Revocar rols a usuaris</h3>
     <pre>
 REVOKE app_user FROM pepe;
     </pre>
-    <p>Quan s'afegixen privilegis a un rol, tots els usuaris que tenen eixe rol adquireixen el nou privilegi 
+    <p>⚠️⚠️ Quan s'afegixen privilegis a un rol, tots els usuaris que tenen eixe rol adquireixen el nou privilegi 
       <strong>de seguida</strong>, encara que ja estigueren connectats, o tinguen sessions obertes des de fa temps,</p>
       <p>postgresql no necessita tancar ni reiniciar la sessió perquè el privilegi faça efecte.</p>
-      <p>Els privilegis no es carreguen només en establir la sessió, sinó que postgresql 
+      <p>==> Els privilegis no es carreguen només en establir la sessió, sinó que postgresql 
         Comprova els privilegis d'accés dinàmicament quan el codi SQL s'executa.</p>
   
         
@@ -754,11 +873,25 @@ WHERE data > '2024-01-01';</code></pre>
 
   <section id="altres-recursos">
     <h2>🖊️ Altres recursos</h2>
+   <hr><h3>Repàs...</h3>
+    <div id="progress-container">
+    <div id="progress-bar"></div>  </div>
+    <!-- <div id="percentatge-text">0%</div>  -->
+
+    <div class="quiz-container">
+        <h4 id="pregunta-text"></h4>
+        <div id="options-container" class="options">
+        </div>
+
+        <p id="feedback"></p>
+        <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
+        <button onclick="carregarPreguntes()">🔁 Reiniciar</button>
+ 
    
   </section>
  
   <section id="seguretat">
-    <h2> <a href="seguretat-mecanismes_p.html">Seguretat en postgresql</a></h2>
+    <h2> <a href="seguretat-mecanismes_p.html">Accés a la segona part del tema 3: <br> -- Seguretat en postgresql -- </a></h2>
   
   </section>
  
@@ -783,6 +916,126 @@ WHERE data > '2024-01-01';</code></pre>
       });
     });
   });
+
+//  Per fer test final
+  // Primer es crea un bancDePreguntes   const
+  // i desprès es carrega una pregunta aleatoria    function
+  // per ultim la funcio de comprobar resposta per a quan es polse un botó
+
+let bancDePreguntes = [];
+let preguntesBarrejades = [];
+let indexPreguntaActual = 0;
+let puntuacio = 0;
+
+function barrejar(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function actualitzarProgres() {
+    const percentatge =
+        (indexPreguntaActual / preguntesBarrejades.length) * 100;
+    document.getElementById('progress-bar').style.width =
+        percentatge + "%";
+}
+
+function actualitzarPercentatge() {
+    const percentatge = Math.round(
+        (puntuacio / preguntesBarrejades.length) * 100
+    );
+    document.getElementById('percentatge-text').innerText =""
+       // `Encerts: 🎯 ${percentatge}%`;
+}
+
+
+function carregarPreguntes() {
+    fetch('preguntes/preguntes31p.json')
+        .then(res => res.json())
+        .then(data => {
+            bancDePreguntes = data;
+            preguntesBarrejades = [...bancDePreguntes];
+            barrejar(preguntesBarrejades);
+            puntuacio = 0;
+            indexPreguntaActual = 0;
+            mostrarPregunta();
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('pregunta-text').innerText =
+                "Error carregant les preguntes 😢";
+        });
+        //document.getElementById('percentatge-text').innerText = "0%";
+
+}
+
+function mostrarPregunta() {
+
+    // Si ja no queden preguntes
+    if (indexPreguntaActual >= preguntesBarrejades.length) {
+        document.getElementById('pregunta-text').innerText =
+            "🎉 Has acabat totes les preguntes!";
+        document.getElementById('options-container').innerHTML = "";
+        document.getElementById('feedback').innerHTML =
+        `Has encertat <strong>${puntuacio}</strong> de 
+        <strong>${preguntesBarrejades.length}</strong> preguntes.`;
+        document.getElementById('btn-seguent').disabled = true;
+        document.getElementById('progress-bar').style.width = "100%";
+        actualitzarProgres();
+        return;
+    }
+
+    const pregunta = preguntesBarrejades[indexPreguntaActual];
+
+    document.getElementById('pregunta-text').innerText = pregunta.titol;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    pregunta.opcions.forEach(opcio => {
+        const btn = document.createElement('button');
+        btn.innerText = opcio.text;
+        btn.onclick = () => comprovaResposta(opcio.correcte, btn);
+        container.appendChild(btn);
+    });
+
+    document.getElementById('feedback').textContent = "";
+    document.getElementById('btn-seguent').disabled = true;
+    actualitzarProgres();
+
+}
+
+
+function comprovaResposta(esCorrecte, element) {
+    const feedback = document.getElementById('feedback');
+
+    document
+        .querySelectorAll('#options-container button')
+        .forEach(btn => btn.disabled = true);
+
+    if (esCorrecte) {
+        feedback.textContent = "✅ Correcte! Molt bé.";
+        element.style.background = "#d4edda";
+        puntuacio++;
+    } else {
+        feedback.textContent = "❌ Incorrecte.";
+        element.style.background = "#f8d7da";
+    }
+    //actualitzarPercentatge();
+    document.getElementById('btn-seguent').disabled = false;
+}
+
+function seguentPregunta() {
+    indexPreguntaActual++;
+    mostrarPregunta();
+}
+
+ 
+
+// Executar en carregar la pàgina
+window.onload = carregarPreguntes;
+
 
 </script>
 
