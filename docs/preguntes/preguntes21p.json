@@ -1,0 +1,93 @@
+[
+  {
+    "titol": "Què és una instància de PostgreSQL?",
+    "opcions": [
+      { "text": "Una única base de dades", "correcte": false },
+      { "text": "Només el fitxer postgresql.conf", "correcte": false },
+      { "text": "El servidor en execució amb dades, memòria i configuració", "correcte": true },
+      { "text": "Un usuari connectat", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Què és una sessió en PostgreSQL?",
+    "opcions": [
+      { "text": "Un fitxer de configuració", "correcte": false },
+      { "text": "Una connexió activa entre client i servidor", "correcte": true },
+      { "text": "Una base de dades", "correcte": false },
+      { "text": "Un procés del sistema", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin enunciat és correcte?",
+    "opcions": [
+      { "text": "1 usuari = 1 sessió sempre", "correcte": false },
+      { "text": "1 connexió = 1 sessió", "correcte": true },
+      { "text": "1 base de dades = 1 sessió", "correcte": false },
+      { "text": "1 taula = 1 sessió", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin fitxer és el principal de configuració?",
+    "opcions": [
+      { "text": "pg_hba.conf", "correcte": false },
+      { "text": "pg_ident.conf", "correcte": false },
+      { "text": "postgresql.conf", "correcte": true },
+      { "text": "pg_settings.conf", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin fitxer controla qui pot connectar-se i com?",
+    "opcions": [
+      { "text": "postgresql.conf", "correcte": false },
+      { "text": "pg_ident.conf", "correcte": false },
+      { "text": "pg_hba.conf", "correcte": true },
+      { "text": "pg_roles.conf", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin d’aquests paràmetres requereix reinici del servidor?",
+    "opcions": [
+      { "text": "context = user", "correcte": false },
+      { "text": "context = sighup", "correcte": false },
+      { "text": "context = postmaster", "correcte": true },
+      { "text": "context = backend", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quina comanda recarrega la configuració sense reiniciar?",
+    "opcions": [
+      { "text": "pg_stop()", "correcte": false },
+      { "text": "pg_reload_conf()", "correcte": true },
+      { "text": "pg_restart()", "correcte": false },
+      { "text": "reload_db()", "correcte": false }
+    ]
+  },
+  {
+    "titol": "On escriu ALTER SYSTEM els canvis?",
+    "opcions": [
+      { "text": "postgresql.conf", "correcte": false },
+      { "text": "pg_hba.conf", "correcte": false },
+      { "text": "postgresql.auto.conf", "correcte": true },
+      { "text": "pg_ident.conf", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quina consulta mostra totes les variables de configuració?",
+    "opcions": [
+      { "text": "SELECT * FROM config;", "correcte": false },
+      { "text": "SHOW VARIABLES;", "correcte": false },
+      { "text": "SELECT name, setting FROM pg_settings;", "correcte": true },
+      { "text": "LIST SETTINGS;", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin context permet canviar una variable en qualsevol sessió?",
+    "opcions": [
+      { "text": "internal", "correcte": false },
+      { "text": "postmaster", "correcte": false },
+      { "text": "superuser", "correcte": false },
+      { "text": "user", "correcte": true }
+    ]
+  }
+]
+

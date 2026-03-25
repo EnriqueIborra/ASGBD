@@ -1,0 +1,90 @@
+[
+ 
+  {
+    "titol": "plsql forma part dels serveis del SGBD de postgresql",
+    "opcions": [
+      { "text": "Vertader", "correcte": false },
+      { "text": "Fals", "correcte": true }
+    ]
+  },
+  {
+    "titol": "El codi es pot posar dins d'un fitxer .sql i executar-lo des de bash",
+    "opcions": [
+      { "text": "Fals", "correcte": false },
+      { "text": "Vertader", "correcte": true }
+    ]
+  },
+  {
+    "titol": "Com gestiona PostgreSQL les connexions?",
+    "opcions": [
+      { "text": "Crea un fil per cada connexió", "correcte": false },
+      { "text": "Crea un procés per cada connexió", "correcte": true },
+      { "text": "Totes les connexions comparteixen un procés", "correcte": false },
+      { "text": "No crea cap procés nou", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin procés és responsable de crear els processos backend?",
+    "opcions": [
+      { "text": "Autovacuum", "correcte": false },
+      { "text": "WAL writer", "correcte": false },
+      { "text": "postmaster", "correcte": true },
+      { "text": "Checkpointer", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Què és un schema en PostgreSQL?",
+    "opcions": [
+      { "text": "Un tipus de taula", "correcte": false },
+      { "text": "Una base de dades independent", "correcte": false },
+      { "text": "Un contenidor d’objectes dins d’una base de dades", "correcte": true },
+      { "text": "Un disc físic", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin element defineix la ubicació física de les dades?",
+    "opcions": [
+      { "text": "Schema", "correcte": false },
+      { "text": "Tablespace", "correcte": true },
+      { "text": "Base de dades", "correcte": false },
+      { "text": "Rol", "correcte": false }
+    ]
+  },
+  {
+    "titol": "On es defineixen els usuaris (rols) en PostgreSQL?",
+    "opcions": [
+      { "text": "Dins de cada taula", "correcte": false },
+      { "text": "Dins de cada schema", "correcte": false },
+      { "text": "A nivell de clúster", "correcte": true },
+      { "text": "Només dins del postmaster", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin procés s’encarrega del registre WAL?",
+    "opcions": [
+      { "text": "Background writer", "correcte": false },
+      { "text": "Checkpointer", "correcte": false },
+      { "text": "WAL writer", "correcte": true },
+      { "text": "Stats collector", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quina és la jerarquia correcta en PostgreSQL?",
+    "opcions": [
+      { "text": "Schema → Clúster → Taula → Base de dades", "correcte": false },
+      { "text": "Clúster → Base de dades → Schema → Taula", "correcte": true },
+      { "text": "Taula → Schema → Clúster → Base de dades", "correcte": false },
+      { "text": "Base de dades → Clúster → Schema → Taula", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quina és la funció de l’autovacuum?",
+    "opcions": [
+      { "text": "Crear usuaris", "correcte": false },
+      { "text": "Eliminar dades obsoletes i optimitzar", "correcte": true },
+      { "text": "Gestionar connexions", "correcte": false },
+      { "text": "Crear schemas", "correcte": false }
+    ]
+  }
+
+] 

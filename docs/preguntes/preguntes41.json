@@ -32,6 +32,31 @@
     { "text": "Fals", "correcte": false },
     { "text": "Vertader", "correcte": true }
   ]
+},
+{
+  "titol": "Quan s'executa un trigger, si no s'ha indicat res en FOR EACH, quantes vegades s'executa ",
+  "opcions": [
+    { "text": "Cap", "correcte": false },
+    { "text": "Una o més vegades", "correcte": false },
+    { "text": "Més d'una vegada", "correcte": false },
+    { "text": "Sols una vegada", "correcte": true }
+  ]
+},
+{
+  "titol": "En Oracle DBMS_SCHEDULER, si no s’indica l’hora (BYHOUR) en el REPEAT_INTERVAL, s’utilitza la primera hora del dia. Les 00:00",
+  "opcions": [
+    { "text": "Fals", "correcte": true },
+    { "text": "Vertader", "correcte": false }
+  ]
+},
+{
+  "titol": "Una vegada creat un job, ja no es pot modificar el nombre d'atributs",
+  "opcions": [
+    { "text": "Fals", "correcte": true },
+    { "text": "Vertader", "correcte": false }
+  ]
 }
     
 ]
+
+

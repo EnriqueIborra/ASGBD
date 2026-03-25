@@ -1,0 +1,189 @@
+[
+  {
+    "titol": "En PostgreSQL, què és un usuari?",
+    "opcions": [
+      { "text": "Un esquema dins d’una base de dades", "correcte": false },
+      { "text": "Una entitat que accedeix a la base de dades", "correcte": true },
+      { "text": "Un tipus de taula especial", "correcte": false },
+      { "text": "Una connexió activa", "correcte": false }
+    ]
+  },
+  {
+    "titol": "On es configura l’autenticació d’usuaris en PostgreSQL?",
+    "opcions": [
+      { "text": "postgresql.conf", "correcte": false },
+      { "text": "pg_roles", "correcte": false },
+      { "text": "pg_hba.conf", "correcte": true },
+      { "text": "pg_ident.conf", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin mètode d’autenticació és propi de PostgreSQL per contrasenya?",
+    "opcions": [
+      { "text": "scram-sha-256", "correcte": true },
+      { "text": "ldap", "correcte": false },
+      { "text": "gss", "correcte": false },
+      { "text": "peer", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin usuari predefinit és l’administrador en PostgreSQL?",
+    "opcions": [
+      { "text": "admin", "correcte": false },
+      { "text": "root", "correcte": false },
+      { "text": "postgres", "correcte": true },
+      { "text": "system", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin privilegi permet crear altres usuaris?",
+    "opcions": [
+      { "text": "CREATEDB", "correcte": false },
+      { "text": "CREATEROLE", "correcte": true },
+      { "text": "LOGIN", "correcte": false },
+      { "text": "SUPERUSER", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Què passa si intentes eliminar un usuari que té objectes o sessions actives?",
+    "opcions": [
+      { "text": "S’elimina igualment", "correcte": false },
+      { "text": "Només elimina els objectes", "correcte": false },
+      { "text": "Dona error i no es pot eliminar", "correcte": true },
+      { "text": "Es desconnecta automàticament", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quina comanda permet finalitzar sessions d’un usuari?",
+    "opcions": [
+      { "text": "DROP SESSION", "correcte": false },
+      { "text": "KILL USER", "correcte": false },
+      { "text": "pg_terminate_backend()", "correcte": true },
+      { "text": "END CONNECTION", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quina afirmació és correcta sobre CREATE ROLE?",
+    "opcions": [
+      { "text": "Sempre permet login", "correcte": false },
+      { "text": "Només crea bases de dades", "correcte": false },
+      { "text": "Només permet login si té LOGIN", "correcte": true },
+      { "text": "És equivalent a DROP USER", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Per defecte, què passa amb el permís CONNECT en una nova base de dades?",
+    "opcions": [
+      { "text": "Només el propietari pot connectar", "correcte": false },
+      { "text": "Ningú pot connectar", "correcte": false },
+      { "text": "Tots els usuaris (PUBLIC) poden connectar", "correcte": true },
+      { "text": "Només superusers poden connectar", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quina és una bona pràctica amb l’usuari postgres?",
+    "opcions": [
+      { "text": "Usar-lo per a totes les operacions", "correcte": false },
+      { "text": "Eliminar-lo després d’instal·lar", "correcte": false },
+      { "text": "No usar-lo per al dia a dia", "correcte": true },
+      { "text": "Canviar-li el nom", "correcte": false }
+    ]
+  },{
+    "titol": "Tens: CREATE ROLE alumne NOLOGIN; i executes psql -U alumne -d postgres. Què passa?",
+    "opcions": [
+      { "text": "Es connecta correctament", "correcte": false },
+      { "text": "Error: no pot iniciar sessió", "correcte": true },
+      { "text": "Es connecta com a postgres", "correcte": false },
+      { "text": "Crea automàticament el rol LOGIN", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Tens una BBDD nova 'escola' i no has fet cap GRANT. Un usuari pot fer: psql -U alumne -d escola. Què passa?",
+    "opcions": [
+      { "text": "No pot connectar-se", "correcte": false },
+      { "text": "Només si és superuser", "correcte": false },
+      { "text": "Pot connectar-se per defecte", "correcte": true },
+      { "text": "Ha de fer GRANT CONNECT manualment", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Executem: REVOKE CONNECT ON DATABASE escola FROM PUBLIC;. Què passa amb els usuaris?",
+    "opcions": [
+      { "text": "Tots poden continuar connectant-se", "correcte": false },
+      { "text": "Només el propietari pot connectar", "correcte": true },
+      { "text": "Esborra la base de dades", "correcte": false },
+      { "text": "Només afecta a nous usuaris", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Usuari2 té només: GRANT UPDATE ON taula1 TO usuari2;. Executa: UPDATE taula1 SET col1=1;. Què passa?",
+    "opcions": [
+      { "text": "Error per falta de SELECT", "correcte": false },
+      { "text": "Funciona correctament", "correcte": true },
+      { "text": "Només actualitza una fila", "correcte": false },
+      { "text": "Necessita permisos d’INSERT", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Usuari2 té només: GRANT UPDATE ON taula1 TO usuari2;. Executa: UPDATE taula1 SET col1=1 WHERE col2=2;. Què passa?",
+    "opcions": [
+      { "text": "Funciona correctament", "correcte": false },
+      { "text": "Error perquè necessita SELECT sobre col2", "correcte": true },
+      { "text": "Només actualitza totes les files", "correcte": false },
+      { "text": "Error perquè necessita DELETE", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Executem: CREATE ROLE app_role;. Després intentem connectar-nos amb aquest rol. Què passa?",
+    "opcions": [
+      { "text": "Es connecta sense problemes", "correcte": false },
+      { "text": "Error perquè no té LOGIN", "correcte": true },
+      { "text": "Es connecta com a postgres", "correcte": false },
+      { "text": "Demana crear una password", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Executem: DROP USER alumne; però l’usuari té sessions obertes. Què passa?",
+    "opcions": [
+      { "text": "S’elimina igualment", "correcte": false },
+      { "text": "Error i no s’elimina", "correcte": true },
+      { "text": "Es tanquen automàticament les sessions", "correcte": false },
+      { "text": "Només elimina els objectes", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Executem: CREATE ROLE alumne LOGIN PASSWORD '1234';. Què pot fer aquest usuari?",
+    "opcions": [
+      { "text": "Només crear bases de dades", "correcte": false },
+      { "text": "Connectar-se al sistema", "correcte": true },
+      { "text": "És automàticament superuser", "correcte": false },
+      { "text": "Crear rols", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Executem: SELECT current_user;. Què retorna?",
+    "opcions": [
+      { "text": "La base de dades actual", "correcte": false },
+      { "text": "El nom del rol actiu", "correcte": true },
+      { "text": "El sistema operatiu", "correcte": false },
+      { "text": "El schema actual", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Executem: SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE usename='alumne';. Què fa?",
+    "opcions": [
+      { "text": "Elimina l’usuari", "correcte": false },
+      { "text": "Tanca les sessions de l’usuari", "correcte": true },
+      { "text": "Bloqueja l’usuari", "correcte": false },
+      { "text": "Canvia la contrasenya", "correcte": false }
+    ]
+  }
+
+]
+
+
+  
+
+
+
+ 
