@@ -515,8 +515,20 @@ postmaster (procés principal)
    ├─ Procés background writer
    └─ Procés stats collector
   </pre>
+<img src="imgs/postgresql-architecture-process.jpg" alt="arch-procces" width="40%" class="imatge-dreta">
   <p>Cada connexió = un procés.</p>
-  
+  <ul> <strong>Flux de treball</strong>
+    <li>El client es connecta</li>
+    <li>El postmaster crea un backend</li>
+    <li>El backend:</li>
+    <ul>
+        <li>Accedeix a una base de dades</li>
+        <li>Treballa dins d’un schema</li>
+        <li>Llegeix/escriu taules</li>
+        <li>Usa tablespaces (disc)</li>
+    </ul>
+</ul>
+
 <!--
 2️⃣ Procés principal: postmaster / postgres
     S'inicia quan el servidor PostgreSQL arranca
@@ -619,6 +631,7 @@ Clúster de PostgreSQL
    │
    └─ Tablespaces (emmagatzematge físic)
 </pre>
+<img src="imgs/physical-structure-of-postgresql-cluster.png" alt="phisical-structura" width="90%">
 <ul>
     <li>Clúster: És tot el servidor PostgreSQL.</li>
     <li>Base de dades: Contenidor lògic independent dins del clúster.</li>
@@ -631,17 +644,7 @@ Clúster de PostgreSQL
 </ul>
 <hr>
 
-<ul> <strong>Flux de treball</strong>
-    <li>El client es connecta</li>
-    <li>El postmaster crea un backend</li>
-    <li>El backend:</li>
-    <ul>
-        <li>Accedeix a una base de dades</li>
-        <li>Treballa dins d’un schema</li>
-        <li>Llegeix/escriu taules</li>
-        <li>Usa tablespaces (disc)</li>
-    </ul>
-</ul>
+
 
 </section>
  
@@ -857,6 +860,8 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
 
   </section>
 
+
+
   <section id="stop">
     <img src="imgs/stop.png" class="imatge-esquerra"  alt="stop" style="width: 6%">
     <h2>Abans de continuar.... </h2> <br>
@@ -910,8 +915,16 @@ sudo systemctl restart postgresql </pre>
         <code>FATAL: database "nom_usuari" does not exist </code> </p>
     <p>Després d’instal·lar PostgreSQL, hi ha sempre: <code> postgres  template0 template1 </code></p>
 
-    <h3>Connexió implícita</h3>
-    <pre>psql -U nom_usuari -d nom_ bbdd </pre>
+    <h3>Connexió amb usuari SO</h3>
+    <p>!! En Windows s'ha de posar el PATH, o fer un 'cd' al directori dels binaris..</p>
+    <pre>psql -d nom_ bbdd </pre>
+
+     <h3>Connexió amb socket</h3>
+    <pre>psql -U nom_usuari -d nom_ bbdd -h IP.IP.IP.IP 
+psql -U nom_usuari -d nom_ bbdd -h url
+psql -U nom_usuari -d nom_ bbdd -h localhost   
+psql -U nom_usuari -d nom_ bbdd   -- igual que el anterior    </pre>
+
 
     <h3>Explorar cluster</h3>
     <p>Una vegada connectats… com veure les altres BBDD en PostgreSQL</p>
@@ -929,7 +942,7 @@ Normalment el prompt mostra la base de dades:     testdb=#
 
 </pre>
 
-    <p>I per canviar (connectar) a una altra BBDD</p>
+    <p>I per canviar (connectar) a una altra BBDD (dins del cluster)</p>
     <pre>\c nom_bbdd
 \connect nom_bbdd  </pre>
 
@@ -943,7 +956,7 @@ Normalment el prompt mostra la base de dades:     testdb=#
     </ul>
 
   <h3>PgAdmin</h3>
-     <img src="./imgs/pgadmin1.png" alt="pgadmin1" class="imatge-esquerra" width="40%">
+     <img src="./imgs/pgadmin1.png" alt="pgadmin1" class="imatge-esquerra" width="60%">
   <p>Per accedir a una instància de postgresql es necessita:  </p>
   <ul>
     <li>IP o url</li>

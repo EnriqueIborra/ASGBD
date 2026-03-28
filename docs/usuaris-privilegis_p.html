@@ -93,7 +93,7 @@
     <h3>🔐 Autenticació d'usuaris</h3>
     <p>Es configura en fitxer <code><strong>pg_hba.conf</strong></code></p>
     <ul>
-      <li><strong>Local</strong>: usuari amb credencials dins de la base de dades. <strong>md5, scram-sha-256</strong></li>
+      <li> usuari amb credencials dins de la base de dades. <strong>md5, scram-sha-256</strong></li>
       <li><strong>peer, ldap, gss, sspi, pam</strong>: validació per S.O., LDAP, Kerberos, Radius</li>
     </ul>
     <p>L’autenticació es defineix per mètodes configurats al fitxer <code> pg_hba.conf </code></p>
@@ -173,6 +173,8 @@ SELECT rolname FROM pg_roles WHERE rolsuper = TRUE;
   
 -- Base de dades on està la sessió actual
 SELECT current_database();      </pre>
+<p>session_user : És l’usuari amb què s’ha iniciat la connexió. No canvia durant la sessió.</p>
+<p>current_user: És l’usuari que PostgreSQL està utilitzant en el moment per comprovar permisos. Pot canviar durant la sessió</p>
   
 <hr>  <h3>Connexió</h3>
     <pre>
@@ -599,7 +601,7 @@ perquè? <br>
   conéixer eixes dades necessita de permís de ‘select'
 </p>
 <pre>GRANT SELECT (columna2) ON taula1 TO usuari2;</pre>
-<p>postgresql Database necessita llegir les dades de la fila per a saber com modificar la fila per a
+<p>postgresql necessita llegir les dades de la fila per a saber com modificar la fila per a
    reflectir els canvis. Si no es tenen els permisos de SELECT, l'actualització no es pot dur a 
    terme correctament. De la mateixa manera li passa a les sentències DELETE    </p>
 
@@ -734,10 +736,11 @@ FROM pg_roles  WHERE rolname = 'gestor_aula';
     <p>Si a un usuari li assignes diversos rols, l'usuari rep la suma de tots els privilegis
        atorgats per cadascun d'eixos rols. i si un mateix privilegi està repetit en diversos rols, 
        postgresql simplement detecta que el privilegi està concedit i l'usuari el té. No hi ha duplicació ni conflicte.</p>
-    <p>--- Quan s'assigna un rol a un usuari, l'usuari rep tots els privilegis del rol
-       i postgresql no permet fer REVOKE d'un privilegi que prové d'un rol.</p>
-       <p>Els rols són objectes de la base de dades a nivell global, igual que els usuaris.
-         No estan dins d'un esquema concret, sinó que existeixen a nivell de base de dades i 
+    <p>--- Quan s'assigna un rol a un usuari, l'usuari rep tots els privilegis del rol.
+       i postgresql no permet 'anular' a un usuari un privilegi que prové d'un rol. 
+       Es a dir, es pot fer REVOKE d'un privilegi, però no tindrà efecte si el privilegi arriba per un rol</p>
+       <p>Els rols són objectes del cluster a nivell global, igual que els usuaris.
+         No estan dins d'un esquema concret, sinó que existeixen a nivell de cluster i 
          qualsevol usuari els pot rebre.</p>
     <h3> Bones pràctiques</h3>
     <ul>
@@ -745,6 +748,8 @@ FROM pg_roles  WHERE rolname = 'gestor_aula';
       <li> Documenta què fa cada rol i qui l'ha de tenir</li>
       <li> Usa rols en lloc de donar permisos individuals sempre que siga possible</li>
     </ul>
+
+    <!-- SET ROLE    RESET ROLE    INHERIT (per defecte)   NOINHERIT     -->
   </section>
   
 
@@ -757,8 +762,6 @@ FROM pg_roles  WHERE rolname = 'gestor_aula';
       i establir polítiques de seguretat sobre les contrasenyes.
     </p>
     <p>En postgres no existeix este mecanisme, però hi ha altres per conseguir estes restriccions</p>
-
-  
   
     <h3> Paràmetres de contrasenya</h3>
     <pre>ALTER ROLE pepe VALID UNTIL '2026-12-31';</pre>
@@ -771,9 +774,9 @@ FROM pg_roles  WHERE rolname = 'gestor_aula';
       directament al rol amb paràmetres com rolconnlimit i rolvaliduntil. No hi ha un DEFAULT PROFILE, 
       cada usuari ha de tenir els seus atributs assignats al crear-lo.</p>
 
-
-
   </section>
+
+
 
   <section id="vistes">
 
@@ -783,6 +786,8 @@ FROM pg_roles  WHERE rolname = 'gestor_aula';
       Les vistes no emmagatzemen dades, sinó que són definicions de consultes SQL que es poden utilitzar 
       com si foren taules normals. Això significa que les vistes permeten a l'administrador de bases de dades (DBA) 
       establir un nivell de seguretat i restricció per a l'accés a la informació a través de consultes personalitzades.</p>
+    <p>les vistes (views) són com taules virtuals: no emmagatzemen dades per si mateixes, sinó que mostren el 
+        resultat d’una consulta sobre una o més taules</p>
 
     <h2>Vistes com a element de seguretat a postgresql</h2>
     <p>A continuació es poden vore algunes de les principals maneres en què les vistes poden ser utilitzades 
@@ -790,16 +795,26 @@ FROM pg_roles  WHERE rolname = 'gestor_aula';
 
     <h3>1. Restricció d'Accés a Dades Sensibles</h3>
     <p><strong>Descripció</strong>: Les vistes permeten crear consultes personalitzades que poden ocultar 
-      certes columnes o taules que contenen dades sensibles. En lloc de permetre que un usuari accedeixi 
-      directament a una taula, es pot crear una vista que exposi només una part de les dades.</p>
-    <pre><code>CREATE VIEW vista_clients_completa AS
-SELECT nom, adreca, telefon
-FROM clients;</code></pre>
+      certes columnes o taules que contenen dades sensibles. En lloc de permetre que un usuari accedeixca 
+      directament a una taula, es pot crear una vista que expose només una part de les dades.</p>
+    <pre><code>-- Vista horitzontal o control de columnes
+      CREATE VIEW vista_clients_completa AS 
+      SELECT nom, adreca, telefon FROM clients;</code></pre>
+
+    <pre><code>-- Vista vertical  o control de files
+      CREATE VIEW vista_clients_completa AS 
+      SELECT *  FROM clients where prov=46;</code></pre>  
+
+    <pre><code>-- Vista mixta
+      CREATE VIEW vista_clients_completa AS 
+      SELECT nom, adreca, telefon FROM clients where prov=46;</code></pre>
+
+
     <p><strong>Avantatge de seguretat</strong>: Limita l'exposició de dades sensibles a només la informació
        necessària, millorant la seguretat de la informació confidencial.</p>
 
     <h3>2. Autenticació de Consultes</h3>
-    <p><strong>Descripció</strong>: Pots utilitzar vistes per garantir que només es poden realitzar consultes
+    <p><strong>Descripció</strong>: Es poden utilitzar vistes per garantir que només es puguen realitzar consultes
        sobre un conjunt específic de dades segons el rol o els permisos d'un usuari. Això es fa mitjançant el 
        control de permisos en les vistes.</p>
     <pre><code>GRANT SELECT ON vista_clients_completa TO usuari_x;</code></pre>
@@ -807,28 +822,7 @@ FROM clients;</code></pre>
       d'usuari, garantint que només els usuaris autoritzats tinguin accés a les vistes que exposen les dades 
       filtrades o restringides.</p>
 
-    <h3>3. Control de Columnes</h3>
-    <p><strong>Descripció</strong>: Les vistes permeten ocultar columnes senceres d'una taula, cosa que és útil
-       per amagar dades que no s'haurien de mostrar. Això és especialment útil quan les taules contenen dades 
-       sensibles, com ara contrasenyes, números de seguretat social, etc.</p>
-    <pre><code>CREATE VIEW vista_usuaris AS
-SELECT id, nom, correu
-FROM usuaris;</code></pre>
-    <p><strong>Avantatge de seguretat</strong>: Permet amagar dades sensibles i garantir que només la informació 
-      necessària sigui accessible.</p>
-
-    <h3>4. Control de les Consultes Realitzades</h3>
-    <p><strong>Descripció</strong>: Mitjançant la creació de vistes, es pot controlar exactament quines 
-      consultes són permeses i com són realitzades. Això permet als administradors establir regles de consulta
-       que limitin l'accés a determinats conjunts de dades.</p>
-    <pre><code>CREATE VIEW vista_transaccions_usuaris AS
-SELECT transaccio_id, data, import
-FROM transaccions
-WHERE usuari_id = :usuari_id;</code></pre>
-    <p><strong>Avantatge de seguretat</strong>: Pot restringir l'abast de les dades consultades i garantir 
-      que els usuaris només obtinguin informació rellevant i personalitzada.</p>
-
-    <h3>5. Vistes Amb Funcionalitat de Seguretat Basada en Rols</h3>
+    <h3>3. Vistes Amb Funcionalitat de Seguretat Basada en Rols</h3>
     <p><strong>Descripció</strong>: Utilitzant vistes, pots aplicar seguretat a nivell de rols, permetent 
       que només certs rols d'usuari puguin accedir a determinades dades. Per exemple, un DBA pot crear una 
       vista per a usuaris normals que només mostri informació bàsica, mentre que un usuari amb un rol administratiu 
@@ -843,30 +837,77 @@ SELECT * FROM clients;</code></pre>
     <p><strong>Avantatge de seguretat</strong>: Permet controlar l'accés a les dades basat en rols d'usuari, 
       garantint que els usuaris només tinguin accés a la informació que necessiten.</p>
 
-    <h3>6. Auditoria i Monitorització de Consultes</h3>
-    <p><strong>Descripció</strong>: Les vistes també poden ser útils per auditar i monitoritzar les consultes. 
-      Per exemple, pots crear una vista que permeta a l'usuari visualitzar només els canvis realitzats en la taula
-       de transaccions en un període de temps determinat.</p>
-    <pre><code>CREATE VIEW vista_transaccions_audit AS
-SELECT transaccio_id, data, import, operacio
-FROM transaccions_audit
-WHERE data > '2024-01-01';</code></pre>
-    <p><strong>Avantatge de seguretat</strong>: Això permet monitoritzar l'activitat de la base de dades i detectar
-       possibles accessos no autoritzats o activitats sospitoses.</p>
+      <h4>4. Opció WITH SECURITY INVOKER vs WITH SECURITY DEFINER</h4>
+      <p>SECURITY INVOKER (per defecte): la vista s’executa amb els permisos de l’usuari que fa la consulta.</p>
+      <p>SECURITY DEFINER: la vista s’executa amb els permisos de qui la va crear. Això permet donar accés limitat
+         a usuaris que normalment no podrien accedir a la taula base.</p>
+    <pre>CREATE VIEW vista_secreta
+SECURITY DEFINER AS
+SELECT nom, salari
+FROM empleats;</pre>
+<p>Ara un usuari amb només permisos sobre la vista pot veure informació que normalment
+   no podria veure directament a la taula.</p>
+   <p>SECURITY DEFINER és útil per exposar informació restringida de forma controlada, 
+    mentre que SECURITY INVOKER és més segur si vols garantir que els permisos originals de la taula s’apliquen sempre.</p>
 
-    <h2>Conclusions</h2>
-    <p>Les <strong>vistes en postgresql</strong> són una eina molt potent per millorar la seguretat de les dades en 
-      una base de dades. Algunes de les maneres en què es poden utilitzar com a element de seguretat són:</p>
-    <ul>
-        <li><strong>Restricció d'accés a dades sensibles</strong></li>
-        <li><strong>Autenticació de consultes</strong> mitjançant l'assignació de permisos a les vistes.</li>
-        <li><strong>Control de columnes</strong> per amagar dades sensibles.</li>
-        <li><strong>Control de consultes</strong> per limitar l'abast de les dades consultades.</li>
-        <li><strong>Seguretat basada en rols</strong> per restringir l'accés a vistes específiques segons els permisos d'usuari.</li>
-        <li><strong>Auditoria i monitorització</strong> per fer seguiment de les operacions en la base de dades.</li>
-    </ul>
-    <p>Les vistes permeten personalitzar l'accés a la informació i garantir que només els usuaris autoritzats 
-      tinguen accés a dades crítiques.</p>
+  <h3>5. Row-Level Security (RLS) i vistes</h3>
+   <p>PostgreSQL inclou una funcionalitat molt potent que no té Oracle: Row-Level Security (RLS). 
+    Aquesta característica permet controlar quines files pot veure o modificar cada usuari.</p>
+   <p>Quan fem un SELECT a través d’una vista, per defecte la vista s’executa amb els permisos del propietari de la vista.
+     Això significa que les regles de RLS no s’apliquen a l’usuari que fa la consulta, sinó al propietari.</p>
+  <p>Perquè la política RLS s’aplique correctament a l’usuari que consulta la vista, podem canviar el comportament de la vista amb:</p>
+
+  <pre>ALTER VIEW nom_de_la_vista SET (security_invoker = on);</pre>
+  <p>Aquesta opció canvia el comportament d’una vista existent.</p>
+  <p>Això fa que la vista s’execute amb els permisos de l’usuari que crida la vista (invoker), 
+    i, per tant, les regles de RLS s’aplicaran com si l’usuari accedís directament a la taula base.</p>
+
+    <h3>5. RLS ( Row-Level Security) en una taula</h3>
+    <p>PostgreSQL permet habilitar RLS en una taula:</p>
+    <pre>ALTER TABLE empleats ENABLE ROW LEVEL SECURITY;</pre>
+    <p>I després definir polítiques de files segons usuari, rol, etc.
+      Això filtra a nivell de fila, el que és més potent que només ocultar columnes</p>
+    <pre>CREATE POLICY veure_propis_empleats
+ON empleats
+FOR SELECT
+USING (user_id = current_user);</pre>  
+
+  <ul>
+    <li>USING defineix quines files es poden seleccionar.</li>
+    <li>current_user és l’usuari que fa la consulta.</li>
+    <li>Així, si l’usuari alice fa un SELECT, només veurà les files on user_id = 'alice'.</li>
+  </ul>
+
+<ul> I, a més a més...
+  <li>Es pot aplicar a SELECT, INSERT, UPDATE i DELETE.</li>
+  <li>Funciona combinat amb vistes i SECURITY INVOKER perquè l’usuari només vegi el que li pertoca.</li>
+</ul>
+
+      <h3>6. Materialized views en postgresql</h3>
+    <li>Vista normal: només és una definició de consulta; les dades no s’emmagatzemen, s’obtenen cada vegada que fas SELECT.</li>
+    <li>Materialized View: guarda físicament els resultats de la consulta en una taula.</li>
+    <pre>CREATE MATERIALIZED VIEW nom_mv AS
+SELECT ...
+FROM taula_base
+[WITH [NO] DATA];</pre>
+
+<p>Com les dades poden canviar a les taules originals, cal actualitzar la materialized view:</p>
+<pre>REFRESH MATERIALIZED VIEW vista_clients_actius;  </pre>
+
+  <ul>
+    <li>Les dades no s’actualitzen automàticament quan la taula base canvia. Cal fer REFRESH.</li>
+    <li>Ocupa espai físic a la base de dades.</li>
+    <li>Si necessites dades en temps real, una vista normal és millor.</li>
+  </ul>
+   <h4>Vistes i actualitzabilitat</h4>
+   <p>Una vista és actualitzable si és una transformació directa d’una sola taula sense agregacions ni DISTINCT.</p>
+   <pre>CREATE VIEW vista_empleats_simple AS
+SELECT id, nom
+FROM empleats;</pre>
+
+    <h4>Exemples de vistes no actualitzables:</h4>
+    <p>Vistes amb GROUP BY, JOIN complex, DISTINCT, UNION.</p>
+
   </section>  
 
 

@@ -38,7 +38,7 @@
     <h3> Què és i per què encriptar?</h3>
     <p>L’encriptació converteix dades llegibles en format codificat (xifrat) que només pot ser desxifrat amb una clau. És essencial per protegir informació sensible.</p>
     <p>Una altra manera d'encriptar és fer un HASH (Hashing). Objectiu: generar una empremta única i irreversible d’un text.
-      Ús típic: Guardar contrasenyes de forma segura,  Verificar integritat de fitxers, Firmes digitals.
+      Ús típic: Guardar contrasenyes de forma segura,  Verificar integritat de fitxers, Signatures digitals.
     </p>
 
     <h4> Raons per aplicar encriptació:</h4>
@@ -62,23 +62,40 @@
         <li><strong>Encriptació en trànsit (SSL/TLS)</strong>: xifrat de dades mentres viatgen per la xarxa</li>
     </ul>
 
-    <h3> pg_cripto (xifratge manual)</h3>
+    <h3>EXTENSIÓ pg_cripto (xifratge manual)</h3>
     <p>Paquet per fer xifrat, hash i autenticació.</p>
 <pre>--Preparació
-CREATE EXTENSION pgcrypto;</pre>
+CREATE EXTENSION pgcrypto;
+CREATE EXTENSION pgcrypto SCHEMA utilitats;  -- Per ocultar funcions</pre>
+<p>I com saber si s'ha instal·lat bé..</p>
+<pre>SELECT extname  FROM pg_extension;
+\dx
+</pre>
+<p>També es pot comprobar si una extensió esta disponible per ser instal·lada amb:  <code>SELECT * 
+FROM pg_available_extensions WHERE name = 'pgcrypto';</code></p>
+<p>Una extensió s'instal·la dins d'un <strong>schema</strong>. 
+Important: <code>search_path</code>. Encara que l’extensió estiga instal·lada, pot no funcionar si l’esquema no està al search_path.</p>
+<pre> -- Com saber en quin schema està instal·lada una extensió ?
+SELECT extname, extnamespace::regnamespace 
+FROM pg_extension WHERE extname = 'pgcrypto';  
+</pre>
 
-<pre>us
+<p>Una extensió porta dins unes funcions per poder utilitzar en el codi pl/pgsql</p>
+<pre> -- Per saber de quines funcions disposa una extensió...
+SELECT proname FROM pg_proc WHERE pronamespace = (
+    SELECT extnamespace     FROM pg_extension     WHERE extname = 'pgcrypto' );  </pre>
+
+<pre> -- ús d'una funció de PRCRYPTO
 INSERT INTO usuaris (nom, email)
 VALUES (
   'Anna',
   pgp_sym_encrypt('anna@email.com', 'clau_secreta')
-);
-</pre>
+);  </pre>
+
 <pre>Llegir dades / desxifrar
 SELECT nom,
        pgp_sym_decrypt(email, 'clau_secreta')
-FROM usuaris;
-</pre>
+FROM usuaris;  </pre>
 
 <pre>-- Generar HASH amb "bcrypt"
 INSERT INTO usuaris (nom, password)
@@ -87,19 +104,18 @@ VALUES (
   crypt('contrasenya123', gen_salt('bf'))
 );
 --   bf >> bcrypt
---  crypt('contrasenya123', gen_salt('bf',12))  >> incrementa el cost (12)
-</pre>
+--  crypt('contrasenya123', gen_salt('bf',12))  >> incrementa el cost (12)   </pre>
 
 <pre>--Verificar contrasenya
 SELECT *
 FROM usuaris
 WHERE nom = 'anna'
   AND password = crypt('contrasenya123', password);
--- Com en password està el salt i el cost, calcula el bcrypt de 'contrasenya123' amb este salt i cost
-</pre>
+-- Com en password està el salt i el cost, calcula el bcrypt de 'contrasenya123' amb este salt i cost  </pre>
+
 <pre>--Altres opcions
-SELECT digest('text', 'sha256');
-</pre>
+SELECT digest('text', 'sha256');   </pre>
+
 
     <hr><h3>Encriptació en trànsit (SSL/TLS)</h3>
     <p>Xifrat automàtic a nivell xarxa.</p>
@@ -285,29 +301,33 @@ log_filename = 'postgresql-%Y-%m-%d.log'
           Evita que una fila faci referència a un valor inexistent.
         </p>
         <pre>CREATE TABLE cursos (
-  id NUMBER PRIMARY KEY,
-  nom VARCHAR2(50)
+  id integer PRIMARY KEY,
+  nom VARCHAR(50)
 );
 
 CREATE TABLE alumnes (
-  id NUMBER PRIMARY KEY,
-  nom VARCHAR2(50),
-  id_curs NUMBER,
+  id INTEGER PRIMARY KEY,
+  nom VARCHAR(50),
+  id_curs INTEGER,
   FOREIGN KEY (id_curs) REFERENCES cursos(id)
-);          </pre>
-      
-        <p>Amb això, no es pot assignar un <code>id_curs</code> a un alumne que no existeixi a la taula <code>cursos</code>.</p>
-      
-        <h3> Integritat de domini</h3>
-        <p>
-          Limita els valors permesos en una columna. Es pot implementar amb tipus de dades, restriccions <code>NOT NULL</code>, <code>CHECK</code> o <code>DEFAULT</code>.
-        </p>
+);   </pre>
+<p>Permisos necessaris en postgresql, CREATE i REFERENCES</p>     
+<pre>GRANT CREATE ON SCHEMA public TO usuari;
+GRANT REFERENCES ON cursos TO usuari; 
+GRANT REFERENCES (id) ON cursos TO usuari;  -- Més restrictiu </pre>
+
+    <p>Amb això, no es pot assignar un <code>id_curs</code> a un alumne que no existeixi a la taula <code>cursos</code>.</p>
+  
+    <h3> Integritat de domini</h3>
+    <p>
+      Limita els valors permesos en una columna. Es pot implementar amb tipus de dades, restriccions <code>NOT NULL</code>, <code>CHECK</code> o <code>DEFAULT</code>.
+    </p>
       
         <pre>CREATE TABLE alumnes (
-  id NUMBER PRIMARY KEY,
-  nom VARCHAR2(50) NOT NULL,
-  edat NUMBER CHECK (edat >= 16),
-  pais VARCHAR2(30) DEFAULT 'Espanya'
+  id INTEGER PRIMARY KEY,
+  nom VARCHAR(50) NOT NULL,
+  edat INTEGER CHECK (edat >= 16),
+  pais VARCHAR(30) DEFAULT 'Espanya'
 );           </pre>
       
         <p>
@@ -324,7 +344,7 @@ CREATE TABLE alumnes (
         </ul>
       
         <p>
-          Aquest tipus d’integritat sovint es basa en <code>PL/SQL</code> o lògica de negoci a l’aplicació.
+          Aquest tipus d’integritat sovint es basa en <code>PL/pgSQL</code> o lògica de negoci a l’aplicació.
         </p>
       
         <h3> Conclusió</h3>
@@ -370,27 +390,36 @@ Cap pot continuar → deadlock</code></pre>
         <p>PostgreSQL és un sistema de base de dades purament transaccional</p>
 <pre>-- Per indicar que comença una transacció
 BEGIN; </pre>
+<p>❓ Què passa si NO poses BEGIN? : PostgreSQL activa el mode autocommit per defecte.=> Cada sentència SQL és una transacció implícita .. </p>
+<pre>-- PostgreSQL fa automàticament:
+BEGIN;
+&lt;la teua sentència>
+COMMIT;   </pre>
+
         <p>En una transacció les dades modificades <strong>no són visibles</strong> per la resta d'usuaris fins que es confirme la transacció</p>
       
         <h4> <code>COMMIT</code></h4>
         <p>
           Fa permanents tots els canvis realitzats en la transacció. <strong> No es poden desfer després</strong>. En este moment les dades modificades ja son
           visibles per la resta d'usuaris .       </p>
-        <pre>INSERT INTO alumnes VALUES (10, 'Joan', 20);
+        <pre>BEGIN;
+INSERT INTO alumnes VALUES (10, 'Joan', 20);
 COMMIT;          </pre>
        <p>Les sentències de finalització de transacció són COMMIT i ROLLBACK</p>
         <h4> <code>ROLLBACK</code></h4>
         <p>
           Desfà tots els canvis realitzats des del darrer <code>COMMIT</code>. Torna l’estat de la BD a com estava abans.
         </p>
-        <pre>UPDATE alumnes SET edat = 30 WHERE id = 10;
+        <pre>BEGIN;
+UPDATE alumnes SET edat = 30 WHERE id = 10;
 ROLLBACK; -- Anul·la l'actualització            </pre> 
       
         <h4> <code>SAVEPOINT</code></h4>
         <p>
           Permet definir punts intermedis dins d’una transacció per fer <code>ROLLBACK</code> parcial.
         </p>
-        <pre>SAVEPOINT punt1;
+        <pre>BEGIN;
+SAVEPOINT punt1;
 DELETE FROM alumnes WHERE edat &lt; 18;
 
 SAVEPOINT punt2;
@@ -399,13 +428,15 @@ UPDATE alumnes SET nom = 'Anònim' WHERE edat &gt; 25;
 ROLLBACK TO punt1; -- desfà només fins al punt1           </pre>
       
         <h3> Transaccions automàtiques i manuals</h3>
-        <p>En PostgreSQL, Cap instrucció fa COMMIT implícit (excepte casos molt especials)</p>
+        <p>En PostgreSQL, Cap sentència SQL normal (INSERT, UPDATE, CREATE TABLE, etc.),
+           ❌ no fa COMMIT implícit dins d’una transacció</p>
       <pre>
 BEGIN;
 CREATE TABLE prova (id int);
 ROLLBACK;        
       </pre>
       <p>Resultat: la taula NO existeix. DDL és totalment transaccional (a diferència de ORACLE)</p>
+    
     <p>⚠️ 5. Excepcions (IMPORTANT). Algunes instruccions NO poden anar dins d’una transacció: Com per Exemple:
       <code> CREATE DATABASE test;</code> i altres com <code>TABLESPACE , CLUSTER, ALTER SYSTEM</code>
 </p>
@@ -438,22 +469,24 @@ ROLLBACK;
         <p>Obrim 2 sessions ( en SQL*PLUS ) amb usuari1 ( dos cmd diferents)   </p>
         <pre> 
     En la primera sessió (1er CMD)
-    SQL> insert into prueba10 (id, nom) values (1000,’valor1 ’);
+    postgres=# BEGIN;
+    postgres=# insert into prueba10 (id, nom) values (1000,’valor1 ’);
     1 row created.
         </pre>
     <pre>
-    En la segon sessió  (2on cmd)    
-    SQL> select count(*) from prueba10;
+    En la segon sessió  (2on cmd) 
+    postgres=# BEGIN   
+    postgres=# select count(*) from prueba10;
     COUNT(*)
     ----------
     0</pre>
         <pre>
     En la primera sessió (1er CMD)
-    SQL> commit;            
+    postgres=# commit;            
         </pre>
     <pre>
     En la segon sessió (2on CMD)    
-    SQL> select count(*) from prueba10;
+    postgres=# select count(*) from prueba10;
     COUNT(*)
     ----------
     1
@@ -462,8 +495,8 @@ ROLLBACK;
     <hr><h4>Exemple ( de deadlock )</h4>
     <p>Suposem que tenim una taula:</p>
     <pre><code>CREATE TABLE comptes (
-    id NUMBER PRIMARY KEY,
-    saldo NUMBER
+    id INTEGER PRIMARY KEY,
+    saldo INTEGER
     ); </code></pre>
     <p>i dos files</p>
     <pre><code>INSERT INTO comptes VALUES (1, 100);
@@ -472,109 +505,118 @@ COMMIT; </code></pre>
 <p>Obri dos sessios sql diferents, Sessio A i Sessio B</p>
 <pre>Sessio A
   -- Bloqueja la fila amb id = 1
+BEGIN;
 UPDATE comptes SET saldo = saldo + 10 WHERE id = 1;
+
 Sessio B
--- Bloqueja la fila amb id = 2
+  -- Bloqueja la fila amb id = 2
+BEGIN;
 UPDATE comptes SET saldo = saldo + 20 WHERE id = 2;
 
--- SESSION A intenta agafar la fila que té B
+  -- SESSIO A intenta agafar la fila que té B
 UPDATE comptes SET saldo = saldo - 5 WHERE id = 2;
---  → A queda esperant, perquè B té bloquejada la fila 2.
+  --  → A queda esperant, perquè B té bloquejada la fila 2.
 
-SESSION B intenta agafar la fila que té A
+  -- SESSIO B intenta agafar la fila que té A
 UPDATE comptes SET saldo = saldo - 5 WHERE id = 1;
--- → B queda esperant, perquè A té bloquejada la fila 1.
+  -- → B queda esperant, perquè A té bloquejada la fila 1.
 
 -- I ací és on PostgreSQL detecta el deadlock
 -- PostgreSQL trenca el bloqueig i dona error a una de les dos sessions 
 -- Com decideix?. tria la transacció “més barata” de cancel·lar, normalment la que ha fet menys treball
+
+ERROR:  se ha detectado un deadlock
+DETAIL:  El proceso 19300 espera ShareLock en transacción 794; bloqueado por proceso 14856.
+El proceso 14856 espera ShareLock en transacción 795; bloqueado por proceso 19300.
+HINT:  Vea el registro del servidor para obtener detalles de las consultas.
+CONTEXT:  mientras se actualizaba la tupla (0,1) en la relación «comptes»
 </pre>
 
-   </section>
+ </section>
       
 
-      <section id="backups">
-        <h2>💾 Recuperació i còpies de seguretat en PostgreSQL</h2>
-      
-        <h3> Per què cal fer còpies de seguretat?</h3>
-        <p>
-          Les còpies de seguretat són essencials per garantir la <strong>continuïtat del servei</strong> i la <strong>protecció de la informació</strong>.  
-          En cas de fallada del sistema, error humà, corrupció de dades o atacs, una bona estratègia de backup permet recuperar la base de dades sense pèrdues.
-        </p>
-        <p>La qüestió de fer còpies de seguretat des de dins d’PostgreSQL (usant eines com <strong>pg_dump</strong> ) 
-          versus fer-les des de fora (copiant fitxers del sistema operatiu) és molt important perquè afecta 
-          la consistència i la recuperabilitat de la base de dades</p>
-        <p>Fer còpies de seguretat des de dins d’PostgreSQL és crític perquè assegura que la base de dades es puga recuperar correctament i 
-          sense pèrdua de dades, fins i tot si està en funcionament. Fer-ho des del sistema operatiu només és segur si la base està apagada,
-           cosa poc pràctica en entorns de producció</p>
-        <p>Problemes si es fan des de fora del SGBD: Inconsistència, Recuperació complicada, No registra transaccions </p>
-        <p>Avantatges si es fan des de dins del SGBD: Consistència de dades, Recuperació puntual, Gestió de logs automàtica, Còpies en calent, Automatització i verificació:</p>
+  <section id="backups">
+    <h2>💾 Recuperació i còpies de seguretat en PostgreSQL</h2>
+  
+    <h3> Per què cal fer còpies de seguretat?</h3>
+    <p>
+      Les còpies de seguretat són essencials per garantir la <strong>continuïtat del servei</strong> i la <strong>protecció de la informació</strong>.  
+      En cas de fallada del sistema, error humà, corrupció de dades o atacs, una bona estratègia de backup permet recuperar la base de dades sense pèrdues.
+    </p>
+    <p>La qüestió de fer còpies de seguretat des de dins d’PostgreSQL (usant eines com <strong>pg_dump</strong> ) 
+      versus fer-les des de fora (copiant fitxers del sistema operatiu) és molt important perquè afecta 
+      la consistència i la recuperabilitat de la base de dades</p>
+    <p>Fer còpies de seguretat des de dins d’PostgreSQL és crític perquè assegura que la base de dades es puga recuperar correctament i 
+      sense pèrdua de dades, fins i tot si està en funcionament. Fer-ho des del sistema operatiu només és segur si la base està apagada,
+        cosa poc pràctica en entorns de producció</p>
+    <p>Problemes si es fan des de fora del SGBD: Inconsistència, Recuperació complicada, No registra transaccions </p>
+    <p>Avantatges si es fan des de dins del SGBD: Consistència de dades, Recuperació puntual, Gestió de logs automàtica, Còpies en calent, Automatització i verificació:</p>
 
-      
-        <h3>🎯 Objectius d’una còpia de seguretat</h3>
-        <ul>
-          <li>Restaurar les dades després d’un error</li>
-          <li>Permetre la recuperació puntual o total</li>
-          <li>Facilitar entorns de prova o migracions</li>
-          <li>Complir normatives legals (protecció de dades)</li>
-        </ul>
-      
-        <h3> Tipus de còpies de seguretat</h3>
-        <ul>
-          <li><strong>Físiques</strong>: còpies dels fitxers físics </li>
-          <li><strong>Lògiques</strong>: exportació de dades (a partir d'SQL)</code></li>
-        </ul>
-        <hr><ul>
-          <li><strong>Totals</strong>: Una BBDD sencera, o un cluster sencer</li>
-          <li><strong>Parcials</strong>: Part d'una BBDD, Una taula concreta, Un index, etc (SQL)</li>
-        </ul>
-        <hr><ul>
-          <li><strong>Online</strong>: També s’anomena còpia de seguretat en calent. Es fa mentre la base de dades continua activa i els usuaris treballen.</li>
-          <li><strong>Offline</strong>: També s’anomena còpia de seguretat freda. Es realitza quan la base de dades està completament aturada</li>
-          (No se sol contemplar esta forma normalment....) 
-        </ul>
-      
-        <hr><h3> Estratègies de backup</h3>
-        <ul>
-          <li><strong>Completa:</strong> còpia total de la BD</li>
-          <li><strong>Incremental:</strong> només les dades modificades des del darrer backup</li>
-          <li><strong>Diferencial:</strong> totes les modificacions des del darrer backup complet</li>
-          <li><strong>Continua:</strong> amb logs (WAL)</li>
-        </ul>
-      <h3> Mecanismes de Postgresql</h3>
-        <ul>
-          <li><strong>pg_dump:</strong> la còpia lògica </li>
-          <li><strong>pg_basebackup:</strong> la còpia física </li>
-          <li>WAL (Write Ahead Log)</li>
-        </ul>
-      <p>pg_dump i pg_basebackup guarden la còpia al sistema on s’executa la comanda, tot i que 
-        habitualment pg_dump s’executa en el client i pg_basebackup en un sistema remot per obtenir una còpia física.</p>
+  
+    <h3>🎯 Objectius d’una còpia de seguretat</h3>
+    <ul>
+      <li>Restaurar les dades després d’un error</li>
+      <li>Permetre la recuperació puntual o total</li>
+      <li>Facilitar entorns de prova o migracions</li>
+      <li>Complir normatives legals (protecció de dades)</li>
+    </ul>
+  
+    <h3> Tipus de còpies de seguretat</h3>
+    <ul>
+      <li><strong>Físiques</strong>: còpies dels fitxers físics </li>
+      <li><strong>Lògiques</strong>: exportació de dades (a partir d'SQL)</code></li>
+    </ul>
+    <hr><ul>
+      <li><strong>Totals</strong>: Una BBDD sencera, o un cluster sencer</li>
+      <li><strong>Parcials</strong>: Part d'una BBDD, Una taula concreta, Un index, etc (SQL)</li>
+    </ul>
+    <hr><ul>
+      <li><strong>Online</strong>: També s’anomena còpia de seguretat en calent. Es fa mentre la base de dades continua activa i els usuaris treballen.</li>
+      <li><strong>Offline</strong>: També s’anomena còpia de seguretat freda. Es realitza quan la base de dades està completament aturada</li>
+      ==> (No se sol contemplar esta forma normalment....) 
+    </ul>
+  
+    <hr><h3> Estratègies de backup</h3>
+    <ul>
+      <li><strong>Completa:</strong> còpia total de la BD</li>
+      <li><strong>Incremental:</strong> només les dades modificades des del darrer backup</li>
+      <li><strong>Diferencial:</strong> totes les modificacions des del darrer backup complet</li>
+      <li><strong>Continua:</strong> amb logs (WAL)</li>
+    </ul>
+  <h3> Mecanismes de Postgresql</h3>
+    <ul>
+      <li><strong>pg_dump:</strong> la còpia lògica </li>
+      <li><strong>pg_basebackup:</strong> la còpia física </li>
+      <li>WAL (Write Ahead Log)</li>
+    </ul>
+  <p>pg_dump i pg_basebackup guarden la còpia al sistema on s’executa la comanda, tot i que 
+    habitualment pg_dump s’executa en el client i pg_basebackup en un sistema remot per obtenir una còpia física.</p>
 
-        <hr><h3> Eines principals de backup en PostgreSQL</h3>
-       <h3>1. 📤 pg_dump</h3>
-      <p>pg_dump genera una còpia <strong>lògica</strong> en un fitxer. Exporta la BD en forma de sentències SQL. Conté CREATE TABLE, INSERT, etc.</p>
-       <pre>pg_dump empresa > backup.sql</pre>
-   
-       <p><strong>ONLINE</strong>: 👉 Funciona mentre la BD està en ús, No cal parar el servidor, Fa una còpia consistent gràcies a MVCC (snapshots)</p>
+    <hr><h3> Eines principals de backup en PostgreSQL</h3>
+    <h3>1. 📤 pg_dump</h3>
+  <p>pg_dump genera una còpia <strong>lògica</strong> en un fitxer. Exporta la BD en forma de sentències SQL. Conté CREATE TABLE, INSERT, etc.</p>
+    <pre>pg_dump empresa > backup.sql</pre>
 
-      <ul> Característiques
-        <li>✔️ Selectiu (pots triar taules)</li>
-        <li>✔️ Portable (serveix entre versions)</li>
-        <li>✔️ Editable (és text)</li>
-        <li>❌ Lent en BD grans</li>
-        <li>❌ No inclou configuració interna</li>
-        <li>❌ No serveix per PITR</li>
-      </ul>
+    <p><strong>ONLINE</strong>: 👉 Funciona mentre la BD està en ús, No cal parar el servidor, Fa una còpia consistent gràcies a MVCC (snapshots)</p>
+
+  <ul> Característiques
+    <li>✔️ Selectiu (pots triar taules)</li>
+    <li>✔️ Portable (serveix entre versions)</li>
+    <li>✔️ Editable (és text)</li>
+    <li>❌ Lent en BD grans</li>
+    <li>❌ No inclou configuració interna</li>
+    <li>❌ No serveix per PITR</li>
+  </ul>
 
 <pre>-- Restauració:
 psql empresa < backup.sql
 </pre>
 
-       <h3>2. 📤 pg_basebackup</h3>
-           <p>pg_basebackup genera una còpia <strong>física</strong> en un directori amb l’estructura interna de PostgreSQL.</p>
-       <pre>pg_basebackup -D /backup</pre>
-      <p>Inclou dades, índexs, configuració, tot</p>
-      <p><strong>ONLINE</strong> Copia fitxers mentre la BD està activa. Es basa en: WAL (Write-Ahead Logs), consistència interna</p>
+    <h3>2. 📤 pg_basebackup</h3>
+        <p>pg_basebackup genera una còpia <strong>física</strong> en un directori amb l’estructura interna de PostgreSQL.</p>
+    <pre>pg_basebackup -D /backup</pre>
+  <p>Inclou dades, índexs, configuració, tot</p>
+  <p><strong>ONLINE</strong> Copia fitxers mentre la BD està activa. Es basa en: WAL (Write-Ahead Logs), consistència interna</p>
       <pre>
 backup/
  ├── base/
@@ -582,14 +624,14 @@ backup/
  ├── pg_wal/
  └── ...        
       </pre>
-      <ul>Característiques
-        <li>✔️ Ràpid per BD grans</li>
-        <li>✔️ Base per PITR</li>
-        <li>✔️ Còpia exacta</li>
-        <li>❌ No selectiu</li>
-        <li>❌ No editable</li>
-        <li>❌ Depèn de versió/arquitectura</li>
-      </ul>
+  <ul>Característiques
+    <li>✔️ Ràpid per BD grans</li>
+    <li>✔️ Base per PITR</li>
+    <li>✔️ Còpia exacta</li>
+    <li>❌ No selectiu</li>
+    <li>❌ No editable</li>
+    <li>❌ Depèn de versió/arquitectura</li>
+  </ul>
   <pre>--Restauració:
 cp -r /backup/* /var/lib/postgresql/data/    
   </pre>
@@ -615,6 +657,7 @@ cp -r /backup/* /var/lib/postgresql/data/
 SELECT pg_backup_start('backup');
 SELECT pg_backup_stop();
 SELECT pg_switch_wal();     </pre>
+
    <p>Aquestes funcions NO fan el backup, sinó que preparen PostgreSQL perquè TU pugues fer una còpia física consistent</p>
 <p>Que fa: Marca l’inici d’un backup físic. Força que tot estigui consistent al disc. Comença a registrar informació especial als WAL</p>
 <p>Després s'ha de fer la còpia amb <strong>pg_basebackup</strong></p>

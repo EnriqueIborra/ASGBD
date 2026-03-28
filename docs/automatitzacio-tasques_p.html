@@ -85,7 +85,7 @@ INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i a
       </ul>
       
       <img src="imgs/important.png" class="imatge-dreta"  alt="stop" style="width: 15%">
-      <h2>Les rutines: S’han de Documentar</h2>
+      <hr><h2>Les rutines: S’han de Documentar</h2>
       
       <h2>QUE ??</h2><p>Descripció de la tasca, descripció de paràmetres d’entrada i eixida, Autor, Versió, Data d’última modificació, etc..</p>
       <h2>COM ??</h2> <p>** Fent servir comentaris en el codi de les rutines. Amb /* */ o  --</p>
@@ -111,7 +111,7 @@ INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i a
       <li> Pot incloure sentències SQL, declaracions de variables, control de flux, i gestió d’excepcions.</li>
     </ul>
      <hr>
-    <h4>En plsql es pot:</h4>
+    <h4>En psql es pot:</h4>
     <ul>
       <li>Es pot editar el contingut del buffer amb  <code>\e</code></li>
       <li>Es pot vore el contingut del buffer amb  <code>\p</code></li>
@@ -611,7 +611,7 @@ WHERE has_schema_privilege(current_user, oid, 'CREATE')   -- Sustituir current_u
 
     <hr><h3> PROCEDURE – Procediment</h3>
     <p>Els procediments <strong>NO retornen valor</strong> i NO poden ser cridades dins SELECT o expressions. 
-      Poden ser cridats des de dins d'un bloc DO, directament des de linea d'ordres plsql o pgAdmin, 
+      Poden ser cridats des de dins d'un bloc DO, directament des de linea d'ordres psql o pgAdmin, 
           , des de dins d'un altre procediment o funció, o des del <strong>DBMS_SCHEDULER</strong> amb un <strong>job</strong></p>
       <h4>Exemples</h4>
       <pre>BEGIN
@@ -1365,7 +1365,7 @@ $$ LANGUAGE plpgsql;       </pre>
   </ul>
 
   <h3>📄 Scripts SQL i .bat</h3>
-  <p>Pots crear scripts `.sql` amb comandes Postgresql i executar-los des de scripts `.bat` o `.sh` mitjançant <code>plsql</code>.</p>
+  <p>Pots crear scripts `.sql` amb comandes Postgresql i executar-los des de scripts `.bat` o `.sh` mitjançant <code>psql</code>.</p>
 
   <h4> Exemple: script SQL</h4>
   <pre>-- arxiu: informe.sql
@@ -1394,13 +1394,19 @@ Consulta alguna guia de com usar CRON <a href="https://www.redeszone.net/tutoria
 <a href="https://www.arsys.es/blog/cron-jobs-una-guia-completa">guia2</a>, o <a href="https://www.hostinger.com/mx/tutoriales/sintaxis-crontab">guia3</a>, per a entendre les diferents opcions de programació horària.  </p>
   
 <hr><h3>📆 pg_cron </h3>
-  <p>  Postgresql disposa d'una extensió del sistema per programar tasques directament des de <strong>DINS</strong> la base de dades: <strong>pg_cron</strong>.  </p>
+  <p>  Postgresql disposa d'una extensió del sistema per programar tasques (anomenades <strong>jobs</strong> ) directament des de <strong>DINS</strong> la base de dades: <strong>pg_cron</strong>.  </p>
+<p>Primer s'ha d'instal·lar en el SO</p>
+<pre>   Linux
+sudo apt install postgresql-XX-cron
+</pre>
 
  <pre>-- En postgresql.conf
 shared_preload_libraries = 'pg_cron'
- </pre>
+-- Per fer que cron server s’inicialitze automàticament   </pre>
+
  <p>⚠️ IMPORTANT: Després de modificar shared_preload_libraries,  cal reiniciar el servidor, <code>
 sudo systemctl restart postgresql  </code> </p>
+<p>En Windows és un poc més complicat,perquè s'ha de compilar codi font.</p>
  
  <h4>Usar extensió</h4>
  <pre>CREATE EXTENSION IF NOT EXISTS pg_cron;</pre>
@@ -1470,6 +1476,76 @@ SELECT cron.alter_job(42, '0 10 * * *');
     <p>==> Documentació oficial de l'extensió <a href="https://github.com/citusdata/pg_cron">.What is pg_cron.</a></p>
 
 <hr><h3>📆 pgAgent , integrat en pgAdmin </h3>
+<img src="./imgs/pgAgent.png" alt="pgagent" width="30%" class="imatge-dreta">
+<ul>
+  <li>És un agent de programació de tasques per PostgreSQL.</li>
+  <li>Et permet automatitzar execucions de SQL, funcions, o scripts segons horaris definits.</li>
+  <li>S’integra amb pgAdmin, així pots crear, modificar i supervisar tasques gràficament.</li>
+  <li>Funciona com un servidor/servei que s’executa constantment i comprova les tasques programades.</li>
+</ul>
+<p>Per poder usar pgAgent, primer s'ha d'instal·lar des del sistema operatiu. Després, crear una extensió.</p>
+<pre>Des de Linux 
+sudo apt update
+sudo apt install -y pgagent
+</pre>
+<p>Executar pgAgent com a servei</p>
+<pre>  Crear servei:
+sudo nano /etc/systemd/system/pgagent.service
+
+[Unit]
+Description=pgAgent Service
+
+[Service]
+Type=forking
+User=postgres
+ExecStart=/usr/bin/pgagent host=localhost dbname=postgres user=postgres
+
+[Install]
+WantedBy=multi-user.target
+</pre>
+<pre>  Inicia i habilita el servei
+sudo systemctl daemon-reload
+sudo systemctl enable pgagent
+sudo systemctl start pgagent
+sudo systemctl status pgagent  </pre>
+
+
+<hr><pre>Des de Windows, executar " <code>StackBuilder</code> ", connectes al cluster, 
+  i en "add-ons, Tools and Utilities, selecciones pgAgent."
+Continues donant les dades que l'instalador el demane fins que acabe</pre>
+<p>Una vegada instal·lat, entres en pgAdmin, connectes a la bbdd postgres i crees la extensió.</p>
+<pre>CREATE EXTENSION pgagent;</pre>
+<p>Això crea les taules de pgAgent (pga_job, pga_jobstep, pga_schedule, etc.) que pgAdmin utilitza.</p>
+<p>Una vegada instal·lat i registrat: Obre pgAdmin i connecta’t al servidor PostgreSQL on està pgAgent.</p>
+<pre>--Navega fins a: 
+Servers → NomDelServidor → pgAgent Jobs  </pre>
+
+<hr><ol> Components principals
+  <li>pgAgent Service / Daemon</li>
+  Procés del SO que s'encarrega de disparar les tasques programades.
+  <li>Base de dades de control</li>
+  Conté les taules que guarden:
+    <ul>
+      <li>Tasques (pgagent.pga_job)</li>
+      <li>Passos de cada tasca (pgagent.pga_jobstep)</li>
+      <li>Horaris (pgagent.pga_schedule)</li>
+      <li>Historial (pgagent.pga_joblog)</li>
+    </ul>
+  <li>pgAdmin</li>
+  Interfície gràfica per crear i gestionar tasques, passos i horaris. <br>
+Permet veure logs d’execució i estats de les tasques.
+</ol>
+
+<ul>
+  <li>Crees una tasca (job) a pgAdmin.</li>
+  <li>La tasca pot tenir un o més passos (steps), que poden ser:</li>
+  SQL directament a la base de dades<br>
+  Comandes externes (scripts shell, bat, etc.)
+  <li>Assignes un horari (schedule) a la tasca:</li>
+  Pot ser repetitiva, diària, setmanal, cada X minuts, etc.
+  <li>El servei pgAgent comprova contínuament les tasques i les dispara segons l’horari.</li>
+  <li>Les execucions queden registrades a la taula pga_joblog.</li>
+</ul>
 
 <hr><h3>📆 Extensions alternatives </h3>
 <h4>pg_timetable</h4>
@@ -1630,7 +1706,7 @@ function actualitzarPercentatge() {
 
 
 function carregarPreguntes() {
-    fetch('preguntes/preguntes41.json')
+    fetch('preguntes/preguntes41p.json')
         .then(res => res.json())
         .then(data => {
             bancDePreguntes = data;

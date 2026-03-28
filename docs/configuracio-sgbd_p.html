@@ -240,6 +240,9 @@ Sessió
 SHOW work_mem;  </pre>
 <pre>O via vista del sistema
 SELECT name, setting FROM pg_settings;  
+
+-- En postgres, per vore les columnes d'una taula es fa:
+\d nom_taula
 </pre>
 
 <ul> Aquestes variables poden ser:
@@ -255,7 +258,8 @@ SET work_mem = '64MB';
   <p>En este cas, quan em desconnecte i després em torne a connectar, el valor "64MB" no estarà fixat.</p>
 <p>Per fer que el canvi siga per usuari (persistent) en lloc de només per sessió, has d’utilitzar:</p>
 <pre>ALTER ROLE nom_usuari SET work_mem = '64MB';
-      S'aplica quan es torne a connectar l'usuari.  </pre> 
+      S'aplica quan es torne a connectar l'usuari. 
+      El canvi es guarda en <code>pg_db_role_setting</code> </pre> 
 <ul>
   <li>Cada vegada que l’usuari joan es connecte → tindrà work_mem = 64MB</li>
   <li>És persistent (no es perd en tancar sessió)</li>
@@ -263,7 +267,8 @@ SET work_mem = '64MB';
 </ul>
 <hr><p>Un altre nivell més alt de canvi és el de BBDD</p>
 <pre>ALTER DATABASE nom_bbdd SET work_mem = '64MB';
-    A partir d'este moment, tindrà efecte en noves sessions que es connecten a eixa base de dades.  </pre>
+    A partir d'este moment, tindrà efecte en noves sessions que es connecten a eixa base de dades. 
+    El canvi es guarda en <code>pg_db_role_setting</code> </pre>
 
 <ul> <strong>Això fa que:</strong>
   <li>Qualsevol usuari que es connecte a la base de dades vendes → tindrà work_mem = 64MB</li>
@@ -1185,8 +1190,6 @@ log_min_messages = warning</code></pre>
 
   <section id="altres-recursos">
     <h2>Recursos addicionals</h2>
-    
-
 
      <hr><h3>Repàs...</h3>
     <div id="progress-container">
