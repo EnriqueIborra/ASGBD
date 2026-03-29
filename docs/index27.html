@@ -361,6 +361,8 @@ input:checked + .slider:before {
 
   </style>
 </head>
+
+
 <body>
   <!-- PANTALLA D'ENTRADA -->
   <div id="intro-screen">
@@ -376,9 +378,7 @@ input:checked + .slider:before {
     <nav class="mobile-nav" id="mobileMenu">
       <a href="#temari">Temari</a>
     </nav>
-
  
-
     <button class="dark-mode-toggle" id="darkModeBtn">🌙</button>
   </header>
 
@@ -386,7 +386,7 @@ input:checked + .slider:before {
   <main>
     <section id="intro">
       <h2>Aprèn a administrar sistemes gestors de bases de dades</h2>
-      <p style="text-align: center; max-width: 600px; margin: 0 auto;">Domina les eines com ORACLE database, sql*plus, SQL Developer per administrar bases de dades amb seguretat i eficiència.</p>
+      <p style="text-align: center; max-width: 600px; margin: 0 auto;">Domina les eines com sql*plus, SQL Developer, o com psql, pgAdmin per administrar bases de dades amb seguretat i eficiència.</p>
     </section>
 
 
@@ -397,19 +397,19 @@ input:checked + .slider:before {
            <img src="imgs/mysql-icon.png" alt="Instal·lació SGBD" style="width: 40px; height: 40px;">
            <img src="imgs/icono-bbdd.png" alt="Icono de base de datos" style="width: 40px; height: 40px;">
            <img src="imgs/icono-pareja.png" alt="Icono de base de datos" style="width: 40px; height: 40px;">
-           <div class="db-toggle"> &nbsp;&nbsp;&nbsp;&nbsp; 📘📓 Materials del curs en:
+           
+        </div>
+        <div class="icons-top">
+           <div class="db-toggle"> &nbsp;&nbsp;&nbsp;&nbsp; Mostrar Materials del curs en:
             <span id="labelOracle">Oracle</span>
-
             <label class="switch">
                 <input type="checkbox" id="dbToggle">
                 <span class="slider"></span>
             </label>
-
             <span id="labelPostgres">PostgreSQL</span>
             </div> 
-           
-           
         </div>
+
         <h2>Unitats didàctiques</h2>
         <div class="grid">
            
@@ -498,7 +498,7 @@ input:checked + .slider:before {
                 <p>UD 5 Optimització del SGBD</p>
               </a>
            
-              <a data-oracle="disponibilitat-sgbd.html"   data-postgresql="disponibilitat-sgbd.html"
+              <a data-oracle="disponibilitat-sgbd.html"   data-postgresql="disponibilitat-sgbd_p.html"
                class="card" title="Garantir la disponibilitat del sistema de gestió de bases de dades.
               Reconeixer la utilitat de les bases de dades distribuïdes.
               Descriure les diverses polítiques de fragmentació de la informació.
