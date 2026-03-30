@@ -205,9 +205,19 @@
             <ul>
                 <li>Connexió local, des del mateix equip on està la base de dades.</li>
                 <li>Exemples:<br>
-                    <code>sqlplus usuari/pass@host/nombasedades</code>
+                    <code>sqlplus / as sysdba</code>
                     <code>mysql -u usuari -p</code><br>
                     <code>psql -U usuari -d basedades</code>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Amb Socket</strong>
+            <ul>
+                <li>Connexió a un equip amb IP o URL.</li>
+                <li>Exemples:<br>
+                    <code>sqlplus usuari/pass@192.168.10.100/nombasedades</code>
+                    <code>mysql -h meuserver.com -u usuari -p</code><br>
+                    <code>psql -U usuari -d basedades -h 192.168.10.100</code>
                 </li>
             </ul>
         </li>
@@ -229,7 +239,8 @@
         <li>Interfície intuïtiva, ideal per a usuaris no tècnics o per a tasques ràpides.</li>
         <li>Exemples:
             <ul>
-                <li>pgadmin</li>
+                <li>pgAdmin</li>
+                <li>SQL Developer</li>
                 <li>DBeaver</li>
                 <li>phpMyAdmin</li>
             </ul>
@@ -276,7 +287,7 @@
     <li><strong>Còpia i recuperació</strong>: Fer còpies de seguretat i restaurar-les en cas de fallada o pèrdua de dades.</li>
 </ul>
 
-<h2>Elements d’un SGBD</h2>
+<hr><h2>Elements d’un SGBD</h2>
 <p>Un Sistema Gestor de Bases de Dades (SGBD) està compost per diversos elements o components que treballen conjuntament per facilitar l’emmagatzematge, recuperació, manipulació i administració de dades.</p>
 
 <h3>1. Processador de consultes</h3>
@@ -339,7 +350,7 @@
 <h2>Com seleccionar un SGBD</h2>
 <p>Una vegada es coneixen els elements d’un SGBD, els tipus de SGBD i els conceptes clau, ja s’està en posició de poder triar un SGBD tenint en compte els factors que determinaran l’elecció.</p>
 
-<h3>Factors per a l’elecció del SGBD</h3>
+<hr><h3>Factors per a l’elecció del SGBD</h3>
 <ul>
     <li>Tipus de dades a tractar</li>
     <li>Volum de dades</li>
@@ -363,7 +374,7 @@
     <li>Actualitzacions del producte</li>
 </ul>
 
-<h2>Documentació</h2>
+<hr><h2>Documentació</h2>
 <p>En cada instal·lació s’haurà d’elaborar o omplir una documentació amb la informació següent. Aquesta documentació <strong>no serà pública</strong> i es guardarà per a consultes tècniques.</p>
 
 <ul>
@@ -397,7 +408,7 @@
     <li>Usuaris</li>
 </ul>
 
-<h2>Registre de la instal·lació (log de la instal·lació)</h2>
+<hr><h2>Registre de la instal·lació (log de la instal·lació)</h2>
 <p>Tots els instal·ladors de sistemes gestors de bases de dades guarden un registre de les operacions 
   realitzades durant la instal·lació. Aquest registre és útil en cas que es produeixi algun problema, 
   per a diagnosticar-ne el motiu.</p>
@@ -430,10 +441,7 @@
     la caducitat d'un producte de programari. És a dir, és el moment en què un programari deixa de tenir 
     manteniment i suport.</p>
 
-    <div class="preg">
-   
-    </div>
- 
+     
     <hr><html></html>
     <h2>Edicions de Postgresql</h2>
       <p>       Postgres NO TÉ EDICIONS, tipus Enterprise, Standard, etc,  com fa ORACLE..    </p>
@@ -737,15 +745,15 @@ postgres=#</pre></li>
     </ul>
     <h4> Extensions comunes</h4>
     <ul>
-        <li> uuid-ossp (UUIDs)</li> 
+        <li>pgcrypto</li>
+        <li>pgaudit</li>
+        <li>pg_cron</li>
+        <li>pgagent</li>
+        <li>pgstattuple</li>
         <li>pg_trgm (cerques similars)</li>
-        <li>hstore (clau-valor en una columna)</li>
         <li>citext  (sense diferenciar may-min)</li>
-        <li>tablefunc (pivotar dades)</li>
         <li>unaccent (eliminar accents)</li>
     </ul>
-    <p>S’activen dins la base de dades, no al sistema:</p>
-    <pre>CREATE EXTENSION pg_trgm; </pre>
 
 <hr>
    <h3>Instal·lació en Windows</h3>
@@ -753,7 +761,9 @@ postgres=#</pre></li>
    <li>Es descarrega un instal·lador oficial</li>
    <li>Durant la instal·lació: Tries la versió, Definixes la contrasenya de l’usuari postgres,
         Tries el port (5432 per defecte),  S’inicialitza el clúster</li>
-    <li>Inclou: pgAdmin, psql, Servici de Windows</li>
+    <li>Deixar marcat per instal·lar Application Stack Builder</li>
+    <li>Inclou: pgAdmin, psql (sense PATH) , Serveis de Windows per a postgres</li>
+    <p>El PATH sol ser <code>c:\Program Files\PostgreSQL\18\bin</code> segons la versió. Afegix esta ruta al teu path</p>
 
     <h3>Instal·lació en macOS</h3>
     <p>Instal·lador oficial, Homebrew</p>
@@ -869,7 +879,7 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
     <h3>Realitzem la nostra primera instal·lació de POSTGRES</h3>
 
     <br><h2>En altra màquina....</h2>
-    <h3>Instal·lació de client gràfic => pdadmin</h3>
+    <h3>Instal·lació de client gràfic => pgAdmin</h3>
     <p>Des de la pàgina oficial de <a href="https://www.pgadmin.org/download/">pgadmin</a></p>
 
   </section>
@@ -883,8 +893,7 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
     <h3> Des d'una terminal</h3>
      <pre>sudo -u postgres psql </pre>
 
-
-    <p>Esta ordre ens connecta al cluster principal...     </p>
+    <p>Esta ordre ens connecta al cluster principal com a usuari DBA principal (postgres).     </p>
 
     <h3>Configuració bàsica després d’instal·lar</h3>
      Canviar contrasenya de postgres 🗝️
@@ -916,7 +925,7 @@ sudo systemctl restart postgresql </pre>
     <p>Després d’instal·lar PostgreSQL, hi ha sempre: <code> postgres  template0 template1 </code></p>
 
     <h3>Connexió amb usuari SO</h3>
-    <p>!! En Windows s'ha de posar el PATH, o fer un 'cd' al directori dels binaris..</p>
+    <p>.. En Windows s'ha de posar el PATH, o fer un 'cd' al directori dels binaris  !!</p>
     <pre>psql -d nom_ bbdd </pre>
 
      <h3>Connexió amb socket</h3>
@@ -957,7 +966,7 @@ Normalment el prompt mostra la base de dades:     testdb=#
 
   <h3>PgAdmin</h3>
      <img src="./imgs/pgadmin1.png" alt="pgadmin1" class="imatge-esquerra" width="60%">
-  <p>Per accedir a una instància de postgresql es necessita:  </p>
+  <p>Per accedir a un cluster de postgresql es necessita:  </p>
   <ul>
     <li>IP o url</li>
     <li>port</li>

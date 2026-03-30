@@ -34,7 +34,7 @@
   
     <h3> Què és el monitoratge?</h3>
     <p>El <strong>monitoratge</strong> és el procés de controlar el funcionament del sistema gestor, detectant 
-      possibles errors o situacions que puguin afectar el rendiment. 
+      possibles errors o situacions que puguen afectar el rendiment. 
       Ha de ser <strong>poc intrusiu</strong>, per tal de no interferir en el funcionament normal del sistema.
     </p>
     <p>S'ha de tractar que les tasques de monitoratge i diagnòstic del sistema siguen el menys intrusives possible 
@@ -111,7 +111,8 @@
       <li>Disseny de taules i tipus de dades (Ajustar al necessari)</li>
       <li>Camps calculats (intentar mantindre els menys possibles)</li>
       <li>Desnormalització (reduir JOIN a costa de augmentar redundància)</li>
-      <li>Desfragmentació: VACUUM, VACUUM FULL, AUTOVACUUM</li>
+      <li>Desfragmentació: VACUUM, ==>AUTOVACUUM</li>
+       Neteja espai de files esborrades (MVCC), Evita creixement innecessari, Millora rendiment general
       <li>Particionament </li>
       <li>Crear, modificar o eliminar índex</li>
       <li>Optimització de consultes </li>
@@ -149,7 +150,7 @@
       <li>BRIN</li>
      </ul>
   </li>
-</ul>s
+</ul>
 
 <h3> Optimització de consultes</h3>
     <ul>
@@ -186,19 +187,42 @@
     </ul>
   
     <h3> Versions millorades</h3>
-    <pre>-- Evitar funcions sobre columnes
+    <pre>
+-- Especificar columnes
+SELECT col1,col4 FROM taula;
+
+-- Evitar funcions sobre columnes
 WHERE data >= TO_DATE('01/01/2023', 'DD/MM/YYYY')
 
 -- Substituir subconsulta per JOIN
 SELECT a.nom, c.nom_curs
 FROM alumnes a
-JOIN cursos c ON a.curs_id = c.id;      </pre>
+JOIN cursos c ON a.curs_id = c.id;    
+
+-- Crear index amb upper -- Solució principal: índex funcional
+CREATE INDEX idx_nom_upper ON clients (UPPER(nom));
+-- Altres solucions
+INSERT INTO clients(nom) VALUES (UPPER('Joan')); -- Insertar totes les dades en maj.
+-- usar tipus CITEXT
+CREATE EXTENSION citext;
+nom CITEXT
+WHERE nom = 'joan'
+
+-- usar ILIKE.    ==>  WHERE nom ILIKE 'joan'
+-- usar índex trigram.  
+CREATE EXTENSION pg_trgm;
+CREATE INDEX idx_nom_trgm ON clients USING gin (nom gin_trgm_ops);
+</pre>
   
     <h3> Altres consells d’optimització</h3>
     <ul>
-      <li> Usa <code>BULK COLLECT</code> i <code>FORALL</code> per treballar amb grans volums en PL/SQL</li>
+      <li> Evitar bucles en PL/pgSQL i utilitzar operacions en bloc (set-based). Usar UPDATE i evita FOR</li>
+      <li> evita múltiples INSERT's: COPY clients FROM '/fitxer.csv' CSV; </li>
+      <li>Utilitza multi-row INSERT si es pot .. <pre>INSERT INTO clients (nom) VALUES ('Joan'), ('Maria'), ('Pere');</pre></li>
       <li> Utilitza particions en taules molt grans</li>
       <li> Evita bloquejos i transaccions llargues</li>
+      <li> Crear índexs adequats i evitar funcions en el WHERE</li>
+      <li> Analitzar consultes amb EXPLAIN ANALYZE</li>
     </ul>
   
     <h3> Resum de bones pràctiques</h3>
@@ -206,6 +230,9 @@ JOIN cursos c ON a.curs_id = c.id;      </pre>
       <li> Coneix el model de dades i el volum</li>
       <li> Usa EXPLAIN  sovint</li>
       <li> Mantén estadístiques al dia</li>
+      <pre>VACUUM;
+ANALYZE;
+VACUUM ANALYZE;</pre>
       <li> Indexa amb criteri</li>
       <li> Millora consultes repetitives o lentes</li>
     </ul>
@@ -360,22 +387,67 @@ WHERE state = 'active';</pre>
 <pre>SELECT * FROM pg_locks;</pre>
 
 <h3> 4. Estadístiques de taula </h3>
-<p>El planner de PostgreSQL utilitza estadístiques per decidir el millor pla.
-ANALYZE → actualitza estadístiques d’una taula o columnes concretes:</p>
-<pre>ANALYZE alumnes;
+<p>El planner de PostgreSQL utilitza estadístiques per decidir el millor pla. <br>
+<strong>ANALYZE</strong> → actualitza estadístiques d’una taula o columnes concretes: <br>
+✔️ PostgreSQL usa aquestes estadístiques per decidir índexs i triar plans d’execució </p>
+<pre>ANALYZE;
+ANALYZE alumnes;
 ANALYZE alumnes(edat, nom);</pre>
-<p>VACUUM ANALYZE → neteja + actualització de estadístiques:</p>
-<pre>VACUUM ANALYZE alumnes;</pre>
+<p><strong>VACUUM ANALYZE</strong> → neteja + actualització de estadístiques:</p>
+<pre>VACUUM ANALYZE;
+VACUUM ANALYZE alumnes;</pre>
 <p>AUTOVACUUM → automàtic, manté estadístiques actualitzades sense intervenció manual</p>
 
 <h3> 5. Altres eines gràfiques </h3>
 <ul>
   <li>pgAdmin Dashboard → monitoratge de sessions, càrrega i consulta de plans</li>
-  <li>pgBadger → informes d’ús i rendiment basats en logs</li>
+  <li>pgBadger → informes d’ús i rendiment basats en logs <br>
+  És una eina externa per PostgreSQL que analitza els logs i genera informes HTML i estadístiques detallades. <br>
+  No afecta la base de dades, només llegeix els logs.
+Serveix per: Detectar consultes lentes, Veure estadístiques per usuari, taula, consulta, Identificar colls d’ampolla</li>
   <li>Grafana + Prometheus → dashboards de rendiment avançats</li>
 </ul>
 
-<h3>Bones pràctiques d’optimització de consultes</h3>
+<hr><h4>pgBadger</h4>
+<p>És una eina Free, es pot trobar en <a href="https://pgbadger.darold.net/">https://pgbadger.darold.net/</a> i també es pot instal·lar</p>
+<pre>sudo apt install pgbadger   # Linux Mint / Ubuntu</pre>
+<p>Previament, postgres s'ha de configurar per generar logs</p>
+<pre>logging_collector = on
+log_destination = 'csvlog'   -- o 'stderr'
+log_min_duration_statement = 500  -- ms per veure consultes lentes
+log_directory = 'pg_log'
+log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'</pre>
+<p>i després usar pgBadger</p>
+<pre>
+pgbadger /var/lib/postgresql/pg_log/postgresql-2026-03-29_*.log -o report.html
+pgbadger -f stderr -o report.html /var/log/postgresql/postgresql.log
+pgbadger -b "2026-03-01 00:00:00" -e "2026-03-29 23:59:59" /var/lib/postgresql/pg_log/*.log -o report.html
+</pre>
+<h4>Que mostra l'informe HTML</h4>
+<ul>
+  <li>Consultes més lentes</li>
+  <li>Consultes més freqüents</li>
+  <li>Temps mitjà per consulta</li>
+  <li>Estadístiques per usuari / base de dades / taula</li>
+  <li>Errors i warnings</li>
+  <li>Temps total de connexions</li>
+</ul>
+
+<h4>pgstattuple</h4>
+<p>Complement de pgBadger. eina per mesurar bloat i dead tuples. Ajuda a decidir entre: VACUUM, VACUUM FULL, REINDEX</p>
+<pre>Instal·lació
+CREATE EXTENSION IF NOT EXISTS pgstattuple;
+</pre>
+<pre>Funcions principals
+SELECT * FROM pgstattuple('clients');
+SELECT * FROM pgstatindex('idx_clients_nom');
+</pre>
+<p>Combinats, et permeten veure taula + índex. Permet decidir si cal VACUUM FULL o REINDEX</p>
+<h4>Diferència amb pg_stat_all_tables</h4>
+<li>pg_stat_all_tables → estadístiques aproximades</li>
+<li>pgstattuple → estadístiques exactes en temps real (més precises però costoses)</li>
+
+<hr> <h3>Bones pràctiques d’optimització de consultes</h3>
 <ul>
   <li>Evita SELECT *, només selecciona les columnes necessàries</li>
   <li>Indexa columnes que apareixen en WHERE i JOIN</li>
@@ -383,6 +455,18 @@ ANALYZE alumnes(edat, nom);</pre>
   <li>Avalua l’ús de EXPLAIN ANALYZE abans i després de canvis</li>
   <li>Prova diferents tipus de joins segons volums de dades (Nested Loop, Hash Join)</li>
 </ul>
+
+<hr><h3>6. pgBouncer</h3>
+<p>pgBouncer és un pooler de connexions per PostgreSQL que millora el rendiment
+   gestionant eficientment les connexions, però no optimitza directament les consultes SQL.</p>
+   <p>pgBouncer és una eina d'optimització a nivell de <strong>arquitectura</strong></p>
+  <h4>Que optimitza</h4>
+<ul>
+  <li>Redueix el cost d’obrir/tancar connexions</li>
+  <li>Evita saturació de connexions</li>
+  <li>Millora el throughput en apps amb moltes connexions</li>
+</ul>
+
 
 
   </section>
@@ -612,6 +696,7 @@ WHERE tablename = 't_pedidos';  </pre>
 <h3>Monitoratge de consultes</h3>
 <li>pg_stat_activity → sessions actives i queries en execució</li>
 <li>pg_stat_statements → historial de consultes amb temps, I/O, número de crides</li>
+-- Detecta consultes costoses i permet optimitzar-les
 <pre>-- Consultes més lentes
 SELECT query, calls, total_time, rows
 FROM pg_stat_statements
