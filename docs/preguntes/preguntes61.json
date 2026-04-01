@@ -1,0 +1,94 @@
+[
+  {
+    "titol": "Quina és la funció principal d’Oracle RAC?",
+    "opcions": [
+      { "text": "Fer còpies de seguretat automàtiques", "correcte": false },
+      { "text": "Permetre l’accés concurrent a una base de dades compartida", "correcte": true },
+      { "text": "Millorar la seguretat de contrasenyes", "correcte": false },
+      { "text": "Optimitzar consultes SQL individuals", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Què passa si un node falla en un entorn RAC?",
+    "opcions": [
+      { "text": "El sistema s’atura completament", "correcte": false },
+      { "text": "Es perd la base de dades", "correcte": false },
+      { "text": "Un altre node assumeix la càrrega automàticament", "correcte": true },
+      { "text": "Cal reiniciar manualment el sistema", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin dels següents és un component necessari en Oracle RAC?",
+    "opcions": [
+      { "text": "Un únic servidor independent", "correcte": false },
+      { "text": "Xarxa WiFi pública", "correcte": false },
+      { "text": "Xarxa d’interconnexió entre nodes", "correcte": true },
+      { "text": "Disc dur extern USB", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin és un dels principals avantatges d’Oracle RAC?",
+    "opcions": [
+      { "text": "Reducció total de costos", "correcte": false },
+      { "text": "Eliminació de la necessitat de manteniment", "correcte": false },
+      { "text": "Escalabilitat dinàmica", "correcte": true },
+      { "text": "Funciona sense xarxa", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quina de les següents és una alternativa a Oracle RAC?",
+    "opcions": [
+      { "text": "Apache Hadoop", "correcte": false },
+      { "text": "Docker Swarm", "correcte": false },
+      { "text": "Microsoft SQL Server AlwaysOn", "correcte": true },
+      { "text": "MongoDB Compass", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Què representa el núvol en el context dels SGBD?",
+    "opcions": [
+      { "text": "Un tipus de base de dades local", "correcte": false },
+      { "text": "Una tecnologia per utilitzar infraestructures virtuals", "correcte": true },
+      { "text": "Un sistema operatiu especialitzat", "correcte": false },
+      { "text": "Un llenguatge de programació", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin és un avantatge del núvol?",
+    "opcions": [
+      { "text": "Necessita grans inversions inicials", "correcte": false },
+      { "text": "No permet accés remot", "correcte": false },
+      { "text": "Pagament per ús més eficient", "correcte": true },
+      { "text": "Elimina la necessitat d’internet", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin és un inconvenient del núvol?",
+    "opcions": [
+      { "text": "Alta disponibilitat", "correcte": false },
+      { "text": "Dependència d’un proveïdor extern", "correcte": true },
+      { "text": "Escalabilitat automàtica", "correcte": false },
+      { "text": "Accés remot des de qualsevol lloc", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Quin dels següents és un proveïdor de núvol?",
+    "opcions": [
+      { "text": "Linux Server", "correcte": false },
+      { "text": "AWS (Amazon Web Services)", "correcte": true },
+      { "text": "Apache", "correcte": false },
+      { "text": "Docker", "correcte": false }
+    ]
+  },
+  {
+    "titol": "Què ofereixen les plataformes de núvol per a SGBD?",
+    "opcions": [
+      { "text": "Només emmagatzematge local", "correcte": false },
+      { "text": "Monitoratge en temps real i còpies automàtiques", "correcte": true },
+      { "text": "Únicament accés offline", "correcte": false },
+      { "text": "Eliminació de la seguretat", "correcte": false }
+    ]
+  }
+]
+
+
