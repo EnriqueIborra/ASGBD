@@ -64,9 +64,11 @@ Sessió
 <p>Inicialment, després de la instal·lació, cap variable està definida (excepte PATH). S'ha de posar manualment els valors si es vol fer ús d'alguna d'elles.</p>
 <p>Com es pot saber el valor que deuria tindre PGDATA: connectar a postgres,..   </p>
   <pre>sudo -u postgres psql -c "show data_directory;"    </pre>
+  <p>També es pot saber mirant el servei de windows <code>services.msc</code>, dins de propietats del servei de postgres
+  , en la comanda d'inici del servei, PGDATA és el que posa darrere de -D </p>
 
 
-<p>I com establir el/s valor/s:</p>
+<h3>I com establir el/s valor/s:</h3>
    
     <h3>🐧 En Linux</h3>
 <pre>Exemple Linux:
@@ -78,17 +80,19 @@ echo "export PGDATA=/var/lib/postgresql/16/main" >> ~/.bashrc
 source ~/.bashrc
 </pre>
 
-  <h3>🖥️ En Windows</h3>
-        <p>Pots modificar-les (el PATH) des de <em>Propietats del sistema → Variables d'entorn</em>.</p>
-      <p>Per vore les varibles d'entorn del SO de postgresql , amb el (REGEDIT) i dins buscar  postgres, per exemple</p>
-  <p>Pots modificar-les des del <strong>Registre (regedit)</strong></p>
+  <h3>🪟 En Windows</h3>
+        <p>Pots modificar-les (el PATH) des de <em>Propietats del sistema → Propietats avançades del sistema → Variables d'entorn</em>.</p>
     
 <h3>On es troben els binaris  (psql)</h3>
 <pre>which psql
 /usr/bin/psql 
     ==> /usr/bin
 Encara que en este directori es troben els links simbolics al directori real:
-/usr/lib/postgresql/16/bin/  </pre>
+/usr/lib/postgresql/16/bin/  
+
+En Windows:
+C:\Program Files\PostgreSQL\18\bin</pre>
+<p>El 16 o 18 dels exemples indiquen la versió instal·lada</p>
 
 <h3>On es troben els fitxers de configuració</h3>
 <pre>find / -name postgresql.conf 2>/dev/null
@@ -96,7 +100,10 @@ Encara que en este directori es troben els links simbolics al directori real:
 
 postgres@serverpg:/etc/postgresql/16/main$ ls
 conf.d	environment  pg_ctl.conf  pg_hba.conf  
-pg_ident.conf  postgresql.conf  start.conf   </pre>
+pg_ident.conf  postgresql.conf  start.conf 
+
+En Windows:
+C:\Program Files\PostgreSQL\18\data </pre>
  
 
   </section>
@@ -107,7 +114,7 @@ pg_ident.conf  postgresql.conf  start.conf   </pre>
   <section id="connexions">
       <img src="imgs/5432.png" class="imatge-dreta"  alt="stop" style="width: 30%">
     <h2>Configuració de les connexions</h2>
-<p>Postgres es un servei (daemon) de base de dades que corre habitualment al port TCP 5432. Es pot 
+<p>Postgres es un servei (daemon) de base de dades que escolta habitualment al port TCP 5432. Es pot 
   canviar editant el fitxer postgresql.conf, guardant, i reiniciant el servei (daemon)
 </p>
 <pre>Sistema Operatiu
@@ -174,8 +181,8 @@ MD5 només per compatibilitat amb sistemes antics.</p>
 
 
 <section id="instancia">
-  <h2>Configuració de la instància</h2>
-  <p>Una instància de PostgreSQL és el programa en execució del servidor de base de dades juntament amb tot 
+  <h2>Configuració de la instància /cluster</h2>
+  <p>Una instància/cluster de PostgreSQL és el programa en execució del servidor de base de dades juntament amb tot 
     el que necessita per funcionar. No és només la base de dades, És tot el sistema que gestiona les bases de dades</p>
     <p>Una instància de PostgreSQL inclou:
 
@@ -294,18 +301,27 @@ SELECT pg_reload_conf();
 SET (sessió)
 ALTER ROLE (usuari)
 ALTER DATABASE (bbdd)
-ALTER SYSTEM / postgresql.conf (global)  </pre>
+ALTER SYSTEM / postgresql.auto.conf
+postgresql.conf (global) 
+hardcoded </pre>
 
 <p>Quan es fa "ALTER SYSTEM SET work_mem = '128MB';", PostgreSQL no modifica directament postgresql.conf
 El que fa és escriure el canvi a un fitxer separat:</p>
 <pre>/var/lib/postgresql/16/main/postgresql.auto.conf</pre>
 <p>Aquest fitxer és llegit després de postgresql.conf quan el servidor arrenca o fas pg_reload_conf()
 Per això, els canvis són persistents, però no toques manualment postgresql.conf</p>
+<p>A PostgreSQL, molts paràmetres tenen un valor per defecte que està hardcoded dins del codi de PostgreSQL,
+es defineix en el moment de compilació / instal·lació, no està guardat en cap fitxer ni taula. <br>
+PostgreSQL els carrega automàticament en iniciar el servidor.</p>
+<p>Són els que source = 'default'</p>
+<pre>Com saber quins són:
+SELECT name, setting  FROM pg_settings
+WHERE source = 'default';  </pre>
 
-<hr>
+<hr><hr>
 <pre># Com saber de quin tipus és cada paràmetre:
 SELECT name, setting, context, vartype, source  FROM pg_settings ORDER BY name;</pre>
-<p>La columna context et diu quan i com es pot modificar el paràmetre (variable GUC).
+<p>La columna <code>context</code> et diu quan i com es pot modificar el paràmetre (variable GUC).
 </p>
 <pre>
 context     Significat
@@ -386,7 +402,7 @@ ALTER SYSTEM SET work_mem = '128MB';
 
 <p>Altres comptes? : No es creen més usuaris per defecte.
 No existeixen comptes com: root  admin  system  guest...</p>
-<p>Si es creen uns rols inicials:
+<!--<p>Si es creen uns rols inicials:
    pg_database_owner
  pg_read_all_data
  pg_write_all_data
@@ -408,7 +424,7 @@ No existeixen comptes com: root  admin  system  guest...</p>
 <p>Són rols ja creats pel sistema,
 No tenen LOGIN → no són usuaris,
 Serveixen per agrupar privilegis específics, i, 
-Els pots assignar a usuaris</p>
+Els pots assignar a usuaris</p> -->
 
 <hr>
 <p><strong>A nivell de sistema operatiu</strong>, quan instal·les PostgreSQL també es crea: </p>
@@ -420,8 +436,13 @@ Els pots assignar a usuaris</p>
   <li>S’utilitza per administrar el servidor</li>
 </ul>
 
- <hr>   <h3>📍 Ubicació dels comptes</h3>
-<p>Tots els usuaris i rols es troben a la base de dades postgres o qualsevol altra base de dades del cluster.
+<img src="./imgs/bdusers.png" alt="bd-users" width="20%" class="imatge-dreta"> 
+<hr>   <h3>📍 Ubicació dels comptes</h3>
+ 
+<p>Tots els usuaris i rols es troben fora i a la mateixa altura que les bases de dades. Els usuaris i les bases de dades
+  depenen del cluster. Així, un mateix usuari pot connectar (si te permís) a qualsevol BBDD del cluster.
+  
+<!--
 Concretament, la informació està en les taules del diccionari de dades dins l’esquema <code>pg_catalog</code> </p>
 <p>La taula principal és: <code>pg_catalog.pg_authid </code> . 
   També hi ha una vista més segura per a consultes normals:  <code>pg_catalog.pg_roles </code>   </p>
@@ -434,7 +455,7 @@ SELECT rolname, rolpassword  FROM pg_authid;
   <pre>
 $PGDATA/base/   → fitxers de bases de dades
 $PGDATA/global/ → informació global, incloent usuaris i rols
-  </pre>
+  </pre>  -->
   
     <h3> Canvi de contrasenya</h3>
 <h2>🔑 Canvi de contrasenya de l'usuari <code>postgres</code></h2>
@@ -526,7 +547,7 @@ $PGDATA/global/ → informació global, incloent usuaris i rols
 
 <h2>Arrancada del servidor</h2>
 
-<h3> En Linux (systemd – el més habitual)</h3>
+<h3> 🐧 En Linux (systemd – el més habitual)</h3>
 <pre><code>sudo systemctl start postgresql</code></pre>
 
 <p>O si hi ha versions específiques:</p>
@@ -541,7 +562,7 @@ $PGDATA/global/ → informació global, incloent usuaris i rols
 <p>Exemple:</p>
 <pre><code>pg_ctl -D /var/lib/postgresql/16/main start</code></pre>
 
-<h3> En Windows</h3>
+<h3> 🪟 En Windows</h3>
 <p>PostgreSQL s’instal·la com a servei:</p>
 <pre><code>net start postgresql-x64-16</code></pre>
 
@@ -556,9 +577,15 @@ psql és només un client per executar consultes SQL, i parar el servidor és
 una operació d’administració del sistema, no de SQL.</p>
 
 <h3> En Linux (systemd)</h3>
+<p>És una ordre a nivell de sistema, no específica de PostgreSQL.
+Internament, systemd acabarà cridant alguna cosa similar a pg_ctl, però segons com estiga definit el servei.
+El comportament (smart, fast, immediate) depèn del fitxer de configuració del servei (postgresql.service).</p>
 <pre><code>sudo systemctl stop postgresql</code></pre>
+<p>és més genèric i automatitzat. Nivell Sistema Operatiu</p>
 
 <h3> Amb pg_ctl</h3>
+<p>pg_ctl, una eina pròpia de PostgreSQL. Atura un cluster concret (el que apunta PGDATA).
+Tens control directe sobre com es fa l’aturada amb -m .Nivell de cluster. Gestió directa de postgres</p>
 <pre><code>pg_ctl -D /ruta/al/PGDATA stop</code></pre>
 
 <h3>⚠️ Modes de parada (important)</h3>
@@ -699,7 +726,7 @@ una operació d’administració del sistema, no de SQL.</p>
 <li>Emmagatzemats dins <code>base/&lt;OID_database&gt;/</code></li>
 </ul>
 
-<p>⚠️ No es guarda amb el nom de la taula, sinó amb un identificador intern.</p>
+<p class="alert">⚠️ No es guarda amb el nom de la taula, sinó amb un identificador intern.</p>
 <p>PostgreSQL guarda les dades així:</p>
 <pre>
 /var/lib/postgresql/16/main/base/
@@ -1030,7 +1057,7 @@ grep "ERROR" $PGDATA/pg_log/postgresql-2026-02-19_120000.log
 # Buscar per una data específica
 grep "2026-02-19" $PGDATA/pg_log/postgresql-2026-02-19_*.log</code></pre>
 
-<h3>Windows</h3>
+<h3>🪟 Windows</h3>
 <p>Obrir els fitxers <code>.log</code> amb Notepad o Notepad++ i filtrar per errors o sentències.</p>
 
 <h2>🛠 Configuració clau a <code>postgresql.conf</code></h2>

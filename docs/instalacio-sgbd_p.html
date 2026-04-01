@@ -33,6 +33,7 @@
 
 </nav>
 
+
 <main>
   <section id="intro">
     <h1>Instal·lació d'un SGBD</h1> <hr>
@@ -197,11 +198,11 @@
     </ul>
     <p>Alguns SGBD moderns (com PostgreSQL o SQL Server) poden realitzar funcions OLTP i OLAP híbrides, encara que no tan especialitzades com les eines pures.</p>
 
-    <h2>Tipus de connexió a una Base de Dades</h2>
+    <hr> <h2>Tipus de connexió a una Base de Dades</h2>
 
     <h3>1. Des de consola (CLI - Command Line Interface)</h3>
     <ul>
-        <li><strong>In situ</strong>
+        <li><strong>In situ / peer</strong>
             <ul>
                 <li>Connexió local, des del mateix equip on està la base de dades.</li>
                 <li>Exemples:<br>
@@ -240,7 +241,7 @@
         <li>Exemples:
             <ul>
                 <li>pgAdmin</li>
-                <li>SQL Developer</li>
+                <li>SQL Developer</li> 
                 <li>DBeaver</li>
                 <li>phpMyAdmin</li>
             </ul>
@@ -270,7 +271,7 @@
         </li>
     </ul>
 
-    <h2>Funcions d’un SGBD</h2>
+    <hr> <h2>Funcions d’un SGBD</h2> 
 <ul>
     <li><strong>DDL (Data Definition Language)</strong>: <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>, <code>TRUNCATE</code>, <code>COMMENT</code>, <code>RENAME</code></li>
     <li><strong>DML (Data Manipulation Language)</strong>: <code>INSERT</code>, <code>DELETE</code>, <code>UPDATE</code>, <code>SELECT</code>
@@ -699,7 +700,7 @@ Clúster de PostgreSQL
     📌 PostgreSQL és lliure i gratuït.
     <p>Es pot trobar més informació en la pàgina oficial  <a href="https://www.postgresql.org/download/">PostgreSQL/Downloads</a></p>
       
-    <h3>Instal·lació en GNU/Linux (la més habitual)</h3>
+    <h3>🐧 Instal·lació en GNU/Linux (la més habitual)</h3>
     Instal·lació amb gestor de paquets
     <pre>sudo apt update
 sudo apt install postgresql postgresql-contrib
@@ -756,7 +757,7 @@ postgres=#</pre></li>
     </ul>
 
 <hr>
-   <h3>Instal·lació en Windows</h3>
+   <h3>🪟 Instal·lació en Windows</h3>
    <h4>Instal·lador gràfic</h4>
    <li>Es descarrega un instal·lador oficial</li>
    <li>Durant la instal·lació: Tries la versió, Definixes la contrasenya de l’usuari postgres,
@@ -856,9 +857,9 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
  no en un directori separat.</p>
  <pre>
 /var/lib/postgresql/16/main/
-├── base/       <- dades de cada base de dades (pg_default)
-├── global/     <- dades globals (pg_global)
-├── pg_tblspc/  <- enllaços a tablespaces externs (buits si no n'hi ha)
+├── base/       - dades de cada base de dades (pg_default)
+├── global/     - dades globals (pg_global)
+├── pg_tblspc/  - enllaços a tablespaces externs (buits si no n'hi ha)
  </pre>
  <p>No existeis un lloc per defecte per posar TABLESPACES addicionals, els ha de definir el DBA. 
     Permeten guardar dades en altres discos/directoris</p>
@@ -867,6 +868,8 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
 <h4>BACKUPS</h4>
 <p>No existeix un lloc per defecte, l'ha de definir el DBA. 
     On es guarden còpies de seguretat: dumps (pg_dump), backups físics</p>
+<p class="preg"> 🧪 Crea un directori en el SO per a guardar els backups <br>
+                 🧪 Crea un directori en el SO per posar tablespaces addicionals</p>
 
   </section>
 
@@ -891,12 +894,13 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
     <h2>Accés a Postgresql</h2>
     <p>Després de tindre acabada la instal·lació, hem de comprovar que es pot accedir al cluster.</p>
     <h3> Des d'una terminal</h3>
-     <pre>sudo -u postgres psql </pre>
+     <pre>🐧 Linux:    sudo -u postgres psql 
+🪟 Windows:  psql -U postgres</pre>
 
     <p>Esta ordre ens connecta al cluster principal com a usuari DBA principal (postgres).     </p>
 
     <h3>Configuració bàsica després d’instal·lar</h3>
-     Canviar contrasenya de postgres 🗝️
+     Canviar contrasenya de l'usuari <code>postgres</code> (DBA)  🗝️
      <pre>ALTER USER postgres WITH PASSWORD 'nova_contrasenya';</pre>
  
     <h3>Permetre connexions remotes (opcional)</h3>
@@ -910,6 +914,13 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
     <h3>Crear BBDD i usuari</h3>
     <pre>CREATE USER alumne WITH PASSWORD '1234';
 CREATE DATABASE alumne OWNER alumne;  </pre>
+<p>L’usuari alumne és el propietari de la base de dades alumne.
+En PostgreSQL, el propietari té permisos totals sobre la base de dades. Un owner de DB pot:
+Connectar-se a la base de dades: Crear esquemes dins la base de dades: Crear taules, vistes, funcions, etc.:
+Donar permisos sobre objectes que crea (tables, sequences, schemas): Esborrar objectes que ha creat (DROP TABLE, DROP SCHEMA, etc.)
+Modificar propietat d’objectes amb ALTER TABLE/SCHEMA … OWNER TO …  <br>
+Que no pot: No té permisos globals sobre altres bases de dades.
+No pot modificar configuració del servidor (per això existeixen rols com SUPERUSER).</p>
 
         <h3>Arrancar i parar <s>BBDD</s> Cluster</h3>
         <pre>sudo systemctl start postgresql
