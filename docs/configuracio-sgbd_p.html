@@ -80,7 +80,7 @@ echo "export PGDATA=/var/lib/postgresql/16/main" >> ~/.bashrc
 source ~/.bashrc
 </pre>
 
-  <h3>🪟 En Windows</h3>
+  <h3>🖥️ En Windows</h3>
         <p>Pots modificar-les (el PATH) des de <em>Propietats del sistema → Propietats avançades del sistema → Variables d'entorn</em>.</p>
     
 <h3>On es troben els binaris  (psql)</h3>
@@ -562,7 +562,7 @@ $PGDATA/global/ → informació global, incloent usuaris i rols
 <p>Exemple:</p>
 <pre><code>pg_ctl -D /var/lib/postgresql/16/main start</code></pre>
 
-<h3> 🪟 En Windows</h3>
+<h3> 🖥️ En Windows</h3>
 <p>PostgreSQL s’instal·la com a servei:</p>
 <pre><code>net start postgresql-x64-16</code></pre>
 
@@ -1057,7 +1057,7 @@ grep "ERROR" $PGDATA/pg_log/postgresql-2026-02-19_120000.log
 # Buscar per una data específica
 grep "2026-02-19" $PGDATA/pg_log/postgresql-2026-02-19_*.log</code></pre>
 
-<h3>🪟 Windows</h3>
+<h3>🖥️ Windows</h3>
 <p>Obrir els fitxers <code>.log</code> amb Notepad o Notepad++ i filtrar per errors o sentències.</p>
 
 <h2>🛠 Configuració clau a <code>postgresql.conf</code></h2>

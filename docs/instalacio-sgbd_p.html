@@ -29,7 +29,7 @@
   <a href="#estruc">Estructura carpetes</a>
   <a href="#acces">Accés a PostgreSQL</a>
   <a href="#altres-recursos">Altres Recursos</a>
-  <a href="#multi">Multi instància</a>
+  <a href="#multi">Multi cluster</a>
 
 </nav>
 
@@ -757,13 +757,13 @@ postgres=#</pre></li>
     </ul>
 
 <hr>
-   <h3>🪟 Instal·lació en Windows</h3>
+   <h3>🖥️ Instal·lació en Windows</h3>
    <h4>Instal·lador gràfic</h4>
    <li>Es descarrega un instal·lador oficial</li>
    <li>Durant la instal·lació: Tries la versió, Definixes la contrasenya de l’usuari postgres,
         Tries el port (5432 per defecte),  S’inicialitza el clúster</li>
-    <li>Deixar marcat per instal·lar Application Stack Builder</li>
-    <li>Inclou: pgAdmin, psql (sense PATH) , Serveis de Windows per a postgres</li>
+    <li>Deixar marcat per instal·lar <strong>Application Stack Builder</strong></li>
+    <li>Inclou: pgAdmin (Client postgresql), psql (sense PATH) , Serveis de Windows per a postgres (servidor PostgreSQL), Application Stack Builder (manteniment)</li>
     <p>El PATH sol ser <code>c:\Program Files\PostgreSQL\18\bin</code> segons la versió. Afegix esta ruta al teu path</p>
 
     <h3>Instal·lació en macOS</h3>
@@ -857,9 +857,9 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
  no en un directori separat.</p>
  <pre>
 /var/lib/postgresql/16/main/
-├── base/       - dades de cada base de dades (pg_default)
-├── global/     - dades globals (pg_global)
-├── pg_tblspc/  - enllaços a tablespaces externs (buits si no n'hi ha)
+├── base/        🡐 dades de cada base de dades (pg_default)
+├── global/      🡐 dades globals (pg_global)
+├── pg_tblspc/   🡐 enllaços a tablespaces externs (buits si no n'hi ha)
  </pre>
  <p>No existeis un lloc per defecte per posar TABLESPACES addicionals, els ha de definir el DBA. 
     Permeten guardar dades en altres discos/directoris</p>
@@ -895,7 +895,7 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
     <p>Després de tindre acabada la instal·lació, hem de comprovar que es pot accedir al cluster.</p>
     <h3> Des d'una terminal</h3>
      <pre>🐧 Linux:    sudo -u postgres psql 
-🪟 Windows:  psql -U postgres</pre>
+🖥️ Windows:  psql -U postgres</pre>
 
     <p>Esta ordre ens connecta al cluster principal com a usuari DBA principal (postgres).     </p>
 
@@ -1012,63 +1012,132 @@ Normalment el prompt mostra la base de dades:     testdb=#
 
  <section id="multi">
    <h2>(Ampliació ++)</h2>
-    <h2>Instal·lar més d'una instància en una mateixa màquina</h2>
+    <h2>Instal·lar més d'un cluster en una mateixa màquina</h2>
     <h3>Directoris de dades separats</h3>
-    <p>Cada instància necessita el seu PGDATA, és a dir, el directori on es guarden les dades, logs i configuracions.</p>
+    <p>Cada cluster necessita el seu PGDATA, és a dir, el directori on es guarden les dades, logs i configuracions.</p>
+
+<h4>🐧 Instal·lació en GNU/Linux</h4>
 <pre>
-# Instància 1
-mkdir -p /var/lib/postgresql/instance1
-# Instància 2
-mkdir -p /var/lib/postgresql/instance2
+# Cluster 1
+mkdir -p /var/lib/postgresql/cluster1
+# Cluster 2
+mkdir -p /var/lib/postgresql/cluster2
+</pre>
+
+<h3>Inicialitzar la/les base de dades</h3>
+<pre>
+# Cluster 1
+initdb -D /var/lib/postgresql/cluster1
+
+# Cluster 2
+initdb -D /var/lib/postgresql/cluster2    
 </pre>
 
 <h3>Ports separats</h3>
-<p> PostgreSQL per defecte usa el port 5432. La segona instància ha de tenir un altre port, per exemple 5433.
+<p> PostgreSQL per defecte usa el port 5432. El segon cluster ha de tenir un altre port, per exemple 5433.
 </p>
 <pre>
-# Al postgresql.conf de la segona instància
+# Al postgresql.conf del segon cluster
 port = 5433
 </pre>
 
 <h3>Configuració independent</h3>
-    <p>Cada instància té els seus fitxers: </p>
+    <p>Cada cluster té els seus fitxers: </p>
 <ul>
     <li>postgresql.conf → configuració principal</li>
     <li>pg_hba.conf → autenticació i permisos</li>
     <li>pg_ident.conf → mapatge d’usuaris</li>
 </ul>
 
-<h3>Inicialitzar la/les base de dades</h3>
-<pre>
-# Instància 1
-initdb -D /var/lib/postgresql/instance1
 
-# Instància 2
-initdb -D /var/lib/postgresql/instance2    
+<h3>Executar clusters separats</h3>
+<p>Opció A: manual amb diferents ports</p>
+<p>ràpid i simple. Útil per proves, però, no hi ha control fàcil (stop, restart), no gestiona logs bé, no recomanat en producció</p>
+<pre>
+postgres -D /var/lib/postgresql/cluster1 -p 5432 &
+postgres -D /var/lib/postgresql/cluster2 -p 5433 &    
 </pre>
 
-<h3>Executar instàncies separades</h3>
-<p>Opció A: com a serveis separats (Linux)</p>
 
+<p>Opció B: com a serveis separats (Linux)</p>
 Crea serveis systemd independents apuntant a cada PGDATA i port.
-
 <pre>
 # Exemples 
-pg_ctl -D /var/lib/postgresql/instance1 -l logfile1 start
-pg_ctl -D /var/lib/postgresql/instance2 -l logfile2 start    
+pg_ctl -D /var/lib/postgresql/cluster1 -l logfile1 start
+pg_ctl -D /var/lib/postgresql/cluster2 -l logfile2 start    
 </pre>
 
-<p>Opció B: manual amb diferents ports</p>
+<p>Integrar amb systemctl</p>
 <pre>
-postgres -D /var/lib/postgresql/instance1 -p 5432 &
-postgres -D /var/lib/postgresql/instance2 -p 5433 &    
+[Unit]
+Description=PostgreSQL Cluster 1
+
+[Service]
+Type=forking
+User=postgres
+ExecStart=/usr/lib/postgresql/15/bin/pg_ctl -D /var/lib/postgresql/cluster1 -l /var/log/postgresql/cluster1.log start
+ExecStop=/usr/lib/postgresql/15/bin/pg_ctl -D /var/lib/postgresql/cluster1 stop
+
+[Install]
+WantedBy=multi-user.target
+</pre>
+<p>El nom del fitxer el tries tu, però ha d’acabar en:  <code>.service</code>   </p>
+<p>S'ha de posar :  <code>/etc/systemd/system/</code></p>
+<p>I després de modificar algun fitxer:  <code>systemctl daemon-reload</code></p>
+
+<pre>
+-- I després es podrà Fer
+systemctl start postgresql-cluster1
+systemctl stop postgresql-cluster1
+systemctl status postgresql-cluster1
+</pre>
+<pre>
+-- Activar servei
+systemctl enable postgresql-cluster1
 </pre>
 
-<h3>Connexió a cada instància</h3>
+
+<h3>Connexió a cada cluster</h3>
 <pre>
-psql -h localhost -p 5432 -U usuari -d db1   # instància 1
-psql -h localhost -p 5433 -U usuari -d db2   # instància 2    
+psql -h localhost -p 5432 -U usuari -d db1   # cluster 1
+psql -h localhost -p 5433 -U usuari -d db2   # cluster 2    
 </pre>
+
+<hr><h3>🖥️ En Windows</h3>
+
+<h4>Crear un directori de dades nou, per exemple</h4>
+
+<pre>"C:\Program Files\PostgreSQL\15\bin\initdb.exe" -D "C:\pgsql\data2 --encoding=UTF8 --locale=es_ES.UTF-8"
+o 
+"C:\Program Files\PostgreSQL\15\bin\initdb.exe" -D "C:\pgsql\data2"
+</pre>
+
+<h4>Cambiar port d'escolta</h4>
+<pre>
+-- C:\pgsql\data2\postgresql.conf
+port = 5433  </pre>
+<h4>Donar més seguretat</h4>
+<pre>
+-- C:\pgsql\data2\pg_hba.conf
+local   all   all   scram-sha-256
+host    all   all   127.0.0.1/32   scram-sha-256
+</pre>
+
+<h4>Iniciar Server manualment</h4>
+
+<pre>-- Iniciar server postgres
+pg_ctl.exe -D "C:\pgsql\data2" start</pre>
+
+<h4>Crear un servei nou per aquest cluster</h4>
+<p>Si volem que el nou cluster arranque en iniciar la màquina</p>
+<pre>pg_ctl register -N "postgresql-cluster2" -D "C:\pgsql\data2"</pre>
+
+<h4>Arrancar el servei</h4>
+<pre>net start postgresql-cluster2
+</pre>
+
+<h4>Provar connexió</h4>
+<pre>psql -p 5433 -U postgres</pre>
 
 
   </section>
