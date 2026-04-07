@@ -88,16 +88,60 @@
     <p>Lloc on posar les dades: Variables o Cel·les d'una Taula</p>     
 
     <p>Cada columna d’una taula ha de tenir un tipus de dada, segons el valor que ha d’emmagatzemar:</p>
-  
-    <ul>
-      <li> <code>NUMBER(n) o NUMBER</code> → enters o decimals amb n dígits</li>
-      <li> <code>VARCHAR2(n)</code> → cadenes de text de longitud variable (fins a n caràcters)</li>
-      <li> <code>DATE o TIMESTAMP</code> → valors de data i hora</li>
-      <li> <code>CHAR(n)</code> → cadena de longitud fixa</li>
-      <li> <code>BOOLEAN</code> (no suportat a Oracle directament, però simulat)</li>
-    </ul>
-    <p> &emsp;<strong>Nota:</strong> Des d'Oracle 23, boolean es pot fer servir en columnes de taules i en consultes</p>
-  
+ 
+<table border="1">
+  <thead>
+    <tr>
+      <th>Descripció</th>
+      <th>Tipus de dada (Oracle)</th>
+      <th>Tipus de dada (PostgreSQL)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Enters (sense limit) o amb n dígits</td>
+      <td><code>NUMBER / NUMBER(n) </code></td>
+      <td> <code>INTEGER o INT</code> / <code>NUMERIC(n)</code></td>
+    </tr>
+        <tr>
+      <td>Amb decimals amb n dígits</td>
+      <td><code>NUMBER(p,s) o NUMBER</code></td>
+      <td><code>NUMERIC(p,s)</code> / <code>DECIMAL</code>  </td>
+    </tr>
+    <tr>
+      <td>Cadenes de text de longitud variable (sense limit)</td>
+      <td><code> "Tipus especial" </code></td>
+      <td><code> TEXT</code></td>
+    </tr>
+    <tr>
+      <td>Cadenes de text de longitud variable (fins a n caràcters)</td>
+      <td><code>VARCHAR2(n)</code></td>
+      <td><code>VARCHAR(n) </code></td>
+    </tr>
+    <tr>
+      <td>Valors de data i hora</td>
+      <td><code>DATE o TIMESTAMP</code></td>
+      <td><code>DATE</code> / <code>TIMESTAMP</code></td>
+    </tr>
+    <tr>
+      <td>Cadena de longitud fixa</td>
+      <td><code>CHAR(n)</code></td>
+      <td><code>CHAR(n)</code></td>
+    </tr>
+    <tr>
+      <td> Valor Booleà (cert/fals)</td>
+      <td><code>BOOLEAN</code></td>
+      <td><code>BOOLEAN</code></td>
+    </tr>
+    <tr>
+      <td>Array (No suportat a Oracle directament)</td>
+      <td><code></code></td>
+      <td><code>int[], text[], date[] boolean[]</code></td>
+    </tr>
+  </tbody>
+</table>    
+
+      
     <p> &emsp;<strong>Nota:</strong> en Oracle, `VARCHAR2` és més habitual que `VARCHAR` per compatibilitat.</p>
 
     <p>Una <strong>variable</strong> representa un contenidor o un espai en la memòria física o virtual d'una computadora, 
@@ -155,6 +199,7 @@
   
   <section id="crud">
    
+<img src="imgs/crud_.jpg" alt="crud" width="30%" class="imatge-dreta ">    
 <h2>Què és el CRUD</h2>
 <p> El terme CRUD és un acrònim que fa referència a les quatre operacions bàsiques que es realitzen en bases de dades 
     i sistemes de gestió d'informació:</p>
@@ -183,13 +228,21 @@
   </p>
 
   <h3>📄 Exemple bàsic:</h3>
-  <pre>
+  <pre>  ** Oracle
 CREATE TABLE alumnes (
    id NUMBER(3),
    nom VARCHAR2(30),
    edat NUMBER(2),
    curs VARCHAR2(10)
 );   </pre>
+<pre>  ** postgresql
+CREATE TABLE alumnes (
+   id NUMERIC(3),
+   nom VARCHAR(30),
+   edat NUMERIC(2),
+   curs VARCHAR(10)
+);  
+</pre>
   <p>Se sol posar d'aquesta forma per llegibilitat, però tambè es pot posar així:</p>
   <pre>   CREATE TABLE alumnes (id NUMBER(3), nom VARCHAR2(30), edat NUMBER(2), curs VARCHAR2(10) ); </pre>
 
@@ -211,6 +264,15 @@ CREATE TABLE alumnes (
    edat NUMBER(2) DEFAULT 18 CHECK (edat >= 16),
    curs VARCHAR2(10)
 );
+  </pre>
+
+  <pre>  ** postgresql
+CREATE TABLE alumnes (
+   id INTEGER PRIMARY KEY,
+   nom VARCHAR(30) NOT NULL,
+   edat SMALLINT DEFAULT 18 CHECK (edat >= 16),
+   curs VARCHAR(10)
+);    
   </pre>
   <table border="1">      <thead><tr><th>ID</th><th>Nom</th><th>Edat</th><th>Curs</th></tr></thead>      </table>  
   <p>Però una cosa és crear una taula (estructura), la qual es crea buida, 
@@ -414,6 +476,7 @@ WHERE edat >= 18;
   </ul>
 
   <pre>
+BEGIN;
 UPDATE alumnes SET edat = 30 WHERE id = 999; -- Ups!
 ROLLBACK; -- Desfem el canvi
   </pre>
@@ -498,8 +561,8 @@ ROLLBACK; -- Desfem el canvi
     <h3> Control de seguretat amb claus foranes</h3>
     <p>** Per entendre millor este cas pot ser convenient mirar el apartat de "Normalització" primer</p>
     <p>
-      Si una fila està relacionada amb una altra taula mitjançant una <code>FOREIGN KEY</code>, pot ser que el DELETE <strong>no es permeti</strong> (error de restricció), 
-      a menys que estigui configurada l’opció <code>ON DELETE CASCADE</code>.
+      Si una fila està relacionada amb una altra taula mitjançant una <code>FOREIGN KEY</code>, pot ser que el DELETE <strong>no es permeta</strong> (error de restricció), 
+      a menys que estiga configurada l’opció <code>ON DELETE CASCADE</code>.
     </p>
   
     <h4>Exemple amb relació:</h4>
@@ -750,12 +813,21 @@ DROP TABLE alumnes;
  </ul>
 
  <h3> Com comprovar que ha desaparegut?</h3>
- <pre>
+ <pre>  ** Oracle
   SELECT table_name
   FROM user_tables
   WHERE table_name = 'NOM_TAULA';  </pre>
+<pre>  ** postgresql
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'   -- esquema on està la taula
+  AND table_name = 'nom_taula';  
+</pre>
  <p>Si la consulta no retorna cap fila, vol dir que la taula ja no existeix dins del teu esquema d'usuari.</p>
  <p>NOM_TAULA hauria d'estar en majúscules, ja que Oracle desa els noms d’objectes en majúscules per defecte</p>
+
+ <li>Si hi ha foreign keys referenciant la taula, <code>DROP TABLE</code> pot fallar → cal <code>DROP TABLE … CASCADE</code> per forçar-ho.</li>
+<li><code>TRUNCATE</code> també pot fallar amb foreign keys si no es fa <code>TRUNCATE … CASCADE</code></li>
 
  <h3> Bones pràctiques abans d’esborrar</h3>
  <ul>
@@ -1003,14 +1075,9 @@ FULL OUTER JOIN departaments b ON a.dept_id = b.id;</code></pre>
 FROM empleats a
 CROSS JOIN departaments b;</code></pre>
    
-    <h2>6. Sintaxi antiga (Oracle 8 o abans)</h2>
-    <p>Oracle permet encara aquesta sintaxi antiga per fer LEFT JOINs:</p>
-    <pre style="width:50%;"><code>SELECT a.nom, b.departament
-FROM empleats a, departaments b
-WHERE a.dept_id = b.id(+);</code></pre>
-    <p><strong>Nota:</strong> el <code>(+)</code> va al costat de la taula que pot tenir <code>NULL</code>.</p>
+   
 
-<h1>Diferència entre <code>JOIN</code> i unió amb coma en SQL Oracle</h1>
+<h1>Diferència entre <code>JOIN</code> i unió amb coma en SQL </h1>
 
           <h2>1. JOIN explícit (moderna i clara)</h2>
       <p>És la forma recomanada actualment, amb una sintaxi clara i separació entre la lògica de la unió i la resta de condicions.</p>
