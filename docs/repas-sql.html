@@ -19,13 +19,13 @@
 <nav class="repas">
   <h2>Índex</h2>
   <a href="#introduccio-sql">Introduccio a SQL</a>
-  <a href="#dades-tipus">Dades</a>
-  <a href="#crud">CRUD</a>
+  <a href="#dades-tipus">Tipus de Dades</a>
+  <a href="#taules">Taules (estructura)</a>
+  <a href="#crud">CRUD (dades)</a>
   <a href="#create"> &emsp; C create</a>
   <a href="#read">   &emsp; R read</a>
   <a href="#update"> &emsp; U update</a>
   <a href="#delete"> &emsp; D delete</a>
-  <a href="#modifica-taula">Modifica taula</a>
   <a href="#condicions">Condicions</a>
   <a href="#normalitzacio">Normalització</a>
   <a href="#permisos">Permisos </a>
@@ -58,7 +58,7 @@
         <img src="imgs/sql.png" class="imatge-dreta" alt="fitxer-fitxes" style="width: 25%">
         <ul>
           <li> Definició de taules i manipulació de dades (<strong>DDL</strong> i <strong>DML</strong>)</li>
-          <li> Ús de claus primàries i foranes</li>
+          <li> Ús de claus primàries i alienes</li>
           <li> Consultes amb filtres, ordenacions i funcions agregades (<strong>DQL</strong>)</li>
           <li> Funcions i operadors</li>
           <li> Permisos: <code>GRANT</code> i <code>REVOKE</code> (<strong>DCL</strong>)</li>
@@ -123,6 +123,11 @@
       <td><code>DATE o TIMESTAMP</code></td>
       <td><code>DATE</code> / <code>TIMESTAMP</code></td>
     </tr>
+  <tr>
+      <td>Fila o registre</td>
+      <td><code>ROWTYPE</code></td>
+      <td><code>ROWTYPE</code></td>
+    </tr>    
     <tr>
       <td>Cadena de longitud fixa</td>
       <td><code>CHAR(n)</code></td>
@@ -196,35 +201,21 @@
   
 
 
-  
-  <section id="crud">
-   
-<img src="imgs/crud_.jpg" alt="crud" width="30%" class="imatge-dreta ">    
-<h2>Què és el CRUD</h2>
-<p> El terme CRUD és un acrònim que fa referència a les quatre operacions bàsiques que es realitzen en bases de dades 
-    i sistemes de gestió d'informació:</p>
-<ul>
-    <li> Create (Crear): Fa referència a l'operació d'afegir nous registres o elements a la base de dades.</li>
-    <li>Read (Llegir): Implica obtenir o consultar les dades emmagatzemades a la base de dades.</li>
-    <li>Update (Actualitzar): Consisteix a modificar o actualitzar els registres existents.</li>
-    <li>Delete (Eliminar): Es refereix a eliminar registres o dades de la base de dades.</li>
-</ul>
-    <p>Aquestes operacions són fonamentals per a la gestió i manteniment de bases de dades en moltes aplicacions, 
-    des de sistemes senzills fins a plataformes més complexes. CRUD és un concepte que s'aplica en moltes àrees 
-    de desenvolupament de programari, especialment en el context d'aplicacions web o mòbils que interactuen amb 
-    bases de dades.</p>
 
-  </section>
-  
-
-
-
- 
-  <section id="create">
-    <h2>🛠️ Creació de taules: <code>CREATE TABLE</code></h2>
+<section id="taules">
+  <h2>TAULES</h2>
+  <p>Una taula és la unitat bàsica d’emmagatzematge de dades dins d’una base de dades relacional.</p>
+  <ul>
+    <li>Una taula és un conjunt de registres (files) que comparteixen la mateixa estructura.</li>
+    <li>Cada registre conté valors per a cada camp (columna) definit a la taula.</li>
+    <li>Els camps tenen un tipus de dada específic (INTEGER, VARCHAR, DATE, etc.) </li>
+    <li>i poden tenir restriccions (<code>NOT NULL, PRIMARY KEY, CHECK,</code> etc.).</li>
+  </ul>
+   <h2>🛠️ Creació de taules: <code>CREATE TABLE</code></h2>
 
   <p>
-    Per definir una nova taula, fem servir la ordre <code>CREATE TABLE</code> indicant el nom, les columnes, el tipus de dades i, opcionalment, les restriccions.
+    Per definir una nova taula, fem servir la ordre <code>CREATE TABLE</code> indicant el nom (de la taula), 
+    les columnes amb el tipus de dades i, opcionalment, les restriccions.
   </p>
 
   <h3>📄 Exemple bàsic:</h3>
@@ -262,7 +253,7 @@ CREATE TABLE alumnes (
    id NUMBER(3) PRIMARY KEY,
    nom VARCHAR2(30) NOT NULL,
    edat NUMBER(2) DEFAULT 18 CHECK (edat >= 16),
-   curs VARCHAR2(10)
+   curs VARCHAR2(10) NOT NULL
 );
   </pre>
 
@@ -271,16 +262,313 @@ CREATE TABLE alumnes (
    id INTEGER PRIMARY KEY,
    nom VARCHAR(30) NOT NULL,
    edat SMALLINT DEFAULT 18 CHECK (edat >= 16),
-   curs VARCHAR(10)
+   curs VARCHAR(10) NOT NULL
 );    
   </pre>
   <table border="1">      <thead><tr><th>ID</th><th>Nom</th><th>Edat</th><th>Curs</th></tr></thead>      </table>  
+ 
+
+   
+  <h2> Afegir una columna a una taula existent: <code>ALTER TABLE ... ADD</code></h2>
+
+    <h3>📘 Per a què serveix?</h3>
+    <p>
+      Quan necessites <strong>modificar l’estructura d’una taula</strong> que ja existeix, per exemple, afegint una nova columna per a una informació nova (telèfon, correu, etc.), fas servir la comanda <code>ALTER TABLE</code>.
+    </p>
+
+    <h3> Què és pot modificar</h3>
+    <ul>
+      <li> Afegir una columna</li>
+      <li> Esborrar una columna</li>
+      <li> Modificar una columna</li>
+    </ul>
+
+  
+    <h3>🔧 Sintaxi bàsica - Afegir columna nova</h3>
+    <pre>
+  ALTER TABLE nom_taula
+  ADD (nom_columna tipus_dada [restriccions]);
+    </pre>
+  
+    <h4> Exemple senzill: afegir el correu electrònic</h4>
+    <pre>
+  ALTER TABLE alumnes
+  ADD (correu VARCHAR2(50));
+    </pre>
+  
+    <p>Amb això, la taula <code>alumnes</code> ara tindrà una nova columna anomenada <code>correu</code>, de fins a 50 caràcters.</p>
+  
+    <h3>🧱 Afegir diverses columnes a la vegada</h3>
+    <pre>
+  ALTER TABLE alumnes
+  ADD (
+    telefon VARCHAR2(15),
+    data_alta DATE
+  );
+    </pre>
+  
+    <p>Això és útil quan fas evolucions del model de dades.</p>
+  
+    <h3>🔐 Afegir columna amb restricció <code>NOT NULL</code></h3>
+    <p>
+      Quan afegeixes una nova columna i li poses la restricció <code>NOT NULL</code>, has d’assegurar-te que totes les files actuals tindran un valor vàlid.
+    </p>
+  
+    <pre>
+  -- Això provocarà error si no assignem un valor a totes les files existents
+  ALTER TABLE alumnes
+  ADD (dni VARCHAR2(9) NOT NULL); -- ❌ ERROR
+    </pre>
+  
+    <h4>✅ Solució: primer afegir-la sense restricció, omplir-la, i després aplicar-la</h4>
+    <pre>
+  ALTER TABLE alumnes
+  ADD (dni VARCHAR2(9));
+  
+  UPDATE alumnes SET dni = 'PENDENT'; -- o un valor real
+  
+  ALTER TABLE alumnes
+  MODIFY (dni VARCHAR2(9) NOT NULL);
+    </pre>
+  
+    <h3> Bones pràctiques</h3>
+    <ul>
+      <li> Planeja bé quins camps nous necessites</li>
+      <li> Revisa que els noms no existeixin ja</li>
+      <li> Si la columna ha de ser obligatòria, assegura’t que totes les files tinguin valor abans de posar <code>NOT NULL</code></li>
+      <li> Utilitza tipus de dada adequats per a l’ús que faràs</li>
+    </ul>
+  
+    <h3>🔍 Comprovar els canvis</h3>
+    <p>Pots veure l’estructura actual d’una taula amb:</p>
+    <pre>
+  DESC alumnes;
+  -- o
+  SELECT column_name, data_type FROM user_tab_columns
+  WHERE table_name = 'ALUMNES';
+    </pre>
+  
+    <h3> Casos habituals d’ús</h3>
+    <ul>
+      <li> Afegir una columna <code>observacions</code> o <code>comentaris</code></li>
+      <li> Afegir un <code>telefon</code> o <code>email</code> si abans no s’havia registrat</li>
+      <li> Afegir una data de creació o d’actualització de registres</li>
+    </ul>
+
+  <!-- modificar columna d'una taula-->
+  <h2>&nbsp;</h2>
+  <h2>🗑️ Modificar una columna d’una taula: <code>ALTER TABLE ... MODIFY COLUMN ...</code></h2>
+    <p>Pot interessar modificar una columna, com per exemple, afegir una restricció que no té</p>
+    <pre>
+    ALTER TABLE alumnes
+    MODIFY (dni VARCHAR2(9) NOT NULL);
+  </pre>
+  <p>Si es fa açò, s'ha de comprovar que totes les files compleixen la restricció, de no ser així, fallarà i donarà ERROR</p>
+  <p>Quan modifiques el tipus d'una columna en Oracle, com per exemple de <code>NUMBER</code> a <code>VARCHAR2</code>,
+     Oracle intenta convertir automàticament les dades existents al nou tipus.</p>
+  <pre>
+    CREATE TABLE test (  id NUMBER );
+    INSERT INTO test VALUES (123);
+    ALTER TABLE test MODIFY id VARCHAR2(10);    </pre>   
+  <h4>✅ Si la conversió és possible:</h4>
+     <p>    Oracle converteix totes les dades automàticament i sense error</p>   
+  <h4>❌ Si hi ha valors que no es poden convertir:</h4>   
+   <p>     L'operació fallarà amb un error de tipus ORA-01439. Això passa, per exemple, si vas de VARCHAR2 a NUMBER i hi ha valors no numèrics</p>    
+
+    <!-- esborrar columna d'una taula-->
+     <h2>&nbsp;</h2>
+    <h2>🗑️ Esborrar una columna d’una taula: <code>ALTER TABLE ... DROP COLUMN ...</code></h2>
+
+    <h3>📘 Quan cal esborrar una columna?</h3>
+    <p>
+      A vegades, una columna ja no és necessària perquè:
+    </p>
+    <ul>
+      <li>Ha quedat obsoleta (ex: <code>fax</code>)</li>
+      <li>Ha estat substituïda per una altra més útil o normalitzada</li>
+      <li>S'ha afegit per error o durant proves</li>
+    </ul>
+  
+    <h3>🧱 Sintaxi bàsica</h3>
+    <pre>
+  ALTER TABLE nom_taula
+  DROP COLUMN nom_columna;
+    </pre>
+  
+    <h4> Exemple: eliminar el camp <code>telefon</code></h4>
+    <pre>
+  ALTER TABLE alumnes
+  DROP COLUMN telefon;
+    </pre>
+  
+    <p>Aquesta comanda elimina completament la columna <code>telefon</code> i totes les dades que contenia.</p>
+  
+    <h3>⚠️ Atenció amb la pèrdua de dades!</h3>
+    <p>
+      Aquesta operació <strong>no es pot desfer</strong> fàcilment. Un cop eliminada una columna, les dades desapareixen definitivament, a menys que:
+    </p>
+    <ul>
+      <li> Tinguem una còpia de seguretat (backup)</li>
+      <li> L’hàgim exportada prèviament</li>
+    </ul>
+  
+    <h3> Alternativa: posar-la com a inactiva (via convenció)</h3>
+    <p>
+      Si no vols perdre les dades immediatament, pots:
+    </p>
+    <ul>
+      <li>Renombrar-la (ex: <code>telefon_obsolet</code>)</li>
+      <li>Deixar-la buida (<code>NULL</code>) i ignorar-la</li>
+    </ul>
+  
+    <h3> Esborrar múltiples columnes (Oracle 12c+)</h3>
+    <pre>
+  ALTER TABLE alumnes
+  DROP (telefon, observacions);
+    </pre>
+  
+    <p> No tots els SGBD permeten aquesta sintaxi directa. En Oracle antic cal fer-ho de forma individual.</p>
+  
+    <h3> Com comprovar que ha desaparegut?</h3>
+    <pre>
+  DESC alumnes;
+  -- o
+  SELECT column_name FROM user_tab_columns
+  WHERE table_name = 'ALUMNES';
+    </pre>
+  
+    <h3> Bones pràctiques abans d’esborrar</h3>
+    <ul>
+      <li> Assegura’t que realment no s’utilitza ni en consultes ni aplicacions</li>
+      <li> Exporta les dades si poden tenir valor futur</li>
+      <li> Informa l’equip o documenta el canvi</li>
+      <li> Considera posar la columna com a <code>NULL</code> i fer una neteja progressiva</li>
+    </ul>
+  
+    <h3> Exemple complet</h3>
+    <pre>
+  -- Comprovem si la columna hi és
+  DESC alumnes;
+  
+  -- Eliminem la columna
+  ALTER TABLE alumnes DROP COLUMN data_alta;
+  
+  -- Verifiquem de nou
+  DESC alumnes;
+    </pre>     
+
+
+ <!-- esborrar una taula  !!-->
+ <h2>&nbsp;</h2>
+ <h2>🗑️ Esborrar una taula: <code>DROP TABLE ... </code></h2>
+
+ <h3>📘 Quan cal esborrar una taula</h3>
+ <p>
+   A vegades, una taula deixa de formar part del E-R perquè:
+ </p>
+ <ul>
+   <li>Ha quedat obsoleta </li>
+   <li>Ha estat substituïda per una altra més útil o normalitzada</li>
+   <li>S'ha afegit per error o durant proves</li>
+ </ul>
+
+ <h3>🧱 Sintaxi bàsica</h3>
+ <pre>
+DROP TABLE nom_taula;
+ </pre>
+
+ <h4> Exemple: eliminar la taula  <code>alumnes</code></h4>
+ <pre>
+DROP TABLE alumnes;
+ </pre>
+
+ <p>Aquesta comanda elimina completament la taula i totes les dades que contenia.</p>
+
+ <h3>⚠️ Atenció amb la pèrdua de dades!</h3>
+ <p>
+   Aquesta operació <strong>no es pot desfer</strong> fàcilment. Un cop eliminada una taula, les dades desapareixen 
+   definitivament, a menys que:
+ </p>
+ <ul>
+   <li> Tinguem una còpia de seguretat (backup)</li>
+   <li> L’hàgim exportada prèviament</li>
+ </ul>
+
+ <h3> Com comprovar que ha desaparegut?</h3>
+ <pre>  ** Oracle
+  SELECT table_name
+  FROM user_tables
+  WHERE table_name = 'NOM_TAULA';  </pre>
+<pre>  ** postgresql
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'   -- esquema on està la taula
+  AND table_name = 'nom_taula';  
+</pre>
+ <p>Si la consulta no retorna cap fila, vol dir que la taula ja no existeix dins del teu esquema d'usuari.</p>
+ <p>NOM_TAULA hauria d'estar en majúscules, ja que Oracle desa els noms d’objectes en majúscules per defecte</p>
+
+ <li>Si hi ha foreign keys referenciant la taula, <code>DROP TABLE</code> pot fallar → cal <code>DROP TABLE … CASCADE</code> per forçar-ho.</li>
+<li><code>TRUNCATE</code> també pot fallar amb foreign keys si no es fa <code>TRUNCATE … CASCADE</code></li>
+
+ <h3> Bones pràctiques abans d’esborrar</h3>
+ <ul>
+   <li> Assegura’t que realment no s’utilitza ni en consultes ni aplicacions</li>
+   <li> Exporta les dades si poden tenir valor futur</li>
+   <li> Informa l’equip o documenta el canvi</li>
+ </ul>
+ <hr></hr>
   <p>Però una cosa és crear una taula (estructura), la qual es crea buida, 
-    i una altra cosa és posar dades dins de la taula, omplir la taula amb dades</p>
+    i una altra cosa és posar dades dins de la taula, omplir la taula amb dades</p> 
+
+ </section>
+
+
+
+
+
+
+
+  
+  <section id="crud">
+   
+<img src="imgs/crud_.jpg" alt="crud" width="30%" class="imatge-dreta ">    
+<h2>Què és el CRUD</h2>
+<p> El terme CRUD és un acrònim que fa referència a les quatre operacions bàsiques que es realitzen en bases de dades 
+    i sistemes de gestió d'informació. És un model conceptual per a operacions bàsiques sobre dades.</p>
+<ul>
+    <li>Create (Inserir dades): Fa referència a l'operació d'afegir nous registres o elements a la base de dades.</li>
+    <li>Read (Llegir dades): Implica obtenir o consultar les dades emmagatzemades a la base de dades.</li>
+    <li>Update (Modificar dades): Consisteix a modificar o actualitzar els registres existents.</li>
+    <li>Delete (Eliminar dades): Es refereix a eliminar registres o dades de la base de dades.</li>
+</ul>
+   <p>És un concepte general, aplicable a qualsevol sistema de gestió de dades, no només SQL.</p>
+    <p>Aquestes operacions són fonamentals per a la gestió i manteniment de bases de dades en moltes aplicacions, 
+    des de sistemes senzills fins a plataformes més complexes. CRUD és un concepte que s'aplica en moltes àrees 
+    de desenvolupament de programari, especialment en el context d'aplicacions web o mòbils que interactuen amb 
+    bases de dades.</p>
+    <p>DML és la implementació SQL concreta del CRUD.</p>
+  <pre>
+| Sentència SQL | Operació CRUD equivalent |
+| ------------- | ------------------------ |
+| `INSERT`      | Create                   |
+| `SELECT`      | Read                     |
+| `UPDATE`      | Update                   |
+| `DELETE`      | Delete                   |
+</pre>
+
+  </section>
+  
+
+
+
+ 
+  <section id="create">
+
   <!-- insertar dades en una taula -->
 
-    <h2> Omplir una taula: <code>INSERT INTO</code></h2>
-  
+    <h2> Omplir una taula: <code>INSERT INTO</code>  </h2> 
+
     <h3>📘 Què fa l’ordre <code>INSERT</code>?</h3>
     <p>
       L’ordre <code>INSERT INTO</code> s’utilitza per afegir <strong>noves files (registres)</strong> en una taula. 
@@ -558,7 +846,7 @@ ROLLBACK; -- Desfem el canvi
   DELETE FROM alumnes WHERE edat &lt; 18;
     </pre>
   
-    <h3> Control de seguretat amb claus foranes</h3>
+    <h3> Control de seguretat amb claus alienes</h3>
     <p>** Per entendre millor este cas pot ser convenient mirar el apartat de "Normalització" primer</p>
     <p>
       Si una fila està relacionada amb una altra taula mitjançant una <code>FOREIGN KEY</code>, pot ser que el DELETE <strong>no es permeta</strong> (error de restricció), 
@@ -567,7 +855,7 @@ ROLLBACK; -- Desfem el canvi
   
     <h4>Exemple amb relació:</h4>
     <pre> 
-  -- alumnes té una clau forana cap a cursos
+  -- alumnes té una clau aliena cap a cursos
   DELETE FROM cursos WHERE id = 1;  -- error si hi ha alumnes vinculats
     </pre>
   
@@ -582,262 +870,7 @@ ROLLBACK; -- Desfem el canvi
     </ul>
       </section>  
   
-
-
-
-  <section id="modifica-taula">
-   
-    <h2> Afegir una columna a una taula existent: <code>ALTER TABLE ... ADD</code></h2>
-
-    <h3>📘 Per a què serveix?</h3>
-    <p>
-      Quan necessites <strong>modificar l’estructura d’una taula</strong> que ja existeix, per exemple, afegint una nova columna per a una informació nova (telèfon, correu, etc.), fas servir la comanda <code>ALTER TABLE</code>.
-    </p>
-
-    <h3> Què és pot modificar</h3>
-    <ul>
-      <li> Afegir una columna</li>
-      <li> Esborrar una columna</li>
-      <li> Modificar una columna</li>
-    </ul>
-
   
-    <h3>🔧 Sintaxi bàsica - Afegir columna nova</h3>
-    <pre>
-  ALTER TABLE nom_taula
-  ADD (nom_columna tipus_dada [restriccions]);
-    </pre>
-  
-    <h4> Exemple senzill: afegir el correu electrònic</h4>
-    <pre>
-  ALTER TABLE alumnes
-  ADD (correu VARCHAR2(50));
-    </pre>
-  
-    <p>Amb això, la taula <code>alumnes</code> ara tindrà una nova columna anomenada <code>correu</code>, de fins a 50 caràcters.</p>
-  
-    <h3>🧱 Afegir diverses columnes a la vegada</h3>
-    <pre>
-  ALTER TABLE alumnes
-  ADD (
-    telefon VARCHAR2(15),
-    data_alta DATE
-  );
-    </pre>
-  
-    <p>Això és útil quan fas evolucions del model de dades.</p>
-  
-    <h3>🔐 Afegir columna amb restricció <code>NOT NULL</code></h3>
-    <p>
-      Quan afegeixes una nova columna i li poses la restricció <code>NOT NULL</code>, has d’assegurar-te que totes les files actuals tindran un valor vàlid.
-    </p>
-  
-    <pre>
-  -- Això provocarà error si no assignem un valor a totes les files existents
-  ALTER TABLE alumnes
-  ADD (dni VARCHAR2(9) NOT NULL); -- ❌ ERROR
-    </pre>
-  
-    <h4>✅ Solució: primer afegir-la sense restricció, omplir-la, i després aplicar-la</h4>
-    <pre>
-  ALTER TABLE alumnes
-  ADD (dni VARCHAR2(9));
-  
-  UPDATE alumnes SET dni = 'PENDENT'; -- o un valor real
-  
-  ALTER TABLE alumnes
-  MODIFY (dni VARCHAR2(9) NOT NULL);
-    </pre>
-  
-    <h3> Bones pràctiques</h3>
-    <ul>
-      <li> Planeja bé quins camps nous necessites</li>
-      <li> Revisa que els noms no existeixin ja</li>
-      <li> Si la columna ha de ser obligatòria, assegura’t que totes les files tinguin valor abans de posar <code>NOT NULL</code></li>
-      <li> Utilitza tipus de dada adequats per a l’ús que faràs</li>
-    </ul>
-  
-    <h3>🔍 Comprovar els canvis</h3>
-    <p>Pots veure l’estructura actual d’una taula amb:</p>
-    <pre>
-  DESC alumnes;
-  -- o
-  SELECT column_name, data_type FROM user_tab_columns
-  WHERE table_name = 'ALUMNES';
-    </pre>
-  
-    <h3> Casos habituals d’ús</h3>
-    <ul>
-      <li> Afegir una columna <code>observacions</code> o <code>comentaris</code></li>
-      <li> Afegir un <code>telefon</code> o <code>email</code> si abans no s’havia registrat</li>
-      <li> Afegir una data de creació o d’actualització de registres</li>
-    </ul>
-
-  <!-- modificar columna d'una taula-->
-  <h2>&nbsp;</h2>
-  <h2>🗑️ Modificar una columna d’una taula: <code>ALTER TABLE ... MODIFY COLUMN ...</code></h2>
-    <p>Pot interessar modificar una columna, com per exemple, afegir una restricció que no té</p>
-    <pre>
-    ALTER TABLE alumnes
-    MODIFY (dni VARCHAR2(9) NOT NULL);
-  </pre>
-  <p>Si es fa açò, s'ha de comprovar que totes les files compleixen la restricció, de no ser així, fallarà i donarà ERROR</p>
-  <p>Quan modifiques el tipus d'una columna en Oracle, com per exemple de <code>NUMBER</code> a <code>VARCHAR2</code>,
-     Oracle intenta convertir automàticament les dades existents al nou tipus.</p>
-  <pre>
-    CREATE TABLE test (  id NUMBER );
-    INSERT INTO test VALUES (123);
-    ALTER TABLE test MODIFY id VARCHAR2(10);    </pre>   
-  <h4>✅ Si la conversió és possible:</h4>
-     <p>    Oracle converteix totes les dades automàticament i sense error</p>   
-  <h4>❌ Si hi ha valors que no es poden convertir:</h4>   
-   <p>     L'operació fallarà amb un error de tipus ORA-01439. Això passa, per exemple, si vas de VARCHAR2 a NUMBER i hi ha valors no numèrics</p>    
-
-    <!-- esborrar columna d'una taula-->
-     <h2>&nbsp;</h2>
-    <h2>🗑️ Esborrar una columna d’una taula: <code>ALTER TABLE ... DROP COLUMN ...</code></h2>
-
-    <h3>📘 Quan cal esborrar una columna?</h3>
-    <p>
-      A vegades, una columna ja no és necessària perquè:
-    </p>
-    <ul>
-      <li>Ha quedat obsoleta (ex: <code>fax</code>)</li>
-      <li>Ha estat substituïda per una altra més útil o normalitzada</li>
-      <li>S'ha afegit per error o durant proves</li>
-    </ul>
-  
-    <h3>🧱 Sintaxi bàsica</h3>
-    <pre>
-  ALTER TABLE nom_taula
-  DROP COLUMN nom_columna;
-    </pre>
-  
-    <h4> Exemple: eliminar el camp <code>telefon</code></h4>
-    <pre>
-  ALTER TABLE alumnes
-  DROP COLUMN telefon;
-    </pre>
-  
-    <p>Aquesta comanda elimina completament la columna <code>telefon</code> i totes les dades que contenia.</p>
-  
-    <h3>⚠️ Atenció amb la pèrdua de dades!</h3>
-    <p>
-      Aquesta operació <strong>no es pot desfer</strong> fàcilment. Un cop eliminada una columna, les dades desapareixen definitivament, a menys que:
-    </p>
-    <ul>
-      <li> Tinguem una còpia de seguretat (backup)</li>
-      <li> L’hàgim exportada prèviament</li>
-    </ul>
-  
-    <h3> Alternativa: posar-la com a inactiva (via convenció)</h3>
-    <p>
-      Si no vols perdre les dades immediatament, pots:
-    </p>
-    <ul>
-      <li>Renombrar-la (ex: <code>telefon_obsolet</code>)</li>
-      <li>Deixar-la buida (<code>NULL</code>) i ignorar-la</li>
-    </ul>
-  
-    <h3> Esborrar múltiples columnes (Oracle 12c+)</h3>
-    <pre>
-  ALTER TABLE alumnes
-  DROP (telefon, observacions);
-    </pre>
-  
-    <p> No tots els SGBD permeten aquesta sintaxi directa. En Oracle antic cal fer-ho de forma individual.</p>
-  
-    <h3> Com comprovar que ha desaparegut?</h3>
-    <pre>
-  DESC alumnes;
-  -- o
-  SELECT column_name FROM user_tab_columns
-  WHERE table_name = 'ALUMNES';
-    </pre>
-  
-    <h3> Bones pràctiques abans d’esborrar</h3>
-    <ul>
-      <li> Assegura’t que realment no s’utilitza ni en consultes ni aplicacions</li>
-      <li> Exporta les dades si poden tenir valor futur</li>
-      <li> Informa l’equip o documenta el canvi</li>
-      <li> Considera posar la columna com a <code>NULL</code> i fer una neteja progressiva</li>
-    </ul>
-  
-    <h3> Exemple complet</h3>
-    <pre>
-  -- Comprovem si la columna hi és
-  DESC alumnes;
-  
-  -- Eliminem la columna
-  ALTER TABLE alumnes DROP COLUMN data_alta;
-  
-  -- Verifiquem de nou
-  DESC alumnes;
-    </pre>     
-
-
- <!-- esborrar una taula  !!-->
- <h2>&nbsp;</h2>
- <h2>🗑️ Esborrar una taula: <code>DROP TABLE ... </code></h2>
-
- <h3>📘 Quan cal esborrar una taula</h3>
- <p>
-   A vegades, una taula deixa de formar part del E-R perquè:
- </p>
- <ul>
-   <li>Ha quedat obsoleta </li>
-   <li>Ha estat substituïda per una altra més útil o normalitzada</li>
-   <li>S'ha afegit per error o durant proves</li>
- </ul>
-
- <h3>🧱 Sintaxi bàsica</h3>
- <pre>
-DROP TABLE nom_taula;
- </pre>
-
- <h4> Exemple: eliminar la taula  <code>alumnes</code></h4>
- <pre>
-DROP TABLE alumnes;
- </pre>
-
- <p>Aquesta comanda elimina completament la taula i totes les dades que contenia.</p>
-
- <h3>⚠️ Atenció amb la pèrdua de dades!</h3>
- <p>
-   Aquesta operació <strong>no es pot desfer</strong> fàcilment. Un cop eliminada una taula, les dades desapareixen 
-   definitivament, a menys que:
- </p>
- <ul>
-   <li> Tinguem una còpia de seguretat (backup)</li>
-   <li> L’hàgim exportada prèviament</li>
- </ul>
-
- <h3> Com comprovar que ha desaparegut?</h3>
- <pre>  ** Oracle
-  SELECT table_name
-  FROM user_tables
-  WHERE table_name = 'NOM_TAULA';  </pre>
-<pre>  ** postgresql
-SELECT table_name
-FROM information_schema.tables
-WHERE table_schema = 'public'   -- esquema on està la taula
-  AND table_name = 'nom_taula';  
-</pre>
- <p>Si la consulta no retorna cap fila, vol dir que la taula ja no existeix dins del teu esquema d'usuari.</p>
- <p>NOM_TAULA hauria d'estar en majúscules, ja que Oracle desa els noms d’objectes en majúscules per defecte</p>
-
- <li>Si hi ha foreign keys referenciant la taula, <code>DROP TABLE</code> pot fallar → cal <code>DROP TABLE … CASCADE</code> per forçar-ho.</li>
-<li><code>TRUNCATE</code> també pot fallar amb foreign keys si no es fa <code>TRUNCATE … CASCADE</code></li>
-
- <h3> Bones pràctiques abans d’esborrar</h3>
- <ul>
-   <li> Assegura’t que realment no s’utilitza ni en consultes ni aplicacions</li>
-   <li> Exporta les dades si poden tenir valor futur</li>
-   <li> Informa l’equip o documenta el canvi</li>
- </ul>
-
- </section>
-
   
  
 
@@ -1011,7 +1044,7 @@ WHERE table_schema = 'public'   -- esquema on està la taula
       <li> Creació i modificació de taules amb <code>CREATE TABLE</code> i <code>ALTER TABLE</code></li>
       <li> Inserció, esborrat i actualització de dades amb <code>INSERT</code>, <code>DELETE</code> i <code>UPDATE</code></li>
       <li> Consultes amb <code>SELECT</code>, filtres amb <code>WHERE</code>, condicions lògiques i tractament de <code>NULL</code></li>
-      <li> Ús correcte de tipus de dades, restriccions i clau primària / clau forana</li>
+      <li> Ús correcte de tipus de dades, restriccions i clau primària / clau aliena</li>
       <li> Gestió segura i eficaç dels canvis estructurals com afegir o eliminar columnes</li>
     </ul>
   
@@ -1041,9 +1074,11 @@ WHERE table_schema = 'public'   -- esquema on està la taula
 
   </section>
   
+
+
   <section>
 
-  <h1>Tipus de JOIN en Oracle SQL</h1>
+  <h1>Tipus de JOIN en SQL</h1>
   <img src="imgs/joins1.png" class="imatge-dreta" alt="fitxer-fitxes" style="width: 45%">
     <h2>1. INNER JOIN (JOIN)</h2>
     <p>Només retorna files que tenen coincidència en ambdues taules.</p>
