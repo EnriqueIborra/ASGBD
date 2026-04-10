@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>⏳ Repàs E-R</title>
+  <link rel="stylesheet" href="estilsunitats.css">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
+</head>
+<body  >
+
+<header>
+  <a href="./">
+      <!--<img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" alt="Oracle Logo"> -->
+      <img src="imgs/ASGBD.png" alt="Mòdul ASGBD">
+  </a>
+  <h1>ASGBD   -    Repàs E-R</h1>
+</header>
+
+<nav class="repas">
+  <h2>Índex</h2>
+  <a href="#introduccio-E-R">Introduccio a E-R</a>
+  <a href="#dades-tipus">Tipus de Dades</a>
+  
+  <a href="#conclusions">Conclusions</a>
+</nav>
+
+<main>
+  
+
+    <section id="introduccio-E-R" >
+     <h2> Introducció al E-R</h2>
+    <h3>Diagrama E-R</h3>
+    <p>Un diagrama E-R (Entitat-Relació) és una eina gràfica utilitzada en disseny de bases 
+      de dades per representar de manera visual l’estructura de les dades i com es relacionen entre elles.</p>
+
+<ul>
+  És un model conceptual que descriu:
+  <li>Entitats → objectes o conceptes (ex: Alumnes, Professors)</li>
+  <li>Atributs → característiques de les entitats (ex: nom, edat)</li>
+  <li>Relacions → com es connecten les entitats (ex: un alumne es matricula en un curs)</li>
+  👉 Es representa amb formes:
+  <li>Rectangles → entitats</li>
+  <li>El·lipses → atributs</li>
+  <li>Diamants → relacions</li>
+</ul>
+<p>Per a què serveix?</p>
+<ul>
+  1. Dissenyar bases de dades
+  <li>Ajuda a definir què dades cal guardar abans de crear taules reals.</li>
+  <li>És el pas previ a crear l’esquema SQL.</li>
+  2. Entendre el sistema
+  <li>Permet veure ràpidament l’estructura de la informació.</li>
+  <li>És útil per explicar el sistema a altres persones (equips, clients, estudiants).</li>
+  3. Evitar errors de disseny
+  <li>Ajuda a detectar: duplicacions de dades , relacions incorrectes, mancances d’informació</li>
+  4. Transformació a model relacional
+  <li>Es pot convertir fàcilment en: taules, claus primàries, claus foranes</li>
+</ul>
+
+<h3>Exemple senzill</h3>
+Sistema acadèmic: Entitat: Alumnes , Entitat: Cursos , Relació: Matricula  <br>
+👉 Interpretació: <br>
+Un alumne pot matricular-se en diversos cursos, Un curs pot tenir diversos alumnes <br>
+
+      
+   <hr> <h2>Entitat</h2>
+   <img src="imgs/E_professor.png" alt="e-professor" width="20%" class="imatge-dreta"> 
+   <p>Una entitat és un objecte, concepte o “cosa” del món real sobre el qual volem emmagatzemar informació dins d’una base de dades.</p>
+    <p>Cada entitat té atributs, que són les dades que volem registrar sobre ella.</p>
+    <p>Una entitat pot ser independent o dependre d’altres entitats (relacions).</p>
+
+    <pre>
+| Aspecte           | Descripció                                                                                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Representació E-R | Normalment es dibuixa amb un **rectangle**                                                                                                                                      |
+| Atributs          | Columnes que descriuen propietats de l’entitat (ex: nom, edat, direcció)                                                                                                        |
+| Clau primària     | Un atribut o combinació d’atributs que identifica **únicament cada instància**                                                                                                  |
+| Instància         | Cada fila o registre concret d’una entitat és una **instància** (ex: “Anna” en la taula alumnes)                                                                                |
+| Tipus d’entitat   | - **Entitat forta**: existeix de manera independent (ex: Alumnes, Empleats) 
+| Tipus d’entitat   | - **Entitat dèbil**: depèn d’una altra entitat per existir (ex: Matricules depenent d’Alumnes) |
+
+    </pre>
+    <h3>Exemple     </h3>
+    <ul>
+      <li>Entitat: Alumnes</li>
+      <li>Atributs: id, nom, edat, curs</li>
+      <li>Clau primària: id</li>
+    </ul>
+
+    <p>Relació entre entitat i taula de BBDD</p>
+  <ol>
+    <li>Cada entitat correspon a una taula en una base de dades relacional.</li>
+    <li>Els atributs de l’entitat corresponen a les columnes de la taula.</li>
+    <li>Les relacions entre entitats (1:1, 1:N, N:M) indiquen com les entitats interactuen entre elles.</li>
+  </ol>
+
+      </section>
+      
+  
+
+
+  <section id="dades-tipus">
+ 
+
+  </section>
+
+
+</main>
+
+<script>
+
+  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
+      //  <div class="pre-container">
+      //    <button class="copy-button">Copia Codi !</button>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.copy-button');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const code = this.nextElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          this.innerText = ' ✔ Copiat!';
+          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
+        });
+      });
+    });
+  });
+
+</script>
+
+</body>
+</html>
