@@ -537,6 +537,13 @@ postmaster (procés principal)
         <li>Usa tablespaces (disc)</li>
     </ul>
 </ul>
+<ul> <strong>Mentrestant</strong>, Altres processos continuen fent la seua feina
+<li>autovacuum: Elimina dades obsoletes i optimitza</li>
+<li>WAL writer: Primer s’escriu al WAL, Després a les dades</li>
+<li>checkpointer: complementa al WAL</li>
+<li>background writer: complementa al WAL </li>
+<li>stats collector: prepara stadístiques per optimitzar consultes</li>
+</ul>
 
 <!--
 2️⃣ Procés principal: postmaster / postgres
