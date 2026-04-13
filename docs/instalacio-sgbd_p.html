@@ -807,14 +807,13 @@ pg_config --bindir
 pg_config --help   </pre>
 <p>Estructura</p>
 <pre>
+/etc/postgresql/16/main/          → Configuració
 /usr/lib/postgresql/16/bin/       → BINARIS
 /var/lib/postgresql/16/main       → DATA DIRECTORY
-/var/lib/postgresql/16/main/pg_wal   → WAL (separat)
-/etc/postgresql/16/main/             → Configuració
-/var/log/postgresql/     → LOGS
-/var/run/postgresql/    → SOCKETS
+/var/lib/postgresql/16/main/pg_wal     → WAL (separat)
 /var/lib/postgresql/16/main/pg_tblspc  →  Enllaços simbòlics a tablespaces personalitzats
-
+/var/log/postgresql/    → LOGS
+/var/run/postgresql/    → SOCKETS
 </pre>
 <h4>BINARIS</h4>
 <p> Conté els executables de PostgreSQL: psql→client , postgres→server dbinit→server(config), </p>
