@@ -298,6 +298,67 @@ a:hover {
   unicode-range: U+00A9, U+229C, U+1F10D-1F10F, U+1F16D-1F16F;
 }
 
+/* ===== TOGGLE BBDD ===== */
+
+.db-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 500;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #ad4234;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #007BFF;
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+/* Actiu destacat */
+.active-db {
+  color: #007BFF;
+  font-weight: bold;
+}
+.active-db2 {
+  color: #ad4234;
+  font-weight: bold;
+}
+
   </style>
 </head>
 
@@ -317,6 +378,7 @@ a:hover {
     <nav class="mobile-nav" id="mobileMenu">
       <a href="#temari">Temari</a>
     </nav>
+ 
     <button class="dark-mode-toggle" id="darkModeBtn">🌙</button>
   </header>
 
@@ -324,7 +386,7 @@ a:hover {
   <main>
     <section id="intro">
       <h2>Aprèn a administrar sistemes gestors de bases de dades</h2>
-      <p style="text-align: center; max-width: 600px; margin: 0 auto;">Domina les eines com ORACLE database, sql*plus, SQL Developer per administrar bases de dades amb seguretat i eficiència.</p>
+      <p style="text-align: center; max-width: 600px; margin: 0 auto;">Domina les eines com sql*plus, SQL Developer, o com psql, pgAdmin per administrar bases de dades amb seguretat i eficiència.</p>
     </section>
 
 
@@ -337,10 +399,22 @@ a:hover {
            <img src="imgs/icono-pareja.png" alt="Icono de base de datos" style="width: 40px; height: 40px;">
            
         </div>
+        <div class="icons-top">
+           <div class="db-toggle"> &nbsp;&nbsp;&nbsp;&nbsp; Mostrar Materials del curs en:
+            <span id="labelOracle">Oracle</span>
+            <label class="switch">
+                <input type="checkbox" id="dbToggle">
+                <span class="slider"></span>
+            </label>
+            <span id="labelPostgres">PostgreSQL</span>
+            </div> 
+        </div>  
+
         <h2>Unitats didàctiques</h2>
         <div class="grid">
            
-              <a href="instalacio-sgbd.html" class="card" title="Instal·lació de Sistemes de Gestió de Bases de Dades.
+              <a data-oracle="instalacio-sgbd.html"   data-postgresql="instalacio-sgbd_p.html"
+              class="card" title="Instal·lació de Sistemes de Gestió de Bases de Dades.
                 Conèixer els Elements d’un sistema gestor de bases de dades
                 Característiques dels principals sistemes gestors de bases de dades
                 Seleccionar el sistema gestor de bases de dades
@@ -356,7 +430,8 @@ a:hover {
               </a>
            
          
-              <a href="configuracio-sgbd.html" class="card" title="Configuració bàsica dels SGBD per a un rendiment òptim.
+              <a data-oracle="configuracio-sgbd.html"   data-postgresql="configuracio-sgbd_p.html" 
+              class="card" title="Configuració bàsica dels SGBD per a un rendiment òptim.
               Descriure les condicions d'inici i parada del sistema gestor
               Seleccionar el motor de base de dades
               Assegurar els comptes d'administració
@@ -371,7 +446,8 @@ a:hover {
               </a>
            
            
-              <a href="usuaris-privilegis.html" class="card" title="Gestió d'usuaris i permisos dins de l'entorn SGBD.
+              <a  data-oracle="usuaris-privilegis.html"   data-postgresql="usuaris-privilegis_p.html"
+               class="card" title="Gestió d'usuaris i permisos dins de l'entorn SGBD.
               Definir i eliminar comptes d'usuari
               Crear sinònims de taules i vistes
               Identificar els privilegis sobre les bases de dades i els seus elements
@@ -391,7 +467,8 @@ a:hover {
               </a>
        
           
-              <a href="automatitzacio-tasques.html" class="card" title="Automatització de tasques dins del SGBD.
+              <a data-oracle="automatitzacio-tasques.html"   data-postgresql="automatitzacio-tasques_p.html"
+               class="card" title="Automatització de tasques dins del SGBD.
               Reconéixer la importància d'automatitzar tasques administratives.
               Descriure els diferents mètodes d'execució de guions.
               Identificar les eines disponibles per redactar guions.
@@ -405,7 +482,8 @@ a:hover {
                 <p>UD 4 Automatització de Tasques</p>
               </a>
             
-              <a href="optimitzacio-sgbd.html" class="card" title="Optimització i millora del rendiment dels SGBD.
+              <a data-oracle="optimitzacio-sgbd.html"   data-postgresql="optimitzacio-sgbd_p.html"
+                class="card" title="Optimització i millora del rendiment dels SGBD.
               Identificar les eines de monitoratge disponibles per al sistema gestor.
               Descriure els avantatges i inconvenients de la creació d'índexs.
               Crear índexs en taules i vistes.
@@ -420,7 +498,8 @@ a:hover {
                 <p>UD 5 Optimització del SGBD</p>
               </a>
            
-              <a href="disponibilitat-sgbd.html" class="card" title="Garantir la disponibilitat del sistema de gestió de bases de dades.
+              <a data-oracle="disponibilitat-sgbd.html"   data-postgresql="disponibilitat-sgbd_p.html"
+               class="card" title="Garantir la disponibilitat del sistema de gestió de bases de dades.
               Reconeixer la utilitat de les bases de dades distribuïdes.
               Descriure les diverses polítiques de fragmentació de la informació.
               Implantar una base de dades distribuïda homogènia.
@@ -515,6 +594,45 @@ window.addEventListener('DOMContentLoaded', () => {
   sections.forEach(section => observer.observe(section));
 });
 
+
+/* ===== TOGGLE BASE DE DADES ===== */
+const dbToggle = document.getElementById('dbToggle');
+const cards = document.querySelectorAll('.card');
+const labelOracle = document.getElementById('labelOracle');
+const labelPostgres = document.getElementById('labelPostgres');
+
+function updateLinks() {
+  const isPostgres = dbToggle.checked;
+
+  cards.forEach(card => {
+    if (isPostgres) {
+      card.setAttribute('href', card.dataset.postgresql);
+    } else {
+      card.setAttribute('href', card.dataset.oracle);
+    }
+  });
+
+  // Actualitzar estil etiqueta activa
+  labelOracle.classList.toggle('active-db2', !isPostgres);
+  labelPostgres.classList.toggle('active-db', isPostgres);
+
+  // Guardar preferència
+  localStorage.setItem('selectedDB', isPostgres ? 'postgresql' : 'oracle');
+}
+
+// Carregar preferència guardada
+//localStorage.setItem('selectedDB', 'postgresql') ;   // sempre obri mostrant postgresql
+const savedDB = localStorage.getItem('selectedDB');
+if (savedDB === 'postgresql') {
+  dbToggle.checked = true;
+} 
+if (savedDB === null) {
+  dbToggle.checked = true;
+} 
+
+updateLinks();
+
+dbToggle.addEventListener('change', updateLinks);
 
 </script>
 </body>
