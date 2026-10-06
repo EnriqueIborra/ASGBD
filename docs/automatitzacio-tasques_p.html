@@ -37,7 +37,8 @@
 <main>
 
   <section id="autom">
-    <br><h2> Automatització</h2>
+    <h1>Automatització de tasques</h1><hr>
+    <h2> Automatització</h2>
     <p>L'automatització consisteix en fer tasques de manera sistemàtica i repetitiva 
       sense que estiga involucrat un usuari en la seua execució</p>
     <p>Quan parlem d’automatització en postgresql, generalment ens referim a processos que es programen per executar-se automàticament, 
@@ -1160,7 +1161,7 @@ WHERE identity_generation IS NOT NULL;    </pre>
 
   <hr>
   <h3> Cursors implícits</h3>
-  <p>No es declaren, i sols deurien tornar un resultat o fila:</p>
+  <p><strong>No es declaren</strong>, i sols deurien tornar un resultat o fila. PostgreSQL el crea automàticament quan fas una query amb <CODE>SELECT INTO</CODE>.</p>
   <pre>SELECT DESCRIPCION INTO vdescripcion from PAISES WHERE CO_PAIS = 'ESP';   </pre>
 
 <p>Els cursors implícits només poden retornar una única fila. En cas que es retorne més d'una fila 
@@ -1186,8 +1187,14 @@ SELECT DESCRIPCION INTO vdescripcion from PAISES WHERE CO_PAIS = 'ESP' limit 1;
     <li><code>GET DIAGNOSTICS n = ROW_COUNT;</code> → nombre de files tractades</li>
   </ul>
 
+  <h4>Cursor impícit amb FOR</h4>
+  <pre>FOR r IN SELECT * FROM alumnes LOOP
+   -- ús de r
+END LOOP;   </pre>
+
   <hr>
-  <h3> Ús d’un cursor explícit</h3>
+  <h3> Cursors explícits</h3>
+  <p><strong>Es declaren</strong>. Solen tornar moltes files per després processar-les una a una. </p>
   <p><strong>Passos:</strong></p>
   <ol>
     <li>Declarar el cursor</li>
@@ -1195,6 +1202,16 @@ SELECT DESCRIPCION INTO vdescripcion from PAISES WHERE CO_PAIS = 'ESP' limit 1;
     <li>Llegir fila a fila</li>
     <li>Tancar-lo</li>
   </ol>
+
+  <pre>Exemple:
+DECLARE c1 CURSOR FOR SELECT * FROM alumnes;
+OPEN c1;
+LOOP
+   FETCH c1 INTO r;
+   EXIT WHEN NOT FOUND;
+   RAISE NOTICE '%', r.nom;
+END LOOP;
+CLOSE c1;    </pre>
 
 
   <h3> Cursor FOR – simplificat</h3>
@@ -1617,20 +1634,8 @@ CALL defrag_taules('public');
 </section>
 
 
-<section id="altres-recursos">
-  <h2>Altres recursos</h2>
-    
-  <!--<h3>Ús de Dates en Postgres</h3>
-    <h2> <a href="dates-en-postgres.html">Dates en postgres</a></h2> -->
-  
-   <!--    <a href="">link</a> 
-    <h3>AuithID en procedure</h3>
-
-    <h3>FOR en procedure</h3>
-    <h3> doble & en variable de substitució  - &&dismeCodi</h3>
-    -->
-
-    <hr><h3>Repàs...</h3>
+ <section id="altres-recursos">
+      <hr><h2>Abans d'avançar, un poc de repàs..</h2>
     <div id="progress-container">
     <div id="progress-bar"></div>  </div>
     <!-- <div id="percentatge-text">0%</div>  -->
@@ -1641,157 +1646,20 @@ CALL defrag_taules('public');
         </div>
 
         <p id="feedback"></p>
+        <button onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
         <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
-        <button onclick="carregarPreguntes()">🔁 Reiniciar</button>
-
-
-    </div>    
-
-</section>
+        <button onclick="carregarPreguntes('preguntes41p')">🔁 Reiniciar</button>
+        <p id="pista"></p>
+         
+   </section>
 
 
 </main>
-
+<script src="scriptsunitats.js"></script>
 <script>
-
-  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
-      //  <div class="pre-container">
-      //    <button class="copy-button">Copia Codi !</button>
-  document.addEventListener('DOMContentLoaded', function () {
-    const buttons = document.querySelectorAll('.copy-button');
-
-    buttons.forEach(button => {
-      button.addEventListener('click', function () {
-        const code = this.nextElementSibling.innerText;
-        navigator.clipboard.writeText(code).then(() => {
-          this.innerText = ' ✔ Copiat!';
-          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
-        });
-      });
-    });
-  });
-
-
-  //  Per fer test final
-  // Primer es crea un bancDePreguntes   const
-  // i desprès es carrega una pregunta aleatoria    function
-  // per ultim la funcio de comprobar resposta per a quan es polse un botó
-
-let bancDePreguntes = [];
-let preguntesBarrejades = [];
-let indexPreguntaActual = 0;
-let puntuacio = 0;
-
-function barrejar(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-function actualitzarProgres() {
-    const percentatge =
-        (indexPreguntaActual / preguntesBarrejades.length) * 100;
-    document.getElementById('progress-bar').style.width =
-        percentatge + "%";
-}
-
-function actualitzarPercentatge() {
-    const percentatge = Math.round(
-        (puntuacio / preguntesBarrejades.length) * 100
-    );
-    document.getElementById('percentatge-text').innerText =""
-       // `Encerts: 🎯 ${percentatge}%`;
-}
-
-
-function carregarPreguntes() {
-    fetch('preguntes/preguntes41p.json')
-        .then(res => res.json())
-        .then(data => {
-            bancDePreguntes = data;
-            preguntesBarrejades = [...bancDePreguntes];
-            barrejar(preguntesBarrejades);
-            puntuacio = 0;
-            indexPreguntaActual = 0;
-            mostrarPregunta();
-        })
-        .catch(err => {
-            console.error(err);
-            document.getElementById('pregunta-text').innerText =
-                "Error carregant les preguntes 😢";
-        });
-        //document.getElementById('percentatge-text').innerText = "0%";
-
-}
-
-function mostrarPregunta() {
-
-    // Si ja no queden preguntes
-    if (indexPreguntaActual >= preguntesBarrejades.length) {
-        document.getElementById('pregunta-text').innerText =
-            "🎉 Has acabat totes les preguntes!";
-        document.getElementById('options-container').innerHTML = "";
-        document.getElementById('feedback').innerHTML =
-        `Has encertat <strong>${puntuacio}</strong> de 
-        <strong>${preguntesBarrejades.length}</strong> preguntes.`;
-        document.getElementById('btn-seguent').disabled = true;
-        document.getElementById('progress-bar').style.width = "100%";
-        actualitzarProgres();
-        return;
-    }
-
-    const pregunta = preguntesBarrejades[indexPreguntaActual];
-
-    document.getElementById('pregunta-text').innerText = pregunta.titol;
-
-    const container = document.getElementById('options-container');
-    container.innerHTML = "";
-
-    pregunta.opcions.forEach(opcio => {
-        const btn = document.createElement('button');
-        btn.innerText = opcio.text;
-        btn.onclick = () => comprovaResposta(opcio.correcte, btn);
-        container.appendChild(btn);
-    });
-
-    document.getElementById('feedback').textContent = "";
-    document.getElementById('btn-seguent').disabled = true;
-    actualitzarProgres();
-
-}
-
-
-function comprovaResposta(esCorrecte, element) {
-    const feedback = document.getElementById('feedback');
-
-    document
-        .querySelectorAll('#options-container button')
-        .forEach(btn => btn.disabled = true);
-
-    if (esCorrecte) {
-        feedback.textContent = "✅ Correcte! Molt bé.";
-        element.style.background = "#d4edda";
-        puntuacio++;
-    } else {
-        feedback.textContent = "❌ Incorrecte.";
-        element.style.background = "#f8d7da";
-    }
-    //actualitzarPercentatge();
-    document.getElementById('btn-seguent').disabled = false;
-}
-
-function seguentPregunta() {
-    indexPreguntaActual++;
-    mostrarPregunta();
-}
-
- 
-
 // Executar en carregar la pàgina
-window.onload = carregarPreguntes;
-
-
+  window.onload = carregarPreguntes('preguntes41p');
+  // canviar nom de preguntes en  button onclick="carregarPreguntes(
 </script>
 
 </body>

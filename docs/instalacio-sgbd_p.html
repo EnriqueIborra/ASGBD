@@ -240,7 +240,7 @@
         <li>Interfície intuïtiva, ideal per a usuaris no tècnics o per a tasques ràpides.</li>
         <li>Exemples:
             <ul>
-                <li>pgAdmin</li>
+                <li>pgAdmin4</li>
                 <li>SQL Developer</li> 
                 <li>DBeaver</li>
                 <li>phpMyAdmin</li>
@@ -558,7 +558,7 @@ postmaster (procés principal)
     Un procés dedicat per connexió (connexió aïllada)
     Executa les consultes 
     Gestiona transaccions i bloquejos (locks)
-    Retorna resultats al client de bbdd (psql, pgAdmin,..)
+    Retorna resultats al client de bbdd (psql, pgAdmin4,..)
     Accedeix a:
         Memòria compartida
         Fitxers de dades
@@ -770,7 +770,7 @@ postgres=#</pre></li>
    <li>Durant la instal·lació: Tries la versió, Definixes la contrasenya de l’usuari postgres,
         Tries el port (5432 per defecte),  S’inicialitza el clúster</li>
     <li>Deixar marcat per instal·lar <strong>Application Stack Builder</strong></li>
-    <li>Inclou: pgAdmin (Client postgresql), psql (sense PATH) , Serveis de Windows per a postgres (servidor PostgreSQL), Application Stack Builder (manteniment)</li>
+    <li>Inclou: pgAdmin4 (Client postgresql), psql (sense PATH) , Serveis de Windows per a postgres (servidor PostgreSQL), Application Stack Builder (manteniment)</li>
     <p>El PATH sol ser <code>c:\Program Files\PostgreSQL\18\bin</code> segons la versió. Afegix esta ruta al teu path</p>
 
     <h3>Instal·lació en macOS</h3>
@@ -786,9 +786,11 @@ brew services start postgresql  </pre>
 </pre>
 <pre>
 -- per veure quan es va instal·lar PostgreSQL 
-grep postgresql /var/log/apt/history.log -B 1 -A 1
-grep postgresql /var/log/apt/term.log
+sudo zgrep -i postgres /var/log/apt/history.log*
+sudo zgrep -i postgresql /var/log/dpkg.log*
 </pre>
+<pre>La línia:  install postgresql-16
+és especialment interessant perquè ens dona la data i hora de la instal·lació</pre>
 <p>Després de la instal·lació, el primer arranc del servidor
      PostgreSQL sí que genera logs dins del directori del clúster, normalment:</p>
 <pre>
@@ -798,6 +800,13 @@ grep postgresql /var/log/apt/term.log
     🧪 Busca la data de la teua instal·lació del cluster <br>
     🧪 Busca quantes vegades s'ha iniciat el servei de postgres
 </div>
+<p>Per vore logs de mariadb : MariaDB en sistemes Linux moderns pot registrar els missatges del servei mitjançant
+     systemd-journald en lloc d'un fitxer específic dins de /var/log/mysql/. Els registres es poden consultar amb
+      journalctl -u mariadb</p>
+<pre>
+sudo journalctl -u mariadb
+sudo journalctl -u mariadb | grep Start
+</pre>
 
 </section>
 
@@ -888,8 +897,8 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
     <h3>Realitzem la nostra primera instal·lació de POSTGRES</h3>
 
     <br><h2>En altra màquina....</h2>
-    <h3>Instal·lació de client gràfic => pgAdmin</h3>
-    <p>Des de la pàgina oficial de <a href="https://www.pgadmin.org/download/">pgadmin</a></p>
+    <h3>Instal·lació de client gràfic (GUI) => pgAdmin4</h3>
+    <p>Des de la pàgina oficial de <a href="https://www.pgadmin.org/download/">pgadmin4</a></p>
 
   </section>
 
@@ -975,13 +984,13 @@ Normalment el prompt mostra la base de dades:     testdb=#
 
     <h3> Altres maneres d'accedir a la instància / cluster</h3>
     <ul>
-      <li> Utilitzant  pgAdmin</li>
+      <li> Utilitzant  pgAdmin4</li>
       <li> Utilitzant  Visual Studio Code + Extensió PostgreSQL O DBCode</li>
       <li> Utilitzant DBeaver ( multi-SGBD sw lliure)</li>
       <li> Utilitzant TOAD  (multi-SGBD propietari)</li>
     </ul>
 
-  <h3>PgAdmin</h3>
+  <h3>PgAdmin4</h3>
      <img src="./imgs/pgadmin1.png" alt="pgadmin1" class="imatge-esquerra" width="60%">
   <p>Per accedir a un cluster de postgresql es necessita:  </p>
   <ul>
@@ -995,9 +1004,9 @@ Normalment el prompt mostra la base de dades:     testdb=#
 
   </section>
 
-  <section id="altres-recursos">
- 
-     <hr><h3>Abans d'avançar, un poc de repàs...</h3>
+
+ <section id="altres-recursos">
+      <hr><h2>Abans d'avançar, un poc de repàs..</h2>
     <div id="progress-container">
     <div id="progress-bar"></div>  </div>
     <!-- <div id="percentatge-text">0%</div>  -->
@@ -1008,13 +1017,16 @@ Normalment el prompt mostra la base de dades:     testdb=#
         </div>
 
         <p id="feedback"></p>
+        <button onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
         <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
-        <button onclick="carregarPreguntes()">🔁 Reiniciar</button>
+        <button onclick="carregarPreguntes('preguntes11p')">🔁 Reiniciar</button>
+        <p id="pista"></p>
+         
+   </section>
 
-    </div>       
-    
-  </section> 
 
+
+<hr><hr>
 
  <section id="multi">
    <h2>(Ampliació ++)</h2>
@@ -1146,150 +1158,19 @@ pg_ctl.exe -D "C:\pgsql\data2" start</pre>
 <pre>psql -p 5433 -U postgres</pre>
 
 
-  </section>
+</section>
+
 
 
 </main>
 
+<script src="scriptsunitats.js"></script>
+
 <script>
-
-  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
-      //  <div class="pre-container">
-      //    <button class="copy-button">Copia Codi !</button>
-  document.addEventListener('DOMContentLoaded', function () {
-    const buttons = document.querySelectorAll('.copy-button');
-
-    buttons.forEach(button => {
-      button.addEventListener('click', function () {
-        const code = this.nextElementSibling.innerText;
-        navigator.clipboard.writeText(code).then(() => {
-          this.innerText = ' ✔ Copiat!';
-          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
-        });
-      });
-    });
-  });
-
- //  Per fer test final
-  // Primer es crea un bancDePreguntes   const
-  // i desprès es carrega una pregunta aleatoria    function
-  // per ultim la funcio de comprobar resposta per a quan es polse un botó
-
-let bancDePreguntes = [];
-let preguntesBarrejades = [];
-let indexPreguntaActual = 0;
-let puntuacio = 0;
-
-function barrejar(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-function actualitzarProgres() {
-    const percentatge =
-        (indexPreguntaActual / preguntesBarrejades.length) * 100;
-    document.getElementById('progress-bar').style.width =
-        percentatge + "%";
-}
-
-function actualitzarPercentatge() {
-    const percentatge = Math.round(
-        (puntuacio / preguntesBarrejades.length) * 100
-    );
-    document.getElementById('percentatge-text').innerText =""
-       // `Encerts: 🎯 ${percentatge}%`;
-}
-
-
-function carregarPreguntes() {
-    fetch('preguntes/preguntes11p.json')
-        .then(res => res.json())
-        .then(data => {
-            bancDePreguntes = data;
-            preguntesBarrejades = [...bancDePreguntes];
-            barrejar(preguntesBarrejades);
-            puntuacio = 0;
-            indexPreguntaActual = 0;
-            mostrarPregunta();
-        })
-        .catch(err => {
-            console.error(err);
-            document.getElementById('pregunta-text').innerText =
-                "Error carregant les preguntes 😢";
-        });
-        //document.getElementById('percentatge-text').innerText = "0%";
-
-}
-
-function mostrarPregunta() {
-
-    // Si ja no queden preguntes
-    if (indexPreguntaActual >= preguntesBarrejades.length) {
-        document.getElementById('pregunta-text').innerText =
-            "🎉 Has acabat totes les preguntes!";
-        document.getElementById('options-container').innerHTML = "";
-        document.getElementById('feedback').innerHTML =
-        `Has encertat <strong>${puntuacio}</strong> de 
-        <strong>${preguntesBarrejades.length}</strong> preguntes.`;
-        document.getElementById('btn-seguent').disabled = true;
-        document.getElementById('progress-bar').style.width = "100%";
-        actualitzarProgres();
-        return;
-    }
-
-    const pregunta = preguntesBarrejades[indexPreguntaActual];
-
-    document.getElementById('pregunta-text').innerText = pregunta.titol;
-
-    const container = document.getElementById('options-container');
-    container.innerHTML = "";
-
-    pregunta.opcions.forEach(opcio => {
-        const btn = document.createElement('button');
-        btn.innerText = opcio.text;
-        btn.onclick = () => comprovaResposta(opcio.correcte, btn);
-        container.appendChild(btn);
-    });
-
-    document.getElementById('feedback').textContent = "";
-    document.getElementById('btn-seguent').disabled = true;
-    actualitzarProgres();
-
-}
-
-
-function comprovaResposta(esCorrecte, element) {
-    const feedback = document.getElementById('feedback');
-
-    document
-        .querySelectorAll('#options-container button')
-        .forEach(btn => btn.disabled = true);
-
-    if (esCorrecte) {
-        feedback.textContent = "✅ Correcte! Molt bé.";
-        element.style.background = "#d4edda";
-        puntuacio++;
-    } else {
-        feedback.textContent = "❌ Incorrecte.";
-        element.style.background = "#f8d7da";
-    }
-    //actualitzarPercentatge();
-    document.getElementById('btn-seguent').disabled = false;
-}
-
-function seguentPregunta() {
-    indexPreguntaActual++;
-    mostrarPregunta();
-}
+  // Executar en carregar la pàgina
+  window.onload = carregarPreguntes('preguntes11p');
 
  
-
-// Executar en carregar la pàgina
-window.onload = carregarPreguntes;
-
-
 </script>
 
 </body>
