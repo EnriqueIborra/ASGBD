@@ -1,0 +1,590 @@
+[
+  {
+    "CE": "1a",
+    "titol": "Quin tipus de SGBD està especialment orientat a representar relacions complexes mitjançant nodes i arestes?",
+    "pista": "Aquest model és especialment útil quan les relacions entre les dades són tan importants com les dades mateixes.",
+    "opcions": [
+      {
+        "text": "SGBD documental",
+        "correcte": false,
+        "feedback": "Incorrecte. Els SGBD documentals emmagatzemen principalment dades en forma de documents, com JSON o BSON."
+      },
+      {
+        "text": "SGBD de grafs",
+        "correcte": true,
+        "feedback": "Correcte. Els SGBD de grafs representen les dades mitjançant nodes i arestes i estan optimitzats per a consultar relacions complexes."
+      },
+      {
+        "text": "SGBD de sèries temporals",
+        "correcte": false,
+        "feedback": "Incorrecte. Els SGBD de sèries temporals estan especialitzats en dades associades a marques temporals, com mètriques o lectures de sensors."
+      },
+      {
+        "text": "SGBD in-memory",
+        "correcte": false,
+        "feedback": "Incorrecte. Els SGBD in-memory prioritzen la velocitat mantenint les dades principalment en memòria RAM."
+      }
+    ]
+  },
+  {
+    "comentari": "definicions",
+    "CE": "1a",
+    "titol": "Quina característica diferencia principalment un SGBD monousuari d'un SGBD multiusuari?",
+    "pista": "Fixa't en el nombre de persones que poden treballar simultàniament amb la base de dades.",
+    "opcions": [
+      {
+        "text": "El monousuari només pot emmagatzemar dades numèriques",
+        "correcte": false,
+        "feedback": "Incorrecte. La diferència no depén del tipus de dades que pot emmagatzemar."
+      },
+      {
+        "text": "El multiusuari permet que diversos usuaris accedisquen simultàniament a la base de dades",
+        "correcte": true,
+        "feedback": "Correcte. Els SGBD multiusuari permeten l'accés concurrent de diversos usuaris i controlen aspectes com la concurrència i la integritat."
+      },
+      {
+        "text": "El monousuari sempre necessita un servidor dedicat",
+        "correcte": false,
+        "feedback": "Incorrecte. Els SGBD monousuari solen estar orientats a entorns personals o d'escriptori i no necessiten necessàriament un servidor dedicat."
+      },
+      {
+        "text": "El multiusuari només pot ser utilitzat des de la mateixa màquina",
+        "correcte": false,
+        "feedback": "Incorrecte. Un SGBD multiusuari pot permetre connexions des de diferents equips."
+      }
+    ]
+  },
+  {
+    "comentari": "caracteristiques",
+    "CE": "1b",
+    "titol": "Quin llenguatge del SGBD inclou sentències com `CREATE`, `ALTER` i `DROP`?",
+    "pista": "Aquest llenguatge s'utilitza per definir o modificar l'estructura de la base de dades.",
+    "opcions": [
+      {
+        "text": "DML",
+        "correcte": false,
+        "feedback": "Incorrecte. DML s'utilitza principalment per manipular les dades, amb sentències com `INSERT`, `UPDATE` i `DELETE`."
+      },
+      {
+        "text": "DCL",
+        "correcte": false,
+        "feedback": "Incorrecte. DCL controla els permisos d'accés mitjançant sentències com `GRANT` i `REVOKE`."
+      },
+      {
+        "text": "DDL",
+        "correcte": true,
+        "feedback": "Correcte. DDL (Data Definition Language) defineix i modifica l'estructura de la base de dades mitjançant sentències com `CREATE`, `ALTER` i `DROP`."
+      },
+      {
+        "text": "TCL",
+        "correcte": false,
+        "feedback": "Incorrecte. TCL controla les transaccions mitjançant sentències com `COMMIT`, `ROLLBACK` i `SAVEPOINT`."
+      }
+    ]
+  },
+  {
+    "CE": "1b",
+    "titol": "Quina sentència s'associa específicament amb DCL i permet concedir permisos als usuaris?",
+    "pista": "DCL està relacionat amb el control d'accés i els permisos.",
+    "opcions": [
+      {
+        "text": "GRANT",
+        "correcte": true,
+        "feedback": "Correcte. `GRANT` permet concedir permisos o privilegis sobre els recursos de la base de dades."
+      },
+      {
+        "text": "COMMIT",
+        "correcte": false,
+        "feedback": "Incorrecte. `COMMIT` pertany a TCL i confirma una transacció."
+      },
+      {
+        "text": "ALTER",
+        "correcte": false,
+        "feedback": "Incorrecte. `ALTER` és una sentència DDL utilitzada per modificar l'estructura d'un objecte de la base de dades."
+      },
+      {
+        "text": "UPDATE",
+        "correcte": false,
+        "feedback": "Incorrecte. `UPDATE` és una sentència DML que modifica dades existents."
+      }
+    ]
+  },
+  {
+    "CE": "1c",
+    "titol": "Per què és important valorar el volum de dades abans de seleccionar un SGBD?",
+    "pista": "Un volum de dades elevat pot afectar els requisits de rendiment i infraestructura.",
+    "opcions": [
+      {
+        "text": "Per determinar únicament el nombre de llicències",
+        "correcte": false,
+        "feedback": "Incorrecte. El volum de dades pot influir en diversos aspectes del sistema, no únicament en les llicències."
+      },
+      {
+        "text": "Per comprovar si el SGBD pot gestionar adequadament la quantitat de dades prevista",
+        "correcte": true,
+        "feedback": "Correcte. El volum de dades és un factor important per valorar el rendiment, l'escalabilitat i els recursos necessaris."
+      },
+      {
+        "text": "Per decidir obligatòriament si s'utilitzarà una base de dades relacional",
+        "correcte": false,
+        "feedback": "Incorrecte. El volum de dades no determina per si mateix que la base de dades haja de ser relacional."
+      },
+      {
+        "text": "Per evitar la necessitat de còpies de seguretat",
+        "correcte": false,
+        "feedback": "Incorrecte. El volum de dades no elimina la necessitat de disposar d'una política adequada de còpies de seguretat."
+      }
+    ]
+  },
+  {
+    "CE": "1c",
+    "titol": "Quin factor s'ha de considerar si una empresa necessita que el nou SGBD es comunique amb altres aplicacions i serveis?",
+    "pista": "Busca els factors relacionats amb la comunicació i la integració amb altres sistemes.",
+    "opcions": [
+      {
+        "text": "Requisits del sistema i integració amb altres aplicacions",
+        "correcte": true,
+        "feedback": "Correcte. La integració amb altres aplicacions, les APIs i la migració de dades formen part dels requisits del sistema que cal valorar."
+      },
+      {
+        "text": "Només el volum de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. El volum de dades és important, però no garanteix que el SGBD puga integrar-se amb altres aplicacions."
+      },
+      {
+        "text": "Únicament la velocitat de lectura",
+        "correcte": false,
+        "feedback": "Incorrecte. La velocitat de lectura és un factor de rendiment, però la integració requereix valorar APIs i compatibilitat amb altres aplicacions."
+      },
+      {
+        "text": "Exclusivament les actualitzacions del producte",
+        "correcte": false,
+        "feedback": "Incorrecte. Les actualitzacions són importants, però no són el factor específic relacionat amb la integració d'aplicacions."
+      }
+    ]
+  },
+  {
+    "CE": "1g",
+    "titol": "Quina informació s'ha de registrar sobre el producte SGBD instal·lat?",
+    "pista": "Cal poder identificar exactament quin producte s'ha instal·lat i quina versió s'ha utilitzat.",
+    "opcions": [
+      {
+        "text": "Només el nom comercial del producte",
+        "correcte": false,
+        "feedback": "Incorrecte. També és necessari registrar la versió utilitzada."
+      },
+      {
+        "text": "El producte i la versió utilitzada del SGBD",
+        "correcte": true,
+        "feedback": "Correcte. La documentació ha d'indicar quin SGBD s'ha instal·lat i quina versió concreta s'ha utilitzat."
+      },
+      {
+        "text": "Només el sistema operatiu de la màquina",
+        "correcte": false,
+        "feedback": "Incorrecte. El sistema operatiu també s'ha de documentar, però no substitueix la informació sobre el SGBD."
+      },
+      {
+        "text": "Únicament el nom de l'usuari que ha fet la instal·lació",
+        "correcte": false,
+        "feedback": "Incorrecte. L'usuari instal·lador és una dada que també es registra, però no identifica el producte SGBD."
+      }
+    ]
+  },
+  {
+    "comentari": "documentacio",
+    "CE": "1g",
+    "titol": "Quina és la finalitat principal de la documentació elaborada durant la instal·lació d'un SGBD?",
+    "pista": "La documentació està destinada a futures consultes de caràcter tècnic.",
+    "opcions": [
+      {
+        "text": "Fer pública tota la informació de la instal·lació",
+        "correcte": false,
+        "feedback": "Incorrecte. El document no serà públic i es guardarà per a consultes tècniques."
+      },
+      {
+        "text": "Registrar la informació rellevant de la instal·lació per a consultes tècniques posteriors",
+        "correcte": true,
+        "feedback": "Correcte. La documentació permet conservar la informació necessària per consultar i gestionar tècnicament la instal·lació."
+      },
+      {
+        "text": "Substituir les còpies de seguretat de la base de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. La documentació no substitueix les còpies de seguretat."
+      },
+      {
+        "text": "Guardar únicament la contrasenya de l'usuari administrador",
+        "correcte": false,
+        "feedback": "Incorrecte. La documentació ha d'incloure molta més informació sobre la instal·lació, el sistema i el SGBD."
+      }
+    ]
+  },
+  {
+    "CE": "1e",
+    "titol": "Per què és important verificar l'espai lliure abans d'instal·lar un SGBD?",
+    "pista": "Pensa en els recursos que necessita el SGBD per funcionar i emmagatzemar dades.",
+    "opcions": [
+      {
+        "text": "Per comprovar que hi ha prou memòria i emmagatzematge disponibles",
+        "correcte": true,
+        "feedback": "Correcte. Cal verificar que hi ha prou espai lliure tant en memòria com en l'emmagatzematge per complir els requisits del SGBD."
+      },
+      {
+        "text": "Per determinar el nom de la base de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. L'espai disponible no determina el nom de la base de dades."
+      },
+      {
+        "text": "Per seleccionar automàticament el sistema operatiu",
+        "correcte": false,
+        "feedback": "Incorrecte. El sistema operatiu i el seu kernel han de complir els requisits establerts pel SGBD."
+      },
+      {
+        "text": "Per comprovar el nombre de ports de xarxa disponibles únicament",
+        "correcte": false,
+        "feedback": "Incorrecte. Les comunicacions també s'han de verificar, però l'espai lliure és un requisit diferent."
+      }
+    ]
+  },
+  {
+    "CE": "1e",
+    "titol": "Quina comprovació està relacionada directament amb la compatibilitat del sistema operatiu amb el SGBD?",
+    "pista": "Busca l'element que fa referència al nucli del sistema operatiu.",
+    "opcions": [
+      {
+        "text": "Verificar el kernel del sistema operatiu adequat",
+        "correcte": true,
+        "feedback": "Correcte. Cal comprovar que el kernel del sistema operatiu és adequat i compatible amb els requisits del SGBD."
+      },
+      {
+        "text": "Comprovar el color de la consola",
+        "correcte": false,
+        "feedback": "Incorrecte. El color de la consola no és un requisit d'instal·lació del SGBD."
+      },
+      {
+        "text": "Comprovar únicament el nom de l'equip",
+        "correcte": false,
+        "feedback": "Incorrecte. El nom de l'equip pot ser rellevant en determinats entorns, però no és la comprovació indicada sobre la compatibilitat del sistema operatiu."
+      },
+      {
+        "text": "Comprovar només la velocitat de la connexió a Internet",
+        "correcte": false,
+        "feedback": "Incorrecte. Les comunicacions s'han de verificar, però la compatibilitat del sistema operatiu està relacionada amb el kernel adequat."
+      }
+    ]
+  },
+  {
+    "CE": "1h",
+    "titol": "Quina ordre permet consultar quan es va instal·lar PostgreSQL a partir de l'historial d'APT?",
+    "pista": "La comanda busca la paraula relacionada amb PostgreSQL dins dels logs d'APT.",
+    "opcions": [
+      {
+        "text": "sudo zgrep -i postgres /var/log/apt/history.log*",
+        "correcte": true,
+        "feedback": "Correcte. Aquesta ordre busca, sense distingir majúscules i minúscules, les aparicions de `postgres` en l'historial d'APT, incloent els fitxers rotats."
+      },
+      {
+        "text": "sudo journalctl -u mariadb",
+        "correcte": false,
+        "feedback": "Incorrecte. Aquesta ordre serveix per consultar els registres del servei MariaDB mitjançant systemd-journald."
+      },
+      {
+        "text": "sudo zgrep -i postgres /var/log/mysql/history.log",
+        "correcte": false,
+        "feedback": "Incorrecte. El text indica que l'historial d'APT es troba en `/var/log/apt/history.log*`."
+      },
+      {
+        "text": "sudo journalctl -u postgresql-install",
+        "correcte": false,
+        "feedback": "Incorrecte. Aquesta no és l'ordre indicada en el text per consultar l'historial d'instal·lació de PostgreSQL."
+      }
+    ]
+  },
+  {
+    "CE": "1h",
+    "titol": "Quina funció té el DBA respecte al registre de la instal·lació?",
+    "pista": "El DBA ha de poder consultar el registre quan siga necessari.",
+    "opcions": [
+      {
+        "text": "Eliminar-lo immediatament després de la instal·lació",
+        "correcte": false,
+        "feedback": "Incorrecte. El DBA ha de conservar i tindre localitzat el registre per poder consultar-lo davant possibles incidències."
+      },
+      {
+        "text": "Tindre'l localitzat i disponible per consultar-lo en cas d'incidències",
+        "correcte": true,
+        "feedback": "Correcte. És important que el DBA conega la ubicació del log per poder analitzar incidències quan siga necessari."
+      },
+      {
+        "text": "Modificar-lo per eliminar totes les operacions registrades",
+        "correcte": false,
+        "feedback": "Incorrecte. Modificar o eliminar el contingut dificultaria la diagnosi de problemes."
+      },
+      {
+        "text": "Utilitzar-lo únicament per controlar els usuaris connectats",
+        "correcte": false,
+        "feedback": "Incorrecte. El registre d'instal·lació serveix principalment per consultar les operacions de la instal·lació i diagnosticar incidències."
+      }
+    ]
+  },
+  {
+    "CE": "1f",
+    "titol": "Quin port utilitza PostgreSQL per defecte després de la instal·lació?",
+    "pista": "És el port estàndard associat al servei PostgreSQL.",
+    "opcions": [
+      {
+        "text": "3306",
+        "correcte": false,
+        "feedback": "Incorrecte. El port 3306 és habitualment el port per defecte de MySQL/MariaDB."
+      },
+      {
+        "text": "1521",
+        "correcte": false,
+        "feedback": "Incorrecte. El port 1521 és habitualment associat a Oracle Database."
+      },
+      {
+        "text": "5432",
+        "correcte": true,
+        "feedback": "Correcte. PostgreSQL escolta habitualment pel port 5432 per defecte."
+      },
+      {
+        "text": "8080",
+        "correcte": false,
+        "feedback": "Incorrecte. 8080 és un port freqüent en serveis web, però no és el port per defecte de PostgreSQL."
+      }
+    ]
+  },
+  {
+    "CE": "1f",
+    "titol": "Quina funció té la comanda `sudo -u postgres psql`?",
+    "pista": "La comanda combina un canvi d'usuari amb l'inici del client de PostgreSQL.",
+    "opcions": [
+      {
+        "text": "Elimina la base de dades postgres",
+        "correcte": false,
+        "feedback": "Incorrecte. La comanda inicia el client psql; no elimina la base de dades."
+      },
+      {
+        "text": "Inicia psql com a usuari postgres i es connecta al clúster i a la base de dades predeterminats",
+        "correcte": true,
+        "feedback": "Correcte. `sudo -u postgres` executa la comanda com a usuari postgres i `psql` inicia el client connectant-se al clúster i a la base de dades predeterminats."
+      },
+      {
+        "text": "Inicia automàticament el servidor PostgreSQL",
+        "correcte": false,
+        "feedback": "Incorrecte. La comanda inicia el client psql. L'estat o inici del servei es gestiona amb eines com systemctl."
+      },
+      {
+        "text": "Crea un usuari nou anomenat postgres",
+        "correcte": false,
+        "feedback": "Incorrecte. L'usuari postgres ja es crea durant la instal·lació; aquesta comanda simplement executa psql amb aquest usuari."
+      }
+    ]
+  },
+  {
+    "comentari": "verificacio funcionament al SGBD",
+    "CE": "1j",
+    "titol": "Quina ordre permet connectar-se a PostgreSQL des d'una terminal Linux com a usuari postgres?",
+    "pista": "Pensa en l'usuari del sistema amb què vols executar psql.",
+    "opcions": [
+      {
+        "text": "psql -U admin",
+        "correcte": false,
+        "feedback": "No és l'ordre indicada per connectar-se com a usuari postgres."
+      },
+      {
+        "text": "sudo -u postgres psql",
+        "correcte": true,
+        "feedback": "Correcte. En Linux, aquesta ordre executa psql com a usuari del sistema postgres i permet connectar-se al cluster principal."
+      },
+      {
+        "text": "sudo psql -d postgres",
+        "correcte": false,
+        "feedback": "Aquesta ordre podria iniciar psql amb privilegis, però no és la forma indicada en el material per connectar-se com a postgres."
+      },
+      {
+        "text": "psql --admin postgres",
+        "correcte": false,
+        "feedback": "psql no utilitza aquesta opció per indicar l'usuari DBA."
+      }
+    ]
+  },
+  {
+    "CE": "1j",
+    "titol": "Quina metacomanda de psql permet connectar-se a una altra base de dades dins del mateix cluster?",
+    "pista": "És una metacomanda que també es pot escriure amb la forma abreujada \\c.",
+    "opcions": [
+      {
+        "text": "\\switch nom_bbdd",
+        "correcte": false,
+        "feedback": "Aquesta no és una metacomanda de psql."
+      },
+      {
+        "text": "\\change nom_bbdd",
+        "correcte": false,
+        "feedback": "Aquesta ordre no existeix en psql."
+      },
+      {
+        "text": "\\connect nom_bbdd",
+        "correcte": true,
+        "feedback": "Correcte. \\connect permet establir una connexió amb una altra base de dades del mateix cluster. També es pot utilitzar \\c."
+      },
+      {
+        "text": "\\database nom_bbdd",
+        "correcte": false,
+        "feedback": "Aquesta no és la metacomanda utilitzada per canviar de base de dades."
+      }
+    ]
+  },
+  {
+    "CE": "1i",
+    "titol": "Quina és la funció principal del WAL (Write-Ahead Log) de PostgreSQL?",
+    "pista": "Pensa en què necessita PostgreSQL per recuperar-se després d'una fallada.",
+    "opcions": [
+      {
+        "text": "Guardar els executables del servidor abans d'iniciar-lo.",
+        "correcte": false,
+        "feedback": "Els executables es troben en el directori de binaris, no en el WAL."
+      },
+      {
+        "text": "Registrar les transaccions abans d'escriure les dades per facilitar la recuperació i la replicació.",
+        "correcte": true,
+        "feedback": "Correcte. El WAL registra les operacions abans que les dades es modifiquen definitivament i és fonamental per a la recuperació davant fallades i la replicació."
+      },
+      {
+        "text": "Guardar únicament els errors produïts pel servidor.",
+        "correcte": false,
+        "feedback": "Els errors i altres esdeveniments es registren en els logs del servidor."
+      },
+      {
+        "text": "Emmagatzemar les contrasenyes dels usuaris de PostgreSQL.",
+        "correcte": false,
+        "feedback": "El WAL no té aquesta funció."
+      }
+    ]
+  },
+  {
+    "CE": "1i",
+    "titol": "Quina funció té el directori DATA DIRECTORY de PostgreSQL?",
+    "pista": "És el directori que conté el nucli de la informació del clúster.",
+    "opcions": [
+      {
+        "text": "Conté únicament els fitxers de registre del servidor.",
+        "correcte": false,
+        "feedback": "Els logs del servidor es troben habitualment en un directori separat, com /var/log/postgresql/."
+      },
+      {
+        "text": "Conté els executables del client i del servidor.",
+        "correcte": false,
+        "feedback": "Els binaris es troben en un directori específic, com /usr/lib/postgresql/16/bin/."
+      },
+      {
+        "text": "És el cor del clúster i conté les dades, catàlegs del sistema i fitxers de configuració.",
+        "correcte": true,
+        "feedback": "Correcte. El DATA DIRECTORY conté la informació essencial del clúster i només hi hauria de tindre accés l'usuari o grup postgres."
+      },
+      {
+        "text": "Conté exclusivament els sockets de comunicació.",
+        "correcte": false,
+        "feedback": "Els sockets es troben habitualment en /var/run/postgresql/."
+      }
+    ]
+  },
+  {
+    "CE": "1y",
+    "titol": "PL/pgSQL forma part dels serveis del SGBD de PostgreSQL",
+    "pista": "Pensa en el llenguatge procedimental que PostgreSQL utilitza per crear funcions i procediments.",
+    "opcions": [
+      {
+        "text": "Vertader",
+        "correcte": false,
+        "feedback": "Incorrecte. PL/pgSQL és un llenguatge procedimental integrat en PostgreSQL, però no és un servei del SGBD."
+      },
+      {
+        "text": "Fals",
+        "correcte": true,
+        "feedback": "Correcte. PL/pgSQL és un llenguatge procedimental que PostgreSQL proporciona per escriure funcions, procediments i blocs de codi."
+      }
+    ]
+  },
+  {
+    "CE": "1y",
+    "titol": "Com gestiona PostgreSQL les connexions?",
+    "pista": "Pensa en l'arquitectura basada en processos de PostgreSQL.",
+    "opcions": [
+      {
+        "text": "Crea un fil per cada connexió",
+        "correcte": false,
+        "feedback": "Incorrecte. PostgreSQL utilitza principalment una arquitectura basada en processos, no un fil per cada connexió."
+      },
+      {
+        "text": "Crea un procés per cada connexió",
+        "correcte": true,
+        "feedback": "Correcte. PostgreSQL utilitza un procés backend independent per gestionar cada connexió de client."
+      },
+      {
+        "text": "Totes les connexions comparteixen un procés",
+        "correcte": false,
+        "feedback": "Incorrecte. Cada connexió de client és gestionada per un procés backend propi."
+      },
+      {
+        "text": "No crea cap procés nou",
+        "correcte": false,
+        "feedback": "Incorrecte. Quan es rep una connexió, PostgreSQL crea un procés backend per gestionar-la."
+      }
+    ]
+  },
+  {
+    "CE": "1z",
+    "titol": "Quin element defineix la ubicació física de les dades?",
+    "pista": "Pensa en l'element de PostgreSQL que permet associar objectes de la base de dades amb una ubicació concreta del sistema de fitxers.",
+    "opcions": [
+      {
+        "text": "Schema",
+        "correcte": false,
+        "feedback": "Incorrecte. Un schema és una estructura lògica per organitzar objectes dins d'una base de dades."
+      },
+      {
+        "text": "Tablespace",
+        "correcte": true,
+        "feedback": "Correcte. Un tablespace permet definir una ubicació del sistema de fitxers on s'emmagatzemen físicament els fitxers de dades."
+      },
+      {
+        "text": "Base de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. Una base de dades és un contenidor lògic d'objectes, però no és l'element que especifica directament una ubicació física concreta."
+      },
+      {
+        "text": "Rol",
+        "correcte": false,
+        "feedback": "Incorrecte. Un rol representa un usuari o grup i està relacionat amb la gestió d'accés i permisos."
+      }
+    ]
+  },
+  {
+    "CE": "1z",
+    "titol": "Quina és la funció de l’autovacuum?",
+    "pista": "Pensa en què passa amb les files antigues després d'un UPDATE o DELETE i en la necessitat de mantenir les taules.",
+    "opcions": [
+      {
+        "text": "Crear usuaris",
+        "correcte": false,
+        "feedback": "Incorrecte. La creació i gestió d'usuaris es realitza mitjançant rols i ordres de gestió corresponents."
+      },
+      {
+        "text": "Eliminar dades obsoletes i optimitzar",
+        "correcte": true,
+        "feedback": "Correcte. Autovacuum automatitza tasques de manteniment, especialment el vacuum de les taules i l'actualització d'estadístiques, ajudant a controlar l'acumulació de tuples obsoletes."
+      },
+      {
+        "text": "Gestionar connexions",
+        "correcte": false,
+        "feedback": "Incorrecte. Les connexions de clients són gestionades per l'arquitectura de processos de PostgreSQL i els processos corresponents."
+      },
+      {
+        "text": "Crear schemas",
+        "correcte": false,
+        "feedback": "Incorrecte. Els schemas es creen mitjançant ordres SQL com CREATE SCHEMA."
+      }
+    ]
+  }
+]
