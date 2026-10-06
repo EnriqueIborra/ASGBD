@@ -750,23 +750,61 @@ Tens control directe sobre com es fa l’aturada amb -m .Nivell de cluster. Gest
 <p>Permeten distribuir dades en diferents discos.</p>
 
 <p>Exemple:</p>
+<p>primer, crear des de SO, una carpeta, que pot estar situada en un disc SSD més ràpid</p>
+<pre><code>sudo mkdir /mnt/ssd/dades/postgres_fast
+sudo chown postgres:postgres /mnt/ssd/dades/postgres_fast</code></pre>
+<p>Després crear <code>TABLESPACE</code> des de dins de postgres</p>
 <pre><code>CREATE TABLESPACE dades_fast
-LOCATION '/mnt/ssd_postgres';</code></pre>
+LOCATION '/mnt/ssd/dades/postgres_fast';</code></pre>
 
 <p>Després pots crear una taula en aquest espai:</p>
 <pre><code>CREATE TABLE clients (
    id serial,
    nom text
 ) TABLESPACE dades_fast;</code></pre>
+<p>O crear una BBDD dins d'un tablespace</p>
+<pre><code>CREATE DATABASE empresa
+TABLESPACE dades_fast;</code></pre>
+<p>A partir d'ací, els objectes que es creen normalment en aquesta base de dades s'emmagatzemaran en dades_fast, 
+  llevat que indiquem un altre tablespace.</p>
 
+<pre><code>-- També podem canviar el tablespace a una BBDD  
+ALTER DATABASE empresa
+SET TABLESPACE dades_fast;</code></pre>
+<p>Aquesta operació mou els objectes de la base de dades al nou tablespace.</p>
+<p>===================</p>
 <p>Útil per:</p>
 <ul>
 <li>Separar dades i WAL</li>
 <li>Utilitzar SSD per índexs</li>
 <li>Millorar rendiment I/O</li>
 </ul>
-
-
+<p>Per defecte, PostgreSQL té dos tablespaces</p>
+<pre><code>pg_default
+pg_global</code></pre>
+<p><code>pg_default</code> és el tablespace per defecte de les bases de dades. <code>pg_global</code>
+   conté objectes compartits per tot el clúster i no es pot utilitzar com un tablespace normal per assignar taules.</p>
+<p>Els <strong>índexs</strong> també poden estar en un tablespace diferent. Podem tindre una taula en un tablespace i un index d'esta
+  taula en un altre tablespace (mes ràpid)  </p>
+  <pre><code>               PostgreSQL
+                    │
+             Base de dades
+                    │
+       ┌────────────┴────────────┐
+       │                         │
+    pg_default               dades_fast
+       │                         │
+     taules                  índexs</code></pre>
+  <h3>Com saber quins tablespaces tenim?</h3>
+<pre><code>\db
+ o 
+SELECT     spcname,     pg_tablespace_location(oid)   FROM pg_tablespace; 
+</code></pre>
+<p><strong>Un tablespace no és una partició de la taula. tablespace ≠ partició</strong></p>
+<p><strong>Un tablespace no és una base de dades independent.</strong></p>
+<p>Un <strong>tablespace</strong> permet indicar en quin lloc de l'emmagatzematge físic PostgreSQL 
+  ha de guardar les dades d'un <strong>objecte</strong>.</p>
+<hr>
 <p>Paràmetres importants a <code>postgresql.conf</code>:</p>
 <pre><code>wal_level = replica
 checkpoint_timeout = 5min
