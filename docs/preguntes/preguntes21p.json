@@ -1,93 +1,272 @@
 [
   {
+    "CE": "a",
     "titol": "Què és una instància de PostgreSQL?",
+    "pista": "Pensa en PostgreSQL mentre el servidor està en execució: no és només una base de dades ni un fitxer.",
     "opcions": [
-      { "text": "Una única base de dades", "correcte": false },
-      { "text": "Només el fitxer postgresql.conf", "correcte": false },
-      { "text": "El servidor en execució amb dades, memòria i configuració", "correcte": true },
-      { "text": "Un usuari connectat", "correcte": false }
+      {
+        "text": "Una única base de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. Una instància pot gestionar diverses bases de dades dins del mateix clúster."
+      },
+      {
+        "text": "Només el fitxer postgresql.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. postgresql.conf és un fitxer de configuració, però una instància inclou molt més: processos, memòria, dades i configuració."
+      },
+      {
+        "text": "El servidor en execució amb dades, memòria i configuració",
+        "correcte": true,
+        "feedback": "Correcte. Una instància fa referència al servidor PostgreSQL en execució, amb els seus processos, memòria, dades i configuració."
+      },
+      {
+        "text": "Un usuari connectat",
+        "correcte": false,
+        "feedback": "Incorrecte. Un usuari connectat genera una sessió, però no representa tota una instància de PostgreSQL."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Què és una sessió en PostgreSQL?",
+    "pista": "Pensa en què es crea quan un client, com psql, estableix una connexió amb el servidor PostgreSQL.",
     "opcions": [
-      { "text": "Un fitxer de configuració", "correcte": false },
-      { "text": "Una connexió activa entre client i servidor", "correcte": true },
-      { "text": "Una base de dades", "correcte": false },
-      { "text": "Un procés del sistema", "correcte": false }
+      {
+        "text": "Un fitxer de configuració",
+        "correcte": false,
+        "feedback": "Incorrecte. Els fitxers de configuració, com postgresql.conf, defineixen el comportament del servidor."
+      },
+      {
+        "text": "Una connexió activa entre client i servidor",
+        "correcte": true,
+        "feedback": "Correcte. Una sessió representa una connexió activa entre un client i el servidor PostgreSQL."
+      },
+      {
+        "text": "Una base de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. Una base de dades és un conjunt d'objectes i dades; una sessió és una connexió activa amb el servidor."
+      },
+      {
+        "text": "Un procés del sistema",
+        "correcte": false,
+        "feedback": "Incorrecte. PostgreSQL utilitza processos per gestionar les connexions, però la sessió és el concepte lògic associat a la connexió."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quin enunciat és correcte?",
+    "pista": "Relaciona cada connexió establerta entre un client i PostgreSQL amb la sessió que es crea.",
     "opcions": [
-      { "text": "1 usuari = 1 sessió sempre", "correcte": false },
-      { "text": "1 connexió = 1 sessió", "correcte": true },
-      { "text": "1 base de dades = 1 sessió", "correcte": false },
-      { "text": "1 taula = 1 sessió", "correcte": false }
+      {
+        "text": "1 usuari = 1 sessió sempre",
+        "correcte": false,
+        "feedback": "Incorrecte. Un mateix usuari pot establir diverses connexions simultànies i, per tant, tenir diverses sessions."
+      },
+      {
+        "text": "1 connexió = 1 sessió",
+        "correcte": true,
+        "feedback": "Correcte. Cada connexió activa d'un client amb el servidor correspon a una sessió."
+      },
+      {
+        "text": "1 base de dades = 1 sessió",
+        "correcte": false,
+        "feedback": "Incorrecte. Una mateixa base de dades pot tenir moltes sessions simultànies."
+      },
+      {
+        "text": "1 taula = 1 sessió",
+        "correcte": false,
+        "feedback": "Incorrecte. Una taula pot ser utilitzada per moltes sessions al mateix temps."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quin fitxer és el principal de configuració?",
+    "pista": "Busca el fitxer que conté la major part dels paràmetres que controlen el comportament del servidor PostgreSQL.",
     "opcions": [
-      { "text": "pg_hba.conf", "correcte": false },
-      { "text": "pg_ident.conf", "correcte": false },
-      { "text": "postgresql.conf", "correcte": true },
-      { "text": "pg_settings.conf", "correcte": false }
+      {
+        "text": "pg_hba.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_hba.conf controla l'autenticació i les regles d'accés de les connexions."
+      },
+      {
+        "text": "pg_ident.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_ident.conf s'utilitza per definir mapatges entre noms d'usuari externs i rols de PostgreSQL."
+      },
+      {
+        "text": "postgresql.conf",
+        "correcte": true,
+        "feedback": "Correcte. postgresql.conf és el fitxer principal de configuració del servidor PostgreSQL."
+      },
+      {
+        "text": "pg_settings.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_settings no és un fitxer de configuració; és una vista que permet consultar els paràmetres de configuració."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quin fitxer controla qui pot connectar-se i com?",
+    "pista": "Pensa en el fitxer que conté les regles d'autenticació i d'accés dels clients a PostgreSQL.",
     "opcions": [
-      { "text": "postgresql.conf", "correcte": false },
-      { "text": "pg_ident.conf", "correcte": false },
-      { "text": "pg_hba.conf", "correcte": true },
-      { "text": "pg_roles.conf", "correcte": false }
+      {
+        "text": "postgresql.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. postgresql.conf conté els principals paràmetres de configuració del servidor, però no les regles específiques d'accés."
+      },
+      {
+        "text": "pg_ident.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_ident.conf permet definir mapatges d'identitats, però les regles generals d'accés es defineixen en pg_hba.conf."
+      },
+      {
+        "text": "pg_hba.conf",
+        "correcte": true,
+        "feedback": "Correcte. pg_hba.conf defineix quins clients poden connectar-se, a quines bases de dades, amb quins usuaris i quin mètode d'autenticació s'utilitza."
+      },
+      {
+        "text": "pg_roles.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_roles.conf no és el fitxer que PostgreSQL utilitza per definir les regles d'accés."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quin d’aquests paràmetres requereix reinici del servidor?",
+    "pista": "Pensa en el context de configuració que indica que un paràmetre només pot aplicar-se quan s'inicia el servidor.",
     "opcions": [
-      { "text": "context = user", "correcte": false },
-      { "text": "context = sighup", "correcte": false },
-      { "text": "context = postmaster", "correcte": true },
-      { "text": "context = backend", "correcte": false }
+      {
+        "text": "context = user",
+        "correcte": false,
+        "feedback": "Incorrecte. Els paràmetres amb context user poden modificar-se a nivell de sessió."
+      },
+      {
+        "text": "context = sighup",
+        "correcte": false,
+        "feedback": "Incorrecte. Un paràmetre amb context sighup pot aplicar-se després de recarregar la configuració, sense reiniciar completament el servidor."
+      },
+      {
+        "text": "context = postmaster",
+        "correcte": true,
+        "feedback": "Correcte. Els paràmetres amb context postmaster només tenen efecte després d'iniciar o reiniciar el servidor PostgreSQL."
+      },
+      {
+        "text": "context = backend",
+        "correcte": false,
+        "feedback": "Incorrecte. Els paràmetres amb context backend s'apliquen als nous processos backend, sense requerir necessàriament un reinici complet del servidor."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quina comanda recarrega la configuració sense reiniciar?",
+    "pista": "Busca la funció de PostgreSQL que demana al servidor que torne a llegir els fitxers de configuració.",
     "opcions": [
-      { "text": "pg_stop()", "correcte": false },
-      { "text": "pg_reload_conf()", "correcte": true },
-      { "text": "pg_restart()", "correcte": false },
-      { "text": "reload_db()", "correcte": false }
+      {
+        "text": "pg_stop()",
+        "correcte": false,
+        "feedback": "Incorrecte. Aquesta no és la funció de PostgreSQL per recarregar la configuració."
+      },
+      {
+        "text": "pg_reload_conf()",
+        "correcte": true,
+        "feedback": "Correcte. pg_reload_conf() indica al servidor PostgreSQL que torne a carregar els fitxers de configuració sense reiniciar el servidor."
+      },
+      {
+        "text": "pg_restart()",
+        "correcte": false,
+        "feedback": "Incorrecte. Aquesta funció no és una funció estàndard de PostgreSQL per recarregar la configuració."
+      },
+      {
+        "text": "reload_db()",
+        "correcte": false,
+        "feedback": "Incorrecte. Aquesta no és una funció de PostgreSQL per recarregar la configuració."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "On escriu ALTER SYSTEM els canvis?",
+    "pista": "Pensa en el fitxer que PostgreSQL utilitza per guardar automàticament els paràmetres modificats amb ALTER SYSTEM.",
     "opcions": [
-      { "text": "postgresql.conf", "correcte": false },
-      { "text": "pg_hba.conf", "correcte": false },
-      { "text": "postgresql.auto.conf", "correcte": true },
-      { "text": "pg_ident.conf", "correcte": false }
+      {
+        "text": "postgresql.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. ALTER SYSTEM no modifica directament postgresql.conf."
+      },
+      {
+        "text": "pg_hba.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_hba.conf conté les regles d'autenticació i accés, no els canvis realitzats amb ALTER SYSTEM."
+      },
+      {
+        "text": "postgresql.auto.conf",
+        "correcte": true,
+        "feedback": "Correcte. ALTER SYSTEM guarda els canvis en postgresql.auto.conf, que PostgreSQL incorpora a la configuració."
+      },
+      {
+        "text": "pg_ident.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_ident.conf s'utilitza per als mapatges d'identitats i no per guardar els canvis d'ALTER SYSTEM."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quina consulta mostra totes les variables de configuració?",
+    "pista": "Pensa en la vista del sistema que PostgreSQL proporciona per consultar els paràmetres de configuració.",
     "opcions": [
-      { "text": "SELECT * FROM config;", "correcte": false },
-      { "text": "SHOW VARIABLES;", "correcte": false },
-      { "text": "SELECT name, setting FROM pg_settings;", "correcte": true },
-      { "text": "LIST SETTINGS;", "correcte": false }
+      {
+        "text": "SELECT * FROM config;",
+        "correcte": false,
+        "feedback": "Incorrecte. No existeix una vista estàndard anomenada config que mostre els paràmetres de configuració."
+      },
+      {
+        "text": "SHOW VARIABLES;",
+        "correcte": false,
+        "feedback": "Incorrecte. SHOW VARIABLES és una sintaxi associada a altres SGBD, com MySQL, no a PostgreSQL."
+      },
+      {
+        "text": "SELECT name, setting FROM pg_settings;",
+        "correcte": true,
+        "feedback": "Correcte. pg_settings és una vista del sistema que permet consultar els paràmetres de configuració de PostgreSQL."
+      },
+      {
+        "text": "LIST SETTINGS;",
+        "correcte": false,
+        "feedback": "Incorrecte. LIST SETTINGS no és una ordre SQL de PostgreSQL per consultar les variables de configuració."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quin context permet canviar una variable en qualsevol sessió?",
+    "pista": "Pensa en el nivell de configuració que permet que cada usuari establisca el valor del paràmetre per a la seua pròpia sessió.",
     "opcions": [
-      { "text": "internal", "correcte": false },
-      { "text": "postmaster", "correcte": false },
-      { "text": "superuser", "correcte": false },
-      { "text": "user", "correcte": true }
+      {
+        "text": "internal",
+        "correcte": false,
+        "feedback": "Incorrecte. Els paràmetres amb context internal no poden ser modificats directament per l'usuari."
+      },
+      {
+        "text": "postmaster",
+        "correcte": false,
+        "feedback": "Incorrecte. Els paràmetres amb context postmaster requereixen reiniciar el servidor per aplicar els canvis."
+      },
+      {
+        "text": "superuser",
+        "correcte": false,
+        "feedback": "Incorrecte. El context superuser permet modificar el paràmetre només a usuaris amb privilegis de superusuari, però no representa el context que permet qualsevol sessió."
+      },
+      {
+        "text": "user",
+        "correcte": true,
+        "feedback": "Correcte. Els paràmetres amb context user poden ser modificats per cada sessió, mitjançant SET, segons els permisos corresponents."
+      }
     ]
   }
 ]
-

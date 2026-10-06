@@ -1,189 +1,544 @@
 [
   {
+    "CE": "a",
     "titol": "En PostgreSQL, què és un usuari?",
+    "pista": "Pensa en l'entitat que identifica una persona o aplicació que vol accedir al servidor i als seus recursos.",
     "opcions": [
-      { "text": "Un esquema dins d’una base de dades", "correcte": false },
-      { "text": "Una entitat que accedeix a la base de dades", "correcte": true },
-      { "text": "Un tipus de taula especial", "correcte": false },
-      { "text": "Una connexió activa", "correcte": false }
+      {
+        "text": "Un esquema dins d’una base de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. Un esquema és un contenidor d'objectes dins d'una base de dades."
+      },
+      {
+        "text": "Una entitat que accedeix a la base de dades",
+        "correcte": true,
+        "feedback": "Correcte. En PostgreSQL, els usuaris es gestionen mitjançant rols, que poden actuar com a usuaris i permetre l'accés a les bases de dades."
+      },
+      {
+        "text": "Un tipus de taula especial",
+        "correcte": false,
+        "feedback": "Incorrecte. Un usuari no és una taula ni un tipus especial de taula."
+      },
+      {
+        "text": "Una connexió activa",
+        "correcte": false,
+        "feedback": "Incorrecte. Una connexió activa genera una sessió, però no és l'usuari."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "On es configura l’autenticació d’usuaris en PostgreSQL?",
+    "pista": "Pensa en el fitxer que conté les regles que determinen qui pot connectar-se, des d'on i amb quin mètode d'autenticació.",
     "opcions": [
-      { "text": "postgresql.conf", "correcte": false },
-      { "text": "pg_roles", "correcte": false },
-      { "text": "pg_hba.conf", "correcte": true },
-      { "text": "pg_ident.conf", "correcte": false }
+      {
+        "text": "postgresql.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. postgresql.conf conté la configuració general del servidor, però les regles d'autenticació es defineixen en un altre fitxer."
+      },
+      {
+        "text": "pg_roles",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_roles és una vista del sistema que mostra informació sobre els rols, però no és el fitxer on es defineixen les regles d'autenticació."
+      },
+      {
+        "text": "pg_hba.conf",
+        "correcte": true,
+        "feedback": "Correcte. pg_hba.conf defineix les regles d'autenticació i control d'accés de les connexions."
+      },
+      {
+        "text": "pg_ident.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_ident.conf s'utilitza per definir mapatges d'identitats, no les regles generals d'autenticació."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quin mètode d’autenticació és propi de PostgreSQL per contrasenya?",
+    "pista": "Busca el mètode basat en SCRAM que PostgreSQL utilitza per verificar contrasenyes de manera segura.",
     "opcions": [
-      { "text": "scram-sha-256", "correcte": true },
-      { "text": "ldap", "correcte": false },
-      { "text": "gss", "correcte": false },
-      { "text": "peer", "correcte": false }
+      {
+        "text": "scram-sha-256",
+        "correcte": true,
+        "feedback": "Correcte. scram-sha-256 és un mètode d'autenticació basat en SCRAM que PostgreSQL suporta per verificar contrasenyes."
+      },
+      {
+        "text": "ldap",
+        "correcte": false,
+        "feedback": "Incorrecte. LDAP és un mètode d'autenticació que utilitza un servei d'directori extern."
+      },
+      {
+        "text": "gss",
+        "correcte": false,
+        "feedback": "Incorrecte. GSS és un mètode d'autenticació basat en GSSAPI i no és el mètode de PostgreSQL específic per a contrasenyes."
+      },
+      {
+        "text": "peer",
+        "correcte": false,
+        "feedback": "Incorrecte. peer autentica comparant la identitat de l'usuari del sistema operatiu amb el rol de PostgreSQL, habitualment en connexions locals."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quin usuari predefinit és l’administrador en PostgreSQL?",
+    "pista": "Pensa en el rol que habitualment es crea durant la instal·lació de PostgreSQL i que tradicionalment s'utilitza per a tasques administratives.",
     "opcions": [
-      { "text": "admin", "correcte": false },
-      { "text": "root", "correcte": false },
-      { "text": "postgres", "correcte": true },
-      { "text": "system", "correcte": false }
+      {
+        "text": "admin",
+        "correcte": false,
+        "feedback": "Incorrecte. admin no és el nom predefinit habitual del rol administrador de PostgreSQL."
+      },
+      {
+        "text": "root",
+        "correcte": false,
+        "feedback": "Incorrecte. root és habitualment l'usuari administrador del sistema operatiu Unix/Linux, no el rol administrador predefinit de PostgreSQL."
+      },
+      {
+        "text": "postgres",
+        "correcte": true,
+        "feedback": "Correcte. postgres és el rol administrador que habitualment es crea en una instal·lació de PostgreSQL."
+      },
+      {
+        "text": "system",
+        "correcte": false,
+        "feedback": "Incorrecte. system és un nom associat habitualment a altres sistemes de bases de dades, però no és el rol administrador predefinit de PostgreSQL."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quin privilegi permet crear altres usuaris?",
+    "pista": "Busca el privilegi relacionat amb la gestió i creació de rols.",
     "opcions": [
-      { "text": "CREATEDB", "correcte": false },
-      { "text": "CREATEROLE", "correcte": true },
-      { "text": "LOGIN", "correcte": false },
-      { "text": "SUPERUSER", "correcte": false }
+      {
+        "text": "CREATEDB",
+        "correcte": false,
+        "feedback": "Incorrecte. CREATEDB permet crear bases de dades, però no és el privilegi específic per crear rols."
+      },
+      {
+        "text": "CREATEROLE",
+        "correcte": true,
+        "feedback": "Correcte. CREATEROLE permet crear i gestionar determinats rols, d'acord amb les restriccions de privilegis corresponents."
+      },
+      {
+        "text": "LOGIN",
+        "correcte": false,
+        "feedback": "Incorrecte. LOGIN permet que un rol puga iniciar sessió, però no li dona la capacitat de crear altres rols."
+      },
+      {
+        "text": "SUPERUSER",
+        "correcte": false,
+        "feedback": "Incorrecte. SUPERUSER dona privilegis administratius molt amplis, però no és el privilegi específic que es busca per crear rols."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Què passa si intentes eliminar un usuari que té objectes o sessions actives?",
+    "pista": "Pensa en què passa quan un rol encara és propietari d'objectes o manté dependències dins del clúster.",
     "opcions": [
-      { "text": "S’elimina igualment", "correcte": false },
-      { "text": "Només elimina els objectes", "correcte": false },
-      { "text": "Dona error i no es pot eliminar", "correcte": true },
-      { "text": "Es desconnecta automàticament", "correcte": false }
+      {
+        "text": "S’elimina igualment",
+        "correcte": false,
+        "feedback": "Incorrecte. PostgreSQL no permet eliminar un rol mentre encara existisquen dependències que impedisquen eliminar-lo."
+      },
+      {
+        "text": "Només elimina els objectes",
+        "correcte": false,
+        "feedback": "Incorrecte. DROP ROLE no elimina automàticament els objectes propietat del rol. Cal eliminar-los o transferir-ne la propietat."
+      },
+      {
+        "text": "Dona error i no es pot eliminar",
+        "correcte": true,
+        "feedback": "Correcte si el rol encara té dependències, com ara objectes que posseeix o privilegis que cal eliminar. En aquest cas, DROP ROLE dona error."
+      },
+      {
+        "text": "Es desconnecta automàticament",
+        "correcte": false,
+        "feedback": "Incorrecte. Les sessions actives es poden finalitzar explícitament amb pg_terminate_backend(), però DROP ROLE no té com a funció desconnectar-les automàticament."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quina comanda permet finalitzar sessions d’un usuari?",
+    "pista": "Pensa en la funció que finalitza el procés backend associat a una sessió concreta.",
     "opcions": [
-      { "text": "DROP SESSION", "correcte": false },
-      { "text": "KILL USER", "correcte": false },
-      { "text": "pg_terminate_backend()", "correcte": true },
-      { "text": "END CONNECTION", "correcte": false }
+      {
+        "text": "DROP SESSION",
+        "correcte": false,
+        "feedback": "Incorrecte. DROP SESSION no és una comanda de PostgreSQL per finalitzar una sessió."
+      },
+      {
+        "text": "KILL USER",
+        "correcte": false,
+        "feedback": "Incorrecte. KILL USER no és una comanda de PostgreSQL."
+      },
+      {
+        "text": "pg_terminate_backend()",
+        "correcte": true,
+        "feedback": "Correcte. pg_terminate_backend() finalitza la sessió associada al procés backend indicat pel seu PID."
+      },
+      {
+        "text": "END CONNECTION",
+        "correcte": false,
+        "feedback": "Incorrecte. END CONNECTION no és una ordre de PostgreSQL per finalitzar sessions."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quina afirmació és correcta sobre CREATE ROLE?",
+    "pista": "Recorda que crear un rol i permetre-li iniciar sessió són dues coses diferents.",
     "opcions": [
-      { "text": "Sempre permet login", "correcte": false },
-      { "text": "Només crea bases de dades", "correcte": false },
-      { "text": "Només permet login si té LOGIN", "correcte": true },
-      { "text": "És equivalent a DROP USER", "correcte": false }
+      {
+        "text": "Sempre permet login",
+        "correcte": false,
+        "feedback": "Incorrecte. CREATE ROLE no dona LOGIN per defecte."
+      },
+      {
+        "text": "Només crea bases de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. CREATE ROLE crea un rol, no una base de dades."
+      },
+      {
+        "text": "Només permet login si té LOGIN",
+        "correcte": true,
+        "feedback": "Correcte. Un rol necessita l'atribut LOGIN per poder iniciar una sessió com a usuari."
+      },
+      {
+        "text": "És equivalent a DROP USER",
+        "correcte": false,
+        "feedback": "Incorrecte. CREATE ROLE crea un rol, mentre que DROP USER elimina un rol."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Per defecte, què passa amb el permís CONNECT en una nova base de dades?",
+    "pista": "Pensa en el rol especial PUBLIC, que representa tots els rols de PostgreSQL.",
     "opcions": [
-      { "text": "Només el propietari pot connectar", "correcte": false },
-      { "text": "Ningú pot connectar", "correcte": false },
-      { "text": "Tots els usuaris (PUBLIC) poden connectar", "correcte": true },
-      { "text": "Només superusers poden connectar", "correcte": false }
+      {
+        "text": "Només el propietari pot connectar",
+        "correcte": false,
+        "feedback": "Incorrecte. Per defecte, el privilegi CONNECT també es concedeix a PUBLIC."
+      },
+      {
+        "text": "Ningú pot connectar",
+        "correcte": false,
+        "feedback": "Incorrecte. PostgreSQL concedeix CONNECT a PUBLIC per defecte en una base de dades nova."
+      },
+      {
+        "text": "Tots els usuaris (PUBLIC) poden connectar",
+        "correcte": true,
+        "feedback": "Correcte. Per defecte, PUBLIC té el privilegi CONNECT sobre les bases de dades, encara que el rol també necessita poder iniciar sessió."
+      },
+      {
+        "text": "Només superusers poden connectar",
+        "correcte": false,
+        "feedback": "Incorrecte. Els usuaris normals també poden connectar-se si tenen LOGIN i el privilegi CONNECT corresponent."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Quina és una bona pràctica amb l’usuari postgres?",
+    "pista": "Pensa en el principi de mínim privilegi i en la conveniència de no utilitzar un compte administratiu per a totes les tasques.",
     "opcions": [
-      { "text": "Usar-lo per a totes les operacions", "correcte": false },
-      { "text": "Eliminar-lo després d’instal·lar", "correcte": false },
-      { "text": "No usar-lo per al dia a dia", "correcte": true },
-      { "text": "Canviar-li el nom", "correcte": false }
+      {
+        "text": "Usar-lo per a totes les operacions",
+        "correcte": false,
+        "feedback": "Incorrecte. Utilitzar sempre un compte amb privilegis administratius augmenta el risc d'errors i d'impacte d'un incident."
+      },
+      {
+        "text": "Eliminar-lo després d’instal·lar",
+        "correcte": false,
+        "feedback": "Incorrecte. Eliminar el rol administrador predefinit no és una bona pràctica general i pot complicar tasques d'administració."
+      },
+      {
+        "text": "No usar-lo per al dia a dia",
+        "correcte": true,
+        "feedback": "Correcte. És preferible utilitzar comptes amb només els privilegis necessaris per a les tasques habituals."
+      },
+      {
+        "text": "Canviar-li el nom",
+        "correcte": false,
+        "feedback": "Incorrecte. Canviar el nom no substitueix la bona pràctica d'utilitzar comptes amb els privilegis mínims necessaris."
+      }
     ]
-  },{
+  },
+  {
+    "CE": "a",
     "titol": "Tens: CREATE ROLE alumne NOLOGIN; i executes psql -U alumne -d postgres. Què passa?",
+    "pista": "Mira l'atribut NOLOGIN: indica si el rol està autoritzat a iniciar una sessió.",
     "opcions": [
-      { "text": "Es connecta correctament", "correcte": false },
-      { "text": "Error: no pot iniciar sessió", "correcte": true },
-      { "text": "Es connecta com a postgres", "correcte": false },
-      { "text": "Crea automàticament el rol LOGIN", "correcte": false }
+      {
+        "text": "Es connecta correctament",
+        "correcte": false,
+        "feedback": "Incorrecte. El rol alumne té NOLOGIN i, per tant, no pot iniciar una sessió."
+      },
+      {
+        "text": "Error: no pot iniciar sessió",
+        "correcte": true,
+        "feedback": "Correcte. NOLOGIN impedeix que el rol puga iniciar sessió en PostgreSQL."
+      },
+      {
+        "text": "Es connecta com a postgres",
+        "correcte": false,
+        "feedback": "Incorrecte. PostgreSQL no substitueix automàticament un rol NOLOGIN per postgres."
+      },
+      {
+        "text": "Crea automàticament el rol LOGIN",
+        "correcte": false,
+        "feedback": "Incorrecte. Intentar connectar-se no modifica automàticament els atributs del rol."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Tens una BBDD nova 'escola' i no has fet cap GRANT. Un usuari pot fer: psql -U alumne -d escola. Què passa?",
+    "pista": "Recorda els privilegis que PostgreSQL concedeix per defecte al rol especial PUBLIC sobre una base de dades nova.",
     "opcions": [
-      { "text": "No pot connectar-se", "correcte": false },
-      { "text": "Només si és superuser", "correcte": false },
-      { "text": "Pot connectar-se per defecte", "correcte": true },
-      { "text": "Ha de fer GRANT CONNECT manualment", "correcte": false }
+      {
+        "text": "No pot connectar-se",
+        "correcte": false,
+        "feedback": "Incorrecte. Per defecte, PUBLIC té el privilegi CONNECT sobre una base de dades nova."
+      },
+      {
+        "text": "Només si és superuser",
+        "correcte": false,
+        "feedback": "Incorrecte. Un usuari normal pot connectar-se si té LOGIN i es compleixen les regles d'autenticació."
+      },
+      {
+        "text": "Pot connectar-se per defecte",
+        "correcte": true,
+        "feedback": "Correcte. CONNECT es concedeix per defecte a PUBLIC en una base de dades nova. A més, el rol alumne ha de poder iniciar sessió."
+      },
+      {
+        "text": "Ha de fer GRANT CONNECT manualment",
+        "correcte": false,
+        "feedback": "Incorrecte. No cal concedir CONNECT manualment mentre es mantinga el privilegi que PUBLIC té per defecte."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Executem: REVOKE CONNECT ON DATABASE escola FROM PUBLIC;. Què passa amb els usuaris?",
+    "pista": "PUBLIC representa tots els rols. Si retirem CONNECT de PUBLIC, pensa qui conserva el privilegi.",
     "opcions": [
-      { "text": "Tots poden continuar connectant-se", "correcte": false },
-      { "text": "Només el propietari pot connectar", "correcte": true },
-      { "text": "Esborra la base de dades", "correcte": false },
-      { "text": "Només afecta a nous usuaris", "correcte": false }
+      {
+        "text": "Tots poden continuar connectant-se",
+        "correcte": false,
+        "feedback": "Incorrecte. En retirar CONNECT de PUBLIC, els rols que només obtenien aquest privilegi a través de PUBLIC deixen de poder connectar-se."
+      },
+      {
+        "text": "Només el propietari pot connectar",
+        "correcte": true,
+        "feedback": "Correcte en el cas habitual plantejat: si no hi ha altres privilegis CONNECT concedits, el propietari conserva la capacitat de connexió i els altres rols no poden connectar-se simplement per pertànyer a PUBLIC."
+      },
+      {
+        "text": "Esborra la base de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. REVOKE CONNECT només modifica els privilegis de connexió; no elimina la base de dades."
+      },
+      {
+        "text": "Només afecta a nous usuaris",
+        "correcte": false,
+        "feedback": "Incorrecte. El canvi afecta el privilegi CONNECT de PUBLIC i, per tant, també els rols existents que només l'obtenien a través de PUBLIC."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Usuari2 té només: GRANT UPDATE ON taula1 TO usuari2;. Executa: UPDATE taula1 SET col1=1;. Què passa?",
+    "pista": "Fixa't que no hi ha cap WHERE ni cap expressió que necessite llegir altres columnes.",
     "opcions": [
-      { "text": "Error per falta de SELECT", "correcte": false },
-      { "text": "Funciona correctament", "correcte": true },
-      { "text": "Només actualitza una fila", "correcte": false },
-      { "text": "Necessita permisos d’INSERT", "correcte": false }
+      {
+        "text": "Error per falta de SELECT",
+        "correcte": false,
+        "feedback": "Incorrecte. En aquest cas, l'operació UPDATE no necessita llegir una columna concreta mitjançant una condició o expressió que requerisca SELECT."
+      },
+      {
+        "text": "Funciona correctament",
+        "correcte": true,
+        "feedback": "Correcte. UPDATE sobre una taula pot realitzar-se amb el privilegi UPDATE; en aquesta sentència no cal SELECT sobre una altra columna."
+      },
+      {
+        "text": "Només actualitza una fila",
+        "correcte": false,
+        "feedback": "Incorrecte. Sense WHERE, l'UPDATE afecta totes les files de la taula que siguen actualitzables."
+      },
+      {
+        "text": "Necessita permisos d’INSERT",
+        "correcte": false,
+        "feedback": "Incorrecte. INSERT és necessari per inserir files, no per executar aquest UPDATE."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Usuari2 té només: GRANT UPDATE ON taula1 TO usuari2;. Executa: UPDATE taula1 SET col1=1 WHERE col2=2;. Què passa?",
+    "pista": "Ara l'UPDATE necessita consultar col2 per poder decidir quines files compleixen la condició WHERE.",
     "opcions": [
-      { "text": "Funciona correctament", "correcte": false },
-      { "text": "Error perquè necessita SELECT sobre col2", "correcte": true },
-      { "text": "Només actualitza totes les files", "correcte": false },
-      { "text": "Error perquè necessita DELETE", "correcte": false }
+      {
+        "text": "Funciona correctament",
+        "correcte": false,
+        "feedback": "Incorrecte. La condició WHERE utilitza col2 i la sentència necessita permís SELECT sobre aquesta columna."
+      },
+      {
+        "text": "Error perquè necessita SELECT sobre col2",
+        "correcte": true,
+        "feedback": "Correcte. PostgreSQL requereix SELECT sobre les columnes que es consulten en la condició WHERE, a més del privilegi UPDATE necessari per modificar col1."
+      },
+      {
+        "text": "Només actualitza totes les files",
+        "correcte": false,
+        "feedback": "Incorrecte. Si faltara la condició WHERE, l'UPDATE podria afectar totes les files, però aquí la condició especifica col2."
+      },
+      {
+        "text": "Error perquè necessita DELETE",
+        "correcte": false,
+        "feedback": "Incorrecte. DELETE és necessari per eliminar files, no per executar aquest UPDATE."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Executem: CREATE ROLE app_role;. Després intentem connectar-nos amb aquest rol. Què passa?",
+    "pista": "Recorda quin atribut necessita un rol perquè puga iniciar una sessió.",
     "opcions": [
-      { "text": "Es connecta sense problemes", "correcte": false },
-      { "text": "Error perquè no té LOGIN", "correcte": true },
-      { "text": "Es connecta com a postgres", "correcte": false },
-      { "text": "Demana crear una password", "correcte": false }
+      {
+        "text": "Es connecta sense problemes",
+        "correcte": false,
+        "feedback": "Incorrecte. CREATE ROLE crea el rol sense donar-li LOGIN per defecte."
+      },
+      {
+        "text": "Error perquè no té LOGIN",
+        "correcte": true,
+        "feedback": "Correcte. El rol creat amb CREATE ROLE no pot iniciar sessió mentre no se li concedisca l'atribut LOGIN."
+      },
+      {
+        "text": "Es connecta com a postgres",
+        "correcte": false,
+        "feedback": "Incorrecte. PostgreSQL no substitueix automàticament un rol sense LOGIN pel rol postgres."
+      },
+      {
+        "text": "Demana crear una password",
+        "correcte": false,
+        "feedback": "Incorrecte. No es crea automàticament una contrasenya ni s'afegeix LOGIN quan s'intenta connectar."
+      }
     ]
   },
   {
-    "titol": "Executem: DROP USER alumne; però l’usuari té sessions obertes. Què passa?",
+    "CE": "a",
+    "titol": "Executem: DROP USER alumne; però l’usuari té objectes dels quals és propietari. Què passa?",
+    "pista": "Pensa què passa quan un rol que volem eliminar encara és propietari de taules, funcions o altres objectes.",
     "opcions": [
-      { "text": "S’elimina igualment", "correcte": false },
-      { "text": "Error i no s’elimina", "correcte": true },
-      { "text": "Es tanquen automàticament les sessions", "correcte": false },
-      { "text": "Només elimina els objectes", "correcte": false }
+      {
+        "text": "S’elimina igualment",
+        "correcte": false,
+        "feedback": "Incorrecte. PostgreSQL no elimina automàticament els objectes propietat del rol."
+      },
+      {
+        "text": "Error i no s’elimina",
+        "correcte": true,
+        "feedback": "Correcte. Si el rol encara té objectes dels quals és propietari, cal transferir-los o eliminar-los abans de poder eliminar el rol."
+      },
+      {
+        "text": "Es tanquen automàticament les sessions",
+        "correcte": false,
+        "feedback": "Incorrecte. DROP USER no és una ordre destinada a finalitzar automàticament les sessions del rol."
+      },
+      {
+        "text": "Només elimina els objectes",
+        "correcte": false,
+        "feedback": "Incorrecte. DROP USER no elimina automàticament els objectes propietat del rol."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Executem: CREATE ROLE alumne LOGIN PASSWORD '1234';. Què pot fer aquest usuari?",
+    "pista": "Fixa't en l'atribut LOGIN: indica si el rol pot iniciar una sessió.",
     "opcions": [
-      { "text": "Només crear bases de dades", "correcte": false },
-      { "text": "Connectar-se al sistema", "correcte": true },
-      { "text": "És automàticament superuser", "correcte": false },
-      { "text": "Crear rols", "correcte": false }
+      {
+        "text": "Només crear bases de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. Crear bases de dades requereix el privilegi CREATEDB, que no s'ha especificat."
+      },
+      {
+        "text": "Connectar-se al sistema",
+        "correcte": true,
+        "feedback": "Correcte. L'atribut LOGIN permet al rol iniciar una sessió en PostgreSQL."
+      },
+      {
+        "text": "És automàticament superuser",
+        "correcte": false,
+        "feedback": "Incorrecte. SUPERUSER és un atribut diferent i no s'assigna automàticament."
+      },
+      {
+        "text": "Crear rols",
+        "correcte": false,
+        "feedback": "Incorrecte. Per crear i gestionar altres rols cal disposar del privilegi CREATEROLE, que no s'ha especificat."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Executem: SELECT current_user;. Què retorna?",
+    "pista": "Pensa en la identitat del rol que PostgreSQL està utilitzant actualment per comprovar els permisos.",
     "opcions": [
-      { "text": "La base de dades actual", "correcte": false },
-      { "text": "El nom del rol actiu", "correcte": true },
-      { "text": "El sistema operatiu", "correcte": false },
-      { "text": "El schema actual", "correcte": false }
+      {
+        "text": "La base de dades actual",
+        "correcte": false,
+        "feedback": "Incorrecte. current_user no indica la base de dades actual."
+      },
+      {
+        "text": "El nom del rol actiu",
+        "correcte": true,
+        "feedback": "Correcte. current_user retorna el nom del rol que s'està utilitzant actualment per a les comprovacions de permisos."
+      },
+      {
+        "text": "El sistema operatiu",
+        "correcte": false,
+        "feedback": "Incorrecte. current_user és un concepte de PostgreSQL i retorna un rol, no el sistema operatiu."
+      },
+      {
+        "text": "El schema actual",
+        "correcte": false,
+        "feedback": "Incorrecte. El schema actual es pot consultar, per exemple, amb current_schema()."
+      }
     ]
   },
   {
+    "CE": "a",
     "titol": "Executem: SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE usename='alumne';. Què fa?",
+    "pista": "La consulta busca els processos backend de les sessions d'alumne i aplica sobre cadascun una funció que finalitza la sessió.",
     "opcions": [
-      { "text": "Elimina l’usuari", "correcte": false },
-      { "text": "Tanca les sessions de l’usuari", "correcte": true },
-      { "text": "Bloqueja l’usuari", "correcte": false },
-      { "text": "Canvia la contrasenya", "correcte": false }
+      {
+        "text": "Elimina l’usuari",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_terminate_backend() no elimina rols; només finalitza sessions."
+      },
+      {
+        "text": "Tanca les sessions de l’usuari",
+        "correcte": true,
+        "feedback": "Correcte. La consulta obté els PID de les sessions d'alumne i pg_terminate_backend() finalitza aquestes sessions."
+      },
+      {
+        "text": "Bloqueja l’usuari",
+        "correcte": false,
+        "feedback": "Incorrecte. Finalitzar les sessions no modifica l'atribut LOGIN ni bloqueja permanentment el rol."
+      },
+      {
+        "text": "Canvia la contrasenya",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_terminate_backend() no modifica les contrasenyes dels rols."
+      }
     ]
   }
-
 ]
 
-
   
-
-
-
- 
