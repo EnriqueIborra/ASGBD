@@ -145,3 +145,4 @@ function seguentPregunta() {
   });
  // FI de  ...Per poder copiar codi en el porta-retalls.
  
+ 
