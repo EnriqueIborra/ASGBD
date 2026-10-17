@@ -25,7 +25,7 @@
   <a href="#segusuaris">Seguretat en Usuaris</a>
   <a href="#permisos">Permisos o Privilegis</a>
   <a href="#rols">Rols en postgresql</a>
-  <a href="#perfils">Perfils en postgresql</a>
+  <a href="#sinonims">Sinònims en postgresql</a>
   <a href="#vistes">Vistes com mecanisme de seguretat</a>
   <a href="#altres-recursos">Altres Recursos</a>
   <a href="#seguretat">2on Part - Seguretat en postgresql</a>
@@ -753,7 +753,7 @@ FROM pg_roles  WHERE rolname = 'gestor_aula';
   </section>
   
 
-  <section id="perfils">
+  <!------ <section id="perfils">     perfils es més caracteristic en oracle.
     <h2>📐 Perfils en postgresql</h2>
   
     <h3> Què és un perfil?</h3>
@@ -774,7 +774,46 @@ FROM pg_roles  WHERE rolname = 'gestor_aula';
       directament al rol amb paràmetres com rolconnlimit i rolvaliduntil. No hi ha un DEFAULT PROFILE, 
       cada usuari ha de tenir els seus atributs assignats al crear-lo.</p>
 
-  </section>
+  </section>  -->
+
+  
+
+    <section id="sinonims">
+    <h1>Sinònims en postgres</h1>
+    <h2>que és un sinònim?</h2>
+    <p>En una base de dades, un sinònim (synonym) és un nom alternatiu que permet fer referència a un objecte de la base de dades,
+       com ara una taula, una vista o un altre objecte compatible, sense haver d'utilitzar-ne el nom original complet.</p>
+    <p>Podem entendre'l com un àlies: en lloc d'accedir a un objecte mitjançant el seu nom habitual, 
+      utilitzem un altre nom que resulta més còmode, senzill o adequat per a una aplicació.</p>
+    <h2>per a que serveixen els sinònims?</h2>
+    <ol>
+      <li>Simplificar els noms dels objectes</li>
+      <li>Ocultar el nom de l'esquema</li>
+      <li>Facilitar el manteniment de les aplicacions</li>
+      <li>Millorar la llegibilitat del codi SQL</li>
+    </ol>
+    <p>Malauradament, PostgreSQL no implementa els sinònims d'objectes mitjançant l'ordre CREATE SYNONYM, com altres SGBD. </p>
+    <p>Això no significa que no puguem aconseguir alguns dels mateixos objectius. PostgreSQL disposa d'altres mecanismes, 
+      principalment les <strong>vistes</strong> i la configuració del camí de cerca dels esquemes <strong><code>(search_path)</code></strong>, que permeten simplificar l'accés als objectes.</p>
+
+     <h2>Utilitzar <code>search_path</code></h2> 
+     <p>PostgreSQL organitza els objectes dins d'esquemes (schemas). Per exemple, podem tindre una taula anomenada 
+      <strong>alumnes</strong> dins de l'esquema <strong>gestio_academica></strong>.</p>
+        <p>Per accedir...</p>
+    <pre><code>SELECT *
+FROM gestio_academica.alumnes;</code></pre>
+      <p>No obstant això, PostgreSQL permet configurar el paràmetre search_path, que determina l'ordre en què es busquen els esquemes 
+        quan s'utilitza un nom d'objecte sense especificar-ne l'esquema.</p>
+     <pre><code>Podem consultar el valor actual amb:
+SHOW search_path;</code></pre>
+    <p>si volem que PostgreSQL busque primer els objectes en l'esquema gestio_academica, podem executar:</p>
+      <pre><code>SET search_path TO gestio_academica, public;</code></pre>
+      <p>A partir d'aquest moment, si existeix una taula anomenada alumnes dins de gestio_academica, podem consultar-la sense indicar l'esquema:</p>
+      <pre><code>SELECT *
+FROM alumnes;</code></pre>
+
+    </section>
+
 
 
 

@@ -20,11 +20,13 @@
 
 <nav>
   <h3>Índex</h3>
+  <a href="#arrancada">Arrancada i Parada</a>
+  <a href="#motor">Seleccio motor BBDD</a>
+  <a href="#admin">Comptes administració</a>  
+  <a href="#clients">Clients del sistema gestor</a>
   <a href="#entorn">Conf. Entorn</a>
   <a href="#connexions">Conf. Connexions</a>
-  <a href="#instancia">Conf. Instància</a>
-  <a href="#admin">Comptes administració</a>
-  <a href="#arrancada">Arrancada i Parada</a>
+  <a href="#instancia">Conf. Cluster</a>
   <a href="#emm">Conf. emmagatzemament</a>
   <a href="#diccionari">Diccionari de dades </a>
   <a href="#quadern">WAL de postgresql</a>
@@ -34,7 +36,481 @@
 
 <main>
 
+<section id="arrancada">
+<h1>Arrancada i parada del cluster de postgresql</h1>
+
+<h2>Arrancada del servidor</h2>
+
+<h3> 🐧 En Linux (systemd – el més habitual)</h3>
+<pre><code>sudo systemctl start postgresql</code></pre>
+
+<p>O si hi ha versions específiques:</p>
+<pre><code>sudo systemctl start postgresql-16</code></pre>
+
+<p>Comprovar estat:</p>
+<pre><code>sudo systemctl status postgresql</code></pre>
+
+<h3> Manualment amb pg_ctl</h3>
+<pre><code>pg_ctl -D /ruta/al/PGDATA start</code></pre>
+
+<p>Exemple:</p>
+<pre><code>pg_ctl -D /var/lib/postgresql/16/main start</code></pre>
+
+<h3> 🖥️ En Windows</h3>
+<p>PostgreSQL s’instal·la com a servei:</p>
+<pre><code>net start postgresql-x64-16</code></pre>
+<p>O des de:</p>
+<pre><code>Services → PostgreSQL → Start</code></pre>
+
+<hr>
+<h2>Parada del servidor</h2>
+<p>En PostgreSQL no es pot parar el clúster directament des de dins de psql amb una comanda SQL estàndard.
+psql és només un client per executar consultes SQL, i parar el servidor és 
+una operació d’administració del sistema, no de SQL.</p>
+
+<h3> En Linux (systemd)</h3>
+<p>És una ordre a nivell de sistema, no específica de PostgreSQL.
+Internament, systemd acabarà cridant alguna cosa similar a pg_ctl, però segons com estiga definit el servei.
+El comportament (smart, fast, immediate) depèn del fitxer de configuració del servei (postgresql.service).</p>
+<pre><code>sudo systemctl stop postgresql</code></pre>
+<p>és més genèric i automatitzat. Nivell Sistema Operatiu</p>
+
+<h3> Amb pg_ctl</h3>
+<p>pg_ctl, una eina pròpia de PostgreSQL. Atura un cluster concret (el que apunta PGDATA).
+Tens control directe sobre com es fa l’aturada amb -m .Nivell de cluster. Gestió directa de postgres</p>
+<pre><code>pg_ctl -D /ruta/al/PGDATA stop</code></pre>
+
+<h3>⚠️ Modes de parada (important)</h3>
+
+<p>PostgreSQL permet 3 modes de shutdown:</p>
+
+<h4>🟢 Smart (per defecte)</h4>
+<p>Espera que acaben les connexions actives.</p>
+<pre><code>pg_ctl stop -m smart</code></pre>
+
+<h4>🟡 Fast (més habitual en producció)</h4>
+<p>Cancela transaccions i fa checkpoint.</p>
+<pre><code>pg_ctl stop -m fast</code></pre>
+
+<h4>🔴 Immediate (forçat)</h4>
+<p>No fa checkpoint net → recuperació al proper inici.</p>
+<pre><code>pg_ctl stop -m immediate</code></pre>
+<p><strong>👉 Normalment s’utilitza fast.</strong></p>
+
+<hr>
+<h2> Reinici</h2>
+<pre><code>sudo systemctl restart postgresql</code></pre>
+<p>O:</p>
+<pre><code>pg_ctl restart -D /ruta/PGDATA</code></pre>
+
+<hr> 
+<h2> Què passa internament quan arranca?</h2>
+<p>Quan arranca:</p>
+
+<ul>
+<li>Es crea el procés principal (postmaster)</li>
+<li>Es crea shared memory</li>
+<li>S’inicien processos background:
+    <ul>
+        <li>Checkpointer</li>
+        <li>WAL writer</li>
+        <li>Autovacuum</li>
+        <li>Background writer</li>
+    </ul>
+</li>
+<li>Es posa en escolta al port (5432 per defecte)</li>
+</ul>
+
+<hr> 
+<h2> Com saber si està actiu?</h2>
+<p>Des de client:</p>
+<pre><code>psql -U postgres</code></pre>
+<p>O des de Sistema Operariu:</p>
+<pre><code>pg_isready</code></pre>
+
+  </section>
+
+
+
+
+
+
+
+
+  <section id="motor">
+<h1>Seleccionar el motor de base de dades</h1>
+
+<p>En la unitat anterior hem seleccionat el sistema gestor de bases de dades (SGBD) que utilitzarem, per exemple, PostgreSQL.</p>
+<p>Una vegada seleccionat el SGBD, hem de decidir <strong>com i en quin entorn s'executarà el motor de base de dades</strong>.</p>
+<p>Podem trobar diferents possibilitats: instal·lar-lo directament en un servidor, executar-lo dins d'una màquina virtual, utilitzar un contenidor o contractar-lo com un servei en el núvol.</p>
+
+<h2>1. Instal·lació directa en una màquina</h2>
+<p>El SGBD s'instal·la directament en el sistema operatiu del servidor.</p>
+<pre>
+Servidor Linux
+   │
+   ├── Sistema operatiu
+   │
+   └── PostgreSQL
+          └── Bases de dades </pre>
+<p><strong>Avantatges:</strong></p> <ul> <li>Control directe sobre el sistema.</li> <li>Accés complet a la configuració.</li> <li>Pot oferir un bon rendiment.</li> </ul>
+<p><strong>Inconvenients:</strong></p> <ul> <li>La instal·lació i el manteniment són responsabilitat de l'administrador.</li> <li>Cal gestionar actualitzacions, còpies de seguretat i recuperació.</li> <li>Cal planificar els recursos del servidor.</li> </ul>
+
+<h2>2. Màquina virtual</h2>
+<p>El SGBD s'executa dins d'una màquina virtual que disposa del seu propi sistema operatiu.</p>
+<pre>
+Servidor físic
+│
+└── Hipervisor
+    │
+    └── Màquina virtual
+        │
+        └── Sistema operatiu Linux
+        │
+        └── PostgreSQL
+            │
+            └── Bases de dades </pre>
+<p>És una opció interessant quan volem <strong>aïllar el servidor de bases de dades</strong> o aprofitar una infraestructura de virtualització.</p>
+
+<h2>3. Contenidor</h2>
+<p>El SGBD s'executa dins d'un contenidor, per exemple amb Docker o Podman.</p>
+<pre>
+Servidor
+│
+└── Motor de contenidors
+    │
+    └── Contenidor PostgreSQL
+        │
+        └── PostgreSQL
+            │
+            └── Bases de dades  </pre>
+<p>Els contenidors permeten desplegar aplicacions de manera ràpida i reproduïble.</p>
+<p>Per exemple, en un entorn de desenvolupament podem crear un PostgreSQL amb Podman o Docker sense instal·lar PostgreSQL directament en el sistema operatiu.</p>
+<p><strong>Important:</strong> un contenidor no ha de considerar-se una alternativa automàtica a les còpies de seguretat. Les dades han d'estar emmagatzemades de manera persistent i disposar de la política de còpies corresponent.</p>
+
+<h2>4. Servei en el núvol</h2>
+<p>També podem utilitzar una base de dades proporcionada com a servei per un proveïdor del núvol.</p>
+<p>En aquest model, el proveïdor s'encarrega de bona part de la infraestructura, mentre que nosaltres configurem i utilitzem el servei de base de dades.</p>
+<pre> Aplicació 
+  │ 
+  │ connexió de xarxa 
+  ▼ Servei de base de dades en el núvol 
+  │ 
+  └── PostgreSQL </pre>
+
+<pre>
+Aplicació
+│
+└── Connexió de xarxa
+    │
+    └──  Servei de base de dades en el núvol
+        │
+        └── PostgreSQL
+            │
+            └── Bases de dades
+</pre>  
+<p>Pot simplificar tasques com el desplegament, l'escalabilitat, les còpies de seguretat o l'alta disponibilitat, segons el servei contractat.</p>
+
+<h2>5. Com seleccionem l'opció adequada?</h2>
+<p>No existeix una opció universalment millor. La selecció depén de les necessitats del projecte.</p>
+
+<table> <thead> <tr> <th>Aspecte</th> <th>Què hem de valorar?</th> </tr> </thead> <tbody> <tr> <td>Rendiment</td> <td>Quins recursos necessita el SGBD?</td> </tr> <tr> <td>Escalabilitat</td> <td>Necessitarem augmentar els recursos en el futur?</td> </tr> <tr> <td>Disponibilitat</td> <td>El servei ha d'estar disponible 24/7?</td> </tr> <tr> <td>Control</td> <td>Necessitem controlar completament el sistema operatiu i el SGBD?</td> </tr> <tr> <td>Administració</td> <td>Qui s'encarregarà del manteniment?</td> </tr> <tr> <td>Cost</td> <td>Quin pressupost tenim?</td> </tr> <tr> <td>Seguretat</td> <td>On s'emmagatzemaran les dades i qui hi tindrà accés?</td> </tr> <tr> <td>Portabilitat</td> <td>Necessitem poder moure fàcilment el servei?</td> </tr> <tr> <td>Desenvolupament o producció</td> <td>És un entorn de proves, desenvolupament o producció?</td> </tr> </tbody> </table>
+
+<h3>Exemple pràctic</h3>
+<p>Una empresa desenvolupa una aplicació web que utilitza PostgreSQL.</p>
+<p>S'ha decidit utilitzar <strong>PostgreSQL</strong>. Ara, cal decidir com desplegar-lo:  </p>
+
+<ul> <li><strong>Desenvolupament:</strong> PostgreSQL en un contenidor.</li> <li><strong>Proves:</strong> PostgreSQL en una màquina virtual.</li> <li><strong>Producció:</strong> servidor dedicat o servei gestionat en el núvol, segons els requisits.</li> </ul>
+<p>Per tant, la selecció no depén únicament de la tecnologia, sinó també de les <strong>necessitats del servei</strong>.</p>
+
+<hr> <p><strong>Seleccionar el SGBD</strong> i <strong>seleccionar com desplegar-lo</strong> són decisions diferents.</p>
+<p>Primer decidim: <strong>Quin SGBD necessitem?</strong> → PostgreSQL</p>
+<p>I després: <strong>Com i on l'executarem?</strong> → servidor, màquina virtual, contenidor o servei en el núvol.</p>
+<p>Aquesta decisió forma part del disseny de la infraestructura del sistema de bases de dades.</p>
+
+  </section>
+
+
+
+
+
+
+
+  <section id="admin">
+        <h1>Comptes d’administració</h1>
+      
+        <h2>👤 Comptes d'administració predeterminats</h2>
+        <p>Quan es crea una base de dades postgres es genera automaticament:</p>
+
+        <h3>A nivell de cluster</h3>
+      <ul>  🔹 postgres  -  Usuari administrador per defecte (SUPERUSER)
+        <li>És el superusuari de la base de dades.</li>
+        <li>Té permisos totals (SUPERUSER)</li>
+        <li>Pot crear bases de dades</li>
+        <li>Pot crear rols/usuaris</li>
+        <li>Pot modificar qualsevol objecte</li>
+        <li>Pot canviar configuració</li>
+        <li>Aquest usuari es crea durant la inicialització amb initdb.</li>
+      </ul>
+      <p>⚠️ Important: Normalment coincideix amb l’usuari del sistema operatiu postgres
+      És el compte equivalent a “SYS” a Oracle</p>
+
+      <p>Altres comptes? : No es creen més usuaris per defecte.
+      No existeixen comptes com: root  admin  system  guest...</p>
+      <!--<p>Si es creen uns rols inicials:
+        pg_database_owner
+      pg_read_all_data
+      pg_write_all_data
+      pg_monitor
+      pg_read_all_settings
+      pg_read_all_stats
+      pg_stat_scan_tables
+      pg_read_server_files
+      pg_write_server_files
+      pg_execute_server_program
+      pg_signal_backend
+      pg_checkpoint
+      pg_maintain
+      pg_use_reserved_connections
+      pg_create_subscription
+      pg_signal_autovacuum_worker
+      </p>
+      <p>Estos són els rols predefinits de PostgreSQL i són molt importants perquè eviten haver de donar permisos “a mà” un per un</p>
+      <p>Són rols ja creats pel sistema,
+      No tenen LOGIN → no són usuaris,
+      Serveixen per agrupar privilegis específics, i, 
+      Els pots assignar a usuaris</p> -->
+
+      <hr>
+      <p><strong>A nivell de sistema operatiu</strong>, quan instal·les PostgreSQL també es crea: </p>
+      🔹 Usuari del SO: postgres
+
+      <ul>  Aquest usuari:
+        <li>Executa el servei PostgreSQL</li>
+        <li>És propietari del directori PGDATA</li>
+        <li>S’utilitza per administrar el servidor</li>
+      </ul>
+
+      <img src="./imgs/bdusers.png" alt="bd-users" width="20%" class="imatge-dreta"> 
+      <hr>   <h3>📍 Ubicació dels comptes</h3>
+      
+      <p>Tots els usuaris i rols es troben fora i a la mateixa altura que les bases de dades. Els usuaris i les bases de dades
+        depenen del cluster. Així, un mateix usuari pot connectar (si te permís) a qualsevol BBDD del cluster.
+        
+      <!--
+      Concretament, la informació està en les taules del diccionari de dades dins l’esquema <code>pg_catalog</code> </p>
+      <p>La taula principal és: <code>pg_catalog.pg_authid </code> . 
+        També hi ha una vista més segura per a consultes normals:  <code>pg_catalog.pg_roles </code>   </p>
+        <p class="alert">⚠️ pg_authid conté les contrasenyes encriptades. Només els superusuaris poden llegir-la.</p>
+        <pre>Consultar rols/usuaris 
+      SELECT rolname, rolsuper, rolcreatedb, rolcanlogin  FROM pg_roles;    </pre>
+      <pre>Només superusuari
+      SELECT rolname, rolpassword  FROM pg_authid;  
+          ## rolpassword conté la contrasenya en format md5 o scram-sha-256</pre>
+        <pre>
+      $PGDATA/base/   → fitxers de bases de dades
+      $PGDATA/global/ → informació global, incloent usuaris i rols
+        </pre>  -->
+        
+       <h2> Canvi de contrasenya</h2>
+      <h3>🔑 Canvi de contrasenya de l'usuari <code>postgres</code></h3>
+
+      <div class="alert">
+      <p>🟡 Important: Escull sempre una contrasenya segura. Després de canviar-la, actualitza les connexions d’aplicacions que utilitzen aquest usuari.</p>
+      </div>
+
+      <h3>1️⃣ Linux / Mac</h3>
+      <ol>
+      <li>Accedir a l’usuari <code>postgres</code> del sistema:</li>
+      <pre><code>sudo -i -u postgres</code></pre>
+
+      <li>Entrar a la consola de PostgreSQL:</li>
+      <pre><code>psql</code></pre>
+
+      <li>Canviar la contrasenya:</li>
+      <pre><code>ALTER USER postgres WITH PASSWORD 'NovaContrasenyaSegura';</code></pre>
+
+      <li>Sortir de la consola:</li>
+      <pre><code>\q</code></pre>
+      </ol>
+
+      <h3>2️⃣ Linux / Mac (comanda directa sense entrar a psql)</h3>
+      <pre><code>sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'NovaContrasenyaSegura';"</code></pre>
+
+      <h3>3️⃣ Windows</h3>
+      <ol>
+      <li>Obrir Command Prompt amb permisos d’administrador.</li>
+      <li>Accedir al directori bin de PostgreSQL (ajusta segons la teva instal·lació):</li>
+      <pre><code>cd "C:\Program Files\PostgreSQL\16\bin"</code></pre>
+
+      <li>Connectar a PostgreSQL:</li>
+      <pre><code>psql -U postgres</code></pre>
+
+      <li>Canviar la contrasenya:</li>
+      <pre><code>ALTER USER postgres WITH PASSWORD 'NovaContrasenyaSegura';</code></pre>
+
+      <li>Eixir de la consola:</li>
+      <pre><code>\q</code></pre>
+      </ol>
+
+      <div class="alert">
+      <p>⚠️ Notes addicionals:</p>
+      <ul>
+      <li>Si tens <code>pg_hba.conf</code> amb autenticació <code>peer</code>, només l’usuari del SO <code>postgres</code> pot connectar-se sense contrasenya.</li>
+      <li>Canviar la contrasenya no modifica el mètode d’autenticació (<code>peer</code>, <code>md5</code>, <code>scram-sha-256</code>).</li>
+      </ul>
+      </div>
+
+          
+        <p>En altres SGBDs, l'usuari administrador varia...</p>
+  <table >
+    <caption >Comparativa d'usuaris administradors</caption>
+    <thead>
+      <tr>
+        <th >Sistema</th>
+        <th >Usuari administrador</th>
+        <th >Descripció breu</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td >Oracle</td>
+        <td ><code>SYS</code></td>
+        <td >Superusuari amb accés al diccionari de dades.</td>
+      </tr>
+      <tr>
+        <td >MySQL</td>
+        <td ><code>root</code></td>
+        <td >Superusuari amb tots els privilegis sobre el servidor.</td>
+      </tr>
+      <tr>
+        <td >PostgreSQL</td>
+        <td ><code>postgres</code></td>
+        <td >Superusuari creat per defecte durant la instal·lació.</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+</section>
+
+
   
+
+  
+<section id="clients">
+  <h1>Programari client del sistema gestor</h1>
+  <p>En el context d’un SGBD (Sistema Gestor de Bases de Dades), el programari client és el conjunt d’eines 
+    que permeten a una persona o a una aplicació connectar-se al servidor de bases de dades i treballar amb les dades.</p>
+  <p>Els SGBD segueixen un esquema client-servidor</p>
+  <p>El client no és la base de dades. El client és el programa que envia peticions al servidor.</p>
+  <p>Exemple: En l'ordre  <code>` SELECT * FROM alumnes; ` </code>  El client envia aquesta ordre al servidor PostgreSQL. 
+    El servidor la processa i retorna el resultat al client. </p>
+<h2>Tipus de clients</h2>
+
+<ul>
+  <li>Client de línia d'ordres:  <code>psql, mysql, mariadb, sqlplus, ..</code></li>
+  <li>Clients gràfics (GUI) <code>pdadmin4, mySQL Workbench, SQL Developer, </code></li>
+  <li>Un programa també pot ser un client <code>en python, java, PHP, ...</code></li>
+  ==> La connexió es fa mitjançant una biblioteca o controlador(driver).
+</ul>
+<p>Hi ha alguns clients que son multi-sgbd, es a dir, el mateix client, pot connectar a distints SGBD,
+   com es el cas de <code> dbeaver, adminer, ..</code></p>
+<p>A més a més, un mateix servidor pot tindre molts clients connectats simultàniament</p>
+<pre><code>                 ┌── psql
+                 │
+                 ├── pgAdmin
+                 │
+                 ├── DBeaver
+PostgreSQL ──────┼── Aplicació Python
+                 │
+                 ├── Aplicació web
+                 │
+                 └── Aplicació mòbil</code></pre>
+<p>El programari client d'un SGBD és el programa que permet a un usuari o a una aplicació connectar-se al 
+  servidor de bases de dades, enviar-li ordres o consultes i rebre'n els resultats.</p>
+
+<h2>Client ≠ servidor</h2>  
+<p>Servidor</p>
+<pre><code>PostgreSQL
+ ├── motor
+ ├── processos
+ ├── bases de dades
+ ├── fitxers de dades
+ └── configuració</code></pre>
+<p>Clients: Eines per connectar a un SGBD</p>
+<pre><code>psql
+pgAdmin
+DBeaver
+Python
+Java
+PHP
+...</code></pre>
+
+<p>Quan instal·lem un SGBD, normalment s'instal·len també algunes eines client que permeten connectar-se al 
+  servidor i administrar-lo o executar consultes. No obstant això, el client i el servidor són components 
+  independents i poden instal·lar-se en equips diferents.</p>
+
+<pre><code>Instal·lació de PostgreSQL
+        │
+        ├── Servidor PostgreSQL
+        │
+        ├── psql  ← client de línia d'ordres
+        │
+        └── altres eines</code></pre>
+
+<p>El client psql és una eina fonamental per a l'administració inicial de PostgreSQL. Una vegada instal·lat i 
+  iniciat el servidor, l'administrador pot utilitzar psql per connectar-s'hi i executar les primeres ordres SQL 
+  necessàries per configurar-lo.</p>
+<p>Per exemple, des de psql l'administrador pot</p>
+
+<ul>
+  <li>crear bases de dades</li>
+  <li>crear usuaris i rols</li>
+  <li>assignar permisos</li>
+  <li>modificar propietats de les bases de dades</li>
+  <li>crear tablespaces</li>
+  <li>crear esquemes,  taules, index, vistes, ..</li>
+  <li>comprovar que el servidor funciona correctament</li>
+  <li>configurar LOGS</li>
+  <li>gestionar Backups i restauracions</li>
+  <li>executar consultes SQL</li>
+  <li>consultar informació del sistema</li>
+</ul>
+<p>La instal·lació d'un client com psql facilita a l'administrador la configuració inicial de PostgreSQL, 
+  ja que permet connectar-se al servidor i executar les ordres necessàries per crear bases de dades, usuaris,
+   rols i permisos, així com comprovar el seu funcionament.</p>
+<p><strong><code>psql</code></strong> no és qui configura internament el servidor (això també es fa mitjançant fitxers de configuració i altres eines). 
+  <strong><code>psql</code></strong> és sobretot el mitjà de comunicació amb el servidor per executar ordres SQL i administratives.</p>
+
+  <h2>Connexió</h2>
+  <p>Necessitarem adreça on està el servidor escoltant, el nom de la base dades i l'usuari que es vol connectar</p>
+  <pre><code>psql -U nom_usuari -d nom_bbdd -h IP.IP.IP.IP -p 5432</code></pre>
+  <p>Si el servidor està configurat correctament i l'usuari requereix autenticació, s'ens demanarà la contrasenya:</p>
+  <p>En PostgreSQL, si ometem alguns paràmetres, <code>psql</code> intenta obtenir-los de valors predeterminats o de l'entorn.</p>
+  <pre><code>-- Si des del SO posem 
+psql
+-- S'intenta fer una connexió amb els parametres:
+host:      socket local
+port:      5432
+usuari:    usuari del sistema
+base de dades: mateix nom que l'usuari    </code></pre>
+<p> ==> Si esta base de dades o este usuari no existeixen, obtindrem un error. </p>
+<p>A més, estos valors es poden modificar mitjançant variables d'entorn (PGHOST, PGPORT, PGUSER, PGDATABASE)</p>
+<pre><code>export PGHOST=192.168.1.20
+export PGPORT=5432
+export PGUSER=postgres
+export PGDATABASE=institut
+
+psql</code></pre>
+
+</section>  
+
+
+
+
+
+
 
   <section id="entorn">
     <h1>Configuració d'un SGBD</h1> <hr>
@@ -107,7 +583,8 @@ C:\Program Files\PostgreSQL\18\data </pre>
  
 
   </section>
-  
+
+
 
 
 
@@ -127,17 +604,22 @@ Variables GUC
     ↓
 Sessió
 </pre>
+<p>PostgreSQL permet configurar diferents aspectes de les connexions dels clients,
+   com el nombre màxim de connexions simultànies, el temps disponible per autenticar-se, etc. </p>
 
 <h3>Fitxer ->   postgresql.conf</h3>
-<p>En este fitxer es pot canviar el port on PostgreSQL escolta...</p>
+<p>En este fitxer es pot canviar el port on PostgreSQL escolta i altres parametres:</p>
 <pre>
+listen_addresses = 'localhost'          # de quines adreces de xarxa acceptarà connexions
 port = 5432                             # (change requires restart)
 max_connections = 100                   # (change requires restart)
-</pre>
+authentication_timeout = 1min           # Temps màxim (per client) per completar l'autenticació
+superuser_reserved_connections = 2      # Connexions reservades per a superusuaris
+statement_timeout = 30s                 # temps màxim que pot durar una sentència SQL  </pre>
 
 <h3>Fitxer ->   pg_hba.conf</h3>
     <p>Inicialment, no es pot accedir des d'altre equip, i s'ha de configurar, donant expresament permís. Es pot especificar 
-      equips concrets, o xarxes concretes, o a tothom  0.0.0.0/0      </p>
+      equips concrets, o xarxes concretes, o a tothom  0.0.0.0/0 . A més s'indica quin tipus d'autenticació.    </p>
 <pre>
 # Database administrative login by Unix domain socket
 local   all             postgres                                peer
@@ -181,10 +663,10 @@ MD5 només per compatibilitat amb sistemes antics.</p>
 
 
 <section id="instancia">
-  <h2>Configuració de la instància /cluster</h2>
+  <h2>Configuració de cluster</h2>
   <p>Una instància/cluster de PostgreSQL és el programa en execució del servidor de base de dades juntament amb tot 
     el que necessita per funcionar. No és només la base de dades, És tot el sistema que gestiona les bases de dades</p>
-    <p>Una instància de PostgreSQL inclou:
+    <p>Un cluster de PostgreSQL inclou:
 
 <ul>
   <li>El procés del servidor (postgres)</li>
@@ -194,8 +676,8 @@ MD5 només per compatibilitat amb sistemes antics.</p>
   <li>El conjunt de bases de dades</li>
 </ul>
 </p>
-<p>En un mateix ordinador pots tenir 1 instància (el més habitual) o Diverses instàncies
-   (per separar entorns: proves, producció…). Cada instància funciona de manera independent.</p>
+<p>En un mateix ordinador pots tenir 1 cluster (el més habitual) o Diversos clusters
+   (per separar entorns: proves, producció…). Cada cluster funciona de manera independent.</p>
 <h3>🔌 Què és una sessió en PostgreSQL?</h3>
 <p>Una sessió és la connexió activa entre un client (usuari o aplicació) i el servidor de base de dades.
  Comença quan et connectes,  Acaba quan et desconnectes</p>
@@ -208,9 +690,9 @@ PostgreSQL gestiona moltes sessions alhora.</p>
 <p>✔ Cada sessió té: El seu estat, Les seves variables, Les seves transaccions.</p>
 <p>Les sessions són independents entre si,  Però poden interactuar (bloquejos, concurrència, etc.)</p>
 
-  <hr><h3>Tornem a la instància....</h3>
+  <hr><h3>Tornem al cluster....</h3>
    <h3>Fitxer:  postgresql.conf</h3>
-   <p>El fitxer postgresql.conf és el fitxer principal de configuració d’una instància de PostgreSQL.
+   <p>El fitxer postgresql.conf és el fitxer principal de configuració d’un cluster de PostgreSQL.
  Serveix per dir-li al servidor com ha de funcionar</p>
 
 <ul> És el fitxer principal. Defineix:
@@ -291,7 +773,7 @@ SELECT pg_reload_conf();
    per aplicar canvis. si no fas pg_reload_conf() ni reinicies,
    ... ni les sessions noves aplicaran el canvi
 </pre>
-<p>ALTER SYSTEM defineix el valor global per defecte per a tota la instància,
+<p>ALTER SYSTEM defineix el valor global per defecte per a tot el cluster,
    però pot ser sobrescrit per configuracions més específiques (usuari, base de dades o sessió).</p>
 
    <hr> <p>I al mateix nivell que ALTER SYSTEM, seria modificar el fitxer <strong>postgresql.conf</strong></p>
@@ -308,7 +790,7 @@ hardcoded </pre>
 <p>Quan es fa "ALTER SYSTEM SET work_mem = '128MB';", PostgreSQL no modifica directament postgresql.conf
 El que fa és escriure el canvi a un fitxer separat:</p>
 <pre>/var/lib/postgresql/16/main/postgresql.auto.conf</pre>
-<p>Aquest fitxer és llegit després de postgresql.conf quan el servidor arrenca o fas pg_reload_conf()
+<p>Aquest fitxer és llegit després de postgresql.conf quan el servidor arranca o fas pg_reload_conf()
 Per això, els canvis són persistents, però no toques manualment postgresql.conf</p>
 <p>A PostgreSQL, molts paràmetres tenen un valor per defecte que està hardcoded dins del codi de PostgreSQL,
 es defineix en el moment de compilació / instal·lació, no està guardat en cap fitxer ni taula. <br>
@@ -368,8 +850,8 @@ ALTER SYSTEM SET work_mem = '128MB';
 
   <h3>Configuració de memòria</h3>
 
-  <h3> Reinici de la instància</h3>
-  <p>Alguns canvis requereixen recarregar la configuració (en calent), o reiniciar la instància</p>
+  <h3> Reinici del cluster</h3>
+  <p>Alguns canvis requereixen recarregar la configuració (en calent), o reiniciar el cluster</p>
   <pre>🔁 pg_reload_conf() → recarrega configuració
 🔴 Reiniciar servei → per canvis estructurals (shared_buffers)     </pre>
 
@@ -381,275 +863,8 @@ ALTER SYSTEM SET work_mem = '128MB';
 
 
 
-  <section id="admin">
-    <h2>Comptes d’administració</h2>
   
-    <h3>👤 Comptes d'administració predeterminats</h3>
-    <p>Quan es crea una base de dades postgres es genera automaticament:</p>
-
-    <h4>A nivell de cluster</h4>
-  <ul>  🔹 postgres  -  Usuari administrador per defecte (SUPERUSER)
-    <li>És el superusuari de la base de dades.</li>
-    <li>Té permisos totals (SUPERUSER)</li>
-    <li>Pot crear bases de dades</li>
-    <li>Pot crear rols/usuaris</li>
-    <li>Pot modificar qualsevol objecte</li>
-    <li>Pot canviar configuració</li>
-    <li>Aquest usuari es crea durant la inicialització amb initdb.</li>
-  </ul>
-  <p>⚠️ Important: Normalment coincideix amb l’usuari del sistema operatiu postgres
-És el compte equivalent a “SYS” a Oracle</p>
-
-<p>Altres comptes? : No es creen més usuaris per defecte.
-No existeixen comptes com: root  admin  system  guest...</p>
-<!--<p>Si es creen uns rols inicials:
-   pg_database_owner
- pg_read_all_data
- pg_write_all_data
- pg_monitor
- pg_read_all_settings
- pg_read_all_stats
- pg_stat_scan_tables
- pg_read_server_files
- pg_write_server_files
- pg_execute_server_program
- pg_signal_backend
- pg_checkpoint
- pg_maintain
- pg_use_reserved_connections
- pg_create_subscription
- pg_signal_autovacuum_worker
-</p>
-<p>Estos són els rols predefinits de PostgreSQL i són molt importants perquè eviten haver de donar permisos “a mà” un per un</p>
-<p>Són rols ja creats pel sistema,
-No tenen LOGIN → no són usuaris,
-Serveixen per agrupar privilegis específics, i, 
-Els pots assignar a usuaris</p> -->
-
-<hr>
-<p><strong>A nivell de sistema operatiu</strong>, quan instal·les PostgreSQL també es crea: </p>
-🔹 Usuari del SO: postgres
-
-<ul>  Aquest usuari:
-  <li>Executa el servei PostgreSQL</li>
-  <li>És propietari del directori PGDATA</li>
-  <li>S’utilitza per administrar el servidor</li>
-</ul>
-
-<img src="./imgs/bdusers.png" alt="bd-users" width="20%" class="imatge-dreta"> 
-<hr>   <h3>📍 Ubicació dels comptes</h3>
  
-<p>Tots els usuaris i rols es troben fora i a la mateixa altura que les bases de dades. Els usuaris i les bases de dades
-  depenen del cluster. Així, un mateix usuari pot connectar (si te permís) a qualsevol BBDD del cluster.
-  
-<!--
-Concretament, la informació està en les taules del diccionari de dades dins l’esquema <code>pg_catalog</code> </p>
-<p>La taula principal és: <code>pg_catalog.pg_authid </code> . 
-  També hi ha una vista més segura per a consultes normals:  <code>pg_catalog.pg_roles </code>   </p>
-  <p class="alert">⚠️ pg_authid conté les contrasenyes encriptades. Només els superusuaris poden llegir-la.</p>
-  <pre>Consultar rols/usuaris 
-SELECT rolname, rolsuper, rolcreatedb, rolcanlogin  FROM pg_roles;    </pre>
-<pre>Només superusuari
-SELECT rolname, rolpassword  FROM pg_authid;  
-    ## rolpassword conté la contrasenya en format md5 o scram-sha-256</pre>
-  <pre>
-$PGDATA/base/   → fitxers de bases de dades
-$PGDATA/global/ → informació global, incloent usuaris i rols
-  </pre>  -->
-  
-    <h3> Canvi de contrasenya</h3>
-<h2>🔑 Canvi de contrasenya de l'usuari <code>postgres</code></h2>
-
-<div class="alert">
-<p>🟡 Important: Escull sempre una contrasenya segura. Després de canviar-la, actualitza les connexions d’aplicacions que utilitzen aquest usuari.</p>
-</div>
-
-<h3>1️⃣ Linux / Mac</h3>
-<ol>
-<li>Accedir a l’usuari <code>postgres</code> del sistema:</li>
-<pre><code>sudo -i -u postgres</code></pre>
-
-<li>Entrar a la consola de PostgreSQL:</li>
-<pre><code>psql</code></pre>
-
-<li>Canviar la contrasenya:</li>
-<pre><code>ALTER USER postgres WITH PASSWORD 'NovaContrasenyaSegura';</code></pre>
-
-<li>Sortir de la consola:</li>
-<pre><code>\q</code></pre>
-</ol>
-
-<h3>2️⃣ Linux / Mac (comanda directa sense entrar a psql)</h3>
-<pre><code>sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'NovaContrasenyaSegura';"</code></pre>
-
-<h3>3️⃣ Windows</h3>
-<ol>
-<li>Obrir Command Prompt amb permisos d’administrador.</li>
-<li>Accedir al directori bin de PostgreSQL (ajusta segons la teva instal·lació):</li>
-<pre><code>cd "C:\Program Files\PostgreSQL\16\bin"</code></pre>
-
-<li>Connectar a PostgreSQL:</li>
-<pre><code>psql -U postgres</code></pre>
-
-<li>Canviar la contrasenya:</li>
-<pre><code>ALTER USER postgres WITH PASSWORD 'NovaContrasenyaSegura';</code></pre>
-
-<li>Eixir de la consola:</li>
-<pre><code>\q</code></pre>
-</ol>
-
-<div class="alert">
-<p>⚠️ Notes addicionals:</p>
-<ul>
-<li>Si tens <code>pg_hba.conf</code> amb autenticació <code>peer</code>, només l’usuari del SO <code>postgres</code> pot connectar-se sense contrasenya.</li>
-<li>Canviar la contrasenya no modifica el mètode d’autenticació (<code>peer</code>, <code>md5</code>, <code>scram-sha-256</code>).</li>
-</ul>
-</div>
-
-    
-  <p>En altres SGBDs, l'usuari administrador varia...</p>
-    <table >
-  <caption >Comparativa d'usuaris administradors</caption>
-  <thead>
-    <tr>
-      <th >Sistema</th>
-      <th >Usuari administrador</th>
-      <th >Descripció breu</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td >Oracle</td>
-      <td ><code>SYS</code></td>
-      <td >Superusuari amb accés al diccionari de dades.</td>
-    </tr>
-    <tr>
-      <td >MySQL</td>
-      <td ><code>root</code></td>
-      <td >Superusuari amb tots els privilegis sobre el servidor.</td>
-    </tr>
-    <tr>
-      <td >PostgreSQL</td>
-      <td ><code>postgres</code></td>
-      <td >Superusuari creat per defecte durant la instal·lació.</td>
-    </tr>
-  </tbody>
-</table>
-
-
-
-  </section>
-  
-
-  <section id="arrancada">
-    <h1>Arrancada i parada de la instància de postgresql</h1>
-
-
-<h2>Arrancada del servidor</h2>
-
-<h3> 🐧 En Linux (systemd – el més habitual)</h3>
-<pre><code>sudo systemctl start postgresql</code></pre>
-
-<p>O si hi ha versions específiques:</p>
-<pre><code>sudo systemctl start postgresql-16</code></pre>
-
-<p>Comprovar estat:</p>
-<pre><code>sudo systemctl status postgresql</code></pre>
-
-<h3> Manualment amb pg_ctl</h3>
-<pre><code>pg_ctl -D /ruta/al/PGDATA start</code></pre>
-
-<p>Exemple:</p>
-<pre><code>pg_ctl -D /var/lib/postgresql/16/main start</code></pre>
-
-<h3> 🖥️ En Windows</h3>
-<p>PostgreSQL s’instal·la com a servei:</p>
-<pre><code>net start postgresql-x64-16</code></pre>
-
-<p>O des de:</p>
-<pre><code>Services → PostgreSQL → Start</code></pre>
-
-<hr>
-
-<h2>Parada del servidor</h2>
-<p>En PostgreSQL no es pot parar el clúster directament des de dins de psql amb una comanda SQL estàndard.
-psql és només un client per executar consultes SQL, i parar el servidor és 
-una operació d’administració del sistema, no de SQL.</p>
-
-<h3> En Linux (systemd)</h3>
-<p>És una ordre a nivell de sistema, no específica de PostgreSQL.
-Internament, systemd acabarà cridant alguna cosa similar a pg_ctl, però segons com estiga definit el servei.
-El comportament (smart, fast, immediate) depèn del fitxer de configuració del servei (postgresql.service).</p>
-<pre><code>sudo systemctl stop postgresql</code></pre>
-<p>és més genèric i automatitzat. Nivell Sistema Operatiu</p>
-
-<h3> Amb pg_ctl</h3>
-<p>pg_ctl, una eina pròpia de PostgreSQL. Atura un cluster concret (el que apunta PGDATA).
-Tens control directe sobre com es fa l’aturada amb -m .Nivell de cluster. Gestió directa de postgres</p>
-<pre><code>pg_ctl -D /ruta/al/PGDATA stop</code></pre>
-
-<h3>⚠️ Modes de parada (important)</h3>
-
-<p>PostgreSQL permet 3 modes de shutdown:</p>
-
-<h4>🟢 Smart (per defecte)</h4>
-<p>Espera que acaben les connexions actives.</p>
-<pre><code>pg_ctl stop -m smart</code></pre>
-
-<h4>🟡 Fast (més habitual en producció)</h4>
-<p>Cancela transaccions i fa checkpoint.</p>
-<pre><code>pg_ctl stop -m fast</code></pre>
-
-<h4>🔴 Immediate (forçat)</h4>
-<p>No fa checkpoint net → recuperació al proper inici.</p>
-<pre><code>pg_ctl stop -m immediate</code></pre>
-
-<p><strong>👉 Normalment s’utilitza fast.</strong></p>
-
-<hr>
-
-<h2> Reinici</h2>
-
-<pre><code>sudo systemctl restart postgresql</code></pre>
-
-<p>O:</p>
-
-<pre><code>pg_ctl restart -D /ruta/PGDATA</code></pre>
-
-<hr>
-
-<h2> Què passa internament quan arranca?</h2>
-
-<p>Quan arranca:</p>
-
-<ul>
-<li>Es crea el procés principal (postmaster)</li>
-<li>Es crea shared memory</li>
-<li>S’inicien processos background:
-    <ul>
-        <li>Checkpointer</li>
-        <li>WAL writer</li>
-        <li>Autovacuum</li>
-        <li>Background writer</li>
-    </ul>
-</li>
-<li>Es posa en escolta al port (5432 per defecte)</li>
-</ul>
-
-<hr>
-
-<h2> Com saber si està actiu?</h2>
-
-<p>Des de client:</p>
-
-<pre><code>psql -U postgres</code></pre>
-
-<p>O des de Sistema Operariu:</p>
-
-<pre><code>pg_isready</code></pre>
-
-  </section>
-  
 
   <section id="emm">
     <h1>Configuració de l’emmagatzematge</h1>
@@ -889,7 +1104,7 @@ fsync</code></pre>
 
 <pre><code>SELECT * FROM pg_catalog.pg_tables;</code></pre>
 
-<p>A nivell de instància (cluster) hi ha alguns catàlegs globals (emmagatzemats a global/), com:
+<p>A nivell de cluster hi ha alguns catàlegs globals (emmagatzemats a global/), com:
 <strong>rols/usuaris (pg_authid), bases de dades (pg_database) </strong> <br>
 👉 Aquests són compartits per totes les bases de dades.</p>
 <table>
@@ -1032,7 +1247,7 @@ UPDATE comptes SET saldo = saldo - 100 WHERE id = 1;
 
 <h3>🔥 Recuperació després d’un crash</h3>
 
-<ul>Quan PostgreSQL arrenca després d’un error:
+<ul>Quan PostgreSQL arranca després d’un error:
   <li>Llegeix el WAL</li>
   <li>Reprodueix les operacions que no s’havien escrit completament a disc</li>
   <li>Deixa la base de dades en estat consistent</li>
@@ -1225,7 +1440,7 @@ Aquests logs depenen de:
 <hr>
 
 
-<h2>🔍 Exemple d’Alert Log real (arrencada i errors)</h2>
+<h2>🔍 Exemple d’Alert Log real (arrancada i errors)</h2>
 <pre><code>2026-02-19 12:00:01 UTC [12345] LOG:  database system was shut down at 2026-02-19 11:59:50 UTC
 2026-02-19 12:00:01 UTC [12345] LOG:  MultiXact member wraparound protections are now enabled
 2026-02-19 12:00:01 UTC [12345] LOG:  database system is ready to accept connections
@@ -1246,7 +1461,7 @@ log_min_duration_statement = 1000
 log_min_messages = warning</code></pre>
 
 <div class="alert">
-<p>🧪 Pràctica: Localitza els fitxers de log, obre’ls i filtra per errors o arrencades de la base de dades. Observa com PostgreSQL registra diferents esdeveniments com arrencada, errors SQL i connexions.</p>
+<p>🧪 Pràctica: Localitza els fitxers de log, obre’ls i filtra per errors o arrancades de la base de dades. Observa com PostgreSQL registra diferents esdeveniments com arrancada, errors SQL i connexions.</p>
 </div>
  
 </section>
@@ -1267,7 +1482,7 @@ log_min_messages = warning</code></pre>
         <p id="feedback"></p>
         <button onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
         <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
-        <button onclick="carregarPreguntes('preguntes21p')">🔁 Reiniciar</button>
+        <button onclick="carregarPreguntes('preguntes21p_1')">🔁 Reiniciar</button>
         <p id="pista"></p>
          
    </section>
@@ -1277,7 +1492,7 @@ log_min_messages = warning</code></pre>
 <script src="scriptsunitats.js"></script>
 <script>
 // Executar en carregar la pàgina
-  window.onload = carregarPreguntes('preguntes21p');
+  window.onload = carregarPreguntes('preguntes21p_1');
   // canviar nom de preguntes en  button onclick="carregarPreguntes(
 
 </script>
