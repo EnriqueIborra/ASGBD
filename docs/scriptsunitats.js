@@ -43,6 +43,7 @@ function carregarPreguntes(RA) {
             console.error(err);
             document.getElementById('pregunta-text').innerText =
                 "Encara no hi ha test habilitat 😢";
+             document.getElementById('btn-seguent').disabled = true;    
         });
         //document.getElementById('percentatge-text').innerText = "0%";
 
