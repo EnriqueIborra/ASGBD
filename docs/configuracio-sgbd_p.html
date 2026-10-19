@@ -43,6 +43,8 @@
 
 <h3> 🐧 En Linux (systemd – el més habitual)</h3>
 <pre><code>sudo systemctl start postgresql</code></pre>
+<p>Aquesta ordre arranca la unitat general postgresql.service mitjançant el gestor de serveis systemd.
+  postgresql.service és una unitat general que coordina els clústers de PostgreSQL instal·lats. </p>
 
 <p>O si hi ha versions específiques:</p>
 <pre><code>sudo systemctl start postgresql-16</code></pre>
@@ -52,6 +54,7 @@
 
 <h3> Manualment amb pg_ctlcluster</h3>
 <pre><code>sudo pg_ctlcluster 16 main start</code></pre>
+<p>Aquesta ordre arranca el clúster PostgreSQL identificat per la versió 16 i el nom main</p>
 
 
 <h3> 🖥️ En Windows</h3>
