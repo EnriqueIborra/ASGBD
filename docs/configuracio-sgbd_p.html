@@ -50,11 +50,9 @@
 <p>Comprovar estat:</p>
 <pre><code>sudo systemctl status postgresql</code></pre>
 
-<h3> Manualment amb pg_ctl</h3>
-<pre><code>pg_ctl -D /ruta/al/PGDATA start</code></pre>
+<h3> Manualment amb pg_ctlcluster</h3>
+<pre><code>sudo pg_ctlcluster 16 main start</code></pre>
 
-<p>Exemple:</p>
-<pre><code>pg_ctl -D /var/lib/postgresql/16/main start</code></pre>
 
 <h3> 🖥️ En Windows</h3>
 <p>PostgreSQL s’instal·la com a servei:</p>
@@ -75,33 +73,35 @@ El comportament (smart, fast, immediate) depèn del fitxer de configuració del 
 <pre><code>sudo systemctl stop postgresql</code></pre>
 <p>és més genèric i automatitzat. Nivell Sistema Operatiu</p>
 
-<h3> Amb pg_ctl</h3>
-<p>pg_ctl, una eina pròpia de PostgreSQL. Atura un cluster concret (el que apunta PGDATA).
-Tens control directe sobre com es fa l’aturada amb -m .Nivell de cluster. Gestió directa de postgres</p>
-<pre><code>pg_ctl -D /ruta/al/PGDATA stop</code></pre>
+<h3> Amb pg_ctlcluster</h3>
+<p>pg_ctlcluster, una eina pròpia de PostgreSQL. Atura un cluster concret.
+<pre><code>sudo pg_ctlcluster 16 main stop</code></pre>
+<h4> ==> A més a més, pg_ctlcluster permet especificar modes de parada</h4>
 
 <h3>⚠️ Modes de parada (important)</h3>
-
 <p>PostgreSQL permet 3 modes de shutdown:</p>
 
 <h4>🟢 Smart (per defecte)</h4>
 <p>Espera que acaben les connexions actives.</p>
-<pre><code>pg_ctl stop -m smart</code></pre>
+<pre><code>sudo pg_ctlcluster 16 main stop --mode smart</code></pre>   
+
 
 <h4>🟡 Fast (més habitual en producció)</h4>
 <p>Cancela transaccions i fa checkpoint.</p>
-<pre><code>pg_ctl stop -m fast</code></pre>
+<pre><code>sudo pg_ctlcluster 16 main stop --mode fast</code></pre>
 
 <h4>🔴 Immediate (forçat)</h4>
-<p>No fa checkpoint net → recuperació al proper inici.</p>
-<pre><code>pg_ctl stop -m immediate</code></pre>
+<p>Cancela transaccions i No fa checkpoint net → recuperació al proper inici.</p>
+<pre><code>sudo pg_ctlcluster 16 main stop --mode immediate</code></pre>
 <p><strong>👉 Normalment s’utilitza fast.</strong></p>
 
 <hr>
 <h2> Reinici</h2>
 <pre><code>sudo systemctl restart postgresql</code></pre>
 <p>O:</p>
-<pre><code>pg_ctl restart -D /ruta/PGDATA</code></pre>
+<pre><code>sudo pg_ctlcluster 16 main restart </code></pre>
+
+<!--  sudo systemctl status postgresql@16-main  -->
 
 <hr> 
 <h2> Què passa internament quan arranca?</h2>
@@ -128,9 +128,14 @@ Tens control directe sobre com es fa l’aturada amb -m .Nivell de cluster. Gest
 <p>O des de Sistema Operariu:</p>
 <pre><code>pg_isready</code></pre>
 
+<p>Comprovar quins clústers hi ha instal·lats</p>
+<pre><code>pg_lsclusters</code></pre>
+
+<pre><code>sudo systemctl status postgresql                 Estat de la unitat general de PostgreSQL.
+sudo systemctl status postgresql@16-main	      Estat de la unitat específica del clúster.
+sudo pg_ctlcluster 16 main status                Si el servidor del clúster està funcionant. </code></pre>
+
   </section>
-
-
 
 
 
@@ -422,7 +427,8 @@ Aplicació
                  ├── pgAdmin
                  │
                  ├── DBeaver
-PostgreSQL ──────┼── Aplicació Python
+PostgreSQL ──────┼
+                 ├── Aplicació Python
                  │
                  ├── Aplicació web
                  │
@@ -616,6 +622,15 @@ max_connections = 100                   # (change requires restart)
 authentication_timeout = 1min           # Temps màxim (per client) per completar l'autenticació
 superuser_reserved_connections = 2      # Connexions reservades per a superusuaris
 statement_timeout = 30s                 # temps màxim que pot durar una sentència SQL  </pre>
+<pre>--  Com vore / comprovar esta informació
+SHOW listen_addresses;
+SHOW port;
+SHOW max_connections;
+SHOW superuser_reserved_connections;
+SHOW ssl;
+SHOW ssl_cert_file;
+SHOW ssl_key_file;
+SHOW password_encryption;   </pre>
 
 <h3>Fitxer ->   pg_hba.conf</h3>
     <p>Inicialment, no es pot accedir des d'altre equip, i s'ha de configurar, donant expresament permís. Es pot especificar 
@@ -1288,7 +1303,15 @@ sudo systemctl restart postgresql   </pre> -->
 <p>Per defecte:</p>
 <pre><code>$PGDATA/pg_log/          (Linux)
 %PGDATA%\pg_log\          (Windows)</code></pre>
-
+<pre>-- Como vore / comprovar esta informació
+SHOW logging_collector;
+SHOW log_destination;
+SHOW log_filename;
+SHOW log_rotation_age;
+SHOW log_rotation_size;
+SHOW log_min_duration_statement;
+SHOW log_statement;
+SHOW log_line_prefix;   </pre>
 
 <p>PostgreSQL pot rotar els logs automàticament amb </p>
 <pre>

@@ -441,9 +441,10 @@
   <p>El  Fi de vida útil, més conegut pel seu terme anglès End Of Life (EOL), és un terme que fa referència a 
     la caducitat d'un producte de programari. És a dir, és el moment en què un programari deixa de tenir 
     manteniment i suport.</p>
-
+<hr>   <p>La versió es pot consultar amb la ordre, des de <strong>psql</strong>, (es vorà com accedir més endavant)</p>
+    <pre>SHOW server_version;     </pre> 
      
-    <hr><html></html>
+    <hr>
     <h2>Edicions de Postgresql</h2>
       <p>       Postgres NO TÉ EDICIONS, tipus Enterprise, Standard, etc,  com fa ORACLE..    </p>
       <p>En Postgress sempre és el mateix motor, sense funcions “capades” per llicència.</p>
@@ -455,6 +456,7 @@
     </ul>
     
 </section>
+
 
   
  
@@ -525,7 +527,7 @@ postmaster (procés principal)
    └─ Procés stats collector
   </pre>
 <img src="imgs/postgresql-architecture-process.jpg" alt="arch-procces" width="40%" class="imatge-dreta">
-  <p>Cada connexió = un procés.</p>
+  <h3>Cada connexió = un procés.</h3>
   <ul> <strong>Flux de treball</strong>
     <li>El client es connecta</li>
     <li>El postmaster crea un backend</li>
@@ -737,6 +739,7 @@ sudo apt install postgresql postgresql-contrib
 Type "help" for help.
 
 postgres=#</pre></li>
+        <li> L'usuari <code>postgres</code> és l'usuari DBA / administrador creat pel sistema</li>
     </ul>
 
     <hr>  <h4>Eixir de psql</h4>
@@ -783,6 +786,14 @@ brew services start postgresql  </pre>
 <pre>ps aux | grep '[p]ostgres'
 o 
 top -u postgres </pre>
+<!--
+<pre>CMD -  tasklist | findstr /I postgres
+Powershell - Get-Process postgres
+           - Get-Process postgres |  Select-Object Id, ProcessName, Path
+psql -  SELECT     pid,     datname AS base_de_dades,     usename AS usuari,     state,     backend_type
+        FROM pg_stat_activity   ORDER BY datname, pid;
+</pre>
+-->
 <hr>
 <h3>Logs d'instal·lació</h3>
 <p>Els paquets de PostgreSQL gestionats pel sistema deixen logs d’instal·lació al sistema de paquets.</p>
@@ -836,9 +847,22 @@ pg_config --help   </pre>
 /var/log/postgresql/    → LOGS
 /var/run/postgresql/    → SOCKETS
 </pre>
+<p>Com vore / comprovar esta informació en la teua instal·lació</p>
+<pre>sudo -u postgres psql    # primer entrar en postgres
+SHOW config_file;
+SHOW data_directory;
+SHOW hba_file;
+SHOW log_directory;
+SHOW unix_socket_directories;   </pre>
+
 <h4>BINARIS</h4>
 <p> Conté els executables de PostgreSQL: psql→client , postgres→server dbinit→server(config), </p>
 <p>Els pot vore i executar qualsevol usuari</p>
+<!--
+<p>En Debian i Ubuntu, l'ordre <code>psql</code> també sol estar disponible en /usr/bin/ ,
+    habitualment és un enllaç simbòlic cap a l'executable de la versió de PostgreSQL instal·lada, per exemple <code>/usr/lib/postgresql/16/bin/psql</code>.</p>
+<pre>-- Per vore on apunta 
+ls -l /usr/bin/psql   </pre>   -->
  
 <h4>DATA DIRECTORY</h4>
 <p>Sols pot accedir l'usuari/grup <code>postgres</code></p>
@@ -871,6 +895,7 @@ initdb --waldir=/pgdata/cluster01/wal
 <h4>TABLESPACES</h4>
 <pre>Per vore els tablespaces:
 \db
+\db+
 </pre>
 <p>pg_default i pg_global són els tablespaces predeterminats de PostgreSQL.
 No tenen ubicació específica mostrada a \db perquè estan dins del directori del clúster (/var/lib/postgresql/16/main/),
@@ -884,6 +909,7 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
  <p>No existeis un lloc per defecte per posar TABLESPACES addicionals, els ha de definir el DBA. 
     Permeten guardar dades en altres discos/directoris</p>
 <pre>CREATE TABLESPACE ts_dades LOCATION '/.../tablespaces/ts_dades';</pre>
+<pre>CREATE TABLESPACE ts_dades OWNER postgres LOCATION '/.../tablespaces/ts_dades';</pre>
 
 <h4>BACKUPS</h4>
 <p>No existeix un lloc per defecte, l'ha de definir el DBA. 
@@ -940,18 +966,27 @@ postgres=#      </pre>
      Editar : pg_hba.conf
     <li>host all all 0.0.0.0/0 md5 </li>
     Recarregar configuració:
-    <pre>SELECT pg_reload_conf(); </pre>
+    <pre>sudo systemctl restart postgresql    # des del sistema operatiu
+o
+SELECT pg_reload_conf();   # des de dins de psql</pre>
 
-    <h3>Crear BBDD i usuari</h3>
+    <h3>Crear usuari i BBDD</h3>
     <pre>CREATE USER alumne WITH PASSWORD '1234';
 CREATE DATABASE alumne OWNER alumne;  </pre>
 <p>L’usuari alumne és el propietari de la base de dades alumne.
-En PostgreSQL, el propietari té permisos totals sobre la base de dades. Un owner de DB pot:
-Connectar-se a la base de dades: Crear esquemes dins la base de dades: Crear taules, vistes, funcions, etc.:
-Donar permisos sobre objectes que crea (tables, sequences, schemas): Esborrar objectes que ha creat (DROP TABLE, DROP SCHEMA, etc.)
-Modificar propietat d’objectes amb ALTER TABLE/SCHEMA … OWNER TO …  <br>
+En PostgreSQL, el propietari té permisos totals sobre les seues bases de dades. </p>
+
+<pre>Un owner de DB pot:
+Connectar-se a la base de dades: 
+Crear esquemes dins la base de dades: 
+Crear taules, vistes, funcions, etc.:
+Donar permisos sobre objectes que crea (tables, sequences, schemas): 
+Esborrar objectes que ha creat (DROP TABLE, DROP SCHEMA, etc.)
+Modificar propietat d’objectes amb ALTER TABLE/SCHEMA … OWNER TO …  
+
 Que no pot: No té permisos globals sobre altres bases de dades.
-No pot modificar configuració del servidor (per això existeixen rols com SUPERUSER).</p>
+No pot modificar configuració del servidor (per això existeixen rols com SUPERUSER).     </pre>
+
 
         <h3>Arrancar i parar <s>BBDD</s> Cluster</h3>
         <pre>sudo systemctl start postgresql
@@ -999,6 +1034,7 @@ psql -U nom_usuari -d nom_ bbdd   -- igual que el anterior    </pre>
     <p>Una vegada connectats… com veure les altres BBDD en PostgreSQL</p>
     <pre>
 \list
+\l
 \l+
 SELECT datname FROM pg_database;      </pre>
 
@@ -1014,7 +1050,13 @@ Normalment el prompt mostra la base de dades:     testdb=#
     <p>I per canviar (connectar) a una altra BBDD (dins del cluster)</p>
     <pre>\c nom_bbdd
 \connect nom_bbdd  </pre>
-
+<hr>
+<p>Com veure els tablespaces </p>
+<pre>\db
+\db+  </pre>
+<hr> <p>Com veure els usuaris </p>
+<pre>\du
+\du+  </pre>
 
     <h3> Altres maneres d'accedir a la instància / cluster</h3>
     <ul>
@@ -1037,6 +1079,30 @@ Normalment el prompt mostra la base de dades:     testdb=#
     <p>🎓 Amb tots aquests coneixements, ja estàs preparat/ada per començar la unitat dos. Configuració d'un SGBD </p>
 
   </section>
+
+
+  <!--
+  <section>
+   <h2>Resum de comandes</h2> 
+   <pre>sudo apt update
+sudo apt install postgresql postgresql-contrib
+sudo systemctl restart postgresql    
+sudo -u postgres psql --version     # mostra versió
+sudo -u postgres psql               # entra en psql interactiu
+SHOW server_version;                # mostra versió des de dins de psql
+SELECT pg_reload_conf();            # reinicia servei (des de dins de psql)
+ALTER USER postgres WITH PASSWORD 'nova_contrasenya';  # canvia password de DBA
+\conninfo   # mostra informació de la connexió      
+\l       # bbdd del cluster
+\c       # connectar a una bbdd
+\db      # tablespaces
+CREATE TABLESPACE ts_dades LOCATION '/.../tablespaces/ts_dades';
+\du      # usuaris 
+CREATE USER alumne WITH PASSWORD '1234';
+CREATE DATABASE alumne OWNER alumne; 
+\q       # quit / eixir de psql  </pre>
+
+  </section>  -->
 
 
  <section id="altres-recursos">
