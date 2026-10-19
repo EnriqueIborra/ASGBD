@@ -274,11 +274,11 @@
   },
   {
     "CE": "1h",
-    "titol": "Quina ordre permet consultar quan es va instal·lar PostgreSQL a partir de l'historial d'APT?",
-    "pista": "La comanda busca la paraula relacionada amb PostgreSQL dins dels logs d'APT.",
+    "titol": "Quina ordre permet consultar quan es va instal·lar PostgreSQL a partir de l'historial de logs?",
+    "pista": "La comanda busca la paraula relacionada amb PostgreSQL dins dels logs d'APT i dpkg.",
     "opcions": [
       {
-        "text": "sudo zgrep -i postgres /var/log/apt/history.log*",
+        "text": "sudo zgrep -i postgres /var/log/dpkg.log*",
         "correcte": true,
         "feedback": "Correcte. Aquesta ordre busca, sense distingir majúscules i minúscules, les aparicions de `postgres` en l'historial d'APT, incloent els fitxers rotats."
       },
