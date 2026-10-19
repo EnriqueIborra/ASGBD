@@ -778,6 +778,12 @@ postgres=#</pre></li>
     <pre>brew install postgresql
 brew services start postgresql  </pre>
 <hr>
+<h3>Processos en memòria</h3>
+<p>Per vore els processos associats al servidor de postgres, es pot fer mitjançant:</p>
+<pre>ps aux | grep '[p]ostgres'
+o 
+top -u postgres </pre>
+<hr>
 <h3>Logs d'instal·lació</h3>
 <p>Els paquets de PostgreSQL gestionats pel sistema deixen logs d’instal·lació al sistema de paquets.</p>
 <pre>
@@ -786,7 +792,6 @@ brew services start postgresql  </pre>
 </pre>
 <pre>
 -- per veure quan es va instal·lar PostgreSQL 
-sudo zgrep -i postgres /var/log/apt/history.log*
 sudo zgrep -i postgresql /var/log/dpkg.log*
 </pre>
 <pre>La línia:  install postgresql-16
@@ -911,8 +916,19 @@ No tenen ubicació específica mostrada a \db perquè estan dins del directori d
     <h3> Des d'una terminal</h3>
      <pre>🐧 Linux:    sudo -u postgres psql 
 🖥️ Windows:  psql -U postgres</pre>
+<pre>user1@user1-VB:~$ sudo -u postgres psql
+psql (16.15 (Ubuntu 16.15-0ubuntu0.24.04.1))
+Type "help" for help.
 
+postgres=#  </pre>
     <p>Esta ordre ens connecta al cluster principal com a usuari DBA principal (postgres).     </p>
+    <pre>-- Una altra forma, primer canviar a usuari postgres
+user1@user1-VB:~$ sudo -i -u postgres
+postgres@user1-VB:~$ psql
+psql (16.15 (Ubuntu 16.15-0ubuntu0.24.04.1))
+Type "help" for help.
+
+postgres=#      </pre>
 
     <h3>Configuració bàsica després d’instal·lar</h3>
      Canviar contrasenya de l'usuari <code>postgres</code> (DBA)  🗝️
@@ -941,6 +957,24 @@ No pot modificar configuració del servidor (per això existeixen rols com SUPER
         <pre>sudo systemctl start postgresql
 sudo systemctl stop postgresql
 sudo systemctl restart postgresql </pre>
+<pre>sudo systemctl status postgresql</pre>
+<p>En PostgreSQL, no es pot parar una única base de dades de manera independent dins d'un clúster, com faries amb un servei o una màquina virtual.
+     El servidor PostgreSQL gestiona totes les bases de dades del <strong>clúster</strong> mitjançant un mateix procés principal (postmaster).</p>
+
+    <!--  
+        <p>Ara bé, sí que pots impedir temporalment l'accés a una base de dades concreta, que és una cosa diferent.</p>
+       <pre>ALTER DATABASE botiga WITH ALLOW_CONNECTIONS false;</pre>
+    <p>Aquesta ordre impedeix noves connexions a botiga, però no tanca automàticament les connexions que ja estan obertes.</p>
+      <pre>-- Tancar connexions existents
+SELECT pg_terminate_backend(pid)  FROM pg_stat_activity WHERE datname = 'botiga'   AND pid <> pg_backend_pid();        
+    </pre>   
+   <p>Això finalitza les sessions actives de botiga, excepte la sessió des de la qual s'executa la consulta.
+         Per tant, convé executar-la connectat a una altra base de dades.</p>
+        <pre>-- Tornar a habilitar les connexions
+ALTER DATABASE botiga WITH ALLOW_CONNECTIONS true;        
+    </pre>
+
+    -->
 
    <h3>Connexió incial</h3>
    <p>Per defecte, (i sinó s'indica altra cosa) PostgreSQL es connecta a una base de dades amb el mateix nom que l’usuari.</p>
