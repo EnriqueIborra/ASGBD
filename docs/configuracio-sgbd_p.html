@@ -56,6 +56,8 @@
 <pre><code>sudo pg_ctlcluster 16 main start</code></pre>
 <p>Aquesta ordre arranca el clúster PostgreSQL identificat per la versió 16 i el nom main</p>
 
+<p>Per comprovar quins clústers hi ha instal·lats</p>
+<pre><code>pg_lsclusters</code></pre>
 
 <h3> 🖥️ En Windows</h3>
 <p>PostgreSQL s’instal·la com a servei:</p>
@@ -77,7 +79,7 @@ El comportament (smart, fast, immediate) depèn del fitxer de configuració del 
 <p>és més genèric i automatitzat. Nivell Sistema Operatiu</p>
 
 <h3> Amb pg_ctlcluster</h3>
-<p>pg_ctlcluster, una eina pròpia de PostgreSQL. Atura un cluster concret.
+<p>pg_ctlcluster, una eina pròpia de PostgreSQL. Para un cluster concret.
 <pre><code>sudo pg_ctlcluster 16 main stop</code></pre>
 <h4> ==> A més a més, pg_ctlcluster permet especificar modes de parada</h4>
 
@@ -96,7 +98,7 @@ El comportament (smart, fast, immediate) depèn del fitxer de configuració del 
 <h4>🔴 Immediate (forçat)</h4>
 <p>Cancela transaccions i No fa checkpoint net → recuperació al proper inici.</p>
 <pre><code>sudo pg_ctlcluster 16 main stop --mode immediate</code></pre>
-<p><strong>👉 Normalment s’utilitza fast.</strong></p>
+<p><strong>👉 Normalment s’utilitza <strong>fast</strong> (indicant-ho). Per defecte, si no s'indica, es fa amb <strong>smart</strong></strong></p>
 
 <hr>
 <h2> Reinici</h2>
@@ -127,13 +129,11 @@ El comportament (smart, fast, immediate) depèn del fitxer de configuració del 
 <hr> 
 <h2> Com saber si està actiu?</h2>
 <p>Des de client:</p>
-<pre><code>psql -U postgres</code></pre>
+<pre><code>psql -U postgres   # Si entra -> Està actiu</code></pre>
 <p>O des de Sistema Operariu:</p>
 <pre><code>pg_isready</code></pre>
 
-<p>Comprovar quins clústers hi ha instal·lats</p>
-<pre><code>pg_lsclusters</code></pre>
-
+<p>Comprovar l'estat del/dels cluster/s</p>
 <pre><code>sudo systemctl status postgresql                 Estat de la unitat general de PostgreSQL.
 sudo systemctl status postgresql@16-main	      Estat de la unitat específica del clúster.
 sudo pg_ctlcluster 16 main status                Si el servidor del clúster està funcionant. </code></pre>
@@ -157,9 +157,9 @@ sudo pg_ctlcluster 16 main status                Si el servidor del clúster est
 <pre>
 Servidor Linux
    │
-   ├── Sistema operatiu
-   │
-   └── PostgreSQL
+   └── Sistema operatiu
+     │
+     └── PostgreSQL
           └── Bases de dades </pre>
 <p><strong>Avantatges:</strong></p> <ul> <li>Control directe sobre el sistema.</li> <li>Accés complet a la configuració.</li> <li>Pot oferir un bon rendiment.</li> </ul>
 <p><strong>Inconvenients:</strong></p> <ul> <li>La instal·lació i el manteniment són responsabilitat de l'administrador.</li> <li>Cal gestionar actualitzacions, còpies de seguretat i recuperació.</li> <li>Cal planificar els recursos del servidor.</li> </ul>
@@ -174,10 +174,8 @@ Servidor físic
     └── Màquina virtual
         │
         └── Sistema operatiu Linux
-        │
-        └── PostgreSQL
-            │
-            └── Bases de dades </pre>
+            └── PostgreSQL
+                └── Bases de dades </pre>
 <p>És una opció interessant quan volem <strong>aïllar el servidor de bases de dades</strong> o aprofitar una infraestructura de virtualització.</p>
 
 <h2>3. Contenidor</h2>
@@ -190,7 +188,6 @@ Servidor
     └── Contenidor PostgreSQL
         │
         └── PostgreSQL
-            │
             └── Bases de dades  </pre>
 <p>Els contenidors permeten desplegar aplicacions de manera ràpida i reproduïble.</p>
 <p>Per exemple, en un entorn de desenvolupament podem crear un PostgreSQL amb Podman o Docker sense instal·lar PostgreSQL directament en el sistema operatiu.</p>
@@ -338,7 +335,7 @@ Aplicació
       <li>Canviar la contrasenya:</li>
       <pre><code>ALTER USER postgres WITH PASSWORD 'NovaContrasenyaSegura';</code></pre>
 
-      <li>Sortir de la consola:</li>
+      <li>Eixir de la consola:</li>
       <pre><code>\q</code></pre>
       </ol>
 
@@ -348,7 +345,7 @@ Aplicació
       <h3>3️⃣ Windows</h3>
       <ol>
       <li>Obrir Command Prompt amb permisos d’administrador.</li>
-      <li>Accedir al directori bin de PostgreSQL (ajusta segons la teva instal·lació):</li>
+      <li>Accedir al directori bin de PostgreSQL (ajusta segons la teua instal·lació):</li>
       <pre><code>cd "C:\Program Files\PostgreSQL\16\bin"</code></pre>
 
       <li>Connectar a PostgreSQL:</li>
@@ -437,7 +434,7 @@ PostgreSQL ──────┼
                  │
                  └── Aplicació mòbil</code></pre>
 <p>El programari client d'un SGBD és el programa que permet a un usuari o a una aplicació connectar-se al 
-  servidor de bases de dades, enviar-li ordres o consultes i rebre'n els resultats.</p>
+  servidor de bases de dades, enviar-li ordres o consultes i rebre els resultats.</p>
 
 <h2>Client ≠ servidor</h2>  
 <p>Servidor</p>
@@ -451,9 +448,9 @@ PostgreSQL ──────┼
 <pre><code>psql
 pgAdmin
 DBeaver
-Python
-Java
-PHP
+Programa en Python
+Programa en Java
+Programa en PHP
 ...</code></pre>
 
 <p>Quan instal·lem un SGBD, normalment s'instal·len també algunes eines client que permeten connectar-se al 
@@ -729,6 +726,12 @@ max_connections = 200
 
 <h3>Fitxer: pg_ident.conf</h3>
 <p>usuaris del sistema → usuaris PostgreSQL.</p>
+<p>El fitxer <code>pg_ident.conf</code> de PostgreSQL serveix per definir correspondències entre els usuaris del sistema operatiu
+   i els usuaris de PostgreSQL. S'utilitza principalment amb els mètodes d'autenticació ident i peer.</p>
+   <pre>MAPNAME       SYSTEM-USERNAME       DATABASE-USERNAME
+alumnes_map   user1                 alumne      </pre>
+<p>I en pg_hba.conf, configurem una regla com esta:</p>
+<pre>local   all   all   peer map=alumnes_map</pre>
 
 <hr><hr><h3>Variables del sistema (GUC - Grand Unified Configuration)</h3>
 <pre>Sistema Operatiu
