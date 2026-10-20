@@ -916,11 +916,10 @@ ALTER SYSTEM SET work_mem = '128MB';
 <p>Exemple típic en Linux:</p>
 <pre><code>/var/lib/postgresql/16/main</code></pre>
 
-<p>Aquest directori es defineix amb:</p>
-<pre><code>PGDATA</code></pre>
+<p>Aquest directori es pot saber amb:</p>
+<pre><code>sudo -u postgres psql -c "show data_directory;" </code></pre>
 
-<p>O en iniciar amb:</p>
-<pre><code>pg_ctl -D /ruta/PGDATA start</code></pre>
+
 
 <h2> Estructura interna del directori</h2>
 
@@ -1043,22 +1042,35 @@ SELECT     spcname,     pg_tablespace_location(oid)   FROM pg_tablespace;
 <hr>
 <p>Paràmetres importants a <code>postgresql.conf</code>:</p>
 <pre><code>wal_level = replica
-checkpoint_timeout = 5min
 max_wal_size = 1GB</code></pre>
+<p><code>wal_level</code> : determina el nivell d'informació que conté el WAL.</p>
+<p><code>max_wal_size</code> : influïx en quan PostgreSQL inicia checkpoints per acumulació de WAL.</p>
 
 <h2> Paràmetres importants d’I/O i emmagatzematge</h2>
-
+<p>En PostgreSQL, els paràmetres d’entrada/eixida (E/S, o I/O en anglés) i d’emmagatzematge controlen com es llig
+   i s’escriu la informació al disc, com es protegeixen les transaccions davant d’una fallada i com es gestionen
+    els registres de recuperació.</p>
 <p>Al <code>postgresql.conf</code>:</p>
 
 <h3> Checkpoints</h3>
-<pre><code>checkpoint_timeout
-max_wal_size</code></pre>
+<pre><code>checkpoint_timeout = 5min
+max_wal_size = 1GB</code></pre>
+<p>La relació entre els dos paràmetres és important: checkpoint_timeout limita l'interval temporal, mentre que
+   max_wal_size influïx en quan es considera necessari un checkpoint per volum de WAL.</p>
 
 <h3> Sincronització</h3>
-<pre><code>synchronous_commit
-fsync</code></pre>
+<pre><code>synchronous_commit = on
+fsync = on</code></pre>
 
-<p>⚠️ <code>fsync=off</code> millora rendiment però és perillós en producció.</p>
+<p><code>synchronous_commit</code>: Amb el valor habitual on, PostgreSQL espera que el registre de confirmació de la 
+  transacció s'haja escrit de manera persistent en el WAL local abans de comunicar que el COMMIT ha finalitzat correctament.</p>
+<p> <code>fsync</code> : Controla si PostgreSQL utilitza mecanismes de sincronització per assegurar que les modificacions
+   s'han transferit a l'emmagatzematge persistent.</p>
+   <p><strong>En producció, mantín fsync = on.</strong></p>
+
+  <p>⚠️ <code>fsync=off</code> millora rendiment però és perillós en producció.</p>
+
+
 
   </section>
   
@@ -1236,6 +1248,8 @@ WHERE tablename = 'clients';</code></pre>
     <h2> WAL (Write Ahead Log)</h2>
 <p>El WAL (Write Ahead Log) a PostgreSQL és el mecanisme que garanteix la seguretat i consistència de les dades.
 WAL significa literalment: Write Ahead Log = Escriure primer al log abans que a la taula</p>
+<p>El WAL és un registre on PostgreSQL anota les modificacions que es fan en la base de dades abans que estes
+   modificacions hagen d'estar reflectides definitivament en els fitxers de dades.</p>
 
 <p>Ubicat a: <code>PGDATA/pg_wal/</code></p>
 
@@ -1290,23 +1304,26 @@ UPDATE comptes SET saldo = saldo - 100 WHERE id = 1;
     <p>Els logs a PostgreSQL són fitxers de registre que documenten l’activitat del servidor (errors, connexions, 
       consultes i esdeveniments interns) i serveixen per a diagnòstic, auditoria i anàlisi del rendiment</p>
 <h2>📁 Ubicació dels fitxers</h2>
-<p>Per defecte, PostgreSQL escriu missatges al stderr, no a fitxers. Per generar logs en fitxers,
-   cal activar el logging_collector i definir un directori amb log_directory, i log_filename:</p>
 
-<pre># Fitxer postgresql.conf (normalment a /etc/postgresql/16/main )
-logging_collector = on          # habilita la recollida de logs a fitxers
-log_directory = 'pg_log'        # nom del directori (pot ser relatiu a $PGDATA)
+<p>Per defecte, PostgreSQL ve configurat per escriure els logs en un fitxer en <code>/var/log/postgresql/postgresql-16-main.log  </code>
+ i en un format standard 'stderr' </p>
+<pre>Per vore el fitxer:
+sudo tail -f /var/log/postgresql/postgresql-16-main.log    </pre>  
+ 
+<p> Per generar logs en fitxers, cal activar el logging_collector i definir un directori amb log_directory, i log_filename:</p>
+<p>Com?</p> 
+<pre># Fitxer postgresql.conf     (normalment a /etc/postgresql/16/main )
+log_destination = 'stderr'   # format/s d'eixida de la informació
+logging_collector = on       # habilita la recollida de logs a fitxers
+log_directory = 'pg_log'     # nom del directori (pot ser relatiu a $PGDATA)
 log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'   # nom dels fitxers</pre>
-<p>En posgresql normalment es generen fitxers separats segons la configuració de log_filename. 
-  Això fa que cada reinici del servidor o cada interval de temps (segons configuració) genere un fitxer nou.</p>
 
-<!-- <p>La carpeta de logs no es crea automàticament dins de $PGDATA, s'ha de crear manualment, amb permisos per a usuari postgres</p>
-<pre>sudo -i -u postgres
-mkdir -p $PGDATA/pg_log      - crec que no cal, que si que es genera automaticament....
-chmod 700 $PGDATA/pg_log   
-sudo systemctl restart postgresql   </pre> -->
+<p>La carpeta de logs no està creada inicialment quan es fa la instal·lació de postgres </p>
+ <p> Posteriorment, es crearà automàticament dins de $PGDATA, quan s'active el  <code>logging_collector = on</code> , 
+  <code>log_directory = 'pg_log' </code>  , es guarden els canvis en <code>postgresql.conf</code> i es reinicie el servei de postgres  </p>
+<pre>sudo systemctl restart postgresql   </pre> 
 
-<p>Per defecte:</p>
+<p>La carpeta es situarà dins de PGDATA :</p>
 <pre><code>$PGDATA/pg_log/          (Linux)
 %PGDATA%\pg_log\          (Windows)</code></pre>
 <pre>-- Como vore / comprovar esta informació
@@ -1319,14 +1336,19 @@ SHOW log_min_duration_statement;
 SHOW log_statement;
 SHOW log_line_prefix;   </pre>
 
+<p>En postgresql normalment es generen fitxers separats segons la configuració de log_filename. 
+  Això fa que cada reinici del servidor o cada interval de temps (segons configuració) genere un fitxer nou.</p>
 <p>PostgreSQL pot rotar els logs automàticament amb </p>
-<pre>
-log_truncate_on_rotation = on   # Esborra el fitxer antic si existeix
+<pre>log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'   # nom dels fitxers
+log_truncate_on_rotation = on   # Esborra el fitxer antic si existeix (sols si el nom es igual)
 log_rotation_age = 1d           # Rotar cada 1 dia
 log_rotation_size = 10MB        # Rotar quan el fitxer arriba a 10 MB  </pre>
 
-<p>Això evita fitxers enormes i permet tenir logs manejables.
-Si utilitzes log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log', cada rotació crearà fitxer nou automàticament.</p>
+<p>Si utilitzes log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log', cada rotació crearà fitxer nou automàticament. 
+  Això evita fitxers enormes i permet tenir logs manejables.  </p>
+
+<p>És molt instructiu pegar una ullada al fitxer <code>postgresql.conf </code> en la secció <code># REPORTING AND LOGGING</code> 
+i vore les distintes formes de capturar els errors.</p>
 
 <h2>🔍 Com consultar els logs</h2>
 <h3>Linux</h3>
@@ -1380,13 +1402,19 @@ LOG:  database system is shut down
 ERROR:  relation "clients" does not exist
 STATEMENT: SELECT * FROM clients;
 </pre>
+<pre>Altres errors que podem simular:
+select 10/0;
+selec * from clients;
+.....
+</pre>
 
 
 <div class="log-section">
   <p class="log-title">🟡 CSV log / File log</p>
   <p>Logs en format CSV, útils per anàlisi automàtica o informes. Extensió: <code>.csv</code></p>
 </div>
-<pre>log_destination = 'csvlog'</pre>
+<pre>log_destination = 'csvlog'
+log_destination = 'stderr,csvlog,jsonlog'  </pre>
 <p>Si s'activa, l'estructura d'emmagatzemament serà tipus .csv, per fer anàlisi posterior</p>
 
 <div class="log-section">
