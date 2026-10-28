@@ -33,37 +33,62 @@
 
 <main>
 
+<section id="cid">
+  <img src="imgs/usuaris_i_permisos_PostgreSQL.png" alt="usiper" width="12%" class="imatge-esquerra"> 
+  <h1>Usuaris i Permisos en PostgreSQL</h1>
+</section>    
     
   <section id="cid">
         <h1>La Triada CID (Confidencialitat, Integritat, Disponibilitat) en postgresql</h1>
         <img src="imgs/CID-ciber.png" class="imatge-esquerra"  alt="stop" style="width: 20%">
-    <p>La triada CID (Confidencialitat, Integritat i Disponibilitat) és un model de seguretat fonamental per garantir la protecció de la informació en qualsevol sistema informàtic, inclòs postgresql. Aquest model es fa servir per establir les bases de les polítiques de seguretat, i postgresql, com a sistema de gestió de bases de dades (SGBD), té diverses característiques i eines que permeten implementar-lo eficaçment.</p>
+    <p>La triada CID (Confidencialitat, Integritat i Disponibilitat) és un model de seguretat fonamental per garantir la protecció 
+      de la informació en qualsevol sistema informàtic, inclòs postgresql. Aquest model es fa servir per establir les bases de les polítiques
+       de seguretat, i postgresql, com a sistema de gestió de bases de dades (SGBD), té diverses característiques i eines que permeten
+        implementar-lo eficaçment.</p>
 
     <h2>1. Confidencialitat (Confidentiality)</h2>
-    <p>La confidencialitat es refereix a la protecció de la informació per evitar que sigui accedida per usuaris no autoritzats. A postgresql, això es pot aconseguir mitjançant:</p>
+    <p>La confidencialitat es refereix a la protecció de la informació per evitar que siga accedida per usuaris no autoritzats. 
+      A postgresql, això es pot aconseguir mitjançant:</p>
     <ul>
-        <li><strong>Autenticació i control d'accés</strong>: postgresql utilitza sistemes d'autenticació com l'usuari/contrassenya per garantir que només els usuaris autoritzats puguin accedir a la base de dades.</li>
-        <li><strong>Privilegis i rols</strong>: Els rols i privilegis d'postgresql defineixen els drets d'accés de cada usuari a les dades. Els privilegis poden ser assignats a rols específics i aquests rols assignats als usuaris.</li>
-        <li><strong>Xifrat de dades (Encryption)</strong>: postgresql permet xifrar tant les dades en repòs com les dades en trànsit. La funció de xifrat de bases de dades d'postgresql (TDE - Transparent Data Encryption) xifra les dades emmagatzemades, mentre que el xifrat SSL/TLS s'utilitza per protegir les dades durant la transmissió.</li>
-        <li><strong>Auditoria</strong>: postgresql ofereix eines per auditar l'accés a la base de dades i registrar les operacions realitzades. Això permet detectar accés no autoritzat a dades sensibles.</li>
+        <li><strong>Autenticació i control d'accés</strong>: postgresql utilitza sistemes d'autenticació com l'usuari/contrassenya per garantir
+           que només els usuaris autoritzats puguen accedir a la base de dades.</li>
+        <li><strong>Privilegis i rols</strong>: Els rols i privilegis d'postgresql defineixen els drets d'accés de cada usuari a les dades.
+           Els privilegis poden ser assignats a rols específics i aquests rols assignats als usuaris.</li>
+        <li><strong>Xifrat de dades (Encryption)</strong>: postgresql permet xifrar tant les dades en repòs com les dades en trànsit.
+          La funció de xifrat de bases de dades d'postgresql (TDE - Transparent Data Encryption) xifra les dades emmagatzemades, 
+          mentre que el xifrat SSL/TLS s'utilitza per protegir les dades durant la transmissió.</li>
+        <li><strong>Auditoria</strong>: postgresql ofereix eines per auditar l'accés a la base de dades i registrar les operacions realitzades.
+           Això permet detectar accés no autoritzat a dades sensibles.</li>
     </ul>
 
     <h2>2. Integritat (Integrity)</h2>
-    <p>La integritat de les dades fa referència a la seva exactitud, coherència i fiabilitat al llarg del temps. Per garantir-la en postgresql, es poden utilitzar diversos mecanismes:</p>
+    <p>La integritat de les dades fa referència a la seva exactitud, coherència i fiabilitat al llarg del temps. Per garantir-la en postgresql,
+       es poden utilitzar diversos mecanismes:</p>
     <ul>
-        <li><strong>Restriccions (Constraints)</strong>: postgresql permet definir restriccions per garantir la coherència de les dades (per exemple, restriccions de clau primària, clau forana, unicitat i validesa).</li>
-        <li><strong>Comprovació de validesa (Validations)</strong>: Es poden utilitzar triggers o funcions per validar les dades abans d'introduir-les a la base de dades. Això ajuda a mantenir la qualitat i la integritat de la informació.</li>
-        <li><strong>Control de versions i còpies de seguretat</strong>: Les còpies de seguretat regulars i el control de versions ajuden a garantir que les dades puguin ser recuperades de manera fiable en cas de pèrdua o corrupció.</li>
-        <li><strong>Controls de transaccions (ACID)</strong>: postgresql utilitza el model ACID (Atomicitat, Consistència, Aïllament, Durabilitat) per assegurar-se que les transaccions són processades correctament i no alteren la integritat de les dades.</li>
+        <li><strong>Restriccions (Constraints)</strong>: postgresql permet definir restriccions per garantir la coherència de les dades
+           (per exemple, restriccions de clau primària, clau forana, unicitat i validesa).</li>
+        <li><strong>Comprovació de validesa (Validations)</strong>: Es poden utilitzar triggers o funcions per validar les dades abans 
+          d'introduir-les a la base de dades. Això ajuda a mantenir la qualitat i la integritat de la informació.</li>
+        <li><strong>Control de versions i còpies de seguretat</strong>: Les còpies de seguretat regulars i el control de versions ajuden 
+          a garantir que les dades puguen ser recuperades de manera fiable en cas de pèrdua o corrupció.</li>
+        <li><strong>Controls de transaccions (ACID)</strong>: postgresql utilitza el model ACID (Atomicitat, Consistència, Aïllament, Durabilitat) per
+           assegurar-se que les transaccions són processades correctament i no alteren la integritat de les dades.</li>
     </ul>
 
     <h2>3. Disponibilitat (Availability)</h2>
-    <p>La disponibilitat fa referència a la capacitat de la base de dades per estar accessible i operativa en tot moment. Per assegurar la disponibilitat en postgresql, es poden utilitzar diversos mecanismes i tecnologies:</p>
+    <p>La disponibilitat fa referència a la capacitat de la base de dades per estar accessible i operativa en tot moment. 
+      Per assegurar la disponibilitat en postgresql, es poden utilitzar diversos mecanismes i tecnologies:</p>
     <ul>
-        <li><strong>Clústers i alta disponibilitat</strong>: postgresql suporta diverses solucions d'alta disponibilitat, com postgresql Real Application Clusters (RAC), que permeten que múltiples instàncies de bases de dades treballin en conjunt per garantir que la base de dades estigui sempre disponible, fins i tot en cas de fallades del sistema.</li>
-        <li><strong>Recuperació davant de desastres (Disaster Recovery)</strong>: postgresql ofereix opcions de recuperació davant de desastres, com postgresql Data Guard, que permet replicar les dades en un lloc secundari per garantir que la base de dades estigui disponible en cas d'incidents importants.</li>
-        <li><strong>Còpies de seguretat i restauració</strong>: Utilitzar postgresql Recovery Manager (RMAN) per realitzar còpies de seguretat i restaurar les dades és essencial per garantir la disponibilitat dels serveis.</li>
-        <li><strong>Manteniment i monitorització</strong>: postgresql proporciona eines per monitoritzar la salut del sistema (postgresql Enterprise Manager) i per planificar el manteniment, per evitar aturades no desitjades i per identificar de manera proactiva possibles problemes de disponibilitat.</li>
+        <li><strong>Clústers i alta disponibilitat</strong>: postgresql suporta diverses solucions d'alta disponibilitat, com 
+          postgresql Real Application Clusters (RAC), que permeten que múltiples clusters treballen en conjunt per garantir que la base de dades 
+          estiga sempre disponible, fins i tot en cas de fallades del sistema.</li>
+        <li><strong>Recuperació davant de desastres (Disaster Recovery)</strong>: postgresql ofereix opcions de recuperació davant de desastres,
+           com postgresql Data Guard, que permet replicar les dades en un lloc secundari per garantir que la base de dades estiga disponible en 
+           cas d'incidents importants.</li>
+        <li><strong>Còpies de seguretat i restauració</strong>: Utilitzar postgresql Recovery Manager (RMAN) per realitzar còpies de seguretat i 
+          restaurar les dades és essencial per garantir la disponibilitat dels serveis.</li>
+        <li><strong>Manteniment i monitorització</strong>: postgresql proporciona eines per monitoritzar la salut del sistema (postgresql Enterprise Manager)
+           i per planificar el manteniment, per evitar aturades no desitjades i per identificar de manera proactiva possibles problemes de disponibilitat.</li>
     </ul>
 
     <h2>Resum</h2>
@@ -74,7 +99,8 @@
         <li><strong>Disponibilitat</strong>: Alta disponibilitat, recuperació davant de desastres i monitorització activa.</li>
     </ul>
 
-    <p>Amb aquests mecanismes, postgresql permet als administradors de bases de dades protegir les dades i garantir que es compleixin les pràctiques de seguretat requerides per a una bona gestió de la informació.</p>
+    <p>Amb estos mecanismes, postgresql permet als administradors de bases de dades protegir les dades i garantir que es complisquen
+      les pràctiques de seguretat requerides per a una bona gestió de la informació.</p>
 
 
   </section>
@@ -92,18 +118,22 @@
 
     <h3>🔐 Autenticació d'usuaris</h3>
     <p>Es configura en fitxer <code><strong>pg_hba.conf</strong></code></p>
-    <ul>
+    <ul> Modes:
+      <li>sistema operatiu (peer, PAM)</li>
+      <li>directori (LDAP)</li>
+      <li>autenticació de domini (GSS/Kerberos)</li>
+      <li>autenticació de domini (SSPI/Windows)</li>
+      <li>servidor centralitzat d'autenticació (RADIUS)</li>
       <li> usuari amb credencials dins de la base de dades. <strong>md5, scram-sha-256</strong></li>
-      <li><strong>peer, ldap, gss, sspi, pam</strong>: validació per S.O., LDAP, Kerberos, Radius</li>
     </ul>
     <p>L’autenticació es defineix per mètodes configurats al fitxer <code> pg_hba.conf </code></p>
   
     <h3> Tipus d'usuaris</h3>
     <ul>
       <li><strong>Predefinits</strong>: postgres , l'administrador del SGBD. "S'ha de protegir i intentar no usar"</li>
-      <li><strong>En instància</strong>: definits dins d'una instància</li>
+      <li><strong>En cluster</strong>: definits dins d'un cluster</li>
     </ul>
-    <p>Els usuaris (roles) es creen a nivell de tota la instància. Un usuari pot connectar-se a qualsevol base de dades (si té permisos)</p>
+    <p>Els usuaris (roles) es creen a nivell de tot el cluster. Un usuari pot connectar-se a qualsevol base de dades (si té permisos)</p>
   
     <h3> Creació, modificació i baixa d'usuaris</h3>
     <p class="tips">Des d'usuari DBA (postgres), o un usuari amb privilegi CREATEROLE</p>
@@ -198,7 +228,7 @@ psql -U system -h localhost -d escola   --  Com a host (amb contrasenya)
     <h2>schema</h2>
     <p>A PostgreSQL, totes les taules han d’estar dins d’un esquema, i per defecte els usuaris treballen a l’esquema <strong>PUBLIC</strong>.</p>
     <p>Un schema en PostgreSQL (i en molts altres SGBD) es pot entendre com un directori o carpeta dins d’una base de dades: (No en el disc dur, ni en el SO, sinó dins d'una BBDD). 
-      És un concepte paregut al ESPAI DE NONS o namespaces. És com un contenidor lògic dins d'una BBDD      </p>
+      És un concepte paregut al ESPAI DE NOMS o namespaces. És com un contenidor lògic dins d'una BBDD      </p>
     <p>Quan es crea una bbdd , es crea un <strong>schema</strong> "public", on el propietari de la BBDD té accés concedit</p>
     <p>El propietari del schema public és el mateix usuari que crea la base de dades. Aquest usuari té permisos de CREATE, USAGE 
       dins del schema, per tant pot crear taules immediatament.</p>
@@ -330,7 +360,7 @@ Es pot implementar amb scripts externs que consulten <code> (pg_roles.rolvalidun
     <h4>Canvi des de pgsql  i pgadmin </h4>
     <p>psql accepta el comando <strong>\password</strong> que inicia un script/conversa per canviar la contrasenya</p>
     <p>Si eres superuser, " <strong>\password pepe</strong> ", incia un script per canviar la password de l'usuari pepe</p>
-    <p>pgAdmin te una opció en les propietats de l'usuari, en la pestanya Definition. El primer camp, 
+    <p>pgAdmin té una opció en les propietats de l'usuari, en la pestanya Definition. El primer camp, 
       password, posar nova password i donar al botó SAVE</p>
 
 
@@ -606,7 +636,8 @@ perquè? <br>
    terme correctament. De la mateixa manera li passa a les sentències DELETE    </p>
 
    <hr> <h3>Privilegi superuser</h3>
-    <p><strong>superuser</strong> és el privilegi administratiu més alt que es pot tindre en una base de dades postgresql. No és un rol ordinari, sinó un <em>privilegi especial d'autenticació</em> que dona control total sobre la instància de la base de dades.</p>
+    <p><strong>superuser</strong> és el privilegi administratiu més alt que es pot tindre en una base de dades postgresql.
+      No és un rol ordinari, sinó un <em>privilegi especial d'autenticació</em> que dona control total sobre el cluster.</p>
   <h4>Què permet fer <code>superuser</code>?</h4>
   <ul>
     <li>Crear/ eliminar rols i usuaris (CREATEROLE)</li>

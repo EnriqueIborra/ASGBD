@@ -59,7 +59,7 @@
 <p>Per comprovar quins clústers hi ha instal·lats</p>
 <pre><code>pg_lsclusters</code></pre>
 
-<h3> 🖥️ En Windows</h3>
+<h3> 🪟 En Windows </h3>
 <p>PostgreSQL s’instal·la com a servei:</p>
 <pre><code>net start postgresql-x64-16</code></pre>
 <p>O des de:</p>
@@ -596,7 +596,7 @@ C:\Program Files\PostgreSQL\18\data </pre>
 
   <section id="connexions">
       <img src="imgs/5432.png" class="imatge-dreta"  alt="stop" style="width: 30%">
-    <h2>Configuració de les connexions</h2>
+    <h1>Configuració de les connexions</h1>
 <p>Postgres es un servei (daemon) de base de dades que escolta habitualment al port TCP 5432. Es pot 
   canviar editant el fitxer postgresql.conf, guardant, i reiniciant el servei (daemon)
 </p>
@@ -659,7 +659,15 @@ host    replication     all             ::1/128                 scram-sha-256
     <pre>host  all  all  192.168.1.0/24      md5
 host  all  all  192.168.1.0/24      scram-sha-256
 </pre>
-<p>En PostgreSQL,<strong><code> md5 i scram-sha-256</code></strong> són mètodes d’autenticació que es configuren al fitxer: <code> pg_hba.conf </code></p>
+<pre>Després de modificar pg_hba.conf, normalment n'hi ha prou amb recarregar la configuració:
+SELECT pg_reload_conf();</pre>
+<pre>Es pot consultar la ubicació del fitxer amb:
+SHOW hba_file;</pre>
+<p>En PostgreSQL,<strong><code> peer,  md5 i scram-sha-256</code></strong> són mètodes d’autenticació que es configuren al fitxer: <code> pg_hba.conf </code></p>
+<p><strong>peer</strong>: Què és? És un mètode d'autenticació que comprova la identitat de l'usuari del sistema operatiu que ha
+   iniciat la connexió local amb PostgreSQL. No necessita una contrasenya de PostgreSQL.  </p>
+  <p>El mètode peer requereix que la connexió siga local a l'equip on s'executa PostgreSQL, 
+    perquè necessita obtindre la identitat de l'usuari del sistema operatiu mitjançant un socket Unix.</p>
 <p><strong>MD5</strong>: Què és? Mètode d’autenticació basat en hash MD5. PostgreSQL guarda la contrasenya com un hash MD5.</p>
 <p>Problemes : MD5 és un algorisme antic (1992). Vulnerable a atacs de col·lisió. Menys segur davant atacs moderns.
 No protegeix bé contra atacs de força bruta amb hash robat.</p>
@@ -676,7 +684,11 @@ MD5 només per compatibilitat amb sistemes antics.</p>
 <p><code>postgresql.conf </code> no és un fitxer exclusiu de configuració de les connexions, sinó el fitxer principal de configuració del
    servidor PostgreSQL. Hi ha molts altres paràmetres relacionats amb la memòria, el rendiment, els registres, la replicació, la seguretat, etc.
    que es voran en els següents punts de la unitat.</p>
-
+<!--
+SELECT inet_client_addr(), inet_client_port();
+- Si retorna NULL en tots dos camps, normalment és una connexió mitjançant socket Unix.
+- Si retorna una adreça IP i un port, és una connexió TCP/IP.
+Aquesta consulta identifica el tipus de connexió, però no el mètode d'autenticació utilitzat.   -->
 
   </section>
 
@@ -686,7 +698,7 @@ MD5 només per compatibilitat amb sistemes antics.</p>
 
 
 <section id="instancia">
-  <h2>Configuració de cluster</h2>
+  <h1>Configuració de cluster</h1>
   <p>Una instància/cluster de PostgreSQL és el programa en execució del servidor de base de dades juntament amb tot 
     el que necessita per funcionar. No és només la base de dades, És tot el sistema que gestiona les bases de dades</p>
     <p>Un cluster de PostgreSQL inclou:
@@ -712,6 +724,20 @@ actualitzacions (UPDATE), esborrats (DELETE), pots fer transaccions, etc..</p>
 PostgreSQL gestiona moltes sessions alhora.</p>
 <p>✔ Cada sessió té: El seu estat, Les seves variables, Les seves transaccions.</p>
 <p>Les sessions són independents entre si,  Però poden interactuar (bloquejos, concurrència, etc.)</p>
+<!-- Us de memòria RAM:   PostgreSQL intenta evitar lectures innecessàries del disc aprofitant la memòria disponible, però manté les dades de manera persistent al disc.
+Quan una consulta necessita una pàgina: 1. PostgreSQL comprova si ja està en shared_buffers. 2. Si hi és, pot llegir-la des de la RAM.
+3. Si no hi és, cal carregar-la des del disc, habitualment passant també per la memòria cau del sistema operatiu.
+Quan es modifiquen dades, PostgreSQL registra els canvis en el WAL abans que les pàgines de dades modificades s'escriguen definitivament als fitxers de les taules.
+Hi ha dos arees principals: shared_buffers i work_mem
+shared_buffers és una memòria cau compartida per tot el servidor PostgreSQL, mentre que work_mem és memòria de treball per a determinades operacions de les consultes.
+*shared_buffers: guardar pàgines de dades en memòria
+PostgreSQL organitza les dades de les taules i els índexs en pàgines, habitualment de 8 KiB. El paràmetre shared_buffers determina la quantitat de memòria compartida que PostgreSQL dedica a mantindre còpies d'aquestes pàgines.
+*work_mem: memòria per a fer càlculs durant les consultes
+work_mem és diferent: no serveix principalment per guardar pàgines de taules, sinó per proporcionar memòria temporal a operacions com ara:
+- Ordenar resultats (ORDER BY). - Agrupar registres (GROUP BY). - Eliminar duplicats (DISTINCT). 
+- Executar determinades operacions JOIN, com ara hash joins. - Construir taules hash temporals per a altres operacions.
+-->
+
 
   <hr><h3>Tornem al cluster....</h3>
    <h3>Fitxer:  postgresql.conf</h3>
@@ -967,12 +993,8 @@ també es pot posar en el fitxer <code>postgresql.conf</code>
 <p>Aquest directori es pot saber amb:</p>
 <pre><code>sudo -u postgres psql -c "show data_directory;" </code></pre>
 
-
-
 <h2> Estructura interna del directori</h2>
-
 <p>Dins de PGDATA trobem:</p>
-
 <table>
 <tr>
 <th>Carpeta</th>
@@ -1401,7 +1423,7 @@ max_wal_size = 1GB</code></pre>
 
 
   <section id="logs">
-    <h1>LOGS</h1>
+    <h1>🔍 LOGS</h1>
     <p>Els logs a PostgreSQL són fitxers de registre que documenten l’activitat del servidor (errors, connexions, 
       consultes i esdeveniments interns) i serveixen per a diagnòstic, auditoria i anàlisi del rendiment</p>
   <p>No obstant això, no podem registrar tota l’activitat del servidor de manera indiscriminada, ja que això generaria una 
