@@ -526,7 +526,7 @@ psql</code></pre>
     ↓
 <strong>Variables d'entorn</strong>
     ↓
-postgresql.conf
+postgresql.conf   pg_hba
     ↓
 Variables GUC
     ↓
@@ -672,9 +672,11 @@ SELECT rolname, rolpassword  FROM pg_authid;
 <p><strong>Recomanació actual</strong> : A PostgreSQL 14, 15, 16… sempre utilitza scram-sha-256 si els clients ho suporten.
 MD5 només per compatibilitat amb sistemes antics.</p>
 
-
-
   </section>
+
+
+
+
 
 
 <section id="instancia">
@@ -733,7 +735,7 @@ alumnes_map   user1                 alumne      </pre>
 <p>I en pg_hba.conf, configurem una regla com esta:</p>
 <pre>local   all   all   peer map=alumnes_map</pre>
 
-<hr><hr><h3>Variables del sistema (GUC - Grand Unified Configuration)</h3>
+<hr><hr><h2>Variables del sistema (GUC - Grand Unified Configuration)</h2>
 <pre>Sistema Operatiu
     ↓
 Variables d'entorn
@@ -744,18 +746,18 @@ postgresql.conf  pg_hba
     ↓
 Sessió
 </pre>
-<p>PostgreSQL té centenars de variables internes configurables (Aquestes no són variables d’entorn, sinó paràmetres de configuració del servidor.). Pots veure-les amb:</p>
+<p>En PostgreSQL, les variables GUC (Grand Unified Configuration) són els paràmetres que permeten configurar el 
+  comportament del servidor, de les sessions i, en alguns casos, de les consultes.</p>
+  <p>PostgreSQL té centenars de variables internes configurables (Aquestes no són variables d’entorn, sinó paràmetres
+   de configuració del servidor.). Pots veure-les amb:</p>
 <pre>SHOW ALL;  </pre>
 <pre>O una concreta:
 SHOW work_mem;  </pre>
 <pre>O via vista del sistema
 SELECT name, setting FROM pg_settings;  
-
--- En postgres, per vore les columnes d'una taula es fa:
-\d nom_taula
 </pre>
 
-<ul> Aquestes variables poden ser:
+<ul> Aquestes variables poden ser configurades de manera:
   <li> Globals (configurades a postgresql.conf)</li>
   <li> Per base de dades</li>
   <li> Per usuari</li>
@@ -763,12 +765,15 @@ SELECT name, setting FROM pg_settings;
 </ul>
 
 <pre>Exemple: canviar variable només per Sessió
-SET work_mem = '64MB';
+SHOW work_mem;   ==>   4MB
+SET work_mem = '64MB';   ==> fixa el valor en 64MB
   Només afecta la connexió actual. S'aplica immediatament.   </pre>
-  <p>En este cas, quan em desconnecte i després em torne a connectar, el valor "64MB" no estarà fixat.</p>
-<p>Per fer que el canvi siga per usuari (persistent) en lloc de només per sessió, has d’utilitzar:</p>
+  <p>En este cas, quan em desconnecte i després em torne a connectar, el valor "64MB" no estarà fixat. Si no s'ha fet altre canvi en altre
+    nivell, el valor serà de 4MB    </p>
+<p>Per fer que el canvi siga per usuari (persistent) en lloc de només per sessió, s'ha d’utilitzar:</p>
 <pre>ALTER ROLE nom_usuari SET work_mem = '64MB';
-      S'aplica quan es torne a connectar l'usuari. 
+      En este cas, el canvi no s'aplica immediatament.
+      S'aplicarà quan es torne a connectar l'usuari.(s'obriga una nova sessió / connexió) 
       El canvi es guarda en <code>pg_db_role_setting</code> </pre> 
 <ul>
   <li>Cada vegada que l’usuari joan es connecte → tindrà work_mem = 64MB</li>
@@ -813,73 +818,110 @@ El que fa és escriure el canvi a un fitxer separat:</p>
 <pre>/var/lib/postgresql/16/main/postgresql.auto.conf</pre>
 <p>Aquest fitxer és llegit després de postgresql.conf quan el servidor arranca o fas pg_reload_conf()
 Per això, els canvis són persistents, però no toques manualment postgresql.conf</p>
-<p>A PostgreSQL, molts paràmetres tenen un valor per defecte que està hardcoded dins del codi de PostgreSQL,
+<hr>
+<h2>source</h2>
+<p>A PostgreSQL, molts paràmetres tenen un valor per defecte que està <code>hardcoded</code> dins del codi de PostgreSQL,
 es defineix en el moment de compilació / instal·lació, no està guardat en cap fitxer ni taula. <br>
 PostgreSQL els carrega automàticament en iniciar el servidor.</p>
 <p>Són els que source = 'default'</p>
 <pre>Com saber quins són:
 SELECT name, setting  FROM pg_settings
 WHERE source = 'default';  </pre>
+<pre> -- Els possibles valors de source són:
+default :            És el valor per defecte que porta el motor de PostgreSQL directament de fàbrica
+configuration file : El valor s'ha establert mitjançant un fitxer de configuració 
+                    (generalment postgresql.conf)
+override : Indica que el valor ha estat sobreescrit per una configuració de nivell superior o específic, 
+           com ara una regla de configuració a nivell de base de dades (ALTER DATABASE), 
+           d'usuari/rol (ALTER ROLE), o una opció de sessió que té prioritat sobre els fitxers generals.
+client:    El valor ha estat enviat o determinat directament per la connexió del client en establir-se la sessió
+           (per exemple, a través d'opcions de connexió a la cadena de connexió 
+           o paràmetres enviats pel driver/client com psql o una aplicació).   </pre>
+ <pre>Com saber quins NO són:
+SELECT name, source, setting  FROM pg_settings
+WHERE source != 'default';  </pre>
 
-<hr><hr>
+<p>Saber d’on ve el valor (columna source) d'un paràmetre</p>
+<pre>SELECT name, source FROM pg_settings WHERE name = 'work_mem';</pre>
+
+
+<hr>
+<h2>context</h2>
+<p>En PostgreSQL, no tots els paràmetres es poden modificar des d'una sessió. <p>
+  <p>Per exemple, el paràmetre <code>log_connections</code>  accepta valors booleans (on o off) i serveix 
+    per decidir si PostgreSQL ha d'escriure una línia al registre (log) cada vegada que un usuari es connecta a la base de dades.</p>
+<p>Evidentment, este paràmetre no pot ser modificat per un usuari, o per una sessió, perquè el seu comportament afecta a tot un <strong>cluster</strong> </p>
+
+<p>  PostgreSQL utilitza una 
+  columna anomenada <code>context</code> a la mateixa vista <code>pg_settings</code> per definir quan i com es pot canviar cada variable.</p>
+<p>Si un paràmetre té un <code>context</code> restrictiu, intentar canviar-lo en una sessió (amb <code>SET paràmetre = valor</code> ) 
+  llançarà un error.</p>
+
 <pre># Com saber de quin tipus és cada paràmetre:
 SELECT name, setting, context, vartype, source  FROM pg_settings ORDER BY name;</pre>
-<p>La columna <code>context</code> et diu quan i com es pot modificar el paràmetre (variable GUC).
+<p>La columna <code>context</code>  diu <strong>quan i com</strong>  es pot modificar el paràmetre (variable GUC).
 </p>
 <pre>
 context     Significat
 --------------------------------------------
-internal    Només intern, no modificable
-postmaster  Requereix reinici del servidor
-sighup      Requereix reload (pg_reload_conf())
-superuser   Només superusuari
-user        Qualsevol usuari pot canviar-lo per sessió
-backend	    Es pot canviar en iniciar sessió
+user          Qualsevol usuari pot canviar-lo per sessió (SET)
+superuser     Només superusuari (pot canviar-lo per sessió (SET) o configuració general)
+              Només superusuari o un rol amb el privilegi SET corresponent.
+backend       Qualsevol usuari pot establir el valor durant la connexió.
+              No es pot canviar amb SET una vegada iniciada la sessió.
+superuser-backend   Es pot configurar en el fitxer de configuració i recarregar-lo, 
+                    però el canvi afecta les sessions que s'inicien després. 
+                    També es pot establir durant la connexió, amb els permisos adequats.
+sighup        Requereix reload (pg_reload_conf()). Es pot modificar sense reiniciar el servidor
+postmaster    Requereix reinici del servidor. Només s'aplica quan s'inicia el servidor PostgreSQL. 
+internal      Només intern, no modificable
 </pre>
 
 <p>Com saber quines variables pot canviar un usuari dins de la seua sessió ?</p>
 <pre>SELECT name FROM pg_settings WHERE context = 'user';</pre>
 
-<p>Saber d’on ve el valor (columna source)</p>
-<pre>SELECT name, source FROM pg_settings WHERE name = 'work_mem';</pre>
+<hr> <p>El paràmetre log_connections afecta el clúster o instància de PostgreSQL, no una base de dades concreta ni una sessió individual
+   com a configuració persistent. El seu context és superuser-backend: només un superusuari o un rol amb el privilegi adequat 
+   pot modificar-lo, però no es pot canviar amb un SET dins d'una sessió ja iniciada.</p>  
+  <pre>Per activar-lo, modifica postgresql.conf:
+log_connections = on
+Després, recarrega la configuració:
+SELECT pg_reload_conf(); </pre>
 
-<pre>
-valor de source     Significat
---------------------------------------------
-default	            Valor per defecte
-configuration file  postgresql.conf
-override            postgresql.auto.conf
-environment         Variable d’entorn
-session	            SET en sessió
-database            Definida per base de dades
-user                Definida per usuari</pre>
-
-
-   <h3>Variables per usuari o per base de dades</h3>
-<pre>
-PostgreSQL permet configurar paràmetres així:
-🔹 Per usuari
-ALTER ROLE usuari SET work_mem = '32MB';
-🔹 Per base de dades
-ALTER DATABASE basedades SET work_mem = '64MB';
-🔹 Global (per defecte)
-ALTER SYSTEM SET work_mem = '128MB';
-  Això escriu al fitxer:  postgresql.auto.conf  
-     ❗ No aplica fins que fas: SELECT pg_reload_conf();  ( o reinici)
-</pre>
-
-
-  <h3>Configuració de memòria</h3>
 
   <h3> Reinici del cluster</h3>
   <p>Alguns canvis requereixen recarregar la configuració (en calent), o reiniciar el cluster</p>
-  <pre>🔁 pg_reload_conf() → recarrega configuració
-🔴 Reiniciar servei → per canvis estructurals (shared_buffers)     </pre>
+  <pre>🔁 pg_reload_conf() → recarrega configuració. 
+                    Pot afectar les connexions que ja estan obertes, però no les tanca ni les reinicia.
+🔴 Reiniciar servei → per canvis estructurals (shared_buffers) 
+                    les connexions actives es perden i les aplicacions han de tornar a connectar-se quan el servidor estiga disponible.    </pre>
 
 <p class="tips">Exercici: Quantes variables té actives la teua instal·lació?</p>
 <p class="tips">Exercici: Quanta memoria de treball té una sessió de la teua instal·lació?</p>
 <p class="tips">Exercici: Qin valor té el "log_destination" de la teua instal·lació?</p>
  
+<hr>
+<h3>PostgreSQL i les funcions <code>Argon2 o bcrypt</code></h3>
+<p>En PostgreSQL no es poden utilitzar les funcions <code>Argon2 o bcrypt</code> directament, però 
+SCRAM permet ajustar el nombre d'iteracions (scram_iterations està disponible a partir de PostgreSQL 16) </p>
+<p>PostgreSQL incorpora una opció per augmentar el cost computacional de l'autenticació SCRAM-SHA-256, 
+de manera que el càlcul de la contrasenya siga més lent i resulte més costós per a un atacant que intente endevinar-la a partir d'un verificador robat.</p>
+
+<p><code>scram-sha-256</code>  es pot configurar com una funció sha lenta, configurant la variable <code> scram_iterations</code>. </p>
+<pre>show scram_iterations;
+4096  </pre>
+<p>Per defecte, el valor es de 4096, però es pot incrementar per fer el càlcul més lent</p>
+<pre>ALTER SYSTEM SET  scram_iterations= 10000;
+   i després
+SELECT pg_reload_conf();   
+també es pot posar en el fitxer <code>postgresql.conf</code> 
+</pre>
+<p>El nombre d'iteracions queda incorporat al verificador SCRAM quan es crea o es canvia la contrasenya.
+   Per tant, modificar la configuració no actualitza automàticament els verificadors existents.</p>
+   <pre>ALTER ROLE usuari PASSWORD 'UnaContrasenyaLlargaIUnica';</pre>
+  <p>S'ha d'executar aquesta operació després d'haver establit el valor de scram_iterations, perquè es genere un verificador nou amb la configuració actual.</p>
+
+
 </section>
 
 
@@ -982,7 +1024,7 @@ ALTER SYSTEM SET work_mem = '128MB';
 
 <h2> Tablespaces (molt important)</h2>
 
-<p>Permeten distribuir dades en diferents discos.</p>
+<p>Permeten distribuir dades en diferents discos (ubicacions).</p>
 
 <p>Exemple:</p>
 <p>primer, crear des de SO, una carpeta, que pot estar situada en un disc SSD més ràpid</p>
@@ -997,9 +1039,16 @@ LOCATION '/mnt/ssd/dades/postgres_fast';</code></pre>
    id serial,
    nom text
 ) TABLESPACE dades_fast;</code></pre>
+
+<p>O un índex</p>
+CREATE INDEX idx_clients_nom
+ON clients (nom)
+TABLESPACE index_fast;</pre>
+
 <p>O crear una BBDD dins d'un tablespace</p>
 <pre><code>CREATE DATABASE empresa
 TABLESPACE dades_fast;</code></pre>
+
 <p>A partir d'ací, els objectes que es creen normalment en aquesta base de dades s'emmagatzemaran en dades_fast, 
   llevat que indiquem un altre tablespace.</p>
 
@@ -1040,12 +1089,6 @@ SELECT     spcname,     pg_tablespace_location(oid)   FROM pg_tablespace;
 <p>Un <strong>tablespace</strong> permet indicar en quin lloc de l'emmagatzematge físic PostgreSQL 
   ha de guardar les dades d'un <strong>objecte</strong>.</p>
 <hr>
-<p>Paràmetres importants a <code>postgresql.conf</code>:</p>
-<pre><code>wal_level = replica
-max_wal_size = 1GB</code></pre>
-<p><code>wal_level</code> : determina el nivell d'informació que conté el WAL.</p>
-<p><code>max_wal_size</code> : influïx en quan PostgreSQL inicia checkpoints per acumulació de WAL.</p>
-
 <h2> Paràmetres importants d’I/O i emmagatzematge</h2>
 <p>En PostgreSQL, els paràmetres d’entrada/eixida (E/S, o I/O en anglés) i d’emmagatzematge controlen com es llig
    i s’escriu la informació al disc, com es protegeixen les transaccions davant d’una fallada i com es gestionen
@@ -1070,10 +1113,10 @@ fsync = on</code></pre>
 
   <p>⚠️ <code>fsync=off</code> millora rendiment però és perillós en producció.</p>
 
-
-
   </section>
+
   
+
 
 
   <section id="diccionari">
@@ -1105,8 +1148,10 @@ fsync = on</code></pre>
   sinó que està distribuït en diferents catàlegs del sistema.</p>
 
   <p>El diccionari de dades està format principalment per:</p>
+  <h3>  <ol>     <li>pg_catalog</li>     <li>information_schema</li>   </ol> </h3>
+ 
 
-  <h3> Esquema <code>pg_catalog</code></h3>
+ <hr> <h2> Esquema <code>pg_catalog</code></h2>
   <p>Cada base de dades té els seus propis catàlegs del sistema (pg_catalog)</p>
 
 <p>És l’esquema intern del sistema.</p>
@@ -1117,18 +1162,22 @@ fsync = on</code></pre>
 <tr>
 <th>Taula</th>
 <th>Funció</th>
+<th>meta-comanda psql</th>
 </tr>
 <tr>
 <td>pg_class</td>
 <td>Taules i índexs</td>
+<td>\dt  \di</td>
 </tr>
 <tr>
 <td>pg_attribute</td>
 <td>Columnes</td>
+<td>\d nomTaula</td>
 </tr>
 <tr>
 <td>pg_type</td>
 <td>Tipus de dades</td>
+<td>\dT \dT+ \dt*</td>
 </tr>
 
 </table>
@@ -1144,27 +1193,31 @@ fsync = on</code></pre>
  <tr>
 <th>Taula</th>
 <th>Funció</th>
+<th>meta-comanda psql</th>
 </tr> 
 <tr>
 <td>pg_roles</td>
 <td>Rols/usuaris</td>
+<td>\du  \du+</td>
 </tr>
 <tr>
 <td>pg_authid</td>
 <td>Autenticació</td>
+<td></td>
 </tr>
 <tr>
 <td>pg_database</td>
 <td>Bases de dades</td>
+<td>\l \list</td>
 </tr>
 <tr>
 <td>pg_tablespace</td>
 <td>Tablespaces</td>
+<td>\db \db+</td>
 </tr>
 </table>
 
-<hr>
-<h2> Information Schema</h2>
+<hr> <h2> Information Schema</h2>
 
 <p>PostgreSQL també implementa:</p>
 
@@ -1185,18 +1238,25 @@ WHERE table_schema = 'public';</code></pre>
 <pre><code>SELECT tablename 
 FROM pg_tables 
 WHERE schemaname = 'public';</code></pre>
+<pre><code> -- També amb:
+\d </code></pre>
 
 <h3>🔹 Veure columnes d’una taula</h3>
 
 <pre><code>SELECT column_name, data_type
 FROM information_schema.columns
 WHERE table_name = 'clients';</code></pre>
+<pre><code> -- També amb:
+\d nom_taula</code></pre>
 
 <h3>🔹 Veure índexs</h3>
 
 <pre><code>SELECT indexname 
 FROM pg_indexes 
 WHERE tablename = 'clients';</code></pre>
+<pre><code> -- També amb:
+\di 
+\di+  </code></pre>
 
 <h2>🏗 Diferència entre pg_catalog i information_schema</h2>
 
@@ -1231,13 +1291,47 @@ WHERE tablename = 'clients';</code></pre>
 <li>Qui és superusuari</li>
 <li>Qui pot crear BD</li>
 <li>Qui pot crear rols</li>
+<li>...</li>
 </ul>
+  <!--
+<hr><h3>més meta-comandes</h3>
+  <ul>
+    <li>\dn: Llista els esquemes (schemas) de la base de dades actual. </li>
+    <li>\dx: Llista les extensions instal·lades (com pg_trgm o PostGIS).</li>
+    <li>\df: Llista les funcions i procediments emmagatzemats.</li>
+    <li>\dv: Llista només les vistes (views).</li>
+    <li>\dY: Llista els triggers (disparadors) definits a la base de dades.</li>
+    <li>\i ruta/fitxer.sql: Executa un fitxer SQL extern des del teu disc.</li>
+    <li>\e: Obre l'editor de text del sistema (com Vim o Nano) amb l'última consulta que hagis escrit per poder editar-la còmodament.</li>
+    <li>\s: Mostra l'historial de totes les comandes que has executat.</li>
+    <li>\watch [segons]: Executa la consulta repetidament cada X segons.</li>
+    <li>\echo missatge: Imprimeix un text a la pantalla (molt útil quan crees scripts .sql automàtics).</li>
+    <li>\?: Mostra la guia de referència de totes les meta-comandes de psql amb una breu explicació en pantalla.</li>
+    <li>\h nom_ordre: Mostra la sintaxi oficial de SQL per a qualsevol comanda (per exemple, \h CREATE TABLE).</li>
+    <li>\set nom_variable valor: Defineix una variable interna de psql. Després pots fer-la servir a les teves consultes amb :nom_variable.</li>
+    <li>\H: Activa el mode HTML. Transforma la sortida de la consulta en una estructura de taula en codi HTML (<table>, <tr>, <td>).</li>
+    <li>\t: Mostra només les files de dades, amagant les capçaleres de les columnes i el resum final de files afectades.</li>
+    <li>\a: Commuta entre format alineat (taula visual elegant) i no alineat (ideal per a copiar dades crues).</li>
+    <li>\dC: Llista les conversions de tipus (casts) disponibles.</li>
+    <li>\z o \dp: Llista els permisos d'accés (privilegis) de totes les taules, vistes i seqüències (mostra qui pot fer SELECT, INSERT, UPDATE, etc.).</li>
+    <li>\ddp: Mostra els privilegis per defecte que s'aplicaran automàticament als nous objectes que es creïn en el futur.</li>
+  </ul>  -->
   
-  
-  
-  
+<!-- a part de  pg_catalog   i   information_schema 
+  Vistes de Rendiment i Estat (pg_stat_*)
+  pg_settings
+  pg_locks
+  pg_stat_replication
+
+    pg_stat_activity
+    pg_stat_user_tables
+    pg_statio_user_tables
+    pg_stat_statements
+-->
+
   </section>
   
+
 
 
 
@@ -1289,11 +1383,12 @@ UPDATE comptes SET saldo = saldo - 100 WHERE id = 1;
 </ul>
 <p>Això s’anomena: <strong>Crash Recovery </strong>  </p>
 
-
-  
-
-
- 
+<!--  <hr>   <p>Paràmetres importants de WAL a <code>postgresql.conf</code>:</p>
+<pre><code>wal_level = replica
+max_wal_size = 1GB</code></pre>
+<p><code>wal_level</code> : determina el nivell d'informació que conté el WAL.</p>
+<p><code>max_wal_size</code> : influïx en quan PostgreSQL inicia checkpoints per acumulació de WAL.</p>  -->
+   
 </section>
   
 
@@ -1303,13 +1398,33 @@ UPDATE comptes SET saldo = saldo - 100 WHERE id = 1;
     <h1>LOGS</h1>
     <p>Els logs a PostgreSQL són fitxers de registre que documenten l’activitat del servidor (errors, connexions, 
       consultes i esdeveniments interns) i serveixen per a diagnòstic, auditoria i anàlisi del rendiment</p>
+  <p>No obstant això, no podem registrar tota l’activitat del servidor de manera indiscriminada, ja que això generaria una 
+    quantitat enorme d’informació, ocuparia molt d’espai en disc i podria dificultar la localització dels esdeveniments 
+    realment importants. A més, registrar totes les consultes SQL pot introduir una sobrecàrrega en el servidor i 
+    afectar el rendiment.</p>
+  <p>Per este motiu, PostgreSQL permet configurar quina informació volem registrar, en quin format o formats i amb quin nivell de detall. 
+    L'objectiu és conservar els registres que ens resulten útils per detectar problemes, investigar errors,
+     supervisar l'activitat i analitzar el rendiment, sense generar informació innecessària.</p>
+  <p>A més, és important establir una política de rotació i conservació dels logs, de manera que els fitxers no cresquen
+     indefinidament. Podem crear fitxers nous periòdicament, limitar la mida i eliminar o arxivar els 
+     registres antics segons les necessitats del sistema.</p>
 <h2>📁 Ubicació dels fitxers</h2>
 
+<h3>stderr</h3>
 <p>Per defecte, PostgreSQL ve configurat per escriure els logs en un fitxer en <code>/var/log/postgresql/postgresql-16-main.log  </code>
  i en un format standard 'stderr' </p>
 <pre>Per vore el fitxer:
 sudo tail -f /var/log/postgresql/postgresql-16-main.log    </pre>  
- 
+<h3>syslog</h3>
+<p>El logging a syslog consisteix a enviar els missatges de registre de PostgreSQL al sistema de registre del sistema operatiu,
+   en lloc de gestionar-los exclusivament en fitxers propis de PostgreSQL.</p>
+   <pre>En el fitxer postgresql.conf, podem establir:  log_destination = 'syslog'</pre>
+<p>On podem veure els logs?</p>
+<pre>sudo journalctl -u postgresql
+o 
+sudo journalctl -f   </pre>
+   
+<h3>fitxers amb format</h3>
 <p> Per generar logs en fitxers, cal activar el logging_collector i definir un directori amb log_directory, i log_filename:</p>
 <p>Com?</p> 
 <pre># Fitxer postgresql.conf     (normalment a /etc/postgresql/16/main )
