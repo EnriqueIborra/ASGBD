@@ -28,6 +28,7 @@
   <a href="#fragmentacio">Fragmentació</a>  
   <a href="#replicacio">Replicació</a>  
   <a href="#SGBDD">SGBDD Postgresql</a>  
+  <a href="#altres-recursos">Altres recursos</a>  
   
 </nav>
 
@@ -591,29 +592,34 @@ L’usuari ho veu com una sola base de dades</p>
       
       
 
+ <section id="altres-recursos">
+      <hr><h2>🖌️ I .. un poc de repàs..</h2>
+    <div id="progress-container">
+    <div id="progress-bar"></div>  </div>
+    <!-- <div id="percentatge-text">0%</div>  -->
+
+    <div class="quiz-container">
+        <h4 id="pregunta-text"></h4>
+        <div id="options-container" class="options">
+        </div>
+
+        <p id="feedback"></p>
+        <button onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
+        <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
+        <button onclick="carregarPreguntes('preguntes61p_1')">🔁 Reiniciar</button>
+        <p id="pista"></p>
+         
+   </section>
 
 </main>
 
-
+<script src="scriptsunitats.js"></script>
 <script>
-
-  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
-      //  <div class="pre-container">
-      //    <button class="copy-button">Copia Codi !</button>
-  document.addEventListener('DOMContentLoaded', function () {
-    const buttons = document.querySelectorAll('.copy-button');
-
-    buttons.forEach(button => {
-      button.addEventListener('click', function () {
-        const code = this.nextElementSibling.innerText;
-        navigator.clipboard.writeText(code).then(() => {
-          this.innerText = ' ✔ Copiat!';
-          setTimeout(() => this.innerText = 'Copia Codi !', 3000);
-        });
-      });
-    });
-  });
+// Executar en carregar la pàgina
+  window.onload = carregarPreguntes('preguntes61p_1');
+  // canviar nom de preguntes en  button onclick="carregarPreguntes(
 
 </script>
+
 </body>
 </html>
