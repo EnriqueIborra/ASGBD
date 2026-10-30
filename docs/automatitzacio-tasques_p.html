@@ -53,17 +53,15 @@
       <h3>Tipus</h3>
       <ul>
         <li>Programa extern (al SGBD)</li>
-        <ul><li> Programador de Tasques de Windows, Crontab en Linux, etc..</li></ul>
-        <li>Programa intern : rutina de bbdd + job</li>
+        <ul><li> Programador de Tasques de Windows, Crontab en Linux, etc..</li> <li>pgAgent</li></ul>
+        <li>Programa intern : <code>jobs =</code> pg_cron +  cron.schedule()</li>
       </ul>
 
       <h3>Rutina</h3>
       <ul>
         <li>Script, guió, programa o seqüència de comandos que permeten dur a terme el processament d'unes certes accions</li>
         <li>Quan és creada rep un nom que permet que siga invocada tantes vegades com siga necessari</li>
-        <li>Van ser introduïdes en la versió SQL3, o SQL:1999</li>
       </ul>
-      <p>Els guions o scripts donaren pas al PL/SQL (Procedural Language, que és diferent del SQL )</p>
       <p><strong>SQL</strong> (Structured Query Language) és un llenguatge declaratiu. S’utilitza per gestionar i consultar bases de dades. 
         No té estructures de control com bucles o condicions complexes. SELECT (consultar dades), 
 INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i altres com DDL, DCL, TCL    </p>
@@ -89,9 +87,20 @@ INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i a
       <hr><h2>Les rutines: S’han de Documentar</h2>
       
       <h2>QUE ??</h2><p>Descripció de la tasca, descripció de paràmetres d’entrada i eixida, Autor, Versió, Data d’última modificació, etc..</p>
-      <h2>COM ??</h2> <p>** Fent servir comentaris en el codi de les rutines. Amb /* */ o  --</p>
+      <h2>COM ??</h2>
+      <ol>
+        <li>Fent servir comentaris en el codi de les rutines. Amb /* */ o --</li>
+        <li>Fent servir documentació institucional en qualsevol suport (documents, fulls de càlcul, diagrames,etc..)</li>
+      </ol>
+      
+      
+      <h3>**  Fent servir comentaris en el codi de les rutines. Amb /* */ o --</h3>
       <pre>-- Esta linea és un comentari </pre>
-      <p>** Fent servir documentació institucional en qualsevol suport (documents, fulls de càlcul, diagrames,etc..)</p>
+      <pre>/*
+ Aquest és un comentari
+ de diverses línies.
+*/</pre>
+      <h3>** Fent servir documentació institucional en qualsevol suport (documents, fulls de càlcul, diagrames,etc..)</h3>
        
   </section>
 
@@ -99,11 +108,11 @@ INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i a
 
   <section id="blocs">
     <br>
-    <h2>🧾 DO Bloc en PL/pgSQL</h2>
+    <h2>🧾 Bloc <strong><code>DO</code></strong> en PL/pgSQL</h2>
   
-    <h3> Què és un DO bloc?</h3>
+    <h3> Què és un bloc <strong><code>DO</code></strong> ?</h3>
     <p>
-      Un <strong>DO bloc</strong> és una unitat de codi en PL/pgSQL que:
+      Un <strong> bloc DO </strong> és una unitat de codi en PL/pgSQL que:
     </p>
     <ul>
       <li> No té nom ni es guarda a la base de dades.</li>
@@ -135,7 +144,7 @@ INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i a
     <p>Una altra forma de obrir un QueryToolWorkspace, des del menu (estaguent situat en una bbdd concreta), Tools, Query Tools, o 
       prement Atl-May-Q </p>
       <hr>
-    <h3> Estructura bàsica d’un DO bloc </h3>
+    <h3> Estructura bàsica d’un bloc <code>DO</code>  </h3>
     <pre translate="no">
 DO $$
 BEGIN
@@ -318,7 +327,7 @@ I els operadors lògics tenen precedència entre ells. NOT té més precedència
 <p>Encara que conegues la precedència, usa parèntesis per fer el codi: *més clar, *menys propens a errors, *més llegible per altres desenvolupadors</p>
 <p>Altres operacions aritmètiques amb funcions: ABS, ROUND, MOD, CEIL, CEILING FLOOR, POWER, SQRT, TO_CHAR </p>
     
-      <hr><h3>🔤 2. Operacions amb cadenes de text</h3>
+      <hr><h3>🔤 2. Operacions amb cadenes de text  (strings)</h3>
       <p>Les cadenes (<code>VARCHAR</code>) es concatenen amb <code>||</code>  </p>
       <pre><code>DECLARE
     nom VARCHAR(20) := 'Joan';
@@ -328,25 +337,37 @@ BEGIN
     nom_complet := nom || ' ' || cognom;
     raise notice  'Nom complet: ' || nom_complet ;
 END; </code></pre>
-<p>Altres operacions amb funcions: LENGTH, UPPER, LOWER, INITCAP, SUBSTRING, POSITION, REPLACE, TRIM, LTRIM, RTRIM, TO_NUMBER</p>
+<p>Altres operacions sobre cadenes (strings) amb funcions: LENGTH, UPPER, LOWER, INITCAP, SUBSTRING, POSITION, REPLACE, TRIM, LTRIM, RTRIM, TO_NUMBER</p>
     
 
-      <hr><h3>📅 3. Operacions amb dates</h3>
-      <p>Les dates es poden restar per obtenir la diferència (resultat en dies, i hores/min) <br>   </p>
-      <p>També es poden sumar 'intervals'  </p>
-      
-      <pre><code>DO $$
+  <hr><h3>📅 3. Operacions amb dates</h3>
+  <p>Les dates son un tipus de dada diferent als nombres i als strings. Serveixen per "marcar" un moment concret del temps. Les dates es poden comparar, 
+    per saber quina data es anterior o posterior.  <br>
+  Les dates es poden restar per obtenir la diferència (resultat en dies, i hores/min). Este resultat és un interval de temps <br>
+  A les dates també se li pot sumar un interval.   </p>
+  <p>Depenent de la precisió requerida, hi ha dos subtipus de dates: <code> DATE </code> i <code> TIMESTAMP </code>   </p>
+<p class="tips"> ✔️ El tipus "DATE" pot emmagatzemar fins al dia. (Any, mes, dia)  <br>
+   Si es necessita més precisió, es pot utilitzar el tipus "TIMESTAMP", el qual
+      pot emmagatzemar fins a milionèsima de segon (Exemple d'un valor de tipus TIMESTAMP: 2026-03-22 15:57:59.811083)     </p>  
+<p>Hi ha dos funcions que ens diuen la data actual</p>
+<pre>
+CURRENT_DATE  -- retorna la data actual.  
+now()         -- retorna la data i l'hora actuals   </pre>
+
+  <pre><code>DO $$
 DECLARE
   d1 date ;
 	d2 date;
 	resultat1 int;
 BEGIN
-  d1 := now();
+  d1 := CURRENT_DATE;
 	d2 := date '2026-01-01';
   resultat1 := d1 - d2 + 8;
   raise notice ' %' ,resultat1 ;	
 END;
 $$ LANGUAGE plpgsql;    </code></pre>
+<!-- en PostgreSQL la resta de dues dates (date - date) retorna un nombre enter de dies. 
+ Si vols obtindre decimals, has de treballar amb marques de temps (timestamp)-->
 
 <pre>-- Exemples d'operacions amb dates
 SELECT CURRENT_DATE + 7 AS setmana_propera;
@@ -355,16 +376,39 @@ SELECT CURRENT_DATE + interval '1 month' AS mes_proper;
 SELECT CURRENT_DATE - interval '2 weeks' AS fa_dos_setmanes;  </pre>
 <pre>--Comparacions
 SELECT '2026-03-22'::date > '2026-03-20'::date;  -- true
-SELECT NOW() BETWEEN '2026-03-22 00:00' AND '2026-03-22 23:59';  </pre>
+SELECT NOW() BETWEEN '2026-09-22 00:00' AND '2026-12-22 23:59';  </pre>
 
-    <p>Al igual que TO_DATE, està el TO_CHAR, amb la posibilitat d'usar màscara ('DD/MM/YY HH:MI PM')</p>
-    <p class="tips"> ✔️ El tipus "DATE" pot emmagatzemar fins al dia. (Any, mes, dia)
-       <br> Si es necessita més precisió, es pot utilitzar el tipus "TIMESTAMP", el qual
-      pot emmagatzemar fins a milionèsima de segon (Exemple d'un valor de tipus TIMESTAMP: 2026-03-22 15:57:59.811083)
-    </p>
-    <p class="alert"> S'ha d'anar amb cura en les operacions amb dates, perquè tots els mesos no tenen el mateix nombre
-      de dies, ni tots els anys tampoc tenen el mateix nombre de dies !! </p>
+<h4>TO_DATE() i TO_CHAR()</h4>
+<p>les funcions TO_DATE() i TO_CHAR() serveixen per convertir dates i hores entre formats.</p>
+<ul>
+  <li>TO_DATE(): converteix un text (text) en una data (date).</li>
+  <li>TO_CHAR(): converteix una data o un valor numèric en text (text) amb un format determinat.</li>
+</ul>
+<pre>--  sintaxi 
+TO_DATE(text, format)   
+-- El segon paràmetre indica com està escrit el text original per saber interpretar-lo.
+-- Exemple
+SELECT TO_DATE('30/10/2026', 'DD/MM/YYYY');  </pre>
+<pre>-- sintaxi
+TO_CHAR(valor, format) 
+-- Exemple:
+SELECT TO_CHAR(CURRENT_DATE, 'DD/MM/YYYY');    </pre>
+<p>Possibles valors en la màscara: <br>
+<code> DD	Dia del mes	 --   MM	Mes numèric	--  YYYY	Any amb quatre xifres -- YY	Any amb dos xifres	  <br>
+HH Hora --   HH24	Hora (format 24 h)	--  MI	Minuts --	 SS	Segons </code>
+<br> Els altres caràcters s'interpretarans tal qual estan.  
+</p>
+
+<p class="alert"> S'ha d'anar amb cura en les operacions amb dates, perquè tots els mesos no tenen el mateix nombre
+  de dies, ni tots els anys tampoc tenen el mateix nombre de dies !! </p>
     
+<p class="alert"> Les dates s'han de guardar i tractar com a dates (DATE o TIMESTAMP), no com a cadenes de text. !! </p>
+
+<!--   Una particularitat important: les transaccions
+En PostgreSQL, now() no canvia durant una mateixa transacció. Sempre retorna l'instant en què va començar la transacció.
+Si necessites l'hora real en cada crida, pots utilitzar:  SELECT clock_timestamp();
+També existeix:   SELECT statement_timestamp();   Que retorna l'instant d'inici de la sentència SQL actual.   -->      
+
       <hr><h3> 4. Operacions lògiques</h3>
       <p>Amb variables <code>BOOLEAN</code>, pots fer condicions:</p>
       <pre><code>AND OR NOT </code></pre>
