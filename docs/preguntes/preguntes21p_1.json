@@ -1,0 +1,488 @@
+[
+  {
+    "CE": "2a",
+    "titol": "Quin mode de parada de PostgreSQL espera que finalitzen les connexions actives abans d'aturar el servidor?",
+    "pista": "És el mode de parada més respectuós amb les connexions existents.",
+    "opcions": [
+      {
+        "text": "Immediate",
+        "correcte": false,
+        "feedback": "Immediate força l'aturada sense una parada neta i pot requerir recuperació en el següent inici."
+      },
+      {
+        "text": "Fast",
+        "correcte": false,
+        "feedback": "Fast cancel·la les transaccions actives i atura el servidor sense esperar que totes les connexions finalitzen normalment."
+      },
+      {
+        "text": "Smart",
+        "correcte": true,
+        "feedback": "Correcte. Smart espera que les connexions actives acaben abans d'aturar el servidor."
+      },
+      {
+        "text": "Restart",
+        "correcte": false,
+        "feedback": "Restart és una operació de reinici, no un dels tres modes de parada descrits."
+      }
+    ]
+  },
+  {
+    "CE": "2a",
+    "titol": "Quina diferència hi ha entre systemctl stop postgresql i pg_ctlcluster 16 main stop?",
+    "pista": "Una ordre gestiona el servei del sistema i l'altra actua directament sobre un clúster concret.",
+    "opcions": [
+      {
+        "text": "Les dues ordres gestionen el servei PostgreSQL de la mateixa manera i només permeten reiniciar tots els clústers actius.",
+        "correcte": false,
+        "feedback": "Incorrecte. Les dues ordres poden parar PostgreSQL, però actuen en nivells diferents i no serveixen únicament per a reiniciar els clústers."
+      },
+      {
+        "text": "systemctl gestiona el servei mitjançant systemd, mentre que pg_ctlcluster permet actuar directament sobre el clúster indicat.",
+        "correcte": true,
+        "feedback": "Correcte. systemctl gestiona les unitats de servei del sistema, mentre que pg_ctlcluster permet controlar un clúster concret de PostgreSQL, identificat en aquest cas per la versió 16 i el nom main."
+      },
+      {
+        "text": "systemctl és una eina exclusiva de PostgreSQL per gestionar bases de dades, mentre que pg_ctlcluster administra els serveis generals de Linux.",
+        "correcte": false,
+        "feedback": "Incorrecte. systemctl és una eina de gestió de serveis en sistemes amb systemd, mentre que pg_ctlcluster és una utilitat de Debian i derivats per gestionar clústers de PostgreSQL."
+      },
+      {
+        "text": "systemctl s'executa dins del client psql per parar el servidor, mentre que pg_ctlcluster només consulta l'estat del clúster indicat.",
+        "correcte": false,
+        "feedback": "Incorrecte. systemctl s'executa des de la línia d'ordres del sistema operatiu, no dins de psql. A més, pg_ctlcluster permet parar, iniciar i reiniciar clústers, entre altres operacions."
+      }
+    ]
+  },
+  {
+    "CE": "2b",
+    "titol": "Quin factor és especialment rellevant quan una empresa decideix contractar PostgreSQL com a servei en el núvol?",
+    "pista": "El proveïdor pot assumir part de les tasques d'infraestructura, però cal valorar les condicions del servei.",
+    "opcions": [
+      {
+        "text": "El servei transfereix tota la responsabilitat sobre la seguretat, les dades i el compliment normatiu al proveïdor.",
+        "correcte": false,
+        "feedback": "Incorrecte. Encara que el proveïdor gestione part de la infraestructura, l'empresa conserva responsabilitats sobre les dades, els accessos i el compliment normatiu."
+      },
+      {
+        "text": "El servei en el núvol sempre resulta més econòmic que una instal·lació pròpia, independentment de l'ús i dels recursos contractats.",
+        "correcte": false,
+        "feedback": "Incorrecte. El cost depén del proveïdor, dels recursos consumits, del nivell de servei contractat i de les necessitats de l'empresa."
+      },
+      {
+        "text": "Cal valorar el cost, la seguretat, l'escalabilitat i les tasques de manteniment que assumeix el proveïdor.",
+        "correcte": true,
+        "feedback": "Correcte. Cal comparar el cost, les mesures de seguretat, les possibilitats d'escalabilitat i les tasques gestionades pel proveïdor, com ara les actualitzacions i les còpies de seguretat, segons el servei contractat."
+      },
+      {
+        "text": "És imprescindible administrar directament el sistema operatiu físic del proveïdor per configurar PostgreSQL i mantindre'n el funcionament.",
+        "correcte": false,
+        "feedback": "Incorrecte. En un servei gestionat, el proveïdor administra bona part de la infraestructura. El client sol gestionar les bases de dades i altres aspectes segons el nivell de servei contractat."
+      }
+    ]
+  },
+  {
+    "CE": "2b",
+    "titol": "Una empresa necessita aïllar PostgreSQL de la resta del sistema i aprofitar una infraestructura de virtualització existent. Quina opció encaixa millor amb aquestes necessitats?",
+    "pista": "L'entorn triat disposa del seu propi sistema operatiu virtualitzat.",
+    "opcions": [
+      {
+        "text": "Instal·lació directa en el servidor físic.",
+        "correcte": false,
+        "feedback": "La instal·lació directa ofereix control sobre el sistema, però no proporciona l'aïllament propi d'una màquina virtual."
+      },
+      {
+        "text": "Màquina virtual.",
+        "correcte": true,
+        "feedback": "Correcte. Una màquina virtual disposa del seu propi sistema operatiu i permet aïllar el servidor de bases de dades dins de la infraestructura de virtualització."
+      },
+      {
+        "text": "Servei en el núvol.",
+        "correcte": false,
+        "feedback": "Un servei en el núvol pot ser una alternativa, però el cas plantejat destaca l'ús d'una infraestructura de virtualització existent i l'aïllament mitjançant una màquina virtual."
+      },
+      {
+        "text": "Client gràfic de PostgreSQL.",
+        "correcte": false,
+        "feedback": "Un client gràfic és una eina d'administració i connexió, no un entorn de desplegament del motor de base de dades."
+      }
+    ]
+  },
+  {
+    "CE": "2c",
+    "titol": "Quina afirmació sobre els rols i les bases de dades de PostgreSQL és correcta?",
+    "pista": "Els rols pertanyen al clúster i poden tindre permisos en diferents bases de dades.",
+    "opcions": [
+      {
+        "text": "Cada rol només existeix dins d'una base de dades concreta i no es pot utilitzar per accedir a altres bases de dades del clúster.",
+        "correcte": false,
+        "feedback": "Incorrecte. Els rols són objectes del clúster de PostgreSQL, no d'una única base de dades. Poden utilitzar-se en diferents bases de dades si disposen dels permisos necessaris."
+      },
+      {
+        "text": "Cada base de dades té el seu propi rol postgres independent, amb credencials i privilegis que no es comparteixen amb altres bases de dades.",
+        "correcte": false,
+        "feedback": "Incorrecte. El rol postgres pertany al clúster i no es crea de manera independent per a cada base de dades. Els rols i les seues propietats són comuns al clúster."
+      },
+      {
+        "text": "Qualsevol rol pot connectar-se automàticament a totes les bases de dades del clúster, independentment dels permisos i de la configuració d'autenticació.",
+        "correcte": false,
+        "feedback": "Incorrecte. Per connectar-se, un rol necessita el privilegi CONNECT sobre la base de dades, llevat que dispose d'altres privilegis aplicables, i ha de superar els controls d'autenticació configurats."
+      },
+      {
+        "text": "Els rols es defineixen a nivell de clúster i poden connectar-se a diferents bases de dades si tenen els permisos necessaris.",
+        "correcte": true,
+        "feedback": "Correcte. Els rols són comuns a totes les bases de dades d'un mateix clúster. L'accés efectiu depén dels privilegis concedits, dels controls d'autenticació i de les altres restriccions aplicables."
+      }
+    ]
+  },
+  {
+    "CE": "2c",
+    "titol": "Quina diferència hi ha entre l'usuari postgres del sistema operatiu i el rol postgres de PostgreSQL?",
+    "pista": "Un pertany al sistema operatiu i l'altre al sistema gestor de bases de dades.",
+    "opcions": [
+      {
+        "text": "Són el mateix compte d'usuari i comparteixen sempre les mateixes credencials per accedir al sistema i al servidor.",
+        "correcte": false,
+        "feedback": "Incorrecte. Són comptes independents de sistemes diferents. Les seues credencials, els permisos i les funcions no han de coincidir."
+      },
+      {
+        "text": "El rol postgres només existeix en Windows, mentre que l'usuari postgres del sistema operatiu només està disponible en Linux.",
+        "correcte": false,
+        "feedback": "Incorrecte. El rol postgres pertany a PostgreSQL, mentre que l'usuari del sistema operatiu pot existir en sistemes Unix/Linux per executar el servei i gestionar-ne els fitxers."
+      },
+      {
+        "text": "L'usuari del sistema operatiu executa el servei i gestiona els fitxers; el rol postgres administra les bases de dades dins de PostgreSQL.",
+        "correcte": true,
+        "feedback": "Correcte. L'usuari del sistema operatiu controla els processos i els permisos dels fitxers segons la configuració. El rol postgres sol tindre privilegis de superusuari dins de PostgreSQL."
+      },
+      {
+        "text": "L'usuari del sistema operatiu només pot consultar dades, mentre que el rol postgres s'encarrega exclusivament d'iniciar i parar el servei.",
+        "correcte": false,
+        "feedback": "Incorrecte. L'usuari del sistema operatiu pot executar el servei i accedir als fitxers segons els permisos, mentre que el rol postgres exerceix funcions administratives dins del SGBD."
+      }
+    ]
+  },
+  {
+    "CE": "2d",
+    "titol": "Quina és la funció principal del programari client d'un SGBD?",
+    "pista": "El client actua com a intermediari entre l'usuari o l'aplicació i el servidor.",
+    "opcions": [
+      {
+        "text": "Emmagatzemar físicament totes les dades i gestionar els fitxers interns del servidor.",
+        "correcte": false,
+        "feedback": "Aquesta és una funció pròpia del servidor i del motor de bases de dades, no del programari client."
+      },
+      {
+        "text": "Substituir el motor del SGBD i processar localment totes les consultes.",
+        "correcte": false,
+        "feedback": "El client no substitueix el motor. En l'arquitectura client-servidor, el servidor processa les consultes que rep."
+      },
+      {
+        "text": "Connectar-se al servidor, enviar-li ordres o consultes i rebre'n els resultats.",
+        "correcte": true,
+        "feedback": "Correcte. El client permet comunicar-se amb el servidor i treballar amb les dades mitjançant peticions i respostes."
+      },
+      {
+        "text": "Crear automàticament una base de dades cada vegada que s'inicia una connexió.",
+        "correcte": false,
+        "feedback": "La connexió no crea automàticament una base de dades. Aquesta operació s'ha de sol·licitar explícitament si es disposa dels permisos necessaris."
+      }
+    ]
+  },
+  {
+    "CE": "2d",
+    "titol": "Quins paràmetres permeten especificar una connexió a PostgreSQL mitjançant psql?",
+    "pista": "Cal identificar el servidor, la base de dades, l'usuari i, si és necessari, el port.",
+    "opcions": [
+      {
+        "text": "El nom de la base de dades i el directori on s'emmagatzemen els fitxers.",
+        "correcte": false,
+        "feedback": "El directori de dades no és un paràmetre habitual de connexió del client. També es poden indicar l'usuari, el servidor i el port."
+      },
+      {
+        "text": "L'adreça del servidor, el nom de la base de dades, l'usuari i el port.",
+        "correcte": true,
+        "feedback": "Correcte. Amb opcions com -h, -d, -U i -p, psql permet indicar el servidor, la base de dades, l'usuari i el port."
+      },
+      {
+        "text": "El nom del procés postmaster, el tipus de taula i el nom de l'índex principal.",
+        "correcte": false,
+        "feedback": "Aquests elements no són els paràmetres necessaris per establir una connexió amb psql."
+      },
+      {
+        "text": "La contrasenya del superusuari postgres.",
+        "correcte": false,
+        "feedback": "La contrasenya pot ser necessària per autenticar-se, però no identifica per si sola el servidor ni la base de dades a què es vol accedir."
+      }
+    ]
+  },
+  {
+    "CE": "2e",
+    "titol": "Quin fitxer de configuració permet modificar el port TCP en què PostgreSQL escolta les connexions entrants?",
+    "pista": "És el fitxer que conté paràmetres generals del servidor, com ara el port i el nombre màxim de connexions simultànies.",
+    "opcions": [
+      {
+        "text": "pg_hba.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. Aquest fitxer defineix les regles d'accés, els equips autoritzats i els mètodes d'autenticació, però no el port d'escolta."
+      },
+      {
+        "text": "postgresql.conf",
+        "correcte": true,
+        "feedback": "Correcte. El paràmetre port es configura en postgresql.conf. Si es modifica, cal reiniciar el servei perquè el canvi tinga efecte."
+      },
+      {
+        "text": "pg_authid",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_authid és un catàleg del sistema que conté informació sobre els rols i les seues dades d'autenticació; no és el fitxer de configuració del port."
+      },
+      {
+        "text": "pg_wal",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_wal emmagatzema els registres de transaccions utilitzats per a la recuperació i la replicació, no els paràmetres de connexió."
+      }
+    ]
+  },
+  {
+    "CE": "2e",
+    "titol": "Quina és la funció principal del fitxer pg_hba.conf en la configuració de les connexions de PostgreSQL?",
+    "pista": "Les seues regles determinen des de quins equips o xarxes es permet l'accés i quin mètode d'autenticació s'utilitza.",
+    "opcions": [
+      {
+        "text": "Establir el nombre màxim de connexions simultànies al servidor i configurar les adreces de xarxa.",
+        "correcte": false,
+        "feedback": "Incorrecte. El nombre màxim de connexions simultànies es configura amb el paràmetre max_connections de postgresql.conf."
+      },
+      {
+        "text": "Definir el temps màxim d'execució de totes les sentències SQL i els mètodes d'autenticació per a les connexions.",
+        "correcte": false,
+        "feedback": "Incorrecte. El temps màxim d'execució es pot configurar mitjançant statement_timeout en postgresql.conf."
+      },
+      {
+        "text": "Configurar les adreces de xarxa, les bases de dades, els usuaris i els mètodes d'autenticació per a les connexions.",
+        "correcte": true,
+        "feedback": "Correcte. pg_hba.conf conté regles que indiquen quines connexions s'autoritzen i quin mètode d'autenticació han d'utilitzar."
+      },
+      {
+        "text": "Emmagatzemar totes les contrasenyes dels usuaris en text pla i definir els mètodes d'autenticació per a les connexions.",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_hba.conf defineix mètodes d'autenticació, però no emmagatzema les contrasenyes dels usuaris en text pla."
+      }
+    ]
+  },
+  {
+    "CE": "2e-",
+    "titol": "Quin d’aquests paràmetres requereix reinici del servidor?",
+    "pista": "Pensa en el context de configuració que indica que un paràmetre només pot aplicar-se quan s'inicia el servidor.",
+    "opcions": [
+      {
+        "text": "context = user",
+        "correcte": false,
+        "feedback": "Incorrecte. Els paràmetres amb context user poden modificar-se a nivell de sessió."
+      },
+      {
+        "text": "context = sighup",
+        "correcte": false,
+        "feedback": "Incorrecte. Un paràmetre amb context sighup pot aplicar-se després de recarregar la configuració, sense reiniciar completament el servidor."
+      },
+      {
+        "text": "context = postmaster",
+        "correcte": true,
+        "feedback": "Correcte. Els paràmetres amb context postmaster només tenen efecte després d'iniciar o reiniciar el servidor PostgreSQL."
+      },
+      {
+        "text": "context = backend",
+        "correcte": false,
+        "feedback": "Incorrecte. Els paràmetres amb context backend s'apliquen als nous processos backend, sense requerir necessàriament un reinici complet del servidor."
+      }
+    ]
+  },
+  {
+    "CE": "2e-",
+    "titol": "Quina comanda recarrega la configuració sense reiniciar?",
+    "pista": "Busca la funció de PostgreSQL que demana al servidor que torne a llegir els fitxers de configuració.",
+    "opcions": [
+      {
+        "text": "pg_stop()",
+        "correcte": false,
+        "feedback": "Incorrecte. Aquesta no és la funció de PostgreSQL per recarregar la configuració."
+      },
+      {
+        "text": "pg_reload_conf()",
+        "correcte": true,
+        "feedback": "Correcte. pg_reload_conf() indica al servidor PostgreSQL que torne a carregar els fitxers de configuració sense reiniciar el servidor."
+      },
+      {
+        "text": "pg_restart()",
+        "correcte": false,
+        "feedback": "Incorrecte. Aquesta funció no és una funció estàndard de PostgreSQL per recarregar la configuració."
+      },
+      {
+        "text": "reload_db()",
+        "correcte": false,
+        "feedback": "Incorrecte. Aquesta no és una funció de PostgreSQL per recarregar la configuració."
+      }
+    ]
+  },
+  {
+    "CE": "2f",
+    "titol": "Què és una sessió en PostgreSQL?",
+    "pista": "Pensa en què es crea quan un client, com psql, estableix una connexió amb el servidor PostgreSQL.",
+    "opcions": [
+      {
+        "text": "Un fitxer de configuració",
+        "correcte": false,
+        "feedback": "Incorrecte. Els fitxers de configuració, com postgresql.conf, defineixen el comportament del servidor."
+      },
+      {
+        "text": "Una connexió activa entre client i servidor",
+        "correcte": true,
+        "feedback": "Correcte. Una sessió representa una connexió activa entre un client i el servidor PostgreSQL."
+      },
+      {
+        "text": "Una base de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. Una base de dades és un conjunt d'objectes i dades; una sessió és una connexió activa amb el servidor."
+      },
+      {
+        "text": "Un procés del sistema",
+        "correcte": false,
+        "feedback": "Incorrecte. PostgreSQL utilitza processos per gestionar les connexions, però la sessió és el concepte lògic associat a la connexió."
+      }
+    ]
+  },
+  {
+    "CE": "2f",
+    "titol": "Què és un cluster de PostgreSQL?",
+    "pista": "Pensa en PostgreSQL mentre el servidor està en execució: no és només una base de dades ni un fitxer.",
+    "opcions": [
+      {
+        "text": "Una única base de dades amb les seues taules, índexs i altres objectes emmagatzemats al disc.",
+        "correcte": false,
+        "feedback": "Incorrecte. Un clúster de PostgreSQL pot contindre diverses bases de dades, cadascuna amb les seues taules, índexs i altres objectes."
+      },
+      {
+        "text": "Només el fitxer postgresql.conf, que conté els paràmetres necessaris per configurar el comportament del servidor.",
+        "correcte": false,
+        "feedback": "Incorrecte. postgresql.conf és un fitxer de configuració. El clúster inclou les dades de les bases de dades i altres fitxers necessaris per al funcionament de PostgreSQL."
+      },
+      {
+        "text": "El servidor en execució amb els seus processos, la memòria utilitzada, les dades i la configuració.",
+        "correcte": true,
+        "feedback": "Correcte si parlem d'una instància de PostgreSQL en execució. Tècnicament, el clúster és el conjunt de bases de dades gestionades per una mateixa instal·lació de servidor i emmagatzemades en un directori de dades."
+      },
+      {
+        "text": "Un usuari connectat al servidor, amb la seua sessió activa i les consultes que executa sobre una base de dades.",
+        "correcte": false,
+        "feedback": "Incorrecte. Un usuari connectat representa una sessió de client. Un servidor PostgreSQL pot gestionar múltiples sessions i diverses bases de dades dins d'un mateix clúster."
+      }
+    ]
+  },
+  {
+    "CE": "2f-",
+    "titol": "Quin fitxer és el principal de configuració?",
+    "pista": "Busca el fitxer que conté la major part dels paràmetres que controlen el comportament del servidor PostgreSQL.",
+    "opcions": [
+      {
+        "text": "pg_hba.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_hba.conf controla l'autenticació i les regles d'accés de les connexions."
+      },
+      {
+        "text": "pg_ident.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_ident.conf s'utilitza per definir mapatges entre noms d'usuari externs i rols de PostgreSQL."
+      },
+      {
+        "text": "postgresql.conf",
+        "correcte": true,
+        "feedback": "Correcte. postgresql.conf és el fitxer principal de configuració del servidor PostgreSQL."
+      },
+      {
+        "text": "pg_settings.conf",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_settings no és un fitxer de configuració; és una vista que permet consultar els paràmetres de configuració."
+      }
+    ]
+  },
+  {
+    "CE": "2f-",
+    "titol": "Quin context permet canviar una variable en qualsevol sessió?",
+    "pista": "Pensa en el nivell de configuració que permet que cada usuari establisca el valor del paràmetre per a la seua pròpia sessió.",
+    "opcions": [
+      {
+        "text": "internal",
+        "correcte": false,
+        "feedback": "Incorrecte. Els paràmetres amb context internal no poden ser modificats directament per l'usuari."
+      },
+      {
+        "text": "postmaster",
+        "correcte": false,
+        "feedback": "Incorrecte. Els paràmetres amb context postmaster requereixen reiniciar el servidor per aplicar els canvis."
+      },
+      {
+        "text": "superuser",
+        "correcte": false,
+        "feedback": "Incorrecte. El context superuser permet modificar el paràmetre només a usuaris amb privilegis de superusuari, però no representa el context que permet qualsevol sessió."
+      },
+      {
+        "text": "user",
+        "correcte": true,
+        "feedback": "Correcte. Els paràmetres amb context user poden ser modificats per cada sessió, mitjançant SET, segons els permisos corresponents."
+      }
+    ]
+  },
+  {
+    "CE": "2h",
+    "titol": "Quina diferència hi ha entre els logs de PostgreSQL i els registres generats durant la instal·lació del servidor mitjançant apt?",
+    "pista": "Considera quin component és responsable de generar cada tipus de registre.",
+    "opcions": [
+      {
+        "text": "Els logs de PostgreSQL documenten l'activitat del servidor, mentre que els registres d'APT i dpkg documenten operacions d'instal·lació i actualització dels paquets.",
+        "correcte": true,
+        "feedback": "Correcte. PostgreSQL registra esdeveniments del servidor, com ara errors i connexions, mentre que APT i dpkg registren operacions relacionades amb la gestió dels paquets del sistema."
+      },
+      {
+        "text": "Els dos tipus de registres documenten l'activitat del servidor i es configuren exclusivament mitjançant els paràmetres del fitxer postgresql.conf.",
+        "correcte": false,
+        "feedback": "Incorrecte. postgresql.conf permet configurar els logs de PostgreSQL, però els registres d'APT i dpkg depenen de les eines de gestió de paquets del sistema operatiu."
+      },
+      {
+        "text": "Els registres d'APT documenten les consultes SQL executades, mentre que els logs de PostgreSQL registren les instal·lacions i actualitzacions dels paquets del servidor.",
+        "correcte": false,
+        "feedback": "Incorrecte. APT i dpkg registren operacions sobre paquets, mentre que PostgreSQL pot registrar errors, connexions, consultes i altres esdeveniments del servidor."
+      },
+      {
+        "text": "Els registres d'APT i dpkg s'emmagatzemen sempre dins de PGDATA, mentre que els logs de PostgreSQL es guarden exclusivament en /var/log/dpkg.log.",
+        "correcte": false,
+        "feedback": "Incorrecte. /var/log/dpkg.log és una ubicació habitual dels registres de dpkg. Els logs de PostgreSQL poden trobar-se en fitxers propis o en el registre del sistema, segons la configuració."
+      }
+    ]
+  },
+  {
+    "CE": "2h",
+    "titol": "Un administrador vol detectar en temps real els errors que apareixen en un fitxer de log de PostgreSQL en Linux. Quina ordre és la més adequada segons el text?",
+    "pista": "Busca l'ordre que permet mostrar les últimes línies d'un fitxer i continuar mostrant-ne les noves.",
+    "opcions": [
+      {
+        "text": "grep \"ERROR\" fitxer.log",
+        "correcte": false,
+        "feedback": "Incorrecte. grep permet buscar línies que contenen ERROR, però no mostra automàticament les noves línies que s'afigen al fitxer."
+      },
+      {
+        "text": "journalctl -u postgresql",
+        "correcte": false,
+        "feedback": "Incorrecte. Aquesta ordre consulta els registres del servei gestionats per systemd, però no segueix directament el fitxer de log indicat."
+      },
+      {
+        "text": "tail -f fitxer.log",
+        "correcte": true,
+        "feedback": "Correcte. tail -f mostra les últimes línies del fitxer i continua mostrant les noves entrades a mesura que s'hi escriuen."
+      },
+      {
+        "text": "grep \"2026-02-19\" fitxer.log",
+        "correcte": false,
+        "feedback": "Incorrecte. Aquesta ordre filtra les línies que contenen una data concreta, però no està pensada per a seguir en temps real els canvis del fitxer."
+      }
+    ]
+  }
+]
