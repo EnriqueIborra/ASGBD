@@ -20,7 +20,6 @@
 
 <nav>
   <h3>Índex</h3>
-  <a href="#cid">CID en postgresql</a>
   <a href="#usuaris">Usuaris en postgresql</a>
   <a href="#segusuaris">Seguretat en Usuaris</a>
   <a href="#permisos">Permisos o Privilegis</a>
@@ -33,13 +32,14 @@
 
 <main>
 
-<section id="cid">
+
+<section id="usuaris">
   <img src="imgs/usuaris_i_permisos_PostgreSQL.png" alt="usiper" width="12%" class="imatge-esquerra"> 
   <h1>Usuaris i Permisos en PostgreSQL</h1>
-</section>    
-    
+</section>  
+
   <section id="cid">
-        <h1>La Triada CID (Confidencialitat, Integritat, Disponibilitat) en postgresql</h1>
+        <h2>La Triada CID <br> (Confidencialitat, Integritat, Disponibilitat) en postgresql</h2>
         <img src="imgs/CID-ciber.png" class="imatge-esquerra"  alt="stop" style="width: 20%">
     <p>La triada CID (Confidencialitat, Integritat i Disponibilitat) és un model de seguretat fonamental per garantir la protecció 
       de la informació en qualsevol sistema informàtic, inclòs postgresql. Aquest model es fa servir per establir les bases de les polítiques
@@ -50,61 +50,28 @@
     <p>La confidencialitat es refereix a la protecció de la informació per evitar que siga accedida per usuaris no autoritzats. 
       A postgresql, això es pot aconseguir mitjançant:</p>
     <ul>
-        <li><strong>Autenticació i control d'accés</strong>: postgresql utilitza sistemes d'autenticació com l'usuari/contrassenya per garantir
+        <li><strong>Usuaris : Autenticació i control d'accés</strong>: postgresql utilitza sistemes d'autenticació com l'usuari/contrassenya per garantir
            que només els usuaris autoritzats puguen accedir a la base de dades.</li>
         <li><strong>Privilegis i rols</strong>: Els rols i privilegis d'postgresql defineixen els drets d'accés de cada usuari a les dades.
            Els privilegis poden ser assignats a rols específics i aquests rols assignats als usuaris.</li>
-        <li><strong>Xifrat de dades (Encryption)</strong>: postgresql permet xifrar tant les dades en repòs com les dades en trànsit.
-          La funció de xifrat de bases de dades d'postgresql (TDE - Transparent Data Encryption) xifra les dades emmagatzemades, 
-          mentre que el xifrat SSL/TLS s'utilitza per protegir les dades durant la transmissió.</li>
-        <li><strong>Auditoria</strong>: postgresql ofereix eines per auditar l'accés a la base de dades i registrar les operacions realitzades.
-           Això permet detectar accés no autoritzat a dades sensibles.</li>
-    </ul>
+        <li><strong>Vistes (Views)</strong>: Les vistes permeten mostrar únicament una part de la informació d'una taula, 
+          ocultant les dades que no han de ser accessibles per determinats usuaris. Mitjançant l'assignació de 
+          permisos sobre les vistes, es pot limitar l'accés a determinades columnes o registres sense donar accés
+           directe a les taules originals.</li>
 
-    <h2>2. Integritat (Integrity)</h2>
-    <p>La integritat de les dades fa referència a la seva exactitud, coherència i fiabilitat al llarg del temps. Per garantir-la en postgresql,
-       es poden utilitzar diversos mecanismes:</p>
-    <ul>
-        <li><strong>Restriccions (Constraints)</strong>: postgresql permet definir restriccions per garantir la coherència de les dades
-           (per exemple, restriccions de clau primària, clau forana, unicitat i validesa).</li>
-        <li><strong>Comprovació de validesa (Validations)</strong>: Es poden utilitzar triggers o funcions per validar les dades abans 
-          d'introduir-les a la base de dades. Això ajuda a mantenir la qualitat i la integritat de la informació.</li>
-        <li><strong>Control de versions i còpies de seguretat</strong>: Les còpies de seguretat regulars i el control de versions ajuden 
-          a garantir que les dades puguen ser recuperades de manera fiable en cas de pèrdua o corrupció.</li>
-        <li><strong>Controls de transaccions (ACID)</strong>: postgresql utilitza el model ACID (Atomicitat, Consistència, Aïllament, Durabilitat) per
-           assegurar-se que les transaccions són processades correctament i no alteren la integritat de les dades.</li>
-    </ul>
 
-    <h2>3. Disponibilitat (Availability)</h2>
-    <p>La disponibilitat fa referència a la capacitat de la base de dades per estar accessible i operativa en tot moment. 
-      Per assegurar la disponibilitat en postgresql, es poden utilitzar diversos mecanismes i tecnologies:</p>
-    <ul>
-        <li><strong>Clústers i alta disponibilitat</strong>: postgresql suporta diverses solucions d'alta disponibilitat, com 
-          postgresql Real Application Clusters (RAC), que permeten que múltiples clusters treballen en conjunt per garantir que la base de dades 
-          estiga sempre disponible, fins i tot en cas de fallades del sistema.</li>
-        <li><strong>Recuperació davant de desastres (Disaster Recovery)</strong>: postgresql ofereix opcions de recuperació davant de desastres,
-           com postgresql Data Guard, que permet replicar les dades en un lloc secundari per garantir que la base de dades estiga disponible en 
-           cas d'incidents importants.</li>
-        <li><strong>Còpies de seguretat i restauració</strong>: Utilitzar postgresql Recovery Manager (RMAN) per realitzar còpies de seguretat i 
-          restaurar les dades és essencial per garantir la disponibilitat dels serveis.</li>
-        <li><strong>Manteniment i monitorització</strong>: postgresql proporciona eines per monitoritzar la salut del sistema (postgresql Enterprise Manager)
-           i per planificar el manteniment, per evitar aturades no desitjades i per identificar de manera proactiva possibles problemes de disponibilitat.</li>
+        <li><strong>Xifrat de dades (Encryption)</strong>: => Segon part de la unitat </li>
+        <li><strong>Auditoria</strong>: => Segon part de la unitat</li>
     </ul>
-
-    <h2>Resum</h2>
-    <p>Implementar la triada CID en postgresql implica la combinació de múltiples mecanismes i eines que permeten protegir la informació:</p>
-    <ul>
-        <li><strong>Confidencialitat</strong>: Autenticació, xifrat de dades, control d'accés i auditoria.</li>
-        <li><strong>Integritat</strong>: Restriccions de dades, control de transaccions i còpies de seguretat.</li>
-        <li><strong>Disponibilitat</strong>: Alta disponibilitat, recuperació davant de desastres i monitorització activa.</li>
-    </ul>
-
+        <h2>2. Integritat  => Segon part de la unitat</h2>
+        <h2>3  Disponibilitat  => Segon part de la unitat</h2>
+   
     <p>Amb estos mecanismes, postgresql permet als administradors de bases de dades protegir les dades i garantir que es complisquen
       les pràctiques de seguretat requerides per a una bona gestió de la informació.</p>
 
-
-  </section>
-  
+  </section>  
+ 
+ 
 
   <section id="usuaris">
     <h2>👤 Usuaris en Postgresql</h2>
@@ -126,7 +93,6 @@
       <li>servidor centralitzat d'autenticació (RADIUS)</li>
       <li> usuari amb credencials dins de la base de dades. <strong>md5, scram-sha-256</strong></li>
     </ul>
-    <p>L’autenticació es defineix per mètodes configurats al fitxer <code> pg_hba.conf </code></p>
   
     <h3> Tipus d'usuaris</h3>
     <ul>
@@ -186,7 +152,7 @@ GRANT CONNECT ON DATABASE escola TO alumne;  -- Per defecte, no cal..    </pre>
     <code>GRANT CONNECT ON DATABASE escola TO usuari;</code>
   </p>
   
-  <hr>  <h3>🔍 Consultes útils</h3>
+  <hr>  <h3>🔍 Consultes útils  (vista de DD : <code>pg_roles</code> )</h3>
     <pre>
   -- Usuaris existents
 SELECT rolname, rolcanlogin, rolvaliduntil FROM pg_roles;
@@ -208,10 +174,10 @@ SELECT current_database();      </pre>
   
 <hr>  <h3>Connexió</h3>
     <pre>
-psql -U system -d escola   -- Intenta connectar com a peer
+psql -U pepe -d escola   -- Intenta connectar com a peer
 
-psql -U system -h localhost -d escola   --  Com a host (amb contrasenya)  
-         usu      lloc        bbdd      </pre>
+psql -U pepe -h localhost -d escola   --  Com a host (amb contrasenya)  
+        -usu-   -lloc-       -bbdd-      </pre>
   
     <h3> Vistes relacionades amb usuaris</h3>
     <ul>
@@ -221,7 +187,7 @@ psql -U system -h localhost -d escola   --  Com a host (amb contrasenya)
     <h3> Bones pràctiques</h3>
     <ul>
       <li> Canviar contrasenyes predefinides</li>
-      <li> No usar usuari postgres per a operacions del dia a dia</li>
+      <li> No usar usuari <strong>postgres</strong> per a operacions del dia a dia</li>
     </ul>
 
     <hr>
@@ -261,13 +227,19 @@ Només si tu crees manualment un schema amb el mateix nom que l’usuari, alesho
 GRANT ALL ON SCHEMA public TO postgres;  -- per defecte a l’usuari que crea la base de dades
 GRANT USAGE ON SCHEMA public TO PUBLIC;  
 al fer USAGE, l'usuari pot 'vore' l'esquema amb
-\dn
-\dt
+\dn    -- Consulta els schema de la bbdd actual
+\dn+   -- Consulta els schema , amb més informació
+\dt    -- Consulta de les taules (del search_path -- $user, public)
 Però no pot vore el que hi ha 'dins' de les taules, (usar SELECT). No té permís.
 Pot vore taules, pero no pot crear noves  ( CRAETE TABLE)
-Per poder crear noves taules, necessita  GRANT CREATE ON SCHEMA
+Per poder crear noves taules, necessita  GRANT CREATE ON SCHEMA   </pre>
 
-   </pre>
+<pre>-- a més a més
+\dt    -- Consulta de les taules (del search_path -- $user, public)
+       -- Si hem creat nous schema pero no estan en el search_path, 
+          --no es veuen les taules amb un \dt</pre>
+<pre>-- Consulta dels schema amb vistes del DD 
+SELECT schema_name   FROM information_schema.schemata ;    </pre>
 
    <h3>Bones pràctiques</h3>
    <pre>
@@ -503,33 +475,36 @@ print(f"{len(usuaris)} avisos enviats.")
       <li><strong>Privilegis d'objecte</strong>: permeten accedir o modificar objectes concrets (taules, vistes...)</li>
     </ul>
   
-    <h4> Exemples de privilegis de sistema</h4>
-    <ul>
-    <li>rolsuper	superusuari SUPERUSER NOSUPERUSER</li>
-    <li>rolcreaterole	pot crear rols  CREATEROLE NOCREATEROLE</li>
-    <li>rolcreatedb	pot crear BD CREATEDB NOCREATEDB</li>
-    <li>rolcanlogin	pot connectar-se LOGIN NOLOGIN</li>
-    <li>rolreplication	replicació REPLICATION NOREPLICATION</li>
-    <li>rolbypassrls	ignora seguretat RL BYPASSRLS  NOBYPASSRLS</li>
-    <li>rolinherit hereda automaticament INHERIT NOINHERIT</li>
-    <li>rolconnlimit	límit connexions </li>
-    <li>rolpassword</li>
-    <li>rolvaliduntil	caducitat </li>
-    <li>rolconfig</li>
- 
-   </ul>
+    <h3> Privilegis de sistema</h3>
+
+<table>
+    <thead>         <tr>            <th>Atribut</th>            <th>Descripció</th>            <th>Opcions / valors</th>        </tr>    </thead>
+    <tbody>
+        <tr>             <td><code>rolsuper</code></td>            <td>Indica si el rol és superusuari i té tots els privilegis.</td>            <td><code>SUPERUSER</code> / <code>NOSUPERUSER</code></td>        </tr>
+        <tr>            <td><code>rolcreaterole</code></td>            <td>Pot crear, modificar i eliminar altres rols.</td>            <td><code>CREATEROLE</code> / <code>NOCREATEROLE</code></td>        </tr>
+        <tr>            <td><code>rolcreatedb</code></td>            <td>Pot crear bases de dades.</td>            <td><code>CREATEDB</code> / <code>NOCREATEDB</code></td>        </tr>
+        <tr>            <td><code>rolcanlogin</code></td>            <td>Pot iniciar sessió i connectar-se a PostgreSQL.</td>            <td><code>LOGIN</code> / <code>NOLOGIN</code></td>        </tr>
+        <tr>            <td><code>rolreplication</code></td>            <td>Pot iniciar connexions de replicació i gestionar operacions de replicació.</td>            <td><code>REPLICATION</code> / <code>NOREPLICATION</code></td>        </tr>
+        <tr>            <td><code>rolbypassrls</code></td>            <td>Pot ignorar les polítiques de seguretat a nivell de fila (<em>Row-Level Security</em>).</td>           <td><code>BYPASSRLS</code> / <code>NOBYPASSRLS</code></td>        </tr>
+        <tr>            <td><code>rolinherit</code></td >           <td>Hereta automàticament els privilegis dels rols dels quals és membre, segons les condicions d'herència.</td>            <td><code>INHERIT</code> / <code>NOINHERIT</code></td>        </tr>
+        <tr>            <td><code>rolconnlimit</code></td>            <td>Nombre màxim de connexions simultànies que pot obrir el rol.</td>            <td>Nombre enter (<code>-1</code> = sense límit)</td>        </tr>
+        <tr>            <td><code>rolpassword</code></td>            <td>Contrasenya del rol, emmagatzemada com a hash (no es mostra en text pla).</td>            <td>Cadena de text o <code>NULL</code></td>        </tr>
+        <tr>            <td><code>rolvaliduntil</code></td>            <td>Data i hora de caducitat de la contrasenya.</td>            <td>Data i hora (<code>NULL</code> = sense caducitat)</td>        </tr>
+        <tr>            <td><code>rolconfig</code></td>            <td>Configuració específica del rol per a determinats paràmetres del servidor.</td>            <td>Llista de paràmetres i valors (<code>NULL</code> = sense configuració específica)</td>        </tr>
+    </tbody>
+</table>   
 
 <!-- SELECT rolname, rolpassword FROM pg_authid;   per vore les passwords, en hash   -->
   
-    <h4> Exemples de privilegis d'objecte</h4>
+    <h3>Privilegis d'objecte (sobre objectes)</h3>
     <ul>
-      <li><code>GRANT SELECT, INSERT, UPDATE, DELETE, ON TABLE taula_client TO pepe;</code> sobre taules</li>
-      <li><code>GRANT TRUNCATE, REFERENCES, TRIGGER ON TABLE taula TO usuari;</code></li>
-      <li><code>GRANT EXECUTE ON FUNCTION calcula_impost(integer) TO pepe;</code> sobre procediments i funcions</li>
-      <li><code>GRANT USAGE, SELECT, UPDATE ON SEQUENCE seq TO usuari;</code></li>
       <li><code>GRANT CONNECT, CREATE, TEMP ON DATABASE escola TO alumne; </code> sobre una BBDD</li>
+      == CONNECTar, CREATE schemas, TEMP crear taules temporals dins la BBDD.
       <li><code>GRANT USAGE ON SCHEMA public TO nom_usuari;</code> sobre un schema</li>
-      <li><code>GRANT CREATE ON SCHEMA public TO nom_usuari;   </code> sobre un schema      </li>
+      <li><code>GRANT CREATE ON SCHEMA public TO nom_usuari;   </code> sobre un schema      </li>      
+      <li><code>GRANT SELECT, INSERT, UPDATE, DELETE, ON TABLE taula_client TO pepe;</code> sobre una taula</li>
+      <li><code>GRANT TRUNCATE, REFERENCES, TRIGGER ON TABLE taula TO usuari;</code> sobre una taula</li>
+      <li><code>GRANT EXECUTE ON FUNCTION calcula_impost(integer) TO pepe;</code> sobre procediments i funcions</li>
     </ul>
   
     <h3>♻️ Revocar permisos</h3>
@@ -544,6 +519,12 @@ GRANT SELECT ON alumnes TO joan WITH GRANT OPTION; </pre>
     <p class="alert">Els privilegis de sistema no es poden propagar per un usuari. Sols el <strong>superuser </strong> pot donar estos privilegis</p>
  
    <hr> <h3>👀 Consultes útils</h3>
+   <h4>Vistes relacionades </h4>
+   <ul>
+    <li>pg_roles   ==>   privilegis de sistema</li>
+    <li>information_schema.role_table_grants  ==> privilegis sobre objectes</li>
+   </ul>
+
     <pre>
   -- Privilegis de sistema atorgats
 SELECT rolname,
@@ -574,9 +555,7 @@ WHERE rolname = current_user;
 
 SELECT grantee, table_schema, table_name, privilege_type
 FROM information_schema.role_table_grants
-WHERE grantee = current_user;
-
-    </pre>
+WHERE grantee = current_user;       </pre>
   
     <h3>🧪 Exemple pràctic</h3>
     <pre>
@@ -592,9 +571,7 @@ WHERE grantee = current_user;
  -- Crear un usuari ajudant de DBA
   CREATE USER profe2 WITH PASSWORD '1234' SUPERUSER; 
 
-  -- Tots els CREATE USER porten implícit el LOGIN
-
-    </pre>
+  -- Tots els CREATE USER porten implícit el LOGIN       </pre>
 
    <hr> <h3>Permisos implícits</h3>
     <p>Si l'usuari “joan” rep el permís CREATE  en postgresql i després crea la seua pròpia taula anomenada 
@@ -907,7 +884,7 @@ SELECT * FROM clients;</code></pre>
     <p><strong>Avantatge de seguretat</strong>: Permet controlar l'accés a les dades basat en rols d'usuari, 
       garantint que els usuaris només tinguin accés a la informació que necessiten.</p>
 
-      <h4>4. Opció WITH SECURITY INVOKER vs WITH SECURITY DEFINER</h4>
+  <!--    <h4>4. Opció WITH SECURITY INVOKER vs WITH SECURITY DEFINER</h4>
       <p>SECURITY INVOKER (per defecte): la vista s’executa amb els permisos de l’usuari que fa la consulta.</p>
       <p>SECURITY DEFINER: la vista s’executa amb els permisos de qui la va crear. Això permet donar accés limitat
          a usuaris que normalment no podrien accedir a la taula base.</p>
@@ -951,11 +928,16 @@ USING (user_id = current_user);</pre>
 <ul> I, a més a més...
   <li>Es pot aplicar a SELECT, INSERT, UPDATE i DELETE.</li>
   <li>Funciona combinat amb vistes i SECURITY INVOKER perquè l’usuari només vegi el que li pertoca.</li>
-</ul>
+</ul>-->
 
-      <h3>6. Materialized views en postgresql</h3>
-    <li>Vista normal: només és una definició de consulta; les dades no s’emmagatzemen, s’obtenen cada vegada que fas SELECT.</li>
-    <li>Materialized View: guarda físicament els resultats de la consulta en una taula.</li>
+      <h3>4. Materialized views en postgresql</h3>
+      <ul>
+      <li>Vista normal: només és una definició de consulta; les dades no s’emmagatzemen, s’obtenen cada vegada que fas SELECT.</li>
+      <li>Materialized View: guarda físicament els resultats de la consulta en una taula.</li>        
+      </ul>
+      <h4>Les vistes normals prioritzen que les dades estiguen sempre actualitzades, 
+        mentre que les vistes materialitzades prioritzen la rapidesa de consulta.</h4>
+
     <pre>CREATE MATERIALIZED VIEW nom_mv AS
 SELECT ...
 FROM taula_base
@@ -970,13 +952,14 @@ FROM taula_base
     <li>Si necessites dades en temps real, una vista normal és millor.</li>
   </ul>
    <h4>Vistes i actualitzabilitat</h4>
-   <p>Una vista és actualitzable si és una transformació directa d’una sola taula sense agregacions ni DISTINCT.</p>
+   <p>Una vista és actualitzable (mitjançant INSERT, UPDATE o DELETE) si és una transformació directa d’una 
+    sola taula sense agregacions ni DISTINCT.</p>
    <pre>CREATE VIEW vista_empleats_simple AS
 SELECT id, nom
 FROM empleats;</pre>
 
     <h4>Exemples de vistes no actualitzables:</h4>
-    <p>Vistes amb GROUP BY, JOIN complex, DISTINCT, UNION.</p>
+    <p>Vistes amb GROUP BY, JOIN complex, DISTINCT, UNION, agregacions com SUM(),COUNT(),..</p>
 
   </section>  
 

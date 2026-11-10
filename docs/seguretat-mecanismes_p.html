@@ -21,6 +21,7 @@
 
 <nav class="segu">
   <h3>Índex</h3>
+  <a href="#cid">CID en postgresql</a>  
   <a href="#encripta">Encriptació en  PostgreSQL</a>
   <a href="#auditoria">Auditoria en PostgreSQL</a>
   <a href="#integritat">Integritat</a>
@@ -32,11 +33,85 @@
 
 <main>
   
-<section id="encripta">
+<section id="cid">
   <img src="imgs/Seguretat PostgreSQL3.png" alt="segpostg" width="12%" class="imatge-esquerra"> 
   <h1>Seguretat en PostgreSQL</h1>
 </section>  
     
+
+    
+  <section id="cid">
+        <h2>La Triada CID <br> (Confidencialitat, Integritat, Disponibilitat) en postgresql</h2>
+        <img src="imgs/CID-ciber.png" class="imatge-esquerra"  alt="stop" style="width: 20%">
+    <p>La triada CID (Confidencialitat, Integritat i Disponibilitat) és un model de seguretat fonamental per garantir la protecció 
+      de la informació en qualsevol sistema informàtic, inclòs postgresql. Aquest model es fa servir per establir les bases de les polítiques
+       de seguretat, i postgresql, com a sistema de gestió de bases de dades (SGBD), té diverses característiques i eines que permeten
+        implementar-lo eficaçment.</p>
+
+    <h2>1. Confidencialitat (Confidentiality)</h2>
+    <p>La confidencialitat es refereix a la protecció de la informació per evitar que siga accedida per usuaris no autoritzats. 
+      A postgresql, això es pot aconseguir mitjançant:</p>
+    <ul>
+        <li><strong>Usuaris: </strong>: Vist en la 1a part.</li>
+        <li><strong>Privilegis i rols</strong>: Vist en la 1a part.</li>
+        <li><strong>Vistes</strong>: Vist en la 1a part.</li>
+        <li><strong>Xifrat de dades (Encryption)</strong>: postgresql permet xifrar tant les dades en repòs com les dades en trànsit.
+          La funció de xifrat de bases de dades d'postgresql (TDE - Transparent Data Encryption) xifra les dades emmagatzemades, 
+          mentre que el xifrat SSL/TLS s'utilitza per protegir les dades durant la transmissió.</li>
+        <li><strong>Auditoria</strong>: postgresql ofereix eines per auditar l'accés a la base de dades i registrar les operacions realitzades.
+           Això permet detectar accés no autoritzat a dades sensibles.</li>
+    </ul>
+
+    <h2>2. Integritat (Integrity)</h2>
+    <p>La integritat de les dades fa referència a la seva exactitud, coherència i fiabilitat al llarg del temps. Per garantir-la en postgresql,
+       es poden utilitzar diversos mecanismes:</p>
+    <ul>
+        <li><strong>Restriccions (Constraints)</strong>: postgresql permet definir restriccions per garantir la coherència de les dades
+           (per exemple, restriccions de clau primària, clau forana, unicitat i validesa).</li>
+        <li><strong>Comprovació de validesa (Validations)</strong>: Es poden utilitzar triggers o funcions per validar les dades abans 
+          d'introduir-les a la base de dades. Això ajuda a mantenir la qualitat i la integritat de la informació.</li>
+        <li><strong>Còpies de seguretat i recuperació de dades</strong>: permeten recuperar versions anteriors de les dades en cas de corrupció,
+           modificacions incorrectes o pèrdua d'informació, ajudant a preservar-ne la fiabilitat. </li>
+        <li><strong>Controls de transaccions (ACID)</strong>: postgresql utilitza el model ACID (Atomicitat, Consistència, Aïllament, Durabilitat) per
+           assegurar-se que les transaccions són processades correctament i no alteren la integritat de les dades.</li>
+    </ul>
+
+    <h2>3. Disponibilitat (Availability)</h2>
+    <p>La disponibilitat fa referència a la capacitat de la base de dades per estar accessible i operativa en tot moment. 
+      Per assegurar la disponibilitat en postgresql, es poden utilitzar diversos mecanismes i tecnologies:</p>
+    <ul>
+       <li><strong>Còpies de seguretat i restauració</strong>: permeten recuperar la base de dades després d'una fallada greu o un desastre, 
+          reduint el temps durant el qual els serveis no estan disponibles.</li>
+        <li><strong>Manteniment i monitorització</strong>: PostgreSQL disposa de diverses eines per supervisar l'estat i el rendiment
+           del sistema. Per exemple, <strong>pgAdmin</strong> permet administrar els servidors i les bases de dades, mentre que eines com 
+           <strong>Postgres Enterprise Manager (PEM)</strong> permeten realitzar una monitorització més avançada, gestionar alertes i analitzar el rendiment. </li>
+        <li><strong>Clústers i alta disponibilitat</strong>: PostgreSQL permet implementar solucions d'alta disponibilitat
+           mitjançant la replicació de dades entre servidors. Amb eines com <strong>Patroni</strong>, es poden supervisar els servidors i 
+           automatitzar la commutació (failover) cap a una rèplica quan el servidor principal falla.</li>
+     </ul>
+     <!--  Per a garantir l'alta disponibilitat, PostgreSQL disposa de diferents solucions:
+- Replicació en streaming (Streaming Replication): permet mantindre una o més rèpliques d'un servidor principal. Si el principal falla, una rèplica pot assumir-ne el paper.
+- Patroni: eina externa que gestiona clústers PostgreSQL, supervisa els servidors i pot automatitzar la commutació a un servidor secundari (failover).
+- pg_auto_failover: eina externa que automatitza la supervisió i la recuperació davant de fallades.
+- Balancejadors de càrrega: eines com HAProxy permeten distribuir les connexions entre servidors segons la configuració.  -->
+
+    <h2>Resum</h2>
+    <p>Implementar la triada CID en postgresql implica la combinació de múltiples mecanismes i eines que permeten protegir la informació:</p>
+    <ul>
+        <li><strong>Confidencialitat</strong>: Autenticació, xifrat de dades, control d'accés i auditoria.</li>
+        <li><strong>Integritat</strong>: Restriccions de dades, control de transaccions i còpies de seguretat.</li>
+        <li><strong>Disponibilitat</strong>: Alta disponibilitat, recuperació davant de desastres i monitorització activa.</li>
+    </ul>
+
+    <p>Amb estos mecanismes, postgresql permet als administradors de bases de dades protegir les dades i garantir que es complisquen
+      les pràctiques de seguretat requerides per a una bona gestió de la informació.</p>
+
+  </section>
+
+
+
+
+
  <section id="encripta">
     <h2>🔐 Encriptació en PostgreSQL</h2>
 
