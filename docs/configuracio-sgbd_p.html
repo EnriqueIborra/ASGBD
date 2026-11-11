@@ -488,6 +488,9 @@ Programa en PHP
    rols i permisos, així com comprovar el seu funcionament.</p>
 <p><strong><code>psql</code></strong> no és qui configura internament el servidor (això també es fa mitjançant fitxers de configuració i altres eines). 
   <strong><code>psql</code></strong> és sobretot el mitjà de comunicació amb el servidor per executar ordres SQL i administratives.</p>
+<pre>psql --version
+  # Com saber la versió del client <code>psql</code>
+</pre>
 
   <h2>Connexió</h2>
   <p>Necessitarem adreça on està el servidor escoltant, el nom de la base dades i l'usuari que es vol connectar</p>
@@ -689,6 +692,23 @@ SELECT inet_client_addr(), inet_client_port();
 - Si retorna NULL en tots dos camps, normalment és una connexió mitjançant socket Unix.
 - Si retorna una adreça IP i un port, és una connexió TCP/IP.
 Aquesta consulta identifica el tipus de connexió, però no el mètode d'autenticació utilitzat.   -->
+<hr>
+<h3>🔌 Què és una sessió en PostgreSQL?</h3>
+<p>Una sessió és la connexió activa entre un client (usuari o aplicació) i el servidor de base de dades.
+ Comença quan et connectes,  Acaba quan et desconnectes</p>
+ <p>Quan obris una sessió, Et connectes amb un usuari i Treballes sobre una base de dades concreta.</p>
+<p>Pots executar: consultes (SELECT), insercions (INSERT),
+actualitzacions (UPDATE), esborrats (DELETE), pots fer transaccions, etc..</p>
+<p>🔄 Cada connexió d'un usuari = una sessió. 1 usuari connectat → 1 sessió, 
+  10 usuaris connectats → 10 sessions. 1 usuari connectat 5 vegades → 5 sessions.: 
+PostgreSQL gestiona moltes sessions alhora.</p>
+<p>✔ Cada sessió té: El seu estat, Les seves variables, Les seves transaccions.</p>
+<p>Les sessions són independents entre si,  Però poden interactuar (bloquejos, concurrència, etc.)</p>
+<hr>
+<p>Es poden consultar les connexions obertes al servidor:</p>
+<pre><code>SELECT datname, usename, application_name, client_addr
+FROM pg_stat_activity;</code></pre>
+<p class="tips"> <code>pg_stat_activity</code> és una vista del DD</p>
 
   </section>
 
@@ -713,17 +733,7 @@ Aquesta consulta identifica el tipus de connexió, però no el mètode d'autenti
 </p>
 <p>En un mateix ordinador pots tenir 1 cluster (el més habitual) o Diversos clusters
    (per separar entorns: proves, producció…). Cada cluster funciona de manera independent.</p>
-<h3>🔌 Què és una sessió en PostgreSQL?</h3>
-<p>Una sessió és la connexió activa entre un client (usuari o aplicació) i el servidor de base de dades.
- Comença quan et connectes,  Acaba quan et desconnectes</p>
- <p>Quan obris una sessió, Et connectes amb un usuari i Treballes sobre una base de dades concreta.</p>
-<p>Pots executar: consultes (SELECT), insercions (INSERT),
-actualitzacions (UPDATE), esborrats (DELETE), pots fer transaccions, etc..</p>
-<p>🔄 Cada connexió d'un usuari = una sessió. 1 usuari connectat → 1 sessió, 
-  10 usuaris connectats → 10 sessions. 1 usuari connectat 5 vegades → 5 sessions.: 
-PostgreSQL gestiona moltes sessions alhora.</p>
-<p>✔ Cada sessió té: El seu estat, Les seves variables, Les seves transaccions.</p>
-<p>Les sessions són independents entre si,  Però poden interactuar (bloquejos, concurrència, etc.)</p>
+
 <!-- Us de memòria RAM:   PostgreSQL intenta evitar lectures innecessàries del disc aprofitant la memòria disponible, però manté les dades de manera persistent al disc.
 Quan una consulta necessita una pàgina: 1. PostgreSQL comprova si ja està en shared_buffers. 2. Si hi és, pot llegir-la des de la RAM.
 3. Si no hi és, cal carregar-la des del disc, habitualment passant també per la memòria cau del sistema operatiu.
@@ -739,7 +749,7 @@ work_mem és diferent: no serveix principalment per guardar pàgines de taules, 
 -->
 
 
-  <hr><h3>Tornem al cluster....</h3>
+  <hr>
    <h3>Fitxer:  postgresql.conf</h3>
    <p>El fitxer postgresql.conf és el fitxer principal de configuració d’un cluster de PostgreSQL.
  Serveix per dir-li al servidor com ha de funcionar</p>
@@ -784,10 +794,13 @@ Sessió
    de configuració del servidor.). Pots veure-les amb:</p>
 <pre>SHOW ALL;  </pre>
 <pre>O una concreta:
-SHOW work_mem;  </pre>
-<pre>O via vista del sistema
+SHOW server_version;  # Mostra la versió del servidor
+o
+SHOW work_mem;        # Mostra la memoria de la sessió</pre>
+<pre>O via vista del DD del sistema
 SELECT name, setting FROM pg_settings;  
 </pre>
+<p class="tips">Algunes variables es podran modificar i altres no (com <code>server_version</code> )</p>
 
 <ul> Aquestes variables poden ser configurades de manera:
   <li> Globals (configurades a postgresql.conf)</li>
@@ -1187,27 +1200,11 @@ fsync = on</code></pre>
 <p>Conté taules com:</p>
 
 <table>
-<tr>
-<th>Taula</th>
-<th>Funció</th>
-<th>meta-comanda psql</th>
-</tr>
-<tr>
-<td>pg_class</td>
-<td>Taules i índexs</td>
-<td>\dt  \di</td>
-</tr>
-<tr>
-<td>pg_attribute</td>
-<td>Columnes</td>
-<td>\d nomTaula</td>
-</tr>
-<tr>
-<td>pg_type</td>
-<td>Tipus de dades</td>
-<td>\dT \dT+ \dt*</td>
-</tr>
-
+<tr> <th>Taula</th>        <th>Funció</th>                    <th>meta-comanda psql</th> </tr>
+<tr> <td>pg_class</td>     <td>Taules, índexs, vistes,..</td> <td>\dt  \di</td> </tr> 
+<tr> <td>pg_tables</td>    <td>Taules</td>                    <td>\dt  \di</td> </tr>
+<tr> <td>pg_attribute</td> <td>Columnes</td>                  <td>\d nomTaula</td> </tr>
+<tr> <td>pg_type</td>      <td>Tipus de dades</td>            <td>\dT \dT+ \dt*</td> </tr>
 </table>
 
 <p>Exemple:</p>
@@ -1218,32 +1215,23 @@ fsync = on</code></pre>
 <strong>rols/usuaris (pg_authid), bases de dades (pg_database) </strong> <br>
 👉 Aquests són compartits per totes les bases de dades.</p>
 <table>
- <tr>
-<th>Taula</th>
-<th>Funció</th>
-<th>meta-comanda psql</th>
-</tr> 
-<tr>
-<td>pg_roles</td>
-<td>Rols/usuaris</td>
-<td>\du  \du+</td>
-</tr>
-<tr>
-<td>pg_authid</td>
-<td>Autenticació</td>
-<td></td>
-</tr>
-<tr>
-<td>pg_database</td>
-<td>Bases de dades</td>
-<td>\l \list</td>
-</tr>
-<tr>
-<td>pg_tablespace</td>
-<td>Tablespaces</td>
-<td>\db \db+</td>
-</tr>
+ <tr>  <th>Taula</th>       <th>Funció</th>         <th>meta-comanda psql</th> </tr> 
+<tr>   <td>pg_roles</td>    <td>Rols/usuaris</td>   <td>\du  \du+</td>  </tr>
+<tr>   <td>pg_authid</td>   <td>Autenticació</td>   <td></td>  </tr>
+<tr> <td>pg_database</td>   <td>Bases de dades</td> <td>\l \list</td>  </tr>
+<tr> <td>pg_tablespace</td> <td>Tablespaces</td>    <td>\db \db+</td> </tr>
+
+<!--<tr>  <td>pg_stat_activity</td> <td>Connexions</td> <td></td> </tr>
+<tr> <td>pg_settings</td> <td>Configuració</td> <td></td> </tr>
+<tr> <td>pg_extension</td>  <td>Extensions</td> <td></td> </tr>
+<tr> <td>pg_available_extensions</td>  <td>Extensions disponibles</td> <td></td> </tr>  -->
+
 </table>
+<p>Els catàlegs del sistema no són tots compartits. PostgreSQL té alguns catàlegs compartits físicament entre totes 
+  les bases de dades del servidor (com pg_database, pg_authid i pg_tablespace), mentre que altres són específics de cada base de dades
+com pg_catalog o information_schema </p>
+<p>PostgreSQL permet consultar informació general del servidor des de qualsevol base de dades, però no permet consultar directament
+els objectes interns d'altres bases de dades.</p>
 
 <hr> <h2> Information Schema</h2>
 

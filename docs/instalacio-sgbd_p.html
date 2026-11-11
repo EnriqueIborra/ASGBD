@@ -1037,6 +1037,7 @@ psql -U nom_usuari -d nom_ bbdd   -- igual que el anterior    </pre>
 \l
 \l+
 SELECT datname FROM pg_database;      </pre>
+<p class="tips"> <code>pg_database</code> és una vista del Diccionari de Dades</p>
 
 <pre>Com saber a quina bbdd estem connectats…
 SELECT current_database();
@@ -1044,8 +1045,8 @@ o
 \conninfo    --També mostra usuari i altra informació
 o 
 Normalment el prompt mostra la base de dades:     testdb=#
-
-</pre>
+o com vore versió del servidor
+SELECT version();   </pre>
 
     <p>I per canviar (connectar) a una altra BBDD (dins del cluster)</p>
     <pre>\c nom_bbdd

@@ -238,14 +238,21 @@ Per poder crear noves taules, necessita  GRANT CREATE ON SCHEMA   </pre>
 \dt    -- Consulta de les taules (del search_path -- $user, public)
        -- Si hem creat nous schema pero no estan en el search_path, 
           --no es veuen les taules amb un \dt</pre>
-<pre>-- Consulta dels schema amb vistes del DD 
+
+<h3>Vistes relacionades amb schema</h3>          
+<ul>
+  <li>information_schema.schemata</li>
+</ul>
+
+<pre>-- Consulta amb vistes del DD dels schema de la BBDD actual
 SELECT schema_name   FROM information_schema.schemata ;    </pre>
+<p class="alert"> En PostgreSQL, no podem consultar directament els esquemes d'una altra base de dades des de la connexió actual.
+  Si volem fer això, primer hem de canviar la connexió: <code>\c altra_bbdd</code> i després <code>\dn</code>  </p>
 
    <h3>Bones pràctiques</h3>
    <pre>
 REVOKE CREATE ON SCHEMA public FROM PUBLIC; 
-CREATE SCHEMA pepe AUTHORIZATION pepe;   
-   </pre>
+CREATE SCHEMA pepe AUTHORIZATION pepe;        </pre>
 
    <h3>  Què és PUBLIC? </h3>
 <pre>
@@ -471,9 +478,11 @@ print(f"{len(usuaris)} avisos enviats.")
   
     <h3> Tipus de permisos</h3>
     <ul>
-      <li><strong>Privilegis de sistema</strong>: permeten executar accions globals (crear taules, accedir a sessions...)</li>
+      <li><strong>Privilegis de sistema</strong>: permeten executar accions globals (crear BBDD, crear Usuaris, connectar,...)</li>
       <li><strong>Privilegis d'objecte</strong>: permeten accedir o modificar objectes concrets (taules, vistes...)</li>
     </ul>
+    <p>en PostgreSQL és més precís parlar d'<strong>atributs dels rols</strong> que de <strong>privilegis de sistema</strong>, 
+      ja que, per exemple, CREATEDB és un atribut del rol, no un privilegi concedit mitjançant GRANT com els permisos sobre objectes (taules, esquemes..).</p>
   
     <h3> Privilegis de sistema</h3>
 
@@ -493,10 +502,15 @@ print(f"{len(usuaris)} avisos enviats.")
         <tr>            <td><code>rolconfig</code></td>            <td>Configuració específica del rol per a determinats paràmetres del servidor.</td>            <td>Llista de paràmetres i valors (<code>NULL</code> = sense configuració específica)</td>        </tr>
     </tbody>
 </table>   
+<h4>Com concedir un atribut a un usuari (rol)</h4>
+<pre><code>  ALTER ROLE alumne CREATEDB; </code></pre>
+<h4>Com retirar un atribut a un usuari (rol)</h4>
+<pre><code>  ALTER ROLE alumne NOCREATEDB; </code></pre>
 
 <!-- SELECT rolname, rolpassword FROM pg_authid;   per vore les passwords, en hash   -->
   
     <h3>Privilegis d'objecte (sobre objectes)</h3>
+    <p>Els privilegis d'objectes o permisos, es concedeixen amb <strong>GRANT</strong> i es retiren amb <strong>REVOKE</strong></p>
     <ul>
       <li><code>GRANT CONNECT, CREATE, TEMP ON DATABASE escola TO alumne; </code> sobre una BBDD</li>
       == CONNECTar, CREATE schemas, TEMP crear taules temporals dins la BBDD.
@@ -517,6 +531,13 @@ REVOKE SELECT ON TABLE taula_client FROM pepe;     </pre>
 GRANT SELECT ON alumnes TO joan WITH GRANT OPTION; </pre>
    
     <p class="alert">Els privilegis de sistema no es poden propagar per un usuari. Sols el <strong>superuser </strong> pot donar estos privilegis</p>
+
+<hr>  <p>⚠️⚠️ Quan s'afegixen privilegis a un usuari, este adquireix el nou privilegi 
+      <strong>de seguida</strong>, encara que ja estigueren connectats, o tinguen sessions obertes des de fa temps,</p>
+      <p>postgresql no necessita tancar ni reiniciar la sessió perquè el privilegi faça efecte.</p>
+      <p>==> Els privilegis no es carreguen només en establir la sessió, sinó que postgresql 
+        Comprova els privilegis d'accés dinàmicament quan el codi SQL s'executa.</p>
+  <hr>
  
    <hr> <h3>👀 Consultes útils</h3>
    <h4>Vistes relacionades </h4>
@@ -705,7 +726,13 @@ GRANT altre_rol TO gestor_aula;      </pre>
     <pre>
 REVOKE app_user FROM pepe;
     </pre>
-    <p>⚠️⚠️ Quan s'afegixen privilegis a un rol, tots els usuaris que tenen eixe rol adquireixen el nou privilegi 
+
+   <h3> Membresia entre rols (<code>WITH ADMIN OPTION</code> )</h3>
+<pre><code>GRANT gestor TO alumne WITH ADMIN OPTION;</code></pre>
+<p>Això permet que <code>alumne</code> siga membre del rol <code>gestor</code> i que puga gestionar la pertinença d'altres usuaris a eixe rol, dins dels límits de la seua autorització.</p>
+<p>ADMIN OPTION és l'equivalent conceptual més pròxim a GRANT OPTION, però aplicat a la pertinença a rols.</p>
+
+<hr>    <p>⚠️⚠️ Quan s'afegixen privilegis a un rol, tots els usuaris que tenen eixe rol adquireixen el nou privilegi 
       <strong>de seguida</strong>, encara que ja estigueren connectats, o tinguen sessions obertes des de fa temps,</p>
       <p>postgresql no necessita tancar ni reiniciar la sessió perquè el privilegi faça efecte.</p>
       <p>==> Els privilegis no es carreguen només en establir la sessió, sinó que postgresql 
