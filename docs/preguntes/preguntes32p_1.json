@@ -1,0 +1,595 @@
+[
+  {
+    "CE": "3h-0",
+    "titol": "Una empresa vol protegir les dades que viatgen entre una aplicació i el servidor PostgreSQL. Quin mecanisme hauria d'utilitzar?",
+    "titol-curt": "Xifrat en trànsit",
+    "pista": "Diferencia entre protegir les dades emmagatzemades i protegir les comunicacions per la xarxa.",
+    "opcions": [
+      {
+        "text": "Les restriccions de clau primària i clau forana.",
+        "correcte": false,
+        "feedback": "Estes restriccions ajuden a mantindre la integritat i la coherència de les dades."
+      },
+      {
+        "text": "Les còpies de seguretat i els processos de restauració.",
+        "correcte": false,
+        "feedback": "Estos mecanismes permeten recuperar informació després d'una fallada o una pèrdua de dades."
+      },
+      {
+        "text": "L'auditoria de les operacions realitzades pels usuaris.",
+        "correcte": false,
+        "feedback": "L'auditoria registra accessos i operacions, però no xifra les comunicacions."
+      },
+      {
+        "text": "El xifrat SSL/TLS de les connexions.",
+        "correcte": true,
+        "feedback": "Correcte. SSL/TLS protegeix les dades durant la transmissió entre el client i el servidor."
+      }
+    ]
+  },
+  {
+    "CE": "3h-0",
+    "titol": "Un servidor PostgreSQL deixa de funcionar i el sistema activa automàticament una rèplica perquè les aplicacions continuen funcionant. Quin principi de la triada CID s'està reforçant?",
+    "titol-curt": "Alta disponibilitat",
+    "pista": "Identifica quin objectiu es busca quan es vol evitar que una fallada interrompa el servei.",
+    "opcions": [
+      {
+        "text": "La confidencialitat, perquè restringeix l'accés a les dades.",
+        "correcte": false,
+        "feedback": "La confidencialitat controla qui pot accedir a la informació, no si el servei continua funcionant."
+      },
+      {
+        "text": "La integritat, perquè comprova que les dades siguen correctes.",
+        "correcte": false,
+        "feedback": "La integritat busca mantindre la coherència i la fiabilitat de les dades."
+      },
+      {
+        "text": "La disponibilitat, perquè manté el servei accessible.",
+        "correcte": true,
+        "feedback": "Correcte. Activar una rèplica quan falla el servidor principal permet reduir la interrupció del servei."
+      },
+      {
+        "text": "L'auditoria, perquè registra les operacions del servidor.",
+        "correcte": false,
+        "feedback": "L'auditoria registra accessos i operacions, però no permet continuar el servei després d'una fallada."
+      }
+    ]
+  },
+  {
+    "comentari": "h-0  triada CID",
+    "CE": "3h-0",
+    "titol": "Quin és l'objectiu principal de la confidencialitat dins de la triada CID aplicada a PostgreSQL?",
+    "titol-curt": "Confidencialitat",
+    "pista": "Pensa en la protecció de la informació davant de persones que no haurien de consultar-la.",
+    "opcions": [
+      {
+        "text": "Garantir que les dades es recuperen després d'una fallada del servidor.",
+        "correcte": false,
+        "feedback": "Això està relacionat principalment amb la disponibilitat, ja que busca recuperar el servei i les dades."
+      },
+      {
+        "text": "Evitar que les dades siguen consultades per usuaris no autoritzats.",
+        "correcte": true,
+        "feedback": "Correcte. La confidencialitat protegeix la informació i limita l'accés als usuaris autoritzats."
+      },
+      {
+        "text": "Assegurar que les dades mantenen la seua coherència al llarg del temps.",
+        "correcte": false,
+        "feedback": "Això correspon a la integritat, que busca mantindre l'exactitud i la coherència de les dades."
+      },
+      {
+        "text": "Mantindre la base de dades operativa quan falla un servidor.",
+        "correcte": false,
+        "feedback": "Això correspon a la disponibilitat, que busca mantindre el servei accessible."
+      }
+    ]
+  },
+  {
+    "CE": "3h-1",
+    "titol": "Un administrador executa CREATE EXTENSION pgcrypto, però després no pot utilitzar algunes de les seues funcions sense indicar l'esquema. Quina pot ser la causa?",
+    "titol-curt": "Extensió i search_path",
+    "pista": "Recorda com determina PostgreSQL en quins esquemes ha de buscar les funcions i altres objectes.",
+    "opcions": [
+      {
+        "text": "L'extensió només permet executar consultes SELECT.",
+        "correcte": false,
+        "feedback": "Incorrecte. Les funcions de pgcrypto es poden utilitzar en diferents operacions SQL, no exclusivament en consultes SELECT."
+      },
+      {
+        "text": "L'esquema on està instal·lada no està inclòs en search_path.",
+        "correcte": true,
+        "feedback": "Correcte. search_path determina en quins esquemes PostgreSQL busca els objectes quan no s'indica explícitament el seu esquema."
+      },
+      {
+        "text": "L'extensió necessita activar SSL/TLS abans d'executar les seues funcions.",
+        "correcte": false,
+        "feedback": "Incorrecte. SSL/TLS protegeix les comunicacions de xarxa i no és un requisit general per executar les funcions de pgcrypto."
+      },
+      {
+        "text": "L'extensió només es pot utilitzar des de funcions PL/pgSQL.",
+        "correcte": false,
+        "feedback": "Incorrecte. Les funcions de pgcrypto també es poden utilitzar directament en sentències SQL, com ara INSERT o SELECT."
+      }
+    ]
+  },
+  {
+    "CE": "3h-1",
+    "titol": "Quina combinació de funcions de pgcrypto permet emmagatzemar una contrasenya utilitzant bcrypt i verificar-la posteriorment?",
+    "titol-curt": "Hash de contrasenyes",
+    "pista": "Fixa't en les funcions que generen el salt i calculen l'empremta de la contrasenya.",
+    "opcions": [
+      {
+        "text": "pgp_sym_encrypt i pgp_sym_decrypt",
+        "correcte": false,
+        "feedback": "Incorrecte. Estes funcions serveixen per xifrar i desxifrar dades amb una clau, no per generar i verificar hashes bcrypt."
+      },
+      {
+        "text": "digest i pgp_sym_encrypt",
+        "correcte": false,
+        "feedback": "Incorrecte. digest genera empremtes hash, però esta combinació no implementa el mecanisme de bcrypt amb salt."
+      },
+      {
+        "text": "crypt i gen_salt('bf')",
+        "correcte": true,
+        "feedback": "Correcte. gen_salt('bf') genera un salt per a bcrypt i crypt calcula el hash. Per verificar la contrasenya, es torna a calcular el hash utilitzant el valor emmagatzemat com a referència."
+      },
+      {
+        "text": "digest i gen_salt('sha256')",
+        "correcte": false,
+        "feedback": "Incorrecte. digest permet generar hashes com SHA-256, però la combinació indicada no utilitza bcrypt."
+      }
+    ]
+  },
+  {
+    "comentari": "h-1  encriptacio",
+    "CE": "3h-1",
+    "titol": "Quina és la diferència principal entre el xifratge i el hashing d'una dada?",
+    "titol-curt": "Xifratge i hashing",
+    "pista": "Pensa en si és possible recuperar el contingut original després d'aplicar cada procés.",
+    "opcions": [
+      {
+        "text": "El xifratge permet recuperar la dada amb una clau, mentre que el hash és irreversible.",
+        "correcte": true,
+        "feedback": "Correcte. El xifratge permet desxifrar les dades amb la clau corresponent, mentre que el hashing genera una empremta que no permet recuperar el text original."
+      },
+      {
+        "text": "El xifratge genera una empremta irreversible, mentre que el hash permet recuperar la dada.",
+        "correcte": false,
+        "feedback": "Incorrecte. Has invertit les característiques: el hashing genera una empremta irreversible i el xifratge permet recuperar la informació amb una clau."
+      },
+      {
+        "text": "El xifratge només s'aplica a fitxers, mentre que el hash només s'aplica a contrasenyes.",
+        "correcte": false,
+        "feedback": "Incorrecte. Tant el xifratge com el hashing tenen aplicacions diverses i no estan limitats a estos tipus de dades."
+      },
+      {
+        "text": "El xifratge i el hashing són equivalents, perquè tots dos necessiten una clau per funcionar.",
+        "correcte": false,
+        "feedback": "Incorrecte. Són processos diferents: el xifratge utilitza una clau per protegir i recuperar informació, mentre que el hashing genera una empremta irreversible."
+      }
+    ]
+  },
+  {
+    "CE": "3h-2",
+    "titol": "Una empresa instal·la pgAudit per millorar el control de les operacions realitzades en PostgreSQL. On s'emmagatzema la informació generada per esta extensió?",
+    "titol-curt": "Emmagatzematge de pgAudit",
+    "pista": "Recorda si pgAudit utilitza una taula pròpia o el sistema de registre del servidor.",
+    "opcions": [
+      {
+        "text": "En una taula especial creada automàticament dins de cada base de dades.",
+        "correcte": false,
+        "feedback": "Incorrecte. Segons el material, pgAudit no emmagatzema els registres en una taula de la base de dades."
+      },
+      {
+        "text": "En un fitxer independent dins del directori de cada usuari.",
+        "correcte": false,
+        "feedback": "Incorrecte. Els registres de pgAudit s'integren en el sistema de logs del servidor PostgreSQL."
+      },
+      {
+        "text": "En els logs del servidor PostgreSQL.",
+        "correcte": true,
+        "feedback": "Correcte. pgAudit genera informació d'auditoria que s'escriu en els logs del servidor, segons la configuració del sistema de registre."
+      },
+      {
+        "text": "En els registres interns de l'extensió, accessibles mitjançant pgAdmin.",
+        "correcte": false,
+        "feedback": "Incorrecte. pgAudit no utilitza uns registres interns consultables des de pgAdmin, sinó els logs del servidor."
+      }
+    ]
+  },
+  {
+    "CE": "3h-2",
+    "titol": "Quina configuració de pgAudit permet registrar operacions de lectura, escriptura i definició d'estructures de la base de dades?",
+    "titol-curt": "Categories de pgAudit",
+    "pista": "Identifica les tres categories indicades en l'exemple de configuració.",
+    "opcions": [
+      {
+        "text": "pgaudit.log = 'read, write, ddl'",
+        "correcte": true,
+        "feedback": "Correcte. La configuració read, write i ddl permet auditar operacions de lectura, escriptura i definició d'objectes de la base de dades."
+      },
+      {
+        "text": "pgaudit.log = 'login, logout, backup'",
+        "correcte": false,
+        "feedback": "Incorrecte. Estos valors no són les categories indicades en el material per configurar pgAudit."
+      },
+      {
+        "text": "pgaudit.log = 'connect, disconnect, select'",
+        "correcte": false,
+        "feedback": "Incorrecte. La configuració presentada utilitza les categories read, write i ddl, no esta combinació."
+      },
+      {
+        "text": "pgaudit.log = 'users, tables, permissions'",
+        "correcte": false,
+        "feedback": "Incorrecte. Estos termes no corresponen a les categories de registre mostrades en l'exemple de pgAudit."
+      }
+    ]
+  },
+  {
+    "CE": "3h-2",
+    "titol": "Un administrador activa log_statement = 'all' en postgresql.conf. Quin efecte tindrà esta configuració?",
+    "titol-curt": "Registre de sentències SQL",
+    "pista": "Fixa't en el significat del valor 'all' aplicat al registre de sentències.",
+    "opcions": [
+      {
+        "text": "Registrarà únicament les consultes que modifiquen dades.",
+        "correcte": false,
+        "feedback": "Incorrecte. Esta configuració no es limita a les operacions que modifiquen dades, sinó que registra totes les sentències SQL."
+      },
+      {
+        "text": "Registrarà totes les sentències SQL executades.",
+        "correcte": true,
+        "feedback": "Correcte. Amb log_statement = 'all', PostgreSQL registra totes les sentències SQL. Això pot generar una gran quantitat d'informació."
+      },
+      {
+        "text": "Registrarà només les connexions i desconnexions dels usuaris.",
+        "correcte": false,
+        "feedback": "Incorrecte. Les connexions i desconnexions es poden registrar amb log_connections i log_disconnections, respectivament."
+      },
+      {
+        "text": "Emmagatzemarà totes les sentències SQL en una taula d'auditoria.",
+        "correcte": false,
+        "feedback": "Incorrecte. Esta configuració registra les sentències en els logs del servidor, no en una taula d'auditoria."
+      }
+    ]
+  },
+  {
+    "CE": "3h-3",
+    "titol": "En una taula alumnes es defineix edat INTEGER CHECK (edat >= 16). Quin tipus d'integritat representa esta restricció?",
+    "titol-curt": "Integritat de domini",
+    "pista": "Observa que la condició limita els valors que pot prendre una columna.",
+    "opcions": [
+      {
+        "text": "Integritat d'entitat, perquè identifica cada alumne de manera única.",
+        "correcte": false,
+        "feedback": "Incorrecte. La integritat d'entitat s'aconsegueix mitjançant una clau primària que identifica cada fila."
+      },
+      {
+        "text": "Integritat referencial, perquè comprova la relació amb una altra taula.",
+        "correcte": false,
+        "feedback": "Incorrecte. La integritat referencial controla les relacions entre taules mitjançant claus foranes."
+      },
+      {
+        "text": "Integritat d'usuari, perquè aplica una regla definida per una aplicació externa.",
+        "correcte": false,
+        "feedback": "Incorrecte. La condició CHECK és una restricció definida directament en la base de dades, no una validació externa de l'aplicació."
+      },
+      {
+        "text": "Integritat de domini, perquè limita els valors permesos en la columna edat.",
+        "correcte": true,
+        "feedback": "Correcte. CHECK (edat >= 16) impedeix introduir valors que no complisquen la condició establida per a la columna."
+      }
+    ]
+  },
+  {
+    "comentari": "h-3  integritat",
+    "CE": "3h-3",
+    "titol": "Quina és la finalitat principal de les restriccions d'integritat en una base de dades?",
+    "titol-curt": "Finalitat de la integritat",
+    "pista": "Pensa en què garanteixen les normes aplicades a les dades emmagatzemades.",
+    "opcions": [
+      {
+        "text": "Garantir que les dades siguen coherents, correctes i fiables.",
+        "correcte": true,
+        "feedback": "Correcte. Les restriccions d'integritat estableixen normes que ajuden a mantindre la qualitat i la coherència de les dades."
+      },
+      {
+        "text": "Garantir que totes les consultes s'executen amb la màxima velocitat.",
+        "correcte": false,
+        "feedback": "Incorrecte. L'optimització del rendiment és una qüestió diferent de la integritat de les dades."
+      },
+      {
+        "text": "Garantir que només els administradors puguen modificar les dades.",
+        "correcte": false,
+        "feedback": "Incorrecte. Això correspon a la gestió de permisos i accessos, no a les restriccions d'integritat."
+      },
+      {
+        "text": "Garantir que totes les taules tinguen el mateix nombre de registres.",
+        "correcte": false,
+        "feedback": "Incorrecte. La integritat no exigeix que les taules tinguen la mateixa quantitat de registres, sinó que les dades complisquen les normes establides."
+      }
+    ]
+  },
+  {
+    "CE": "3h-3",
+    "titol": "Una taula d'alumnes utilitza una columna id definida com a PRIMARY KEY. Quin tipus d'integritat s'està garantint?",
+    "titol-curt": "Integritat d'entitat",
+    "pista": "Relaciona la clau primària amb la identificació única de cada fila.",
+    "opcions": [
+      {
+        "text": "Integritat referencial, perquè relaciona registres de taules diferents.",
+        "correcte": false,
+        "feedback": "Incorrecte. La integritat referencial es garanteix mitjançant claus foranes que relacionen taules."
+      },
+      {
+        "text": "Integritat de domini, perquè limita els valors possibles de la columna.",
+        "correcte": false,
+        "feedback": "Incorrecte. La integritat de domini controla els valors o formats permesos, per exemple mitjançant CHECK."
+      },
+      {
+        "text": "Integritat d'entitat, perquè identifica cada fila de manera única i no nul·la.",
+        "correcte": true,
+        "feedback": "Correcte. PRIMARY KEY garanteix que cada fila tinga un identificador únic i que este no puga ser NULL."
+      },
+      {
+        "text": "Integritat d'usuari, perquè aplica normes definides per l'aplicació.",
+        "correcte": false,
+        "feedback": "Incorrecte. La integritat d'usuari aplica regles específiques de negoci, mentre que PRIMARY KEY garanteix la identificació única de les files."
+      }
+    ]
+  },
+  {
+    "CE": "3h-4",
+    "titol": "Un usuari inicia una transacció, modifica diverses files i finalment executa ROLLBACK. Quin serà el resultat?",
+    "titol-curt": "ROLLBACK",
+    "pista": "Pensa en l'ordre que permet desfer els canvis d'una transacció abans de confirmar-los.",
+    "opcions": [
+      {
+        "text": "Es confirmen tots els canvis i es fan permanents.",
+        "correcte": false,
+        "feedback": "Incorrecte. Esta és la funció de COMMIT, que confirma els canvis de la transacció."
+      },
+      {
+        "text": "Es desfan els canvis realitzats des de l'inici de la transacció.",
+        "correcte": true,
+        "feedback": "Correcte. ROLLBACK anul·la els canvis de la transacció que encara no s'han confirmat i recupera l'estat anterior."
+      },
+      {
+        "text": "Només es desfà l'última sentència executada.",
+        "correcte": false,
+        "feedback": "Incorrecte. ROLLBACK desfà tots els canvis de la transacció, no només els de l'última sentència."
+      },
+      {
+        "text": "Es guarden els canvis temporalment fins que es tanque la connexió.",
+        "correcte": false,
+        "feedback": "Incorrecte. ROLLBACK anul·la els canvis de la transacció; no els manté pendents de confirmació."
+      }
+    ]
+  },
+  {
+    "CE": "3h-4",
+    "titol": "Dues transaccions bloquegen files diferents i després intenten modificar la fila que té bloquejada l'altra transacció. Quin problema s'ha produït?",
+    "titol-curt": "Interbloqueig o deadlock",
+    "pista": "Pensa en una situació en què cada transacció espera un recurs que està bloquejat per l'altra.",
+    "opcions": [
+      {
+        "text": "Un problema d'autocommit, perquè les sentències es confirmen automàticament.",
+        "correcte": false,
+        "feedback": "Incorrecte. Autocommit és el comportament que confirma automàticament les sentències individuals, però no descriu un bloqueig mutu."
+      },
+      {
+        "text": "Un problema d'atomicitat, perquè les operacions s'executen totes alhora.",
+        "correcte": false,
+        "feedback": "Incorrecte. L'atomicitat és una propietat ACID que garanteix el principi de «tot o res»."
+      },
+      {
+        "text": "Un interbloqueig o deadlock, perquè les transaccions s'esperen mútuament.",
+        "correcte": true,
+        "feedback": "Correcte. Es produeix un deadlock quan dues o més transaccions esperen recursos bloquejats per les altres i cap pot continuar."
+      },
+      {
+        "text": "Un problema de durabilitat, perquè els canvis encara no són permanents.",
+        "correcte": false,
+        "feedback": "Incorrecte. La durabilitat fa referència a la permanència dels canvis confirmats, no a l'espera mútua per recursos bloquejats."
+      }
+    ]
+  },
+  {
+    "CE": "3h-4",
+    "titol": "En PostgreSQL, què passa quan s'executa una sentència UPDATE sense haver iniciat abans una transacció amb BEGIN?",
+    "titol-curt": "Autocommit",
+    "pista": "Recorda quin és el comportament per defecte de PostgreSQL quan s'executen sentències SQL individualment.",
+    "opcions": [
+      {
+        "text": "La sentència queda pendent fins que un usuari execute COMMIT manualment.",
+        "correcte": false,
+        "feedback": "Incorrecte. Sense una transacció explícita, PostgreSQL executa la sentència dins d'una transacció implícita i la confirma automàticament si acaba correctament."
+      },
+      {
+        "text": "La sentència s'executa sense cap mecanisme de transaccions.",
+        "correcte": false,
+        "feedback": "Incorrecte. PostgreSQL és transaccional: fins i tot una sentència individual s'executa dins d'una transacció implícita."
+      },
+      {
+        "text": "La sentència s'executa dins d'una transacció implícita que es confirma automàticament.",
+        "correcte": true,
+        "feedback": "Correcte. Amb el comportament per defecte d'autocommit, cada sentència SQL individual es tracta com una transacció i es confirma si acaba correctament."
+      },
+      {
+        "text": "La sentència s'executa, però els canvis es desfan automàticament en acabar.",
+        "correcte": false,
+        "feedback": "Incorrecte. Si la sentència acaba correctament, PostgreSQL confirma automàticament els canvis; no els desfà."
+      }
+    ]
+  },
+  {
+    "comentari": "h-5   backup ",
+    "CE": "3h-5",
+    "titol": "Per què és recomanable utilitzar eines pròpies de PostgreSQL, com pg_dump, per fer còpies de seguretat d'una base de dades en funcionament?",
+    "titol-curt": "Backups des de PostgreSQL",
+    "pista": "Pensa en com es garanteix que les dades exportades siguen coherents encara que hi haja usuaris treballant.",
+    "opcions": [
+      {
+        "text": "Perquè garanteixen una còpia consistent i permeten fer-la sense aturar el servidor.",
+        "correcte": true,
+        "feedback": "Correcte. Les eines de PostgreSQL utilitzen mecanismes que permeten obtindre còpies consistents, fins i tot mentre la base de dades està en funcionament."
+      },
+      {
+        "text": "Perquè copien directament tots els fitxers del sistema operatiu sense consultar PostgreSQL.",
+        "correcte": false,
+        "feedback": "Incorrecte. Copiar directament els fitxers d'una base de dades activa pot generar inconsistències si no s'utilitza un procediment adequat."
+      },
+      {
+        "text": "Perquè eviten registrar les transaccions realitzades durant la còpia.",
+        "correcte": false,
+        "feedback": "Incorrecte. Els mecanismes de PostgreSQL tenen en compte la consistència de les dades i poden utilitzar els registres WAL per a la recuperació."
+      },
+      {
+        "text": "Perquè només permeten fer còpies quan tots els usuaris han tancat la connexió.",
+        "correcte": false,
+        "feedback": "Incorrecte. Eines com pg_dump permeten fer còpies en calent, sense necessitat d'aturar el servidor ni desconnectar els usuaris."
+      }
+    ]
+  },
+  {
+    "CE": "3h-5",
+    "titol": "Quina és la funció dels registres WAL en una estratègia de recuperació PITR?",
+    "titol-curt": "WAL i recuperació PITR",
+    "pista": "Pensa en com es poden recuperar els canvis produïts després de fer una còpia base.",
+    "opcions": [
+      {
+        "text": "Emmagatzemar els canvis necessaris per avançar la recuperació fins a un moment concret.",
+        "correcte": true,
+        "feedback": "Correcte. En una recuperació PITR es restaura una còpia base i s'apliquen els registres WAL posteriors fins a arribar al moment desitjat."
+      },
+      {
+        "text": "Guardar una exportació SQL completa de totes les taules de la base de dades.",
+        "correcte": false,
+        "feedback": "Incorrecte. WAL no és una exportació SQL, sinó un registre de canvis que PostgreSQL utilitza per a la recuperació."
+      },
+      {
+        "text": "Substituir la còpia base i permetre recuperar la base de dades sense cap backup previ.",
+        "correcte": false,
+        "feedback": "Incorrecte. PITR necessita una còpia base i els registres WAL corresponents per reconstruir l'estat de la base de dades."
+      },
+      {
+        "text": "Registrar únicament les connexions i desconnexions dels usuaris.",
+        "correcte": false,
+        "feedback": "Incorrecte. Els registres WAL contenen informació dels canvis necessaris per a la recuperació, no són simplement registres d'activitat dels usuaris."
+      }
+    ]
+  },
+  {
+    "CE": "3h-5",
+    "titol": "Una empresa necessita fer una còpia d'una base de dades PostgreSQL per migrar-la a un altre entorn i poder seleccionar algunes taules. Quina eina és més adequada?",
+    "titol-curt": "Ús de pg_dump",
+    "pista": "Busca l'eina que permet exportar dades de manera selectiva i en un format portable.",
+    "opcions": [
+      {
+        "text": "pg_basebackup, perquè permet seleccionar taules i exportar-les en SQL.",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_basebackup genera una còpia física completa i no permet seleccionar taules individualment."
+      },
+      {
+        "text": "pg_backup_start(), perquè exporta directament les taules en forma de sentències SQL.",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_backup_start() prepara PostgreSQL per fer una còpia física consistent, però no exporta directament les dades."
+      },
+      {
+        "text": "pg_dump, perquè permet fer còpies lògiques i seleccionar les taules que es volen exportar.",
+        "correcte": true,
+        "feedback": "Correcte. pg_dump és adequat per a migracions i exportacions selectives, ja que permet generar còpies lògiques i seleccionar taules."
+      },
+      {
+        "text": "WAL, perquè permet exportar qualsevol taula independentment de la resta de la base de dades.",
+        "correcte": false,
+        "feedback": "Incorrecte. WAL registra canvis de la base de dades i s'utilitza en estratègies de recuperació, però no és una eina d'exportació selectiva de taules."
+      }
+    ]
+  },
+  {
+    "comentari": "h-6  normativa",
+    "CE": "3h-6",
+    "titol": "Quina és la finalitat principal del Reglament General de Protecció de Dades (RGPD)?",
+    "titol-curt": "Finalitat del RGPD",
+    "pista": "Pensa en els drets que protegeix el reglament en relació amb la informació personal.",
+    "opcions": [
+      {
+        "text": "Regular l'ús de les bases de dades en les empreses europees",
+        "correcte": false,
+        "feedback": "Incorrecte. El RGPD no regula exclusivament les bases de dades, sinó el tractament de dades personals."
+      },
+      {
+        "text": "Establir normes comunes per a l'intercanvi de dades entre empreses",
+        "correcte": false,
+        "feedback": "Incorrecte. L'intercanvi de dades pot estar subjecte al RGPD, però no és la seua finalitat principal."
+      },
+      {
+        "text": "Protegir els drets fonamentals de les persones respecte de les seues dades personals",
+        "correcte": true,
+        "feedback": "Correcte. El RGPD té com a objectiu protegir els drets i les llibertats de les persones pel que fa al tractament de les seues dades personals."
+      },
+      {
+        "text": "Garantir la seguretat dels sistemes informàtics de les organitzacions",
+        "correcte": false,
+        "feedback": "Incorrecte. La seguretat dels sistemes és important, però el RGPD se centra en la protecció de les dades personals i dels drets de les persones."
+      }
+    ]
+  },
+  {
+    "CE": "3h-6",
+    "titol": "Quina mesura tècnica relacionada amb les bases de dades contribueix directament a controlar qui pot consultar les dades personals?",
+    "titol-curt": "Control d'accés a dades",
+    "pista": "Pensa en la gestió dels comptes d'usuari i dels privilegis dins del sistema gestor de bases de dades.",
+    "opcions": [
+      {
+        "text": "Assignar permisos segons els rols i les necessitats d'accés",
+        "correcte": true,
+        "feedback": "Correcte. La gestió d'usuaris i permisos permet limitar l'accés a les dades personals a les persones que estan autoritzades."
+      },
+      {
+        "text": "Mantindre còpies de seguretat en diferents ubicacions",
+        "correcte": false,
+        "feedback": "Incorrecte. Les còpies de seguretat ajuden a recuperar la informació, però no controlen directament qui pot consultar-la."
+      },
+      {
+        "text": "Registrar les operacions de modificació de les taules",
+        "correcte": false,
+        "feedback": "Incorrecte. El registre de canvis facilita la traçabilitat, però no substitueix el control dels permisos d'accés."
+      },
+      {
+        "text": "Aplicar xifratge a les dades emmagatzemades",
+        "correcte": false,
+        "feedback": "Incorrecte. El xifratge protegeix la confidencialitat de la informació, però no determina per si mateix quins usuaris tenen permís per consultar-la."
+      }
+    ]
+  },
+  {
+    "CE": "3h-6",
+    "titol": "Quin és l'objectiu principal de l'informe CCN-CERT BP/24 sobre bases de dades?",
+    "titol-curt": "Informe CCN-CERT BP/24",
+    "pista": "És un document tècnic que recull recomanacions per millorar la protecció dels sistemes d'informació.",
+    "opcions": [
+      {
+        "text": "Establir els requisits legals obligatoris per a totes les bases de dades europees",
+        "correcte": false,
+        "feedback": "Incorrecte. L'informe és un document de recomanacions tècniques, no un reglament europeu que establisca obligacions legals."
+      },
+      {
+        "text": "Proporcionar recomanacions i bones pràctiques de seguretat en bases de dades",
+        "correcte": true,
+        "feedback": "Correcte. El CCN-CERT BP/24 ofereix recomanacions tècniques per ajudar les organitzacions a millorar la ciberseguretat de les seues bases de dades."
+      },
+      {
+        "text": "Descriure exclusivament els procediments per recuperar dades perdudes",
+        "correcte": false,
+        "feedback": "Incorrecte. La recuperació de dades és només una possible part de la seguretat; l'informe aborda recomanacions de seguretat en bases de dades de manera més àmplia."
+      },
+      {
+        "text": "Definir els drets digitals de les persones usuàries dels serveis públics",
+        "correcte": false,
+        "feedback": "Incorrecte. La definició de drets digitals correspon al marc normatiu, mentre que aquest informe se centra en recomanacions de ciberseguretat."
+      }
+    ]
+  }
+]
