@@ -1,29 +1,58 @@
 [
   {
     "CE": "3a",
-    "titol": "Com pot una vista ajudar a protegir les dades sensibles d'una taula?",
-    "titol-curt": "Restricció de dades sensibles",
-    "pista": "Pensa en què pot fer l'administrador per mostrar només una part de la informació original.",
+    "titol": "Quina diferència principal hi ha entre una vista normal i una vista materialitzada?",
+    "titol-curt": "Vistes normals i materialitzades",
+    "pista": "Compara on es guarden els resultats i quan s'obtenen les dades de les taules originals.",
     "opcions": [
       {
-        "text": "Permet mostrar només les columnes o les files necessàries.",
+        "text": "La vista normal emmagatzema dades i la materialitzada les consulta cada vegada.",
+        "correcte": false,
+        "feedback": "Incorrecte. És just al contrari: la vista normal no guarda les dades i la materialitzada emmagatzema físicament els resultats."
+      },
+      {
+        "text": "La vista normal consulta les dades actuals i la materialitzada conserva resultats emmagatzemats.",
         "correcte": true,
-        "feedback": "Correcte. Una vista pot limitar les columnes i les files accessibles, evitant exposar informació que l'usuari no necessita."
+        "feedback": "Correcte. La vista normal obté les dades en cada consulta, mentre que la materialitzada guarda els resultats i necessita REFRESH per actualitzar-los."
       },
       {
-        "text": "Permet xifrar automàticament totes les dades de la taula.",
+        "text": "La vista normal només admet SELECT i la materialitzada permet modificar les dades originals.",
         "correcte": false,
-        "feedback": "Incorrecte. Les vistes permeten restringir quines dades es mostren, però no xifren automàticament la informació."
+        "feedback": "Incorrecte. La diferència principal no és aquesta, sinó que la vista materialitzada emmagatzema físicament els resultats de la consulta."
       },
       {
-        "text": "Permet eliminar les dades sensibles després de cada consulta.",
+        "text": "La vista normal necessita REFRESH i la materialitzada s'actualitza automàticament.",
         "correcte": false,
-        "feedback": "Incorrecte. Una vista no elimina les dades originals, sinó que controla quina informació presenta mitjançant una consulta."
+        "feedback": "Incorrecte. És la vista materialitzada la que necessita REFRESH per incorporar els canvis de les taules originals."
+      }
+    ]
+  },
+  {
+    "CE": "3a",
+    "comentari": "3a - vistes",
+    "titol": "Quina és la funció principal d'una vista en PostgreSQL?",
+    "titol-curt": "Concepte de vista",
+    "pista": "Pensa en com es presenta el resultat d'una consulta SQL i en si les dades es guarden físicament.",
+    "opcions": [
+      {
+        "text": "Emmagatzemar una còpia de les dades d'una taula",
+        "correcte": false,
+        "feedback": "Incorrecte. Les vistes normals no emmagatzemen les dades, sinó que guarden la definició d'una consulta SQL."
       },
       {
-        "text": "Permet impedir qualsevol consulta sobre la taula original.",
+        "text": "Crear una còpia independent d'una base de dades",
         "correcte": false,
-        "feedback": "Incorrecte. Es poden restringir els permisos sobre la taula i concedir accés a la vista, però això requereix configurar els permisos adequadament."
+        "feedback": "Incorrecte. Una vista no duplica una base de dades, sinó que mostra el resultat d'una consulta sobre una o més taules."
+      },
+      {
+        "text": "Presentar dades mitjançant una consulta SQL definida",
+        "correcte": true,
+        "feedback": "Correcte. Una vista és una taula virtual que mostra el resultat d'una consulta SQL sense emmagatzemar les dades per si mateixa."
+      },
+      {
+        "text": "Definir els permisos d'accés de tots els usuaris",
+        "correcte": false,
+        "feedback": "Incorrecte. Els permisos es poden concedir sobre les vistes, però aquesta no és la seua funció principal."
       }
     ]
   },
@@ -57,34 +86,6 @@
   },
   {
     "CE": "3c-1",
-    "titol": "On es configura l’autenticació d’usuaris en PostgreSQL?",
-    "titol-curt": "Configuració de l'autenticació",
-    "pista": "Pensa en el fitxer que conté les regles que determinen qui pot connectar-se, des d'on i amb quin mètode d'autenticació.",
-    "opcions": [
-      {
-        "text": "postgresql.conf",
-        "correcte": false,
-        "feedback": "Incorrecte. postgresql.conf conté la configuració general del servidor, però les regles d'autenticació es defineixen en un altre fitxer."
-      },
-      {
-        "text": "pg_roles",
-        "correcte": false,
-        "feedback": "Incorrecte. pg_roles és una vista del sistema que mostra informació sobre els rols, però no és el fitxer on es defineixen les regles d'autenticació."
-      },
-      {
-        "text": "pg_hba.conf",
-        "correcte": true,
-        "feedback": "Correcte. pg_hba.conf defineix les regles d'autenticació i control d'accés de les connexions."
-      },
-      {
-        "text": "pg_ident.conf",
-        "correcte": false,
-        "feedback": "Incorrecte. pg_ident.conf s'utilitza per definir mapatges d'identitats, no les regles generals d'autenticació."
-      }
-    ]
-  },
-  {
-    "CE": "3c-1",
     "titol": "Quin usuari predefinit és l’administrador en PostgreSQL?",
     "titol-curt": "Administrador predefinit postgres",
     "pista": "Pensa en el rol que habitualment es crea durant la instal·lació de PostgreSQL i que tradicionalment s'utilitza per a tasques administratives.",
@@ -112,35 +113,35 @@
     ]
   },
   {
-    "CE": "3c-2",
-    "titol": "Què passa si intentes eliminar un usuari que té objectes o sessions actives?",
-    "titol-curt": "Eliminar usuaris amb dependències",
-    "pista": "Pensa en què passa quan un rol encara és propietari d'objectes o manté dependències dins del clúster.",
+    "CE": "3c-1",
+    "titol": "Quin mètode d’autenticació és propi de PostgreSQL per contrasenya?",
+    "titol-curt": "Mètode d'autenticació SCRAM-SHA-256",
+    "pista": "Busca el mètode basat en SCRAM que PostgreSQL utilitza per verificar contrasenyes de manera segura.",
     "opcions": [
       {
-        "text": "S’elimina igualment",
-        "correcte": false,
-        "feedback": "Incorrecte. PostgreSQL no permet eliminar un rol mentre encara existisquen dependències que impedisquen eliminar-lo."
-      },
-      {
-        "text": "Només elimina els objectes",
-        "correcte": false,
-        "feedback": "Incorrecte. DROP ROLE no elimina automàticament els objectes propietat del rol. Cal eliminar-los o transferir-ne la propietat."
-      },
-      {
-        "text": "Dona error i no es pot eliminar",
+        "text": "scram-sha-256",
         "correcte": true,
-        "feedback": "Correcte si el rol encara té dependències, com ara objectes que posseeix o privilegis que cal eliminar. En aquest cas, DROP ROLE dona error."
+        "feedback": "Correcte. scram-sha-256 és un mètode d'autenticació basat en SCRAM que PostgreSQL suporta per verificar contrasenyes."
       },
       {
-        "text": "Es desconnecta automàticament",
+        "text": "ldap",
         "correcte": false,
-        "feedback": "Incorrecte. Les sessions actives es poden finalitzar explícitament amb pg_terminate_backend(), però DROP ROLE no té com a funció desconnectar-les automàticament."
+        "feedback": "Incorrecte. LDAP és un mètode d'autenticació que utilitza un servei d'directori extern."
+      },
+      {
+        "text": "gss",
+        "correcte": false,
+        "feedback": "Incorrecte. GSS és un mètode d'autenticació basat en GSSAPI i no és el mètode de PostgreSQL específic per a contrasenyes."
+      },
+      {
+        "text": "peer",
+        "correcte": false,
+        "feedback": "Incorrecte. peer autentica comparant la identitat de l'usuari del sistema operatiu amb el rol de PostgreSQL, habitualment en connexions locals."
       }
     ]
   },
   {
-    "CE": "3c-2",
+    "CE": "3c-1",
     "titol": "Quina comanda permet finalitzar sessions d’un usuari?",
     "titol-curt": "Finalitzar sessions d'un usuari",
     "pista": "Pensa en la funció que finalitza el procés backend associat a una sessió concreta.",
@@ -164,34 +165,6 @@
         "text": "END CONNECTION",
         "correcte": false,
         "feedback": "Incorrecte. END CONNECTION no és una ordre de PostgreSQL per finalitzar sessions."
-      }
-    ]
-  },
-  {
-    "CE": "3c-3",
-    "titol": "Executem: CREATE ROLE alumne LOGIN PASSWORD '1234';. Què pot fer aquest usuari?",
-    "titol-curt": "Crear un usuari amb LOGIN",
-    "pista": "Fixa't en l'atribut LOGIN: indica si el rol pot iniciar una sessió.",
-    "opcions": [
-      {
-        "text": "Només crear bases de dades",
-        "correcte": false,
-        "feedback": "Incorrecte. Crear bases de dades requereix el privilegi CREATEDB, que no s'ha especificat."
-      },
-      {
-        "text": "Connectar-se al sistema",
-        "correcte": true,
-        "feedback": "Correcte. L'atribut LOGIN permet al rol iniciar una sessió en PostgreSQL."
-      },
-      {
-        "text": "És automàticament superuser",
-        "correcte": false,
-        "feedback": "Incorrecte. SUPERUSER és un atribut diferent i no s'assigna automàticament."
-      },
-      {
-        "text": "Crear rols",
-        "correcte": false,
-        "feedback": "Incorrecte. Per crear i gestionar altres rols cal disposar del privilegi CREATEROLE, que no s'ha especificat."
       }
     ]
   },
@@ -224,7 +197,63 @@
     ]
   },
   {
-    "CE": "3d-1",
+    "CE": "3c-3",
+    "titol": "Executem: SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE usename='alumne';. Què fa?",
+    "titol-curt": "Finalitzar sessions amb pg_terminate_backend",
+    "pista": "La consulta busca els processos backend de les sessions d'alumne i aplica sobre cadascun una funció que finalitza la sessió.",
+    "opcions": [
+      {
+        "text": "Elimina l’usuari",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_terminate_backend() no elimina rols; només finalitza sessions."
+      },
+      {
+        "text": "Tanca les sessions de l’usuari",
+        "correcte": true,
+        "feedback": "Correcte. La consulta obté els PID de les sessions d'alumne i pg_terminate_backend() finalitza aquestes sessions."
+      },
+      {
+        "text": "Bloqueja l’usuari",
+        "correcte": false,
+        "feedback": "Incorrecte. Finalitzar les sessions no modifica l'atribut LOGIN ni bloqueja permanentment el rol."
+      },
+      {
+        "text": "Canvia la contrasenya",
+        "correcte": false,
+        "feedback": "Incorrecte. pg_terminate_backend() no modifica les contrasenyes dels rols."
+      }
+    ]
+  },
+  {
+    "CE": "3c-3",
+    "titol": "Executem: CREATE ROLE alumne LOGIN PASSWORD '1234';. Què pot fer aquest usuari?",
+    "titol-curt": "Crear un usuari amb LOGIN",
+    "pista": "Fixa't en l'atribut LOGIN: indica si el rol pot iniciar una sessió.",
+    "opcions": [
+      {
+        "text": "Només crear bases de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. Crear bases de dades requereix el privilegi CREATEDB, que no s'ha especificat."
+      },
+      {
+        "text": "Connectar-se al sistema",
+        "correcte": true,
+        "feedback": "Correcte. L'atribut LOGIN permet al rol iniciar una sessió en PostgreSQL."
+      },
+      {
+        "text": "És automàticament superuser",
+        "correcte": false,
+        "feedback": "Incorrecte. SUPERUSER és un atribut diferent i no s'assigna automàticament."
+      },
+      {
+        "text": "Crear rols",
+        "correcte": false,
+        "feedback": "Incorrecte. Per crear i gestionar altres rols cal disposar del privilegi CREATEROLE, que no s'ha especificat."
+      }
+    ]
+  },
+  {
+    "CE": "3d",
     "titol": "Per defecte, què passa amb el permís CONNECT en una nova base de dades?",
     "titol-curt": "Privilegi CONNECT per defecte",
     "pista": "Pensa en el rol especial PUBLIC, que representa tots els rols de PostgreSQL.",
@@ -252,30 +281,30 @@
     ]
   },
   {
-    "CE": "3d-1",
-    "titol": "Tens una BBDD nova 'escola' i no has fet cap GRANT. Un usuari pot fer: psql -U alumne -d escola. Què passa?",
-    "titol-curt": "Connexió a una base de dades nova",
-    "pista": "Recorda els privilegis que PostgreSQL concedeix per defecte al rol especial PUBLIC sobre una base de dades nova.",
+    "CE": "3d",
+    "titol": "Quin privilegi permet crear altres usuaris?",
+    "titol-curt": "Privilegi CREATEROLE",
+    "pista": "Busca el privilegi relacionat amb la gestió i creació de rols.",
     "opcions": [
       {
-        "text": "No pot connectar-se",
+        "text": "CREATEDB",
         "correcte": false,
-        "feedback": "Incorrecte. Per defecte, PUBLIC té el privilegi CONNECT sobre una base de dades nova."
+        "feedback": "Incorrecte. CREATEDB permet crear bases de dades, però no és el privilegi específic per crear rols."
       },
       {
-        "text": "Només si és superuser",
-        "correcte": false,
-        "feedback": "Incorrecte. Un usuari normal pot connectar-se si té LOGIN i es compleixen les regles d'autenticació."
-      },
-      {
-        "text": "Pot connectar-se per defecte",
+        "text": "CREATEROLE",
         "correcte": true,
-        "feedback": "Correcte. CONNECT es concedeix per defecte a PUBLIC en una base de dades nova. A més, el rol alumne ha de poder iniciar sessió."
+        "feedback": "Correcte. CREATEROLE permet crear i gestionar determinats rols, d'acord amb les restriccions de privilegis corresponents."
       },
       {
-        "text": "Ha de fer GRANT CONNECT manualment",
+        "text": "LOGIN",
         "correcte": false,
-        "feedback": "Incorrecte. No cal concedir CONNECT manualment mentre es mantinga el privilegi que PUBLIC té per defecte."
+        "feedback": "Incorrecte. LOGIN permet que un rol puga iniciar sessió, però no li dona la capacitat de crear altres rols."
+      },
+      {
+        "text": "SUPERUSER",
+        "correcte": false,
+        "feedback": "Incorrecte. SUPERUSER dona privilegis administratius molt amplis, però no és el privilegi específic que es busca per crear rols."
       }
     ]
   },
@@ -308,30 +337,58 @@
     ]
   },
   {
-    "CE": "3d",
-    "titol": "Usuari2 té només: GRANT UPDATE ON taula1 TO usuari2;. Executa: UPDATE taula1 SET col1=1;. Què passa?",
-    "titol-curt": "UPDATE sense necessitat de SELECT",
-    "pista": "Fixa't que no hi ha cap WHERE ni cap expressió que necessite llegir altres columnes.",
+    "CE": "3e",
+    "titol": "Quina afirmació és correcta sobre CREATE ROLE?",
+    "titol-curt": "Atribut LOGIN en CREATE ROLE",
+    "pista": "Recorda que crear un rol i permetre-li iniciar sessió són dues coses diferents.",
     "opcions": [
       {
-        "text": "Error per falta de SELECT",
+        "text": "Sempre permet login",
         "correcte": false,
-        "feedback": "Incorrecte. En aquest cas, l'operació UPDATE no necessita llegir una columna concreta mitjançant una condició o expressió que requerisca SELECT."
+        "feedback": "Incorrecte. CREATE ROLE no dona LOGIN per defecte."
       },
       {
-        "text": "Funciona correctament",
+        "text": "Només crea bases de dades",
+        "correcte": false,
+        "feedback": "Incorrecte. CREATE ROLE crea un rol, no una base de dades."
+      },
+      {
+        "text": "Només permet login si té LOGIN",
         "correcte": true,
-        "feedback": "Correcte. UPDATE sobre una taula pot realitzar-se amb el privilegi UPDATE; en aquesta sentència no cal SELECT sobre una altra columna."
+        "feedback": "Correcte. Un rol necessita l'atribut LOGIN per poder iniciar una sessió com a usuari."
       },
       {
-        "text": "Només actualitza una fila",
+        "text": "És equivalent a DROP USER",
         "correcte": false,
-        "feedback": "Incorrecte. Sense WHERE, l'UPDATE afecta totes les files de la taula que siguen actualitzables."
+        "feedback": "Incorrecte. CREATE ROLE crea un rol, mentre que DROP USER elimina un rol."
+      }
+    ]
+  },
+  {
+    "CE": "3e",
+    "titol": "Què permet fer l'opció WITH ADMIN OPTION quan s'assigna un rol a un usuari?",
+    "titol-curt": "WITH ADMIN OPTION",
+    "pista": "No es tracta d'un permís per modificar taules, sinó de gestionar la pertinença a un rol.",
+    "opcions": [
+      {
+        "text": "Permet que l'usuari gestione la pertinença d'altres usuaris a eixe rol",
+        "correcte": true,
+        "feedback": "Correcte. WITH ADMIN OPTION permet al membre concedir o revocar la pertinença d'altres rols o usuaris al rol corresponent, dins dels límits de la seua autorització."
       },
       {
-        "text": "Necessita permisos d’INSERT",
+        "text": "Permet que l'usuari modifique qualsevol privilegi del servidor",
         "correcte": false,
-        "feedback": "Incorrecte. INSERT és necessari per inserir files, no per executar aquest UPDATE."
+        "feedback": "Incorrecte. Aquesta opció està relacionada amb la gestió de la pertinença a un rol, no amb l'administració general de tots els privilegis."
+      },
+      {
+        "text": "Permet que l'usuari es convertisca automàticament en superusuari",
+        "correcte": false,
+        "feedback": "Incorrecte. Rebre un rol amb ADMIN OPTION no concedeix automàticament l'atribut SUPERUSER."
+      },
+      {
+        "text": "Permet que l'usuari assigne contrasenyes als membres del rol",
+        "correcte": false,
+        "feedback": "Incorrecte. ADMIN OPTION permet gestionar membresies, però no concedeix per si mateix permisos per gestionar les contrasenyes dels altres usuaris."
       }
     ]
   },
@@ -365,86 +422,87 @@
     ]
   },
   {
-    "CE": "3e",
-    "titol": "Executem: CREATE ROLE app_role;. Després intentem connectar-nos amb aquest rol. Què passa?",
-    "titol-curt": "CREATE ROLE sense LOGIN",
-    "pista": "Recorda quin atribut necessita un rol perquè puga iniciar una sessió.",
+    "CE": "3f",
+    "titol": "Un administrador vol permetre que el rol alumne puga crear bases de dades. Quina instrucció ha d'executar?",
+    "titol-curt": "Atribut CREATEDB",
+    "pista": "Recorda que crear bases de dades és una capacitat general del rol i no un privilegi sobre una taula.",
     "opcions": [
       {
-        "text": "Es connecta sense problemes",
+        "text": "GRANT CREATEDB ON DATABASE escola TO alumne;",
         "correcte": false,
-        "feedback": "Incorrecte. CREATE ROLE crea el rol sense donar-li LOGIN per defecte."
+        "feedback": "Incorrecte. CREATEDB és un atribut del rol i no es concedeix amb GRANT sobre una base de dades."
       },
       {
-        "text": "Error perquè no té LOGIN",
+        "text": "ALTER ROLE alumne CREATEDB;",
         "correcte": true,
-        "feedback": "Correcte. El rol creat amb CREATE ROLE no pot iniciar sessió mentre no se li concedisca l'atribut LOGIN."
+        "feedback": "Correcte. ALTER ROLE permet modificar els atributs d'un rol. CREATEDB li permet crear bases de dades."
       },
       {
-        "text": "Es connecta com a postgres",
+        "text": "GRANT CREATE ON SCHEMA public TO alumne;",
         "correcte": false,
-        "feedback": "Incorrecte. PostgreSQL no substitueix automàticament un rol sense LOGIN pel rol postgres."
+        "feedback": "Incorrecte. CREATE sobre un esquema permet crear-hi objectes, però no crear bases de dades."
       },
       {
-        "text": "Demana crear una password",
+        "text": "ALTER DATABASE alumne CREATEDB;",
         "correcte": false,
-        "feedback": "Incorrecte. No es crea automàticament una contrasenya ni s'afegeix LOGIN quan s'intenta connectar."
+        "feedback": "Incorrecte. ALTER DATABASE modifica propietats d'una base de dades, no els atributs d'un rol."
       }
     ]
   },
   {
     "CE": "3f",
-    "titol": "Un usuari té permís UPDATE sobre una taula, però no té permís SELECT. Què pot passar quan executa una actualització amb una clàusula WHERE?",
-    "titol-curt": "Permisos UPDATE i SELECT",
-    "pista": "Pensa si PostgreSQL necessita llegir les dades de les columnes utilitzades per determinar quines files ha de modificar.",
+    "titol": "Quina característica diferencia principalment un rol amb el privilegi SUPERUSER d'un rol ordinari?",
+    "titol-curt": "Privilegi SUPERUSER",
+    "pista": "Pensa en el nivell de control que té sobre el servidor i les restriccions d'accés als objectes.",
     "opcions": [
       {
-        "text": "L'actualització sempre funciona perquè UPDATE inclou implícitament el permís SELECT.",
+        "text": "Pot consultar totes les taules, però necessita permisos per modificar-les.",
         "correcte": false,
-        "feedback": "Incorrecte. PostgreSQL no concedeix SELECT automàticament quan s'atorga UPDATE. Són privilegis independents."
+        "feedback": "Incorrecte. Un superusuari no està limitat als permisos ordinaris de consulta i modificació dels objectes."
       },
       {
-        "text": "L'actualització pot fallar perquè necessita llegir les columnes utilitzades en el filtre.",
+        "text": "Pot crear bases de dades, però no pot administrar rols d'altres usuaris.",
+        "correcte": false,
+        "feedback": "Incorrecte. Un superusuari té capacitats administratives que inclouen gestionar rols i crear bases de dades."
+      },
+      {
+        "text": "Pot accedir a qualsevol objecte i administrar el clúster sense les restriccions habituals.",
         "correcte": true,
-        "feedback": "Correcte. Si la clàusula WHERE utilitza una columna sense permís SELECT, PostgreSQL no pot consultar les dades necessàries per identificar les files."
+        "feedback": "Correcte. SUPERUSER proporciona el nivell administratiu més alt de PostgreSQL i permet superar les restriccions habituals de permisos."
       },
       {
-        "text": "L'actualització funciona, però només modifica les files que tenen valors NULL.",
+        "text": "Pot concedir privilegis d'objecte, però no modificar configuracions globals.",
         "correcte": false,
-        "feedback": "Incorrecte. La presència de valors NULL no determina aquest comportament. El problema és la falta de permís SELECT sobre les columnes necessàries."
-      },
-      {
-        "text": "L'actualització es converteix automàticament en una operació DELETE sobre la taula.",
-        "correcte": false,
-        "feedback": "Incorrecte. UPDATE i DELETE són operacions diferents. La falta de SELECT no transforma una actualització en una eliminació."
+        "feedback": "Incorrecte. Un superusuari té capacitats administratives més àmplies, inclosa la possibilitat de modificar configuracions globals."
       }
     ]
   },
   {
+    "comentari": "3f - assignar privilegis",
     "CE": "3f",
-    "titol": "Un usuari rep el privilegi SELECT sobre una taula amb l'opció WITH GRANT OPTION. Què pot fer amb aquest privilegi?",
-    "titol-curt": "Propagació de privilegis",
-    "pista": "Pensa què permet fer l'opció GRANT OPTION a més de consultar les dades.",
+    "titol": "Quina diferència hi ha entre els atributs dels rols i els privilegis d'objecte en PostgreSQL?",
+    "titol-curt": "Atributs i privilegis",
+    "pista": "Pensa si el permís afecta capacitats generals del rol o l'accés a un objecte concret de la base de dades.",
     "opcions": [
       {
-        "text": "Pot modificar l'estructura de la taula i concedir permisos d'administració.",
-        "correcte": false,
-        "feedback": "Incorrecte. GRANT OPTION no concedeix permisos per modificar l'estructura de la taula ni administrar la base de dades."
-      },
-      {
-        "text": "Pot consultar la taula i transferir-ne la propietat a un altre usuari.",
-        "correcte": false,
-        "feedback": "Incorrecte. GRANT OPTION permet concedir el privilegi rebut, però no transferir automàticament la propietat de l'objecte."
-      },
-      {
-        "text": "Pot consultar la taula i concedir el privilegi SELECT a altres usuaris.",
+        "text": "Els atributs regulen accions globals i els privilegis regulen l'accés a objectes concrets.",
         "correcte": true,
-        "feedback": "Correcte. WITH GRANT OPTION permet que qui rep el privilegi puga concedir-lo també a altres rols."
+        "feedback": "Correcte. Atributs com CREATEDB o CREATEROLE defineixen capacitats generals del rol, mentre que privilegis com SELECT o INSERT s'apliquen a objectes concrets."
       },
       {
-        "text": "Pot consultar la taula i adquirir automàticament tots els privilegis disponibles.",
+        "text": "Els atributs regulen l'accés a taules i els privilegis regulen la creació de bases de dades.",
         "correcte": false,
-        "feedback": "Incorrecte. GRANT OPTION només permet propagar el privilegi concret que s'ha rebut, no adquirir tots els altres privilegis."
+        "feedback": "Incorrecte. És just al contrari: la creació de bases de dades es controla mitjançant l'atribut CREATEDB, mentre que l'accés a taules es controla amb privilegis d'objecte."
+      },
+      {
+        "text": "Els atributs només s'apliquen als superusuaris i els privilegis només als usuaris normals.",
+        "correcte": false,
+        "feedback": "Incorrecte. Els atributs i els privilegis d'objecte es poden utilitzar amb diferents rols, no són exclusius d'un tipus d'usuari."
+      },
+      {
+        "text": "Els atributs s'assignen amb GRANT i els privilegis d'objecte amb ALTER ROLE.",
+        "correcte": false,
+        "feedback": "Incorrecte. Els atributs es modifiquen amb ALTER ROLE, mentre que els privilegis d'objecte es concedeixen amb GRANT."
       }
     ]
   }
