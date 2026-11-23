@@ -737,7 +737,7 @@ REFRESH MATERIALIZED VIEW v_pedidos_totals;   </pre>
       <hr><h2>🖍️ Abans d'avançar, un poc de repàs..</h2>
     <div id="progress-container">
     <div id="progress-bar"></div>  </div>
-    <!-- <div id="percentatge-text">0%</div>  -->
+    <div id="percentatge-text"></div>   <!-- No llevar , fa falta-->
 
     <div class="quiz-container">
         <h4 id="pregunta-text"></h4>
@@ -745,9 +745,9 @@ REFRESH MATERIALIZED VIEW v_pedidos_totals;   </pre>
         </div>
 
         <p id="feedback"></p>
-        <button onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
+        <button id="btn-pista" onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
         <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
-        <button onclick="carregarPreguntes('preguntes51p_1')">🔁 Reiniciar</button>
+        <button id="btn-reiniciar"  onclick="carregarPreguntes('preguntes51p_1')">🔁 Reiniciar</button>
         <p id="pista"></p>
          
    </section>

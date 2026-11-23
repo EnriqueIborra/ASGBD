@@ -610,7 +610,7 @@ WHERE grantee = current_user;       </pre>
 SELECT * FROM user2.table1;</code></pre>    -->
 
    <hr> <h3>Permisos UPDATE i DELETE</h3>
-    <p>El permís que s'atorga sobre un objecte de ‘update' d'postgresql, necessita anar aparellat 
+    <p>El permís que s'atorga sobre un objecte de ‘update' de postgresql, necessita anar aparellat 
       al permís de ‘select'. (També passa amb el permís ‘delete' )<br>
         ❗ postgresql no ho fa automàticament ❗</p>
 
@@ -997,6 +997,7 @@ FROM empleats;</pre>
     <div id="progress-container">
     <div id="progress-bar"></div>  </div>
     <!-- <div id="percentatge-text">0%</div>  -->
+     <div id="percentatge-text"></div>
 
     <div class="quiz-container">
         <h4 id="pregunta-text"></h4>
@@ -1004,18 +1005,21 @@ FROM empleats;</pre>
         </div>
 
         <p id="feedback"></p>
-        <button onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
+        <button id="btn-pista" onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
         <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
-        <button onclick="carregarPreguntes('preguntes31p_1')">🔁 Reiniciar</button>
+        <button id="btn-reiniciar"  onclick="carregarPreguntes('preguntes31p_1')">🔁 Reiniciar</button>
+        <!-- carregarPreguntes('preguntes31p_1')  carregarPreguntes('preguntes31p_1','3a',1)
+        carregarPreguntes('preguntes31p_1','3a')  carregarPreguntes('preguntes31p_1',null,1) -->
         <p id="pista"></p>
          
    </section>
 
   <section id="seguretat">
+    <hr><br>
     <h2> <a href="seguretat-mecanismes_p.html">Accés a la segona part del tema 3: <br> -- Seguretat en postgresql -- </a></h2>
-  
+    <br><hr><br><br>
   </section>   
-
+ 
 </main>
 <script src="scriptsunitats.js"></script>
 <script>
@@ -1023,7 +1027,7 @@ FROM empleats;</pre>
   window.onload = carregarPreguntes('preguntes31p_1');
   // canviar nom de preguntes en  button onclick="carregarPreguntes(
 
-</script>
+</script> 
 
 </body>
 </html>

@@ -122,17 +122,26 @@ INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i a
     </ul>
      <hr>
     <h4>En psql es pot:</h4>
-    <ul>
-      <li>Es pot editar el contingut del buffer amb  <code>\e</code></li>
-      <li>Es pot vore el contingut del buffer amb  <code>\p</code></li>
-      <li>Es pot executar el contingut del buffer amb  <code>\i</code></li>
-      <li>Guardar el contingut del buffer en un arxiu ( posa nom + .sql )</li>
-      <ul>         <li>postgres=# \w nom_fitxer.sql</li>       </ul>
-      <li>Carrega el contingut d'un fitxer en el buffer (però <strong>NO</strong> l'executa)</li>
-      <ul>   <li>postgres=# \e nom_fitxer.sql</li> </ul>
-      <li>Executa el contingut d'un fitxer</li>
-      <ul><li> postgres=# \i nom_fitxer.sql</li></ul>
-    </ul>
+    <pre>
+\p           Vore el contingut del buffer 
+\e           Editar el contingut del buffer
+\r           Neteja el buffer 
+\g           Executa la consulta del buffer
+\w nom.sql   Guardar el contingut del buffer en un arxiu
+\w nom.sql   Carrega el contingut d'un fitxer en el buffer (però NO  l'executa)      
+\i nom.sql   Carrega i executa el contingunt d'un fitxer
+\ir nom.sql  Executa un fitxer SQL amb ruta relativa al directori del fitxer actual
+\s           Mostra l'historial d'ordres.
+\!           Ix a una shell d'on es pot tornar amb "exit"
+\!             Executa una ordre del sistema operatiu.
+\cd directori  Canvia el directori de treball.
+\o fitxer.txt  Redirigeix l'eixida de les consultes a un fitxer.
+\o             Torna a mostrar l'eixida per pantalla.
+\?           Mostra l'ajuda de les metacomandes.
+\h           Mostra l'ajuda de les instruccions SQL.
+    </pre>
+    <p>\p, \i, \g, etc. són metacomandes pròpies de psql, no instruccions SQL del servidor PostgreSQL.</p>
+  
 
     <h4>En pgAdmin</h4>
     <img src="imgs/QueryToolWorkspace.png" class="imatge-dreta"  alt="QTW" style="width: 25%">
@@ -261,15 +270,18 @@ Tipus compostos personalitzats (TYPE)
       </table>
     
       <h4>🧪 Exemple de declaració</h4>
-      <pre><code>DECLARE
+      <pre><code>DO $$
+DECLARE
     v_nom       text := 'Anna';
-    v_edat      int := 30;
-    v_sou       numeric 8.27;
+    v_edat      int DEFAULT 30;   -- tots dos són vàlids
+    v_sou       numeric := 8.27;
+    v_sou2      numeric(6,2) := 8.27;    
     v_data_naix DATE := now();
     v_es_actiu  BOOLEAN := TRUE;
 BEGIN
     
-END; </code></pre>
+END;
+$$ LANGUAGE plpgsql; </code></pre>
 
     
       <h2>🛠️ Com assignar valors</h2>
@@ -302,7 +314,8 @@ SELECT avg(sou) INTO v_mitjanasou FROM empleats WHERE departament=101;
     
       <h3>📐 1. Operacions aritmètiques</h3>
       <p>Per fer sumes, restes, multiplicacions, divisions i potències amb variables de tipus <code>NUMBER</code>:</p>
-      <pre><code>DECLARE
+      <pre><code>DO $$
+DECLARE
     a int := 10;
     b int := 3;
     resultat1 int;
@@ -317,7 +330,8 @@ BEGIN
     raise notice ' %' ,resultat1 ;	
     resultat1 := a % b;
     raise notice ' %' ,resultat1 ;
-END; </code></pre>
+END;
+$$ LANGUAGE plpgsql; </code></pre>
 <p><strong>Precedència</strong>: No s'ha d'oblidar que no és el mateix 2 + 5 * 3  que  (2 + 5) * 3. La precedència o ordre de les operacions és crucial en el resultat</p>
 <p>En PL/pgSQL este ordre de precedència és el següent:  
 <table><tr> <td>( )</td>  <td>unaris</td> <td>** potència</td>  <td>* , /, mod</td> <td>+ i -</td> 
@@ -329,14 +343,16 @@ I els operadors lògics tenen precedència entre ells. NOT té més precedència
     
       <hr><h3>🔤 2. Operacions amb cadenes de text  (strings)</h3>
       <p>Les cadenes (<code>VARCHAR</code>) es concatenen amb <code>||</code>  </p>
-      <pre><code>DECLARE
+      <pre><code>DO $$
+DECLARE
     nom VARCHAR(20) := 'Joan';
     cognom VARCHAR(20) := 'Garcia';
     nom_complet VARCHAR(50);
 BEGIN
     nom_complet := nom || ' ' || cognom;
-    raise notice  'Nom complet: ' || nom_complet ;
-END; </code></pre>
+    RAISE NOTICE 'Nom complet: %', nom_complet;
+END;
+$$ LANGUAGE plpgsql; </code></pre>
 <p>Altres operacions sobre cadenes (strings) amb funcions: LENGTH, UPPER, LOWER, INITCAP, SUBSTRING, POSITION, REPLACE, TRIM, LTRIM, RTRIM, TO_NUMBER</p>
     
 
@@ -357,11 +373,11 @@ now()         -- retorna la data i l'hora actuals   </pre>
   <pre><code>DO $$
 DECLARE
   d1 date ;
-	d2 date;
-	resultat1 int;
+  d2 date;
+  resultat1 int;
 BEGIN
   d1 := CURRENT_DATE;
-	d2 := date '2026-01-01';
+  d2 := date '2026-01-01';
   resultat1 := d1 - d2 + 8;
   raise notice ' %' ,resultat1 ;	
 END;
@@ -398,6 +414,17 @@ SELECT TO_CHAR(CURRENT_DATE, 'DD/MM/YYYY');    </pre>
 HH Hora --   HH24	Hora (format 24 h)	--  MI	Minuts --	 SS	Segons </code>
 <br> Els altres caràcters s'interpretarans tal qual estan.  
 </p>
+<pre><code>DO $$
+DECLARE
+    v_data TIMESTAMP := NOW();
+    v_data_text TEXT;
+BEGIN
+    -- Convertir timestamp en text
+    v_data_text := TO_CHAR(v_data, 'DD/MM/YYYY HH24:MI:SS');
+
+    RAISE NOTICE 'Data i hora actual: %', v_data_text;
+END;
+$$ LANGUAGE plpgsql;   </code></pre>
 
 <p class="alert"> S'ha d'anar amb cura en les operacions amb dates, perquè tots els mesos no tenen el mateix nombre
   de dies, ni tots els anys tampoc tenen el mateix nombre de dies !! </p>
@@ -413,7 +440,7 @@ També existeix:   SELECT statement_timestamp();   Que retorna l'instant d'inici
       <p>Amb variables <code>BOOLEAN</code>, pots fer condicions:</p>
       <pre><code>AND OR NOT </code></pre>
 
-     <p>Es pot utilitzar variables <code>BOOLEAN</code> o fer comparacions entre nombres, textos o dates amb els operadors següents:</p>
+     <p>Es pot utilitzar variables o expresions <code>BOOLEAN</code>, o fer comparacions entre nombres, textos o dates amb els operadors següents:</p>
 
     <ul>
       <li><code>=</code> igualtat</li>
@@ -421,7 +448,7 @@ També existeix:   SELECT statement_timestamp();   Que retorna l'instant d'inici
       <li><code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code></li>
       <li><code>AND</code>, <code>OR</code>, <code>NOT</code></li>
     </ul>
-
+<p class="tips">✨ Totes les expresions condicionals tornen un valor BOOLEAN (true /  false).</p>
  <hr><h3>CASE Sensitive</h3>
 <p>En PL/pgSQL: 'admin' no és igual que 'ADMIN' <br>
 Es poden comparar amb < o > també de manera que les cadenes es comparen caràcter per caràcter, 
@@ -430,12 +457,21 @@ segons l’ordre lexicogràfic (semblant a l’ordre del diccionari).</p>
 'abc' < 'abd'       -- TRUE
 'Z' < 'a'           -- TRUE (perquè el codi ASCII de Z és menor)
 </pre>
-<p>Les cadenes de text també es poden comparar amb <code>LIKE</code>, usant '%'=>(qualsevol caracter) o '-'=>(un caracter)</p>
-<p>També amb <code>ILIKE</code></p>
-<pre>IF nom LIKE 'Mar%' THEN</pre>
-   
+<h3>Buscar patrons dins d'un text.</h3>
+<p>Les cadenes de text també es poden comparar amb <code>LIKE</code>, usant '%'=>(qualsevol quantitat de caracters) o '_'=>(un sol caracter)</p>
+<pre>nom LIKE 'Mar%' 
+v_nom LIKE 'M_ria'    </pre>
+<pre><code>DO $$
+DECLARE
+    v_nom TEXT := 'Maria';
+    vb boolean ;
+BEGIN
+    vb := v_nom LIKE 'Mar%';
+    RAISE NOTICE 'Copmença per Mar? : %',vb  ;
+ END;
+$$ LANGUAGE plpgsql;    </code></pre>   
      
-      <p class="tips">✨ Pots provar aquests blocs en pgAdmin, en el Query Tool Workspace.</p>
+ <p class="tips">✨ Pots provar aquests blocs en pgAdmin, en el Query Tool Workspace.</p>
 
   </section>
 
@@ -450,7 +486,24 @@ segons l’ordre lexicogràfic (semblant a l’ordre del diccionari).</p>
   
     <h3> Condicionals</h3>
   
-    <h4> Estructura IF</h4>
+    <h4> Estructura IF  simple</h4>
+    <p>L'estructura <code>IF</code>  permet executar diferents instruccions en funció de si es compleix una condició.</p>
+    <pre>IF condicio THEN
+    instruccions;
+END IF;     </pre>
+
+<h4> Estructura IF amb ELSE </h4>
+    <p>L'estructura <code>IF</code>  permet executar diferents instruccions SI es compleix la condició i altres SINO es compleix la condició.</p>
+    <pre>IF condicio THEN
+    instruccions;
+ELSE
+    instruccions;
+END IF;     </pre>
+
+<h4> Estructura IF ampliada amb ELSIF</h4>
+    <p>ELSIF permet comprovar una nova condició quan la condició anterior no s'ha complit. D'aquesta manera, podem encadenar diverses condicions dins d'una mateixa estructura IF.
+       Les condicions s'avaluen en ordre, de dalt cap avall. S'executen les instruccions del primer bloc que tinga una condició certa. La resta s'ignoren.</p>
+    <p>Els ELSIF van tots entre el IF i el ELSE </p>
     <pre>IF condicio THEN
     instruccions;
 ELSIF altra_condicio THEN
@@ -461,8 +514,7 @@ END IF;     </pre>
 <p>El <code><strong>ELSE i ELSEIF</strong></code> són opcionals</p>
   
     <h4> Exemple IF (🧪 Prova-ho!)</h3>
-    <pre>
-DO $$
+    <pre><code>DO $$
 DECLARE
     x int := 3;
 BEGIN
@@ -472,9 +524,8 @@ BEGIN
         RAISE NOTICE 'x és menor o igual a 5';
     END IF;
 END;
-$$ LANGUAGE plpgsql;      
-    </pre>
-  <pre> -- Exemple amb ELSEIF
+$$ LANGUAGE plpgsql;        </code></pre>
+  <pre><code>-- Exemple amb ELSEIF
 DO $$
 DECLARE
     x int := 5;
@@ -487,20 +538,26 @@ BEGIN
         RAISE NOTICE 'Menor que 5';
     END IF;
 END;
-$$ LANGUAGE plpgsql;    
-  </pre>
+$$ LANGUAGE plpgsql;     </code>  </pre>
     
 
-
     <h4> Estructura CASE</h4>
+    <p>L'estructura CASE permet executar diferents instruccions en funció del valor d'una expressió o del compliment de diverses condicions.</p>
+    <p>És una alternativa a l'estructura IF ... ELSIF ... ELSE quan necessitem avaluar diferents possibilitats.</p>
     <pre>CASE expressio
     WHEN valor1 THEN instruccions;
     WHEN valor2 THEN instruccions;
     ELSE instruccions;
-END CASE;   </pre>
+END CASE;  
+o 
+CASE 
+    WHEN expressio1 THEN instruccions;
+    WHEN expressio2 THEN instruccions;
+    ELSE instruccions;
+END CASE; </pre>
   
     <h4> Exemple CASE  (🧪 Prova-ho!)</h4>
-    <pre>-- CASE amb expressions booleanes
+    <pre><code>-- CASE amb expressions booleanes
 DO $$
 DECLARE
     nota int := 7;
@@ -514,10 +571,9 @@ BEGIN
             RAISE NOTICE 'Suspès';
     END CASE;
 END;
-$$ LANGUAGE plpgsql;
-        </pre>
+$$ LANGUAGE plpgsql;  </code>   </pre>
   
-<pre>-- CASE amb valors
+<pre><code>-- CASE amb valors
 DO $$
 DECLARE
     dia int := 3;
@@ -529,21 +585,30 @@ BEGIN
         ELSE RAISE NOTICE 'Altre dia';
     END CASE;
 END;
-$$ LANGUAGE plpgsql;
-</pre>
+$$ LANGUAGE plpgsql;   </code></pre>
 
 
    <hr><hr> <h3>🔁 Bucles</h3>
   
-    <h4>🔄 LOOP bàsic (amb sortida manual)</h4>
+    <h4>🔄 LOOP bàsic (amb eixida manual)</h4>
+    <p>L'estructura LOOP permet repetir un conjunt d'instruccions de manera indefinida, fins que s'indique explícitament que ha de finalitzar (EXIT).
+És una estructura de control iterativa (bucle).</p>
     <pre>LOOP
     instruccions;
     EXIT WHEN condicio;
 END LOOP;     </pre>
-  
+<p class="alert"> Molta cura o es podria fer un bucle INFINIT, colapsant el programa !! </p>
+
+<ul>
+  <li>LOOP indica l'inici del bucle.</li>
+  <li>EXIT permet eixir del bucle.</li>
+  <li>EXIT WHEN permet eixir del bucle quan es compleix una condició.</li>
+  <li>END LOOP indica el final del bucle.</li>
+</ul>
+<p class="alert"> Si no s'inclou cap instrucció EXIT o un altre mecanisme per finalitzar el bucle, aquest es repetirà indefinidament.  !! </p>
+
     <h4> Exemple LOOP (🧪 Prova-ho!)</h4>
-    <pre>
-DO $$
+    <pre><code>DO $$
 DECLARE
     i int := 1;
 BEGIN
@@ -554,17 +619,19 @@ BEGIN
         EXIT WHEN i > 5;
     END LOOP;
 END;
-$$ LANGUAGE plpgsql;          </pre>
+$$ LANGUAGE plpgsql;  </code>  </pre>
   
     
-<h4>LOOP amb WHILE</h4>
+ <hr><h3>LOOP amb WHILE</h3>
+<p>L'estructura WHILE permet repetir un conjunt d'instruccions mentre es complisca una determinada condició. </p>
+<p>Abans de cada iteració, es comprova la condició. Si és certa, s'executen les instruccions; si és falsa, el bucle finalitza. </p>
+
     <pre>WHILE condicio LOOP
     instruccions;
 END LOOP;     </pre>
   
     <h4> Exemple WHILE   (🧪 Prova-ho!)</h4>
-    <pre>
-DO $$
+    <pre><code>DO $$
 DECLARE
     i int := 1;
 BEGIN
@@ -573,16 +640,18 @@ BEGIN
         i := i + 1;
     END LOOP;
 END;
-$$ LANGUAGE plpgsql;           </pre>
+$$ LANGUAGE plpgsql;    </code>  </pre>
   
-    <h4> LOOP amb FOR</h4>
+    <hr><h3> LOOP amb FOR</h3>
+    <p>    L'estructura FOR permet repetir un conjunt d'instruccions un nombre determinat de vegades, utilitzant una variable de control que va recorrent un rang de valors.</p>
+    <p>A diferència de WHILE, no cal inicialitzar ni incrementar manualment la variable de control.</p>
+
     <pre>FOR variable IN inici..final LOOP
     instruccions;
 END LOOP;     </pre>
   
     <h4> Exemple FOR</h4>
-    <pre>
-DO $$
+    <pre><code>DO $$
 DECLARE
     i int;
 BEGIN
@@ -590,9 +659,9 @@ BEGIN
         RAISE NOTICE 'i = %', i;
     END LOOP;
 END;
-$$ LANGUAGE plpgsql;     </pre>
+$$ LANGUAGE plpgsql;  </code> </pre>
 
-<pre>
+<pre><code>
 DO $$
 DECLARE
     i int;
@@ -601,9 +670,37 @@ BEGIN
         RAISE NOTICE 'i = %', i;
     END LOOP;
 END;
-$$ LANGUAGE plpgsql; </pre>
+$$ LANGUAGE plpgsql;</code> </pre>
+<hr> <h3>LABEL</h3>
+<p>En PL/pgSQL, podem utilitzar etiquetes (LABEL) per identificar un bucle o un bloc de codi. Són especialment útils quan tenim bucles niuats (un bucle dins d'un altre).</p>
+<p>Les etiquetes permeten indicar a quin bucle volem eixir amb EXIT o en quin volem continuar amb CONTINUE.</p>
+<pre>--- Exemple
+&lt;&lt;etiqueta>>
+LOOP
+    -- Instruccions
+END LOOP etiqueta;  
+</pre>
 
+<pre><code>DO $$
+DECLARE
+    v_i INTEGER;
+    v_j INTEGER;
+BEGIN
+    &lt;&lt;bucle_extern>>
+    FOR v_i IN 1..3 LOOP
 
+        FOR v_j IN 1..3 LOOP
+
+            RAISE NOTICE 'i=%, j=%', v_i, v_j;
+
+            IF v_i = 2 AND v_j = 2 THEN
+                EXIT bucle_extern;
+            END IF;
+
+        END LOOP;
+
+    END LOOP bucle_extern;
+END $$;  </code></pre>
   
     <h3> Notes addicionals</h3>
     <ul>
@@ -621,7 +718,7 @@ $$ LANGUAGE plpgsql; </pre>
       <li> Usa `FOR` si saps quantes vegades vols repetir</li>
       <li> Usa `WHILE` si depens d’una condició externa</li>
       <li> Usa `IF` per bifurcar el comportament del codi</li>
-      <li>⚠️ Evita bucles infinits, assegura sempre una condició de sortida</li>
+      <li>⚠️ Evita bucles infinits, assegura sempre una condició d'eixida</li>
     </ul>
   </section>
   
@@ -639,11 +736,15 @@ $$ LANGUAGE plpgsql; </pre>
     <hr><h3>Permisos necessaris</h3>
     <p> ❗ Un usuari necessita tindre permís per executar rutines, o per crear-les i executar-es !!</p>
 <pre>-- Si sols necessita executar
-GRANT EXECUTE ON PROCEDURE nom_proc TO &lt;usuari>/&lt;rol> [WITH GRANT OPTION];</pre>
+GRANT EXECUTE ON PROCEDURE nom_proc TO &lt;usuari>/&lt;rol> [WITH GRANT OPTION];
+o
+GRANT EXECUTE ON FUNCTION nom_proc TO &lt;usuari>/&lt;rol> [WITH GRANT OPTION]; </pre>
 
  <pre>-- Per poder crear  ( i executar les seues)
-GRANT CREATE ON SCHEMA public to usuari [WITH GRANT OPTION];    </pre>
-   
+GRANT CREATE ON SCHEMA public to usuari [WITH GRANT OPTION];  
+i si no te  GRANT USAGE ON SCHEMA public to usuari [WITH GRANT OPTION];    </pre>
+
+<p class="alert">Per defecte, PostgreSQL concedeix EXECUTE a PUBLIC en les funcions i procediments nous. Si volem restringir-ne l'execució, cal revocar aquest permís.</p>
 
     <h3>Vista del DD</h3>
     <p>Per vore si un usuari té estos permisos</p>
@@ -651,17 +752,21 @@ GRANT CREATE ON SCHEMA public to usuari [WITH GRANT OPTION];    </pre>
 FROM pg_namespace
 WHERE has_schema_privilege(current_user, oid, 'CREATE')   -- Sustituir current_user per 'nomusuari'
   AND nspname NOT LIKE 'pg_%'
-  AND nspname <> 'information_schema';
+  AND nspname &lt;> 'information_schema';
 </pre>
 
     <hr><h3> PROCEDURE – Procediment</h3>
     <p>Els procediments <strong>NO retornen valor</strong> i NO poden ser cridades dins SELECT o expressions. 
       Poden ser cridats des de dins d'un bloc DO, directament des de linea d'ordres psql o pgAdmin, 
-          , des de dins d'un altre procediment o funció, o des del <strong>DBMS_SCHEDULER</strong> amb un <strong>job</strong></p>
+          , des de dins d'un altre procediment. Des de dins d'una funció amb CALL , o des del <strong>pg_cron</strong> o altres sistemes de planificació de tasques </p>
       <h4>Exemples</h4>
-      <pre>BEGIN
-      call nom_proc();
-END; </pre>
+      <pre>--Des d'un bloc DO
+DO $$
+BEGIN
+    CALL nom_proc();
+END $$; </pre>
+<pre>--Directament des de psql o pgAdmin:
+CALL nom_proc();</pre>
 
     <hr>
       <h3> FUNCTION – Funció</h3>
@@ -716,19 +821,25 @@ VALUES (101, 'Joan', 'García', 2500);
     Pot rebre paràmetres i fer servir sentències SQL, estructures de control, bucles, excepcions, etc.    </p>
 
   <h3> Estructura bàsica</h3>
-  <pre>
+
+<pre>-- Definir procediment. Es fa una volta
 CREATE OR REPLACE PROCEDURE saludar()
 LANGUAGE plpgsql
 AS $$
 BEGIN
     RAISE NOTICE 'Hola!';
 END;
-$$;     </pre>
+$$;  </pre> 
+
+<pre><code>-- Cridar al procediment. Es pot fer moltes voltes.
+-- Sempre que es necessite
+call saludar();  </code></pre>
 
 <pre>
 Nota important (seguretat) - 👉 Un procediment pot executar-se amb:
 - SECURITY INVOKER (per defecte) → permisos de qui l’executa
 - SECURITY DEFINER → permisos del propietari
+     Si es posa , serà després de  LANGUAGE plpgsql
 </pre>
 
    <h4>Procediment amb parametres</h4>
@@ -736,6 +847,7 @@ Nota important (seguretat) - 👉 Un procediment pot executar-se amb:
 -- Definir procediment
 CREATE PROCEDURE suma(a int, b int)
 LANGUAGE plpgsql
+SECURITY INVOKER
 AS $$
 BEGIN
     RAISE NOTICE 'Suma: %', a + b;
@@ -749,16 +861,26 @@ CALL suma(3, 4);
   <h4> Tipus de paràmetres:</h4>
   <ul>
     <li><code>IN</code>: entrada (per defecte)</li>
-    <li><code>OUT</code>: sortida</li>
-    <li><code>INOUT</code>: entrada i sortida</li>
+    <li><code>OUT</code>: eixida</li>
+    <li><code>INOUT</code>: entrada i eixida</li>
   </ul>
-  <p>Sols vorem els IN, que a més a més, no cal posar la paraula IN perquè és el tipus per defecte</p>
-  <pre>CREATE PROCEDURE obtenir_doble(IN x int, OUT resultat int)</pre>
+    <pre>-- Exemple 
+CREATE PROCEDURE obtenir_doble(IN x int, OUT resultat int)</pre>
+  <p>Sols s'explicarem els IN, que a més a més, no cal posar la paraula IN perquè és el tipus per defecte</p>
 
-   <h4>Valors per defecte</h4>
+   <h4>DEFAULT - Valors per defecte</h4>
+   <p>La paraula clau <code>DEFAULT</code> permet assignar un valor per defecte a un paràmetre d'un procediment o funció.</p>
+   <p>Si quan es cride el procediment no s'indica cap valor per a eixe paràmetre, PostgreSQL utilitzarà automàticament el valor definit amb DEFAULT.</p>
+
    <pre>CREATE PROCEDURE saludar(nom text DEFAULT 'Usuari')</pre>
+   <pre>-- Quan es cride
+CALL saludar('Juan');   -- Utilitza el valor 'Juan' que s'indica en la crida
+CALL saludar();         -- Utilitza el valor per defecte
+-- Les dos formes de cridar al procediment funcionaran </pre>
+  <p class="alert">Els paràmetres amb valor per defecte han d'anar després dels paràmetres obligatoris (sense DEFAULT).
+     Així, podem ometre els últims paràmetres en cridar el procediment.</p>
    
-  <h3>📘 Consultar procediments</h3>
+  <h3>📘 Consultar procediments (DD)</h3>
   <ul>
     <li> Llistar procediments de l’usuari:</li>
     <pre>
@@ -811,47 +933,38 @@ call afegir_client(p_telefon => '123456789', p_nom => 'Joan', p_cognom => 'Garc�
   <h3>📘 Què és una funció?</h3>
   <p>
     Una <strong>funció</strong> és un bloc de codi PL/pgSQL que <strong>rep zero o més paràmetres</strong> i <strong>retorna un valor</strong>.
-    A diferència dels procediments, les funcions es poden cridar dins sentències SQL i expressions.   </p>
+    A diferència dels procediments, les funcions es poden cridar dins sentències SQL i expressions. Tambè dins de procediments o funcions. No es poden cridar amb CALL </p>
     <pre>Exemple:
 SELECT nom, UPPER(nom) FROM alumnes;
-SELECT * FROM alumnes WHERE LENGTH(nom) > 5;           </pre>
+SELECT * FROM alumnes WHERE LENGTH(nom) > 5; 
+SELECT now(); 
+SELECT CURRENT_DATE;     
+<s>CALL now();</s>   </pre>
+
+<h3>Funcions predefinides en postgres</h3>
   <p>Al igual que en els procediments existeixen funcions predefinides que podem utilitzar en postgresql</p>
 
   <table>
     <thead>
-      <tr >
-        <th>Tipus de Funcions</th>
-        <th>Funcions</th>
-      </tr>
+      <tr >       <th>Tipus de Funcions</th>         <th>Funcions</th>       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td><strong>Funcions Numèriques</strong></td>
-        <td>ROUND, TRUNC, MOD, SQRT, POWER, SIGN, ABS, CEIL, FLOOR, RANDOM</td>
-      </tr>
-      <tr>
-        <td><strong>Funcions de Cadenes (Strings)</strong></td>
-        <td>LOWER, UPPER, TRIM, SUBSTRING, LENGTH, REPLACE, POSITION, TRANSLATE, CHR, ASCII, INITCAP,</td>
-      </tr>
-      <tr>
-        <td><strong>Funcions per treballar amb NULL</strong></td>
-        <td> NULLIF, COALESCE</td>
-      </tr>
-      <tr>
-        <td><strong>Funcions de Dates</strong></td>
-        <td>CURRENT_DATE, NOW(),  EXTRACT , CURRENT_TIMESTAMP, AGE </td>
-      </tr>
-      <tr>
-        <td><strong>Funcions de Conversió</strong></td>
-        <td>TO_NUMBER, TO_DATE, TO_CHAR</td>
-      </tr>
-      <tr>
-        <td><strong>Funcions de Sistema</strong></td>
-        <td>VERSION(), CURRENT_USER, PG_DATABASE_SIZE(), PG_TABLE_SIZE() </td>
-      </tr>
+      <tr>        <td><strong>Funcions Numèriques</strong></td>
+        <td>ROUND, TRUNC, MOD, SQRT, POWER, SIGN, ABS, CEIL, FLOOR, RANDOM</td>       </tr>
+      <tr>         <td><strong>Funcions de Cadenes (Strings)</strong></td>
+        <td>LOWER, UPPER, TRIM, SUBSTRING, LENGTH, REPLACE, POSITION, TRANSLATE, CHR, ASCII, INITCAP,</td>       </tr>
+      <tr>         <td><strong>Funcions per treballar amb NULL</strong></td>
+        <td> NULLIF, COALESCE</td>       </tr>
+      <tr>         <td><strong>Funcions de Dates</strong></td>
+        <td>CURRENT_DATE, NOW(),  EXTRACT , CURRENT_TIMESTAMP, AGE </td>       </tr>
+      <tr>         <td><strong>Funcions de Conversió</strong></td>
+        <td>TO_NUMBER, TO_DATE, TO_CHAR</td>       </tr>
+      <tr>         <td><strong>Funcions de Sistema</strong></td>
+        <td>VERSION(), CURRENT_USER, PG_DATABASE_SIZE(), PG_TABLE_SIZE() </td>       </tr>
     </tbody>
   </table>
   
+  <h3>Funcions definides per l'usuari</h3>
   <p>I, al igual que en els procediments , podem definir noves funcions (funcions definides per l'usuari)</p>
   <p>Hem de tindre en compte, que una funció necessita <strong>saber</strong> quin tipus de dada va a retornar, i, 
     a més a més, en algun punt del cos de la funció, ha de <strong>retornar</strong> una dada d'aquest tipus</p>
@@ -865,7 +978,7 @@ BEGIN
     RETURN valor;
 END;
 $$ LANGUAGE plpgsql;    </pre>
-
+<p>[OR REPLACE] en una sintaxi indica que és una part opcional, no que s'haja d'escriure literalment entre claudàtors.</p>
   <h3> Exemple simple</h3>
   <pre>
 CREATE OR REPLACE FUNCTION suma(a integer, b integer)
@@ -874,7 +987,7 @@ BEGIN
     RETURN a + b;
 END;
 $$ LANGUAGE plpgsql;    </pre>
-
+<p class="alert">OR REPLACE no permet canviar el tipus de retorn d'una funció existent. En eixe cas, cal eliminar-la (DROP FUNCTION) i tornar-la a crear.</p>
 <pre>
 CREATE FUNCTION doble(x INT)
 RETURNS INT AS $$
@@ -882,6 +995,7 @@ BEGIN
   RETURN x * 2;
 END;
 $$ LANGUAGE plpgsql;  </pre>
+<p class="tips">En PostgreSQL, "<code>LANGUAGE plpgsql</code>" es pot posar tant abans com després del bloc AS $$ ... $$, tant en funcions com en procediments. Les dos formes són correctes.</p>
 
   <h4>Exemple Crida des de sentència SQL </h4>
   <pre>SELECT doble(4);   </pre>
@@ -892,13 +1006,11 @@ $$ LANGUAGE plpgsql;  </pre>
     <li><code>OUT</code> i <code>IN OUT</code> no es poden fer servir a funcions que es cridin dins SQL</li>
   </ul>
 
-  <h3>⚠️ Limitacions</h3>
-  <ul>
-    <li>Les funcions que es criden des de SQL <strong>no poden modificar dades</strong> (no poden fer INSERT, UPDATE o DELETE)</li>
-    <li>Han de ser deterministes: el resultat ha de dependre només dels valors d’entrada</li>
-  </ul>
+  <p><strong>Diferència amb els procediments:</strong>  els procediments es criden amb CALL i poden gestionar transaccions (COMMIT i ROLLBACK) en determinades condicions.
+     Les funcions no poden gestionar transaccions explícitament.</p>
 
-  <h3>📥 Consulta de funcions</h3>
+
+  <h3>📥 Consulta de funcions (DD)</h3>
   <pre>
 -- Funcions de l’usuari
 SELECT proname
@@ -918,22 +1030,13 @@ JOIN pg_namespace n ON p.pronamespace = n.oid
 WHERE n.nspname NOT LIKE 'pg_%'
   AND n.nspname &lt;> 'information_schema';    </pre>
 
-  <h3> Com cridar funcions:</h3>
-  <ul>
-    <li>✔️ Dins <code>SELECT</code>, <code>WHERE</code>, <code>ORDER BY</code></li>
-    <li>✔️ Assignant a una variable dins un bloc</li>
-    <li>❌ No es poden fer servir dins DML (si tenen codi que modifica dades)</li>
-  </ul>
-
+ 
   <h3> Bones pràctiques</h3>
   <ul>
     <li> Utilitza noms clars i descriptius</li>
     <li> Fes servir <code>RETURN</code> només una vegada si és possible</li>
     <li> Documenta què fa la funció i què retorna</li>
-    <li>⚠️ Evita fer INSERT/UPDATE dins funcions si s’han de cridar des de SQL</li>
   </ul>
-
-
 
 <h3>🧹 Esborrar una funció</h3>
 <pre>DROP FUNCTION nom_de_la_funcio; </pre>
@@ -967,9 +1070,10 @@ WHERE n.nspname NOT LIKE 'pg_%'
 
   <h3> Nivells d’actuació</h3>
   <ul>
-    <li> <strong>Fila a fila</strong> → actua per cada fila afectada (s'indica posant FOR EACH ROW)</li>
-    <li> <strong>Per esdeveniment</strong> → actua una sola vegada per operació (s'indica no posant res)</li>
+    <li> <strong>Fila a fila : FOR EACH ROW</strong> → actua per cada fila afectada (s'indica posant FOR EACH ROW)</li>
+    <li> <strong>Per esdeveniment : FOR EACH STATEMENT</strong> → actua una sola vegada per operació (s'indica no posant res)</li>
   </ul>
+  <p>En PostgreSQL, si no s'indica FOR EACH ROW ni FOR EACH STATEMENT, el comportament per defecte és FOR EACH STATEMENT.</p>
   
   <h3> Sintaxi bàsica (fila a fila)</h3>
   <pre>
@@ -981,12 +1085,12 @@ AS $$
 BEGIN
     INSERT INTO log_alumnes(alumne_id, nom, data_insert)
     VALUES (NEW.id, NEW.nom, now());
-    RETURN NEW;  -- IMPORTANT: RETURN NEW per triggers BEFORE/AFTER INSERT
+    RETURN NEW;  -- IMPORTANT: RETURN NEW per triggers BEFORE INSERT/UPDATE
 END;
 $$;
 
 -- 2. Crear el trigger.  Auditoria --
-CREATE TRIGGER trg_alumne_insert
+CREATE OR REPLACE TRIGGER trg_alumne_insert
 AFTER INSERT ON alumnes
 FOR EACH ROW
 EXECUTE FUNCTION log_alumne_insert();
@@ -1011,7 +1115,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_check_nom    -- Impedix actualitzar si no es complix condició
+CREATE OR REPLACE TRIGGER trg_check_nom    -- Impedix actualitzar si no es complix condició
 BEFORE UPDATE ON alumnes
 FOR EACH ROW
 EXECUTE FUNCTION check_nom_length();    </pre>
@@ -1027,9 +1131,7 @@ SELECT trigger_name,
        action_timing AS timing,
        action_statement AS function_call
 FROM information_schema.triggers
-WHERE trigger_schema = 'public';  -- posar l’esquema que t’interessa
-
-  </pre>
+WHERE trigger_schema = 'public';  -- posar l’esquema que t’interessa     </pre>
 
   <h3> Bones pràctiques</h3>
   <ul>
@@ -1076,7 +1178,7 @@ DROP FUNCTION log_alumne_insert();    </pre>
 
   <h3> Crear una seqüència</h3>
   <pre>-- Donar permís a un usuari per crear seqüències (crear objectes)
-GRANT CREATE ON DATABASE empresa TO usuari;
+GRANT CREATE ON SCHEMA public TO usuari;
 
 -- Crear seqüència
 CREATE SEQUENCE seq_alumnes
@@ -1090,17 +1192,17 @@ CREATE SEQUENCE seq_alumnes
 DROP SEQUENCE seq_alumnes;  </pre>
 
   <h3> Ús de la seqüència</h3>
-  <p>Per obtenir el següent valor (es pot fer servir a INSERTs):</p>
+  <p>Amb funció. Per obtenir el següent valor (es pot fer servir a INSERTs)</p>
   <pre>
-NEXTVAL('seq_alumnes') </pre>
+SELECT NEXTVAL('seq_alumnes'); -- Obté el següent valor  </pre>
 
   <p>Per consultar el valor actual (després d'haver fet NEXTVAL com a mínim una vegada):</p>
-  <pre>CURRVAL('seq_alumnes')   </pre>
+  <pre>SELECT CURRVAL('seq_alumnes'); -- Obté l'últim valor obtingut   </pre>
 
   <h4> Exemple d’ús en una inserció</h4>
   <pre>INSERT INTO alumnes (id, nom, edat)  VALUES (NEXTVAL('seq_alumnes'), 'Laia', 21);   </pre>
 
-  <h3>📘 Consultar seqüències existents</h3>
+  <h3>📘 Consultar seqüències existents (DD)</h3>
   <pre>SELECT sequence_name
 FROM information_schema.sequences
 WHERE sequence_schema = 'public';  -- posar l’esquema desitjat    </pre>
@@ -1173,7 +1275,7 @@ INSERT INTO factures (id, data_emissio) VALUES (NEXTVAL('seq_factura'), now() );
       </tr>
     </tbody>
   </table>
-  <h3>Consultar informació de les Identity Columns</h3>
+  <h3>Consultar informació de les Identity Columns (DD)</h3>
   <pre>SELECT table_name, column_name, identity_generation, start_value, increment_by
 FROM information_schema.columns
 WHERE identity_generation IS NOT NULL;    </pre>
@@ -1205,62 +1307,30 @@ WHERE identity_generation IS NOT NULL;    </pre>
 
   <hr>
   <h3> Cursors implícits</h3>
+  <h4>Cursor impícit amb INTO</h4>
   <p><strong>No es declaren</strong>, i sols deurien tornar un resultat o fila. PostgreSQL el crea automàticament quan fas una query amb <CODE>SELECT INTO</CODE>.</p>
   <pre>SELECT DESCRIPCION INTO vdescripcion from PAISES WHERE CO_PAIS = 'ESP';   </pre>
+  <p><strong>Comportament: </strong> Si no troba files, assigna NULL. Si troba diverses files, agafa la primera. Es poden consultar estes situacions amb FOUND i amb ROW_COUNT</p>
 
-<p>Els cursors implícits només poden retornar una única fila. En cas que es retorne més d'una fila 
-  (o cap fila) es produirà una <strong>excepció</strong>: Esta <strong>EXCEPCIÓ</strong> podrà ser capturada i tractada</p>
+  <p>INTO STRICT : quan esperes que una consulta retorne exactament un registre i vulgues controlar explícitament els possibles errors.</p>
+  <pre>SELECT DESCRIPCION INTO STRICT vdescripcion from PAISES WHERE CO_PAIS = 'ESP';   </pre>
+<p>Els cursors implícits STRICT exigeixen retornar una única fila. En cas que es retorne més d'una fila 
+  (o cap fila) es produirà una <strong>excepció</strong>: Esta <strong>EXCEPCIÓ</strong> podrà ser capturada i tractada. 
+Si no en troba cap, genera NO_DATA_FOUND; si en troba més d'una, genera TOO_MANY_ROWS. (I SQLERRM permet obtindre el missatge de l'últim error produït)</p>
 
   <p>Per salvar estes situacionses pot fer:</p>
-<pre>--  Ús de limit 1
-SELECT DESCRIPCION INTO vdescripcion from PAISES WHERE CO_PAIS = 'ESP' limit 1;
-  -- Això evita TOO_MANY_ROWS si hi ha més d’una coincidència 
- --  Pero pot tornar un valor diferent del que es busca perquè hi han més d'u  </pre>
-<p>O fer primer un:</p>
-    <pre>SELECT count(*) INTO vcant from factura WHERE idcli = 'V00923';</pre>
+  <pre>SELECT count(*) INTO vcant from factura WHERE idcli = 'V00923';</pre>
   <p>I preguntar si vcant es 1</p>
-  <pre>IF vcant=1 THEN </pre>
-
-  <p>I despres preguntar :</p>
-  <pre>IF vdescripcion IS NULL THEN</pre>
-
+  <pre>IF vcant=1 THEN 
+    SELECT DESCRIPCION INTO vdescripcion from PAISES WHERE CO_PAIS = 'ESP';    </pre>
   
-  <h3> Atributs útils</h3>
-  <ul> Quan Postgresql crea un cursor implícit, es pot consultar:
-    <li><code>var is null</code> → si no s’ha trobat cap fila</li>
-    <li><code>GET DIAGNOSTICS n = ROW_COUNT;</code> → nombre de files tractades</li>
-  </ul>
-
-  <h4>Cursor impícit amb FOR</h4>
+ 
+  <h4>Cursor implícit amb FOR</h4>
   <pre>FOR r IN SELECT * FROM alumnes LOOP
    -- ús de r
 END LOOP;   </pre>
-
-  <hr>
-  <h3> Cursors explícits</h3>
-  <p><strong>Es declaren</strong>. Solen tornar moltes files per després processar-les una a una. </p>
-  <p><strong>Passos:</strong></p>
-  <ol>
-    <li>Declarar el cursor</li>
-    <li>Obrir-lo</li>
-    <li>Llegir fila a fila</li>
-    <li>Tancar-lo</li>
-  </ol>
-
-  <pre>Exemple:
-DECLARE c1 CURSOR FOR SELECT * FROM alumnes;
-OPEN c1;
-LOOP
-   FETCH c1 INTO r;
-   EXIT WHEN NOT FOUND;
-   RAISE NOTICE '%', r.nom;
-END LOOP;
-CLOSE c1;    </pre>
-
-
-  <h3> Cursor FOR – simplificat</h3>
-  <p>Postgresql gestiona automàticament l’obertura, lectura i tancament.</p>
-  <pre>
+<p>Recordem: Un cursor implícit és gestionat automàticament per PL/pgSQL. No cal Obrir-lo ni tancar-lo</p>
+  <pre>-- Cursor FOR simplificat
 DO $$
 DECLARE
     v_alumne RECORD;
@@ -1274,6 +1344,29 @@ BEGIN
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;    </pre>
+
+  <hr>
+  <h3> Cursors explícits</h3>
+  <p><strong>Es declaren</strong>. Solen tornar moltes files per després processar-les una a una. Amb FETCH</p>
+  <p><strong>Passos:</strong></p>
+  <ol>
+    <li>Declarar el cursor (DECLARE)</li>
+    <li>Obrir-lo (OPEN)</li>
+    <li>Llegir fila a fila (FETCH)</li>
+    <li>Tancar-lo (CLOSE)</li>
+  </ol>
+
+  <pre>Exemple:
+DECLARE c1 CURSOR FOR SELECT * FROM alumnes;
+OPEN c1;
+LOOP
+   FETCH c1 INTO r;
+   EXIT WHEN NOT FOUND;
+   RAISE NOTICE '%', r.nom;
+END LOOP;
+CLOSE c1;    </pre>
+
+
 <hr> <h4> Exemple cursor complet</h4>
   <pre>
 DO $$
@@ -1345,6 +1438,29 @@ EXCEPTION
         RAISE NOTICE 'S’ha produït una altra excepció';
 END;
 $$ LANGUAGE plpgsql;</pre>
+
+<pre>--  Exemple de captura d'excepcions del cursor INTO
+DO $$
+DECLARE
+    vdescripcion TEXT;
+BEGIN
+    SELECT descripcion
+    INTO STRICT vdescripcion
+    FROM paises
+    WHERE co_pais = 'ESP';
+
+    RAISE NOTICE 'País: %', vdescripcion;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE NOTICE 'No s''ha trobat cap país';
+
+    WHEN TOO_MANY_ROWS THEN
+        RAISE NOTICE 'La consulta ha retornat més d''un país';
+
+    WHEN OTHERS THEN
+        RAISE NOTICE 'S''ha produït un error: %', SQLERRM;
+END $$; </pre>
 
   <h3> Tipus d’excepcions</h3>
 
@@ -1425,45 +1541,92 @@ $$ LANGUAGE plpgsql;       </pre>
     <li> Tasques de manteniment periòdic</li>
   </ul>
 
-  <h3>📄 Scripts SQL i .bat</h3>
-  <p>Pots crear scripts `.sql` amb comandes Postgresql i executar-los des de scripts `.bat` o `.sh` mitjançant <code>psql</code>.</p>
+  <h2>📄 Scripts SQL  .bat i .sh :</h2>
+  <p>Els scripts SQL  i els scripts .bat o .sh són fitxers que contenen instruccions que podem executar automàticament per realitzar determinades tasques.
+    La diferència principal és el tipus d'instruccions que contenen i qui les interpreta.   </p>
+    <ul>
+      <li>.sql (ordres sql): Contenen instruccions SQL (consultes, insercions, actualitzacions, crides a funcions i procediments, etc.). 
+        Es poden executar mitjançant psql amb l'opció -f .(Estes ordres SQL tambè es poden executar des d'un procediment)</li>
+      <li>.sql (amb metacomandes) : Poden contindre instruccions SQL i metacomandes de psql. Es poden executar mitjançant psql amb l'opció -f . 
+        Les metacomandes no  es poden executar des d'un procediment </li>
+      <li>.bat . Són scripts de Windows que contenen ordres del sistema operatiu. Permeten executar programes com <strong>psql</strong>,
+         cridant a scripts .sql .psql i comandes directes amb  "-c "CALL el_meu_procediment();"".</li>
+      <li>.sh : Són scripts habitualment utilitzats en Linux que contenen ordres del sistema operatiu. Igual que els .bat</li>
+    </ul>
 
-  <h4> Exemple: script SQL</h4>
+  <h4> Exemple: script SQL + psql</h4>
   <pre>-- arxiu: informe.sql
--- informe.sql
 \pset pager off       -- desactiva el paginador
-\o informe_resultats.txt  -- envia la sortida a fitxer
-
+\o informe_resultats.txt  -- envia l'eixida a fitxer
 SELECT * FROM alumnes;
-
-\o                    -- torna la sortida a la consola
-\q                    -- surt de psql  </pre>
+\o                    -- torna l'eixida a la consola
+\q                    -- ix de psql  </pre>
 
   <h4> 🖥️ Script .bat (Windows)</h4>
+<pre>-- Un .bat llança el informe.sql
+@echo off
+psql -U postgres -d institut -f informe.sql
+pause</pre>
+  <h4>🐧 Script .sh (Linux)</h4>
+<pre>-- Un .sh llança el informe.sql
+#!/bin/bash
+psql -U postgres -d institut -f informe.sql  
+</pre>
+<pre>chmod +x executar.sh
+./executar.sh  
+</pre>
+<p>Les ordres que comencen per \ (\pset, \o, \q, etc.) són metacomandes pròpies de psql, no instruccions SQL estàndard. 
+  Per això, el fitxer s'ha d'executar amb psql i no directament des d'un altre client SQL.</p>
+  
+  <hr><h4> Exemple: procediment de postgres</h4>
+
+<h4> 🖥️ Amb Script .bat (Windows)</h4>
   <pre>-- arxiu: llança_informe.bat
-psql -d empresa -c "CALL el_meu_procediment();" 
+-- executa un procediment de dins de postgres des del Sistema Operatiu
+psql -U postgres -d empresa -c "CALL el_meu_procediment();" 
 pause    </pre>
 <p>Una vegada creat el fitxer .bat, s'ha de crear una tasca programada. Panel de control → Tareas programadas → Agregar Tarea → ...   </p>
 <p>Consulta alguna guia de com usar el programador de tasques de Windows. <a href="https://www.adslzone.net/esenciales/windows-10/programar-tareas/"> guia1 </a>, 
 <a href="https://openwebinars.net/blog/programacion-de-tareas-desde-la-terminal-de-windows/">guia2</a></p>
 
-  <h4>🐧 Script .sh (Linux)</h4>
+  <h4>🐧 Amb Script .sh (Linux)</h4>
   <pre>#!/bin/bash
-psql -d empresa -c "CALL el_meu_procediment();"    </pre>
+psql -U postgres -d empresa -c "CALL el_meu_procediment();"    </pre>
 <p>En Linux, s'utilitza el CRON / CRONTAB per afegir tasques que s'executaran a determinades hores / dies () .  
 Consulta alguna guia de com usar CRON <a href="https://www.redeszone.net/tutoriales/servidores/cron-crontab-linux-programar-tareas/">guia1</a>, 
 <a href="https://www.arsys.es/blog/cron-jobs-una-guia-completa">guia2</a>, o <a href="https://www.hostinger.com/mx/tutoriales/sintaxis-crontab">guia3</a>, per a entendre les diferents opcions de programació horària.  </p>
   
+<hr><h2>pg_cron i pgAagent</h2>
+<p>Tant pg_cron com pgAgent permeten programar tasques automàtiques (jobs) en PostgreSQL. La diferència principal és que pg_cron està
+   integrat dins del servidor PostgreSQL com una extensió, mentre que pgAgent funciona com un servei o procés independent que consulta 
+   la base de dades per saber quines tasques ha d'executar.</p>
+
 <hr><h3>📆 pg_cron </h3>
   <p>  Postgresql disposa d'una extensió del sistema per programar tasques (anomenades <strong>jobs</strong> ) directament des de <strong>DINS</strong> la base de dades: <strong>pg_cron</strong>.  </p>
+
+<ul>  <strong>pg_cron</strong>
+  <li>S'instal·la com una extensió de PostgreSQL.</li>
+  <li>Les tasques es defineixen DINS de la bbdd mitjançant instruccions SQL.</li>
+  <li>Utilitza una sintaxi de programació semblant a la de Linux cron.</li>
+  <li>Permet executar consultes SQL, funcions i procediments.</li>
+  <li>Les tasques es gestionen des de la base de dades.</li>
+</ul>
+
 <p>Primer s'ha d'instal·lar en el SO</p>
 <pre>   Linux
 sudo apt install postgresql-XX-cron
 </pre>
+<p>Cal substituir XX per la versió de PostgreSQL instal·lada</p>
 
  <pre>-- En postgresql.conf
 shared_preload_libraries = 'pg_cron'
 -- Per fer que cron server s’inicialitze automàticament   </pre>
+<pre>cron.database_name = 'postgres'
+-- També es pot indicar en quina base de dades es crearà la configuració de pg_cron:
+-- Per defecte, s'utilitza la base de dades postgres
+</pre>
+<p>Important: pg_cron només es pot instal·lar en una base de dades per clúster PostgreSQL. <br>
+  ** Es poden programar tasques en altres bases de dades mitjançant cron.schedule_in_database().</p>
 
  <p>⚠️ IMPORTANT: Després de modificar shared_preload_libraries,  cal reiniciar el servidor, <code>
 sudo systemctl restart postgresql  </code> </p>
@@ -1536,14 +1699,45 @@ SELECT cron.alter_job(42, '0 10 * * *');
  
     <p>==> Documentació oficial de l'extensió <a href="https://github.com/citusdata/pg_cron">.What is pg_cron.</a></p>
 
-<hr><h3>📆 pgAgent , integrat en pgAdmin </h3>
+
+<hr><h3>🕰️ pgAgent , integrat en pgAdmin </h3>
 <img src="./imgs/pgAgent.png" alt="pgagent" width="30%" class="imatge-dreta">
 <ul>
-  <li>És un agent de programació de tasques per PostgreSQL.</li>
-  <li>Et permet automatitzar execucions de SQL, funcions, o scripts segons horaris definits.</li>
+  <li>S'instal·la com un programa o servei independent del servidor PostgreSQL.</li>
+  <li>Consulta periòdicament la base de dades per comprovar si hi ha tasques pendents.</li>
+  <li>Permet automatitzar execucions de SQL, funcions, o <strong>scripts</strong> del sistema operatiu segons horaris definits.</li>
+  <li>Permet definir tasques compostes per diversos passos (steps).</li>
+  <li>Permet definir horaris i diverses planificacions per a una mateixa tasca.</li>
   <li>S’integra amb pgAdmin, així pots crear, modificar i supervisar tasques gràficament.</li>
   <li>Funciona com un servidor/servei que s’executa constantment i comprova les tasques programades.</li>
 </ul>
+
+<pre>-- Exemple de job amb steps:  Job: Manteniment nocturn
+Pas 1: SQL  Executar un procediment d'actualització de dades.   CALL actualitzar_dades();
+Pas 2: SQL  Eliminar registres antics.   DELETE FROM registres WHERE data &lt; CURRENT_DATE - 365;
+Pas 3: Sistema operatiu    Executar un script de còpia de seguretat.   ./copia_seguretat.sh   </pre>
+
+<p class="alert">pgAgent no necessita que pgAdmin estiga obert ni en funcionament les 24 hores.
+El que necessita estar en funcionament és el servei pgAgent.</p>
+
+<ul> Els tres components:
+  <li>PostgreSQL: el servidor de bases de dades on es guarden les definicions dels jobs i la seua planificació.</li>
+  <li>pgAgent: el servei independent que comprova les tasques programades i les executa quan arriba el moment.</li>
+  <li>pgAdmin: l'eina gràfica que permet configurar i administrar els jobs, però no és responsable d'executar-los.</li>
+</ul>
+<p>El servidor PostgreSQL i el servei pgAgent no necessiten estar instal·lats en el mateix ordinador. 
+  pgAgent pot funcionar en un ordinador diferent del servidor PostgreSQL, sempre que puga connectar-se a aquest mitjançant la xarxa. </p>
+
+<ul> Per tant:
+  <li>El servidor PostgreSQL ha d'estar accessible des de l'ordinador on funciona pgAgent.</li>
+  <li>pgAgent necessita credencials i permisos per connectar-se a PostgreSQL.</li>
+  <li>La connexió de xarxa ha d'estar disponible quan s'hagen d'executar les tasques.</li>
+  <li>Si pgAgent executa scripts del sistema operatiu (.bat, .sh), aquests s'executaran en l'ordinador on està instal·lat pgAgent, no necessàriament en el servidor PostgreSQL.</li>
+</ul>
+<p>En general, es recomana instal·lar pgAgent en el mateix servidor que PostgreSQL, especialment en instal·lacions xicotetes o mitjanes. 
+  No obstant això, no és un requisit: també pot funcionar en una màquina independent.</p>
+
+<hr>
 <p>Per poder usar pgAgent, primer s'ha d'instal·lar des del sistema operatiu. Després, crear una extensió.</p>
 <pre>Des de Linux 
 sudo apt update
@@ -1596,8 +1790,12 @@ Servers → NomDelServidor → pgAgent Jobs  </pre>
   Interfície gràfica per crear i gestionar tasques, passos i horaris. <br>
 Permet veure logs d’execució i estats de les tasques.
 </ol>
+<p>Els jobs de pgAgent es guarden dins de la pròpia base de dades PostgreSQL, no en fitxers del sistema operatiu.</p>
+<p>Concretament, pgAgent crea un <strong>esquema</strong> anomenat <code>pgagent</code>  en la base de dades a la qual es connecta durant la instal·lació.</p>
+<p>Dins d'aquest esquema hi ha diverses <strong>taules</strong> per emmagatzemar la configuració i l'historial dels jobs.
+Algunes de les més importants són: pga_job, pga_jobstep, pga_schedule, pga_joblog, pga_jobsteplog</p>
 
-<ul>
+<ul> Exemple:
   <li>Crees una tasca (job) a pgAdmin.</li>
   <li>La tasca pot tenir un o més passos (steps), que poden ser:</li>
   SQL directament a la base de dades<br>
@@ -1608,16 +1806,24 @@ Permet veure logs d’execució i estats de les tasques.
   <li>Les execucions queden registrades a la taula pga_joblog.</li>
 </ul>
 
-<hr><h3>📆 Extensions alternatives </h3>
-<h4>pg_timetable</h4>
-<h4>timescaledb background jobs</h4>
-
  <hr> <h4>📘 Consultar jobs en el DD</h4>
  <h4>Consultar el jobs</h4>
 <pre>SELECT * FROM cron.job;</pre>  
   
+ <hr><h3>Comparació pg_cron - pgAgent</h3>
+ <table>      <thead>    <tr>              <th>Característica</th>             <th>pg_cron</th>             <th>pgAgent</th>         </tr>     </thead> 
+     <tbody>
+        <tr>            <td>Tipus</td>             <td>Extensió PostgreSQL</td>             <td>Servei independent</td>         </tr>
+        <tr>             <td>Instal·lació</td>             <td>Extensió i configuració del servidor</td>            <td>Programa/servei addicional</td>        </tr>
+        <tr>            <td>Administració</td>            <td>SQL</td>            <td>pgAdmin o SQL</td>        </tr>
+        <tr>            <td>Executar SQL</td>            <td>Sí</td>            <td>Sí</td>        </tr>
+        <tr>            <td>Executar <code>.bat</code> o <code>.sh</code></td>            <td>No directament</td>            <td>Sí</td>        </tr>
+        <tr>            <td>Diversos passos per job</td>            <td>No com a funcionalitat pròpia</td>            <td>Sí</td>        </tr>
+        <tr>            <td>Planificació</td>            <td>Sintaxi cron</td>            <td>Planificació configurable</td>        </tr>
+        <tr>            <td>Execució</td>            <td>Dins del servidor PostgreSQL</td>            <td>Des del procés pgAgent</td>        </tr>
+    </tbody> </table>
 
-  <h3> Exemple complet d’automatització</h3>
+  <hr><h3> Exemple complet d’automatització</h3>
   <ul>
     <li> <code>informe.sql</code>: genera un informe amb SELECTs</li>
     <li> <code>informe.bat</code>: l’executa des del sistema</li>
@@ -1633,7 +1839,7 @@ Permet veure logs d’execució i estats de les tasques.
     <li>⚠️ Evita duplicar jobs o crear-ne de recurrents sense control</li>
   </ul>
 
-<hr>  <h3> SQL dinàmic</h3>
+<hr><hr>  <h2> SQL dinàmic</h2>
   <p>En algunes tasques de manteniment, s’utilitzarà el diccionari de dades 
     (amb un cursor)- i per a cada objecte de DD s’aplicarà una sentència DDL</p>
     <p class="alert">Si esta sentència correspon al DDL, no es pot executar directament dins d'un bloc de codi</p>
@@ -1682,7 +1888,7 @@ CALL defrag_taules('public');
       <hr><h2>✒️ Abans d'avançar, un poc de repàs..</h2>
     <div id="progress-container">
     <div id="progress-bar"></div>  </div>
-    <!-- <div id="percentatge-text">0%</div>  -->
+     <div id="percentatge-text"></div>   <!-- No llevar , fa falta-->
 
     <div class="quiz-container">
         <h4 id="pregunta-text"></h4>
@@ -1690,9 +1896,9 @@ CALL defrag_taules('public');
         </div>
 
         <p id="feedback"></p>
-        <button onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
+        <button id="btn-pista" onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
         <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
-        <button onclick="carregarPreguntes('preguntes41p_1')">🔁 Reiniciar</button>
+        <button id="btn-reiniciar"  onclick="carregarPreguntes('preguntes41p_1')">🔁 Reiniciar</button>
         <p id="pista"></p>
          
    </section>

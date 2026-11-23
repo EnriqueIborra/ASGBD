@@ -151,8 +151,9 @@ CREATE EXTENSION pgcrypto SCHEMA utilitats;  -- Per ocultar funcions</pre>
 <pre>SELECT extname  FROM pg_extension;
 \dx
 </pre>
-<p>També es pot comprobar si una extensió esta disponible per ser instal·lada amb:  <code>SELECT * 
-FROM pg_available_extensions WHERE name = 'pgcrypto';</code></p>
+<p>També es pot comprobar si una extensió esta disponible per ser instal·lada amb: </p>
+<pre><code>SELECT * FROM pg_available_extensions WHERE name = 'pgcrypto';</code></pre> 
+
 <p>Una extensió s'instal·la dins d'un <strong>schema</strong>. 
 Important: <code>search_path</code>. Encara que l’extensió estiga instal·lada, pot no funcionar si l’esquema no està al search_path.</p>
 <pre> -- Com saber en quin schema està instal·lada una extensió ?
@@ -163,7 +164,16 @@ FROM pg_extension WHERE extname = 'pgcrypto';
 <p>Una extensió porta dins unes funcions per poder utilitzar en el codi pl/pgsql</p>
 <pre> -- Per saber de quines funcions disposa una extensió...
 SELECT proname FROM pg_proc WHERE pronamespace = (
-    SELECT extnamespace     FROM pg_extension     WHERE extname = 'pgcrypto' );  </pre>
+SELECT extnamespace     FROM pg_extension     WHERE extname = 'pgcrypto' );  </pre>
+<pre>-- Preparar taula usuaris
+DROP TABLE IF EXISTS usuaris;  
+CREATE TABLE usuaris (
+    id SERIAL PRIMARY KEY,
+    nom VARCHAR(20) NOT NULL,
+    email BYTEA UNIQUE,
+    password VARCHAR(100) 
+);
+</pre>
 
 <pre> -- ús d'una funció de PRCRYPTO
 INSERT INTO usuaris (nom, email)
@@ -171,29 +181,37 @@ VALUES (
   'Anna',
   pgp_sym_encrypt('anna@email.com', 'clau_secreta')
 );  </pre>
+<pre>-- Comprovar
+select * from usuaris;  </pre>
 
 <pre>Llegir dades / desxifrar
 SELECT nom,
        pgp_sym_decrypt(email, 'clau_secreta')
 FROM usuaris;  </pre>
+<p><strong><code>pgp_sym_encrypt()</code></strong>:  és xifrat reversible, no és un hash. És adequat per a dades que necessites recuperar posteriorment, com un correu electrònic.</p>
 
+<hr>
 <pre>-- Generar HASH amb "bcrypt"
 INSERT INTO usuaris (nom, password)
 VALUES (
   'anna',
-  crypt('contrasenya123', gen_salt('bf'))
+  crypt('contrasenya123', gen_salt('bf', 12 ))
 );
---   bf >> bcrypt
---  crypt('contrasenya123', gen_salt('bf',12))  >> incrementa el cost (12)   </pre>
+--   bf >> identifica l'algorisme: bcrypt
+--  crypt('contrasenya123', gen_salt('bf',12))  >> incrementa el cost (12)
+--  gen_salt() genera una sal aleatòria.   </pre>
+<p>el valor 12 no representa directament 12 iteracions, sinó un factor de cost logarítmic. 
+  En bcrypt, cada increment d'una unitat duplica aproximadament el nombre d'operacions de treball.</p>
 
 <pre>--Verificar contrasenya
 SELECT *
 FROM usuaris
 WHERE nom = 'anna'
   AND password = crypt('contrasenya123', password);
--- Com en password està el salt i el cost, calcula el bcrypt de 'contrasenya123' amb este salt i cost  </pre>
+-- Com en password està el salt i el cost, 
+-- calcula el bcrypt de 'contrasenya123' amb este salt i cost  </pre>
 
-<pre>--Altres opcions
+<pre>--Altres opcions per calcular hash
 SELECT digest('text', 'sha256');   </pre>
 
 
@@ -205,53 +223,92 @@ ssl = on
 <pre>--  Afegir certificats
 server.crt   -- certificat
 server.key   -- clau privada
+-- Es poden indicar les rutes dels fitxers en postgresql.conf
+ssl_cert_file = 'server.crt'
+ssl_key_file = 'server.key'
 </pre>
 <pre>-- Permisos importants
 chmod 600 server.key
 </pre>
 <pre>-- Reiniciar postgres
 pg_ctl restart  
+o 
+sudo systemctl restart postgresql
 </pre>
 <pre>-- Configurar accés segur (pg_hba.conf)
 hostssl all all 0.0.0.0/0 md5
+o 
+hostssl all all 0.0.0.0/0 scram-sha-256
 </pre>
 <p>Connectar amb:</p>
 <pre>psql -h localhost -d empresa -U anna --set=sslmode=require
 o 
 psql "host=localhost dbname=empresa user=anna sslmode=verify-full"
 </pre>
+<pre>-- Consultar configuració
+SELECT     ssl,     version,     cipher
+FROM pg_stat_ssl
+WHERE pid = pg_backend_pid();  </pre>
+
 Modes SSL importants (ssl-mode)
 <table>
-<tr>
-  <th>Mode	</th><th> Significat</th>
-</tr>
-<tr>
-  <td>disable</td><td>	sense SSL</td>
-</tr>
-<tr>
-  <td>prefer </td><td>	usa SSL si pot</td>
-</tr>
-<tr>
-  <td>require </td><td>	obliga SSL</td>
-</tr>
-<tr>
-  <td>verify-ca	</td><td> valida certificat</td>
-</tr>
-<tr>
-  <td>verify-full </td><td>	valida certificat + host</td>
-</tr>
+<tr>   <th>Mode	</th><th> Significat</th> </tr>
+<tr>   <td>disable</td><td>	sense SSL</td> </tr>
+<tr>   <td>prefer </td><td>	usa SSL si pot</td> </tr>
+<tr>   <td>require </td><td>	obliga SSL</td> </tr>
+<tr>   <td>verify-ca	</td><td> valida certificat</td> </tr>
+<tr>   <td>verify-full </td><td>	valida certificat + host</td> </tr>
 </table>
+<p>El client ha de configurar la verificació del certificat, per exemple amb sslmode=verify-full.</p>
+<p>Si en el servidor no existeixen els fitxers <code>server.crt  i server.key</code></p>    
+<pre>openssl req -new -x509 -days 365 -nodes \
+  -text \
+  -out server.crt \
+  -keyout server.key \
+  -subj "/CN=localhost"  </pre>
+<pre>-- Copiar els fitxers al directori de dades
+sudo cp server.crt /var/lib/postgresql/16/main/
+sudo cp server.key /var/lib/postgresql/16/main/
 
-    
+sudo chown postgres:postgres /var/lib/postgresql/16/main/server.*
+sudo chmod 600 /var/lib/postgresql/16/main/server.key   </pre>
+<h3>Comprovar que funciona</h3>
+<pre>-- Connecta't a PostgreSQL i executa:
+SHOW ssl;
+-- I comprova la connexió actual
+SELECT ssl, version, cipher
+FROM pg_stat_ssl
+WHERE pid = pg_backend_pid();  </pre>
+
+<!--  
+-- Generar el certificat per a una IP
+openssl req -new -x509 -days 365 -nodes \
+  -out server.crt \
+  -keyout server.key \
+  -subj "/CN=192.168.1.100" \
+  -addext "subjectAltName = IP:192.168.1.100"
+
+-- Comprovar el SAN
+openssl x509 -in server.crt -noout -text
+
+-- Per connectar des del client
+psql "host=192.168.1.100 dbname=empresa user=postgres sslmode=verify-full sslrootcert=server.crt"
+
+-- Generar el certificat per a una IP i DNS
+openssl req -new -x509 -days 365 -nodes \
+  -out server.crt \
+  -keyout server.key \
+  -subj "/CN=postgres.empresa.local" \
+  -addext "subjectAltName = IP:192.168.1.100,DNS:postgres.empresa.local"
+-->
+
     <hr><hr><h3> Bones pràctiques</h3>
     <ul>
         <li>Xifra només les dades sensibles</li>
-        <li>Evita BASE64 o ROT13 per contrasenyes</li>
         <li>Usa funcions <code>HASH()</code> per emmagatzemar contrasenyes</li>
     </ul>
 
-    <h3> Conclusió</h3>
-    <p>L’encriptació és essencial per a la protecció de dades en entorns reals i és un requisit legal i de bones pràctiques. 
+    <p class="tips">L’encriptació és essencial per a la protecció de dades en entorns reals i és un requisit legal i de bones pràctiques. 
       PostgreSQL ofereix solucions potents que cobreixen necessitats tècniques i legals.</p>
 
     <blockquote>
@@ -921,7 +978,7 @@ pg_ctl start
       <hr><h2>🪶 Abans d'avançar, un poc de repàs..</h2>
     <div id="progress-container">
     <div id="progress-bar"></div>  </div>
-    <!-- <div id="percentatge-text">0%</div>  -->
+    <div id="percentatge-text"></div>   <!-- No llevar , fa falta-->
 
     <div class="quiz-container">
         <h4 id="pregunta-text"></h4>
@@ -929,9 +986,9 @@ pg_ctl start
         </div>
 
         <p id="feedback"></p>
-        <button onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
+        <button id="btn-pista" onclick="mostrarPista()">🕵️‍♂️ Vols una pista?</button>
         <button id="btn-seguent" onclick="seguentPregunta()">      ➕ Següent pregunta </button>
-        <button onclick="carregarPreguntes('preguntes32p_1')">🔁 Reiniciar</button>
+        <button id="btn-reiniciar" onclick="carregarPreguntes('preguntes32p_1')">🔁 Reiniciar</button>
         <p id="pista"></p>
          
    </section>

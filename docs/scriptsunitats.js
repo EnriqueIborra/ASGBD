@@ -4,6 +4,19 @@ let bancDePreguntes = [];
 let preguntesBarrejades = [];
 let indexPreguntaActual = 0;
 let puntuacio = 0;
+let mostranumpreg = null;
+// Estes variables faciliten canviar l'idioma dels texts. També s'ha de modificar els .html
+let titoltest="🖋️ Abans d'avançar, un poc de repàs....."
+let missatgeError = "El test no està disponible";
+let missatgeAcabar = "S'han acabat les preguntes" 
+let missatgeEncert1 = "Has encertat ";
+let missatgeEncert2 = "preguntas ";
+let missatgeResultat3_1 = "🎉 Enhorabona! Ho tens dominat !!";
+let missatgeResultat3_2 = "💪 Continua practicant!";
+let textbotopista =" 🕵️‍♂️ Vols una pista??";
+let textbotoseg =" ➕ Següent pregunta";
+let textbotoreini =" 🔁 Reiniciar";
+let nohaytest = "Encara no hi ha test habilitat 😢";
 
 function barrejar(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -15,8 +28,8 @@ function barrejar(array) {
 function actualitzarProgres() {
     const percentatge =
         (indexPreguntaActual / preguntesBarrejades.length) * 100;
-    document.getElementById('progress-bar').style.width =
-        percentatge + "%";
+    document.getElementById('progress-bar').style.width =  percentatge + "%";
+    document.getElementById('progress-bar').textContent = Math.round(percentatge) + "%";    
 }
 
 function actualitzarPercentatge() {
@@ -28,11 +41,26 @@ function actualitzarPercentatge() {
 }
 
 
-function carregarPreguntes(RA) {
+function carregarPreguntes(RA, ca=null, mostra=null) {
+    //document.getElementById('quizz_title').innerText = titoltest;
+    document.getElementById('btn-pista').innerText = textbotopista;
+    document.getElementById('btn-seguent').innerText = textbotoseg;
+    document.getElementById('btn-reiniciar').innerText = textbotoreini;
+    document.getElementById('feedback').innerHTML = "";
+    document.getElementById('btn-seguent').disabled = true;
+
     fetch('preguntes/' + RA + '.json')
         .then(res => res.json())
         .then(data => {
             bancDePreguntes = data;
+
+            // Filtrar per CE si s'ha indicat
+            if (ca !== null) {
+                bancDePreguntes = bancDePreguntes.filter(p => p.CE === ca);
+            }
+            if (mostra !== null) {
+            mostranumpreg = 1;
+            }
             preguntesBarrejades = [...bancDePreguntes];
             barrejar(preguntesBarrejades);
             puntuacio = 0;
@@ -41,11 +69,9 @@ function carregarPreguntes(RA) {
         })
         .catch(err => {
             console.error(err);
-            document.getElementById('pregunta-text').innerText =
-                "Encara no hi ha test habilitat 😢";
-             document.getElementById('btn-seguent').disabled = true;    
+            document.getElementById('pregunta-text').innerText = nohaytest;
+            document.getElementById('btn-seguent').disabled = true;    
         });
-        //document.getElementById('percentatge-text').innerText = "0%";
 
 }
 
@@ -53,12 +79,20 @@ function mostrarPregunta() {
 
     // Si ja no queden preguntes
     if (indexPreguntaActual >= preguntesBarrejades.length) {
-        document.getElementById('pregunta-text').innerText =
-            "🎉 Has acabat totes les preguntes!";
+        let percentatge3 = (puntuacio / preguntesBarrejades.length) * 100;
+        let missatgeResultat3;
+        if (percentatge3 > 90) {
+            missatgeResultat3 = missatgeResultat3_1;
+        } else {
+            missatgeResultat3 = missatgeResultat3_2;
+        }      
+        document.getElementById('pregunta-text').innerText = missatgeAcabar;
+            
         document.getElementById('options-container').innerHTML = "";
         document.getElementById('feedback').innerHTML =
-        `Has encertat <strong>${puntuacio}</strong> de 
-        <strong>${preguntesBarrejades.length}</strong> preguntes.`;
+        `${missatgeEncert1} <strong>${puntuacio}</strong> de 
+        <strong>${preguntesBarrejades.length}</strong> ${missatgeEncert2}.
+          <br><br>  <strong>${missatgeResultat3}</strong>`;
         document.getElementById('btn-seguent').disabled = true;
         document.getElementById('progress-bar').style.width = "100%";
         actualitzarProgres();
@@ -67,17 +101,19 @@ function mostrarPregunta() {
 
     const pregunta = preguntesBarrejades[indexPreguntaActual];
 
-    // document.getElementById('pregunta-text').innerText = pregunta.titol;
-    document.getElementById('pregunta-text').innerHTML = pregunta.titol;
+    //    document.getElementById('pregunta-text').innerHTML = pregunta.titol;   // si es vol posar codi amb <pre>
+    //    anar en compte, perque si algu extern pot posar codi html es pot fer un atac de seguretat
+    //   també s'ha de canviar el codi HTML de les preguntes de <h4> a <div>    <h4 id="pregunta-text"></h4>
+    document.getElementById('pregunta-text').innerText = pregunta.titol;
 
     const container = document.getElementById('options-container');
     container.innerHTML = "";
 
-    //pregunta.opcions.forEach(opcio => {
-    const opcionsBarrejades = [...pregunta.opcions];
+    //pregunta.opcions.forEach(opcio => {    //  respeta l'ordre de les respostes
+    const opcionsBarrejades = [...pregunta.opcions];    // barreja les respostes
     barrejar(opcionsBarrejades);
 
-    opcionsBarrejades.forEach(opcio => {        
+    opcionsBarrejades.forEach(opcio => {  
         const btn = document.createElement('button');
         btn.innerText = opcio.text;
         btn.onclick = () => comprovaResposta(opcio.correcte, btn, opcio.feedback);
@@ -88,6 +124,10 @@ function mostrarPregunta() {
     document.getElementById('pista').textContent = "";
     document.getElementById('btn-seguent').disabled = true;
     actualitzarProgres();
+    if (mostranumpreg !== null) {
+        document.getElementById('percentatge-text').innerText = (indexPreguntaActual+1) +"/"+ 
+            preguntesBarrejades.length + "::" + pregunta.CE + "::" + pregunta["titol-curt"]  ;
+    }      
 
 }
 
@@ -128,9 +168,9 @@ function seguentPregunta() {
 
 
 
-  // Per poder copiar codi en el porta-retalls. S'ha de posar un botó en cada <pre>
-      //  <div class="pre-container">
-      //    <button class="copy-button">Copia Codi !</button>
+  // Per poder copiar codi en el porta-retalls. S'ha de posar un <div> i un  <botó>  envoltant a cada <pre>
+      //  <div class="pre-container">   <button class="copy-button">Copia Codi !</button>
+      //    <pre>   el codi      </pre>     </div>
   document.addEventListener('DOMContentLoaded', function () {
     const buttons = document.querySelectorAll('.copy-button');
 

@@ -225,17 +225,25 @@ CREATE TABLE alumnes (
    nom VARCHAR2(30),
    edat NUMBER(2),
    curs VARCHAR2(10)
-);   </pre>
-<pre>  ** postgresql
+  ) ;   </pre>
+<p>Se sol posar d'aquesta forma per llegibilitat, però tambè es pot posar així:</p>
+  <pre> <code>CREATE TABLE alumnes (id NUMBER(3), nom VARCHAR2(30), edat NUMBER(2), curs VARCHAR2(10) );</code>   </pre> 
+
+<pre>  ** postgresql  i mysql/mariadb
 CREATE TABLE alumnes (
    id NUMERIC(3),
    nom VARCHAR(30),
    edat NUMERIC(2),
    curs VARCHAR(10)
-);  
-</pre>
-  <p>Se sol posar d'aquesta forma per llegibilitat, però tambè es pot posar així:</p>
-  <pre>   CREATE TABLE alumnes (id NUMBER(3), nom VARCHAR2(30), edat NUMBER(2), curs VARCHAR2(10) ); </pre>
+);  </pre>
+<pre>  ** sqlite
+CREATE TABLE alumnes (
+    id INTEGER,
+    nom VARCHAR(30),
+    edat INTEGER,
+    curs VARCHAR(10)
+);  </pre>
+
 
   <h3> Restriccions comunes</h3>
   <ul>
@@ -248,26 +256,24 @@ CREATE TABLE alumnes (
   </ul>
 
   <h3> Exemple amb restriccions:</h3>
-  <pre>
-CREATE TABLE alumnes (
+  <pre>  ** Oracle
+CREATE TABLE alumnes2 (
    id NUMBER(3) PRIMARY KEY,
    nom VARCHAR2(30) NOT NULL,
    edat NUMBER(2) DEFAULT 18 CHECK (edat >= 16),
    curs VARCHAR2(10) NOT NULL
-);
-  </pre>
+);    </pre>
 
-  <pre>  ** postgresql
-CREATE TABLE alumnes (
+  <pre>  ** postgresql i mysql/mariadb  i sqlite
+CREATE TABLE alumnes2 (
    id INTEGER PRIMARY KEY,
    nom VARCHAR(30) NOT NULL,
    edat SMALLINT DEFAULT 18 CHECK (edat >= 16),
    curs VARCHAR(10) NOT NULL
-);    
-  </pre>
+);     </pre>
+
   <table border="1">      <thead><tr><th>ID</th><th>Nom</th><th>Edat</th><th>Curs</th></tr></thead>      </table>  
  
-
    
   <h2> Afegir una columna a una taula existent: <code>ALTER TABLE ... ADD</code></h2>
 
@@ -287,25 +293,29 @@ CREATE TABLE alumnes (
     <h3>🔧 Sintaxi bàsica - Afegir columna nova</h3>
     <pre>
   ALTER TABLE nom_taula
-  ADD (nom_columna tipus_dada [restriccions]);
-    </pre>
+  ADD (nom_columna tipus_dada [restriccions]);       </pre>
   
     <h4> Exemple senzill: afegir el correu electrònic</h4>
-    <pre>
-  ALTER TABLE alumnes
-  ADD (correu VARCHAR2(50));
-    </pre>
+    <pre>  ** ORACLE
+ALTER TABLE alumnes
+ADD (correu VARCHAR2(50));       </pre>
+    <pre>  ** postgresql i mysql/mariadb  i sqlite
+ALTER TABLE alumnes
+ADD correu VARCHAR(50);           </pre>
   
     <p>Amb això, la taula <code>alumnes</code> ara tindrà una nova columna anomenada <code>correu</code>, de fins a 50 caràcters.</p>
   
     <h3>🧱 Afegir diverses columnes a la vegada</h3>
-    <pre>
-  ALTER TABLE alumnes
-  ADD (
-    telefon VARCHAR2(15),
-    data_alta DATE
-  );
-    </pre>
+    <pre>  ** Oracle
+ALTER TABLE alumnes
+ADD (
+  telefon VARCHAR2(15),
+  data_alta DATE
+);      </pre>
+    <pre>** postgresql i mysql/mariadb
+ALTER TABLE alumnes
+  ADD COLUMN telefon VARCHAR(15),
+  ADD COLUMN data_alta DATE;      </pre>
   
     <p>Això és útil quan fas evolucions del model de dades.</p>
   
@@ -314,22 +324,23 @@ CREATE TABLE alumnes (
       Quan afegeixes una nova columna i li poses la restricció <code>NOT NULL</code>, has d’assegurar-te que totes les files actuals tindran un valor vàlid.
     </p>
   
-    <pre>
-  -- Això provocarà error si no assignem un valor a totes les files existents
-  ALTER TABLE alumnes
-  ADD (dni VARCHAR2(9) NOT NULL); -- ❌ ERROR
-    </pre>
+    <pre>  ** Oracle
+-- Això provocarà error si no assignem un valor a totes les files existents
+ALTER TABLE alumnes
+  ADD (dni VARCHAR2(9) NOT NULL); -- ❌ ERROR       </pre>
+  <pre>** postgresql i mysql/mariadb
+ALTER TABLE alumnes
+  ADD dni VARCHAR(9) NOT NULL; -- ❌ ERROR     </pre>    
   
     <h4>✅ Solució: primer afegir-la sense restricció, omplir-la, i després aplicar-la</h4>
     <pre>
-  ALTER TABLE alumnes
+ALTER TABLE alumnes
   ADD (dni VARCHAR2(9));
   
-  UPDATE alumnes SET dni = 'PENDENT'; -- o un valor real
+UPDATE alumnes SET dni = 'PENDENT'; -- o un valor real
   
-  ALTER TABLE alumnes
-  MODIFY (dni VARCHAR2(9) NOT NULL);
-    </pre>
+ALTER TABLE alumnes
+  MODIFY (dni VARCHAR2(9) NOT NULL);       </pre>
   
     <h3> Bones pràctiques</h3>
     <ul>
@@ -342,11 +353,10 @@ CREATE TABLE alumnes (
     <h3>🔍 Comprovar els canvis</h3>
     <p>Pots veure l’estructura actual d’una taula amb:</p>
     <pre>
-  DESC alumnes;
-  -- o
-  SELECT column_name, data_type FROM user_tab_columns
-  WHERE table_name = 'ALUMNES';
-    </pre>
+DESC alumnes;
+-- o
+SELECT column_name, data_type FROM user_tab_columns
+WHERE table_name = 'ALUMNES';        </pre>
   
     <h3> Casos habituals d’ús</h3>
     <ul>
@@ -359,17 +369,24 @@ CREATE TABLE alumnes (
   <h2>&nbsp;</h2>
   <h2>🗑️ Modificar una columna d’una taula: <code>ALTER TABLE ... MODIFY COLUMN ...</code></h2>
     <p>Pot interessar modificar una columna, com per exemple, afegir una restricció que no té</p>
-    <pre>
-    ALTER TABLE alumnes
-    MODIFY (dni VARCHAR2(9) NOT NULL);
-  </pre>
+    <pre>  ** Oracle
+ALTER TABLE alumnes
+  MODIFY (dni VARCHAR2(9) NOT NULL);    </pre>
+  <pre>** postgresql 
+ALTER TABLE alumnes
+    ALTER COLUMN dni TYPE VARCHAR(9),
+    ALTER COLUMN dni SET NOT NULL;    </pre>
+<pre>** mysql / mariadb
+ALTER TABLE alumnes
+    MODIFY COLUMN dni VARCHAR(9) NOT NULL;   </pre>
+
   <p>Si es fa açò, s'ha de comprovar que totes les files compleixen la restricció, de no ser així, fallarà i donarà ERROR</p>
   <p>Quan modifiques el tipus d'una columna en Oracle, com per exemple de <code>NUMBER</code> a <code>VARCHAR2</code>,
      Oracle intenta convertir automàticament les dades existents al nou tipus.</p>
   <pre>
-    CREATE TABLE test (  id NUMBER );
-    INSERT INTO test VALUES (123);
-    ALTER TABLE test MODIFY id VARCHAR2(10);    </pre>   
+CREATE TABLE test (  id NUMBER );
+INSERT INTO test VALUES (123);
+ALTER TABLE test MODIFY id VARCHAR2(10);    </pre>   
   <h4>✅ Si la conversió és possible:</h4>
      <p>    Oracle converteix totes les dades automàticament i sense error</p>   
   <h4>❌ Si hi ha valors que no es poden convertir:</h4>   
@@ -391,15 +408,13 @@ CREATE TABLE alumnes (
   
     <h3>🧱 Sintaxi bàsica</h3>
     <pre>
-  ALTER TABLE nom_taula
-  DROP COLUMN nom_columna;
-    </pre>
+ALTER TABLE nom_taula
+  DROP COLUMN nom_columna;      </pre>  
   
     <h4> Exemple: eliminar el camp <code>telefon</code></h4>
-    <pre>
-  ALTER TABLE alumnes
-  DROP COLUMN telefon;
-    </pre>
+    <pre>**  igual en ORACLE i en postgresql
+ALTER TABLE alumnes
+  DROP COLUMN telefon;      </pre>
   
     <p>Aquesta comanda elimina completament la columna <code>telefon</code> i totes les dades que contenia.</p>
   
@@ -422,20 +437,29 @@ CREATE TABLE alumnes (
     </ul>
   
     <h3> Esborrar múltiples columnes (Oracle 12c+)</h3>
-    <pre>
-  ALTER TABLE alumnes
-  DROP (telefon, observacions);
-    </pre>
+    <pre>  ** Oracle
+ALTER TABLE alumnes
+  DROP (telefon, observacions);       </pre>
+    <pre>** postgresql
+ALTER TABLE alumnes
+  DROP COLUMN telefon,
+  DROP COLUMN observacions;      </pre>
   
     <p> No tots els SGBD permeten aquesta sintaxi directa. En Oracle antic cal fer-ho de forma individual.</p>
   
     <h3> Com comprovar que ha desaparegut?</h3>
-    <pre>
-  DESC alumnes;
+    <pre>  ** Oracle 
+DESC alumnes;
   -- o
-  SELECT column_name FROM user_tab_columns
-  WHERE table_name = 'ALUMNES';
-    </pre>
+SELECT column_name FROM user_tab_columns
+  WHERE table_name = 'ALUMNES';      </pre>
+    <pre>**  postgresql
+\d alumnes      </pre>
+    <pre>** mysql/mariadb 
+desc alumnes;
+describe alumnes;
+SHOW COLUMNS FROM alumnes;
+SHOW CREATE TABLE alumnes;       </pre>
   
     <h3> Bones pràctiques abans d’esborrar</h3>
     <ul>
@@ -447,15 +471,14 @@ CREATE TABLE alumnes (
   
     <h3> Exemple complet</h3>
     <pre>
-  -- Comprovem si la columna hi és
-  DESC alumnes;
+-- Comprovem si la columna hi és
+DESC alumnes;
   
-  -- Eliminem la columna
-  ALTER TABLE alumnes DROP COLUMN data_alta;
+-- Eliminem la columna
+ALTER TABLE alumnes DROP COLUMN data_alta;
   
-  -- Verifiquem de nou
-  DESC alumnes;
-    </pre>     
+-- Verifiquem de nou 
+DESC alumnes;       </pre>     
 
 
  <!-- esborrar una taula  !!-->
@@ -474,13 +497,11 @@ CREATE TABLE alumnes (
 
  <h3>🧱 Sintaxi bàsica</h3>
  <pre>
-DROP TABLE nom_taula;
- </pre>
+DROP TABLE nom_taula;   </pre>
 
  <h4> Exemple: eliminar la taula  <code>alumnes</code></h4>
- <pre>
-DROP TABLE alumnes;
- </pre>
+ <pre> **  igual en ORACLE i en postgresql
+DROP TABLE alumnes;    </pre>
 
  <p>Aquesta comanda elimina completament la taula i totes les dades que contenia.</p>
 
@@ -499,14 +520,22 @@ DROP TABLE alumnes;
   SELECT table_name
   FROM user_tables
   WHERE table_name = 'NOM_TAULA';  </pre>
+ <p>Si la consulta no retorna cap fila, vol dir que la taula ja no existeix dins del teu esquema d'usuari.</p>
+ <p>NOM_TAULA hauria d'estar en majúscules, ja que Oracle desa els noms d’objectes en majúscules per defecte</p>  
 <pre>  ** postgresql
 SELECT table_name
 FROM information_schema.tables
 WHERE table_schema = 'public'   -- esquema on està la taula
   AND table_name = 'nom_taula';  
-</pre>
- <p>Si la consulta no retorna cap fila, vol dir que la taula ja no existeix dins del teu esquema d'usuari.</p>
- <p>NOM_TAULA hauria d'estar en majúscules, ja que Oracle desa els noms d’objectes en majúscules per defecte</p>
+
+  o més senzill
+\dt
+\dt *.*
+\dt nom_schema.*     </pre>
+<pre>** mysql/maridb 
+show tables;        
+SHOW TABLES FROM nom_bbdd;   </pre>
+
 
  <li>Si hi ha foreign keys referenciant la taula, <code>DROP TABLE</code> pot fallar → cal <code>DROP TABLE … CASCADE</code> per forçar-ho.</li>
 <li><code>TRUNCATE</code> també pot fallar amb foreign keys si no es fa <code>TRUNCATE … CASCADE</code></li>
@@ -578,21 +607,18 @@ WHERE table_schema = 'public'   -- esquema on està la taula
     <h3> Sintaxi bàsica</h3>
     <pre>
   INSERT INTO nom_taula (col1, col2, ..., colN)
-  VALUES (valor1, valor2, ..., valorN);
-    </pre>
+  VALUES (valor1, valor2, ..., valorN);      </pre>
   
     <h4> Exemple bàsic</h4>
-    <pre>
+    <pre>**  igual en ORACLE , en postgresql i en mysql / mariadb
   INSERT INTO alumnes (id, nom, edat, curs)
-  VALUES (1, 'Julia', 19, '2n ASIX');
-    </pre>
+  VALUES (1, 'Julia', 19, '2n ASIX');      </pre>
   
     <h4> Exemple sense especificar columnes (no recomanat)</h4>
     <pre>
   INSERT INTO alumnes
   VALUES (2, 'Marc', 18 '1r ASIX');
-  //  Funciona, però no es recomana !
-    </pre>
+  //  Funciona, però no es recomana !      </pre>
     <p><strong>⚠️ Compte:</strong> s’ha de respectar l’ordre de les columnes definides en la taula.</p>
   
     <h3> Bones pràctiques</h3>
@@ -604,7 +630,7 @@ WHERE table_schema = 'public'   -- esquema on està la taula
   
     <h3> Exemple amb valors per defecte</h3>
     <p>Suposem que la taula <code>alumnes</code> té un valor per defecte d’edat = 18:</p>
-    <pre>
+    <pre>  ** ORACLE
   CREATE TABLE alumnes (
     id NUMBER PRIMARY KEY,
     nom VARCHAR2(30) NOT NULL,
@@ -612,14 +638,22 @@ WHERE table_schema = 'public'   -- esquema on està la taula
   );
   
   INSERT INTO alumnes (id, nom)
-  VALUES (5, 'Núria');
-    </pre>
+  VALUES (5, 'Núria');      </pre>
+
+  <pre>** postgresql
+CREATE TABLE alumnes (
+    id INTEGER PRIMARY KEY,
+    nom VARCHAR(30) NOT NULL,
+    edat INTEGER DEFAULT 18
+);
+
+INSERT INTO alumnes (id, nom)
+VALUES (5, 'Núria');    </pre>  
     <p><strong>Resultat:</strong> s’inserirà l’edat 18 automàticament.</p>
   
     <h3> Comprovació</h3>
     <pre>
-  SELECT * FROM alumnes;
-    </pre>
+  SELECT * FROM alumnes;      </pre>
   
     <h3> Possibles errors comuns</h3>
     <ul>
@@ -673,11 +707,10 @@ SELECT * FROM alumnes  WHERE edat > 18;
     <li><code>BETWEEN</code> → dins un rang de valors</li>
   </ul>
 
-  <pre>
+  <pre>** igual en ORACLE , en postgres  i en mysql / maridb
 SELECT * FROM alumnes WHERE nom LIKE 'L%';     -- noms que comencen amb L
 SELECT * FROM alumnes WHERE edat BETWEEN 18 AND 21;
-SELECT * FROM alumnes WHERE id_curs IN (1, 2, 3);
-  </pre>
+SELECT * FROM alumnes WHERE id_curs IN (1, 2, 3);    </pre>
   <p> Als operadors <code>LIKE, IN, BETWEEN</code> també se'ls anomena <strong>predicats</strong>. 
     I altres són <code>IS NULL, EXISTS, ALL, ANY</code></p>
 
@@ -701,15 +734,13 @@ SELECT * FROM alumnes WHERE id_curs IN (1, 2, 3);
 UPDATE nom_taula
 SET columna1 = valor1,
     columna2 = valor2
-WHERE condició;
-  </pre>
+WHERE condició;    </pre>
 
   <h4> Exemple senzill: canviar l’edat d’un alumne</h4>
-  <pre>
+  <pre>** igual en ORACLE , en postgres i en mysql / maridb
 UPDATE alumnes
 SET edat = 21
-WHERE id = 3;
-  </pre>
+WHERE id = 3;    </pre>
 
   <p><strong>Resultat:</strong> l’alumne amb id 3 tindrà l’edat actualitzada a 21.</p>
 
@@ -718,8 +749,7 @@ WHERE id = 3;
 UPDATE alumnes
 SET edat = edat + 1,
     nom = 'Marc Actualitzat'
-WHERE id = 5;
-  </pre>
+WHERE id = 5;    </pre>
 
   <p>És possible utilitzar càlculs, expressions o funcions dins del <code>SET</code>.</p>
 
@@ -727,23 +757,20 @@ WHERE id = 5;
   <pre>
 -- ⚠️ Sense WHERE: actualitza TOTES les files!
 UPDATE alumnes
-SET edat = 18;
-  </pre>
+SET edat = 18;     </pre>
 
   <p>
     Sempre comprova primer les files afectades amb una <code>SELECT</code>:
   </p>
   <pre>
 SELECT * FROM alumnes WHERE id = 3;
-UPDATE alumnes SET edat = 22 WHERE id = 3;
-  </pre>
+UPDATE alumnes SET edat = 22 WHERE id = 3;     </pre>
 
   <h3> Exemple real: increment d’edat per a majors d’edat</h3>
   <pre>
 UPDATE alumnes
 SET edat = edat + 1
-WHERE edat >= 18;
-  </pre>
+WHERE edat >= 18;     </pre>
 
   <p> Totes les persones majors d’edat tindran 1 any més.</p>
 
@@ -766,8 +793,7 @@ WHERE edat >= 18;
   <pre>
 BEGIN;
 UPDATE alumnes SET edat = 30 WHERE id = 999; -- Ups!
-ROLLBACK; -- Desfem el canvi
-  </pre>
+ROLLBACK; -- Desfem el canvi    </pre>
 
   <h3> Bones pràctiques</h3>
   <ul>
@@ -776,8 +802,12 @@ ROLLBACK; -- Desfem el canvi
     <li> Fes còpia de seguretat o treballa dins d’una transacció si tens dubtes</li>
     <li> Usa aliasses si treballes amb subconsultes o joins</li>
   </ul>
+  <hr>
+  <p>Important: perquè les transaccions funcionen correctament, les taules han d'utilitzar un motor compatible, 
+    habitualment InnoDB. MyISAM, per exemple, no admet transaccions</p>
   </section>
   
+
 
   <section id="delete">
     <!-- esborrar files d una taula   https://www.youtube.com/watch?v=i_cVJgIz_Cs  -->
@@ -791,15 +821,13 @@ ROLLBACK; -- Desfem el canvi
   
     <h3>🔍 Sintaxi bàsica</h3>
     <pre>
-  DELETE FROM nom_taula
-  WHERE condició;
-    </pre>
+DELETE FROM nom_taula
+  WHERE condició;      </pre>
   
     <h4>🧱 Exemple: eliminar alumnes menors de 18 anys</h4>
     <pre>
-  DELETE FROM alumnes  
-  WHERE edat &lt; 18;
-    </pre>
+DELETE FROM alumnes  
+  WHERE edat &lt; 18;      </pre>
   
     <h3>⚠️ Molt important: NO oblidis el <code>WHERE</code></h3>
     <p>
@@ -807,13 +835,12 @@ ROLLBACK; -- Desfem el canvi
     </p>
   
     <pre>
-  -- ⚠️ Elimina totes les files!
-  DELETE FROM alumnes;
+-- ⚠️ Elimina totes les files!
+DELETE FROM alumnes;
   
-  TRUNCATE TABLE alumnes;  
+TRUNCATE TABLE alumnes;  
   // És equivalent i més eficient si el que volem és esborrar totes les files
-  /// La taula quedarà buida, però la estructura encara existeix en la BBDD
-    </pre>
+  /// La taula quedarà buida, però la estructura encara existeix en la BBDD       </pre>
   
     <h3> Comparació amb <code>TRUNCATE</code></h3>
     <table border="1">
@@ -842,9 +869,8 @@ ROLLBACK; -- Desfem el canvi
     <p><strong>Recomanació:</strong> abans d’un DELETE, comprova les files afectades amb un <code>SELECT</code>:</p>
   
     <pre>
-  SELECT * FROM alumnes WHERE edat &lt; 18;
-  DELETE FROM alumnes WHERE edat &lt; 18;
-    </pre>
+SELECT * FROM alumnes WHERE edat &lt; 18;
+DELETE FROM alumnes WHERE edat &lt; 18;      </pre> 
   
     <h3> Control de seguretat amb claus alienes</h3>
     <p>** Per entendre millor este cas pot ser convenient mirar el apartat de "Normalització" primer</p>
@@ -855,9 +881,8 @@ ROLLBACK; -- Desfem el canvi
   
     <h4>Exemple amb relació:</h4>
     <pre> 
-  -- alumnes té una clau aliena cap a cursos
-  DELETE FROM cursos WHERE id = 1;  -- error si hi ha alumnes vinculats
-    </pre>
+-- alumnes té una clau aliena cap a cursos
+DELETE FROM cursos WHERE id = 1;  -- error si hi ha alumnes vinculats       </pre>
   
     <p>Amb <code>ON DELETE CASCADE</code>, també s’eliminarien automàticament els alumnes del curs 1.</p>
   
@@ -887,22 +912,20 @@ ROLLBACK; -- Desfem el canvi
     </ul>
   
     <pre>
-  SELECT * FROM alumnes
+SELECT * FROM alumnes
   WHERE edat > 18 AND id_curs = 1;
   
-  SELECT * FROM alumnes
+SELECT * FROM alumnes
   WHERE edat < 18 OR id_curs = 2;
 
-     ¿que fa cada select? 
-    </pre>
+     ¿que fa cada select?       </pre> 
   
     <h3>🔍 Atenció amb els parèntesis</h3>
     <p>Quan hi ha múltiples condicions, <strong>l’ordre de prioritat importa</strong>. Usa parèntesis per controlar-ho:</p>
   
     <pre>
-  SELECT * FROM alumnes
-  WHERE (edat > 18 AND id_curs = 1) OR (nom LIKE 'M%');
-    </pre>
+SELECT * FROM alumnes
+  WHERE (edat > 18 AND id_curs = 1) OR (nom LIKE 'M%');      </pre>
   
     <p>
       Aquesta consulta retorna alumnes que:
@@ -922,8 +945,7 @@ ROLLBACK; -- Desfem el canvi
   
     <pre>
   SELECT * FROM alumnes WHERE nota IS NULL;
-  SELECT * FROM alumnes WHERE nota IS NOT NULL;
-    </pre>
+  SELECT * FROM alumnes WHERE nota IS NOT NULL;      </pre>
   
     <p><strong>Important:</strong> <code>nota = NULL</code> <u>no funcionarà</u>, sempre retorna FALSE.</p>
     <p><strong>Recorda:</strong> <code>NULL</code> <u>no es 0 (zero)</u> , <code>NULL</code> <u>no es "" (cadena buida)</u></p>
@@ -933,12 +955,11 @@ ROLLBACK; -- Desfem el canvi
   <section id="normalitzacio">
     <h2> Normalització</h2>
     <pre>
-        Exemple
-        Posar en la taula alumnes, el curs amb VARCHAR2.
-        * Analitzar posibles problemes
-        * 1 CURS, 1 curs, 1er curs, ...
-        Cal normalitzar. 
-    </pre>
+Exemple
+Posar en la taula alumnes, el curs amb VARCHAR2.
+* Analitzar posibles problemes
+* 1 CURS, 1 curs, 1er curs, ...
+Cal normalitzar.       </pre>
     <p>Per exemple, en la següent taula</p>
     <table border="1">
       <thead><tr><th>ID</th><th>Nom</th><th>Edat</th><th>Curs</th></tr></thead>
@@ -974,24 +995,22 @@ ROLLBACK; -- Desfem el canvi
   <section id="permisos">
     <h2> GRANT i REVOKE  (DCL)</h2>
     <pre>
-        Els usuaris poden tindre privilegis per fer operacions sobre la base de dades.
-        Per atorgar privilegis utilitzarem
-        GRANT
-        Per revocar(llevar) privilegis atorgats prèviament utilitzarem
-        REVOKE 
-    </pre>
+Els usuaris poden tindre privilegis per fer operacions sobre la base de dades.
+Per atorgar privilegis utilitzarem
+GRANT
+Per revocar(llevar) privilegis atorgats prèviament utilitzarem
+REVOKE       </pre>
    
   </section>
 
   <section id="agregacio">
     <h2> Funcions d'agregació</h2>
     <pre>
-        AVG , MAX , MIN , COUNT , SUM
-        Exemple
-        SELECT MAX(edat) FROM alumnes ;
-        SELECT MAX(edat) FROM alumnes where curs=5;
-        SELECT count(*) FROM alumnes where curs=1;        
-    </pre>
+AVG , MAX , MIN , COUNT , SUM
+Exemple
+SELECT MAX(edat) FROM alumnes ;
+SELECT MAX(edat) FROM alumnes where curs=5;
+SELECT count(*) FROM alumnes where curs=1;               </pre>
     <p>En el primer cas, visualiza la edat major de tota la taula alumnes</p>
     <p>En el segon cas, visualiza la edat major dels alumnes del curs=5</p>
     <p>En el tercer cas, visualiza el compte (quants) dels alumnes del curs=1</p>
@@ -1022,10 +1041,10 @@ ROLLBACK; -- Desfem el canvi
    </ul>
 
    <pre>
-    Si una transacció va bé. Es fa un COMMIT
-    Si una transacció NO va bé. Es fa un ROLLBACK
-    Quan Oracle fa COMMIT automàtic?
-    Després d’un DDL (com CREATE, ALTER, DROP) i Quan es tanca la sessió    </pre>
+Si una transacció va bé. Es fa un COMMIT
+Si una transacció NO va bé. Es fa un ROLLBACK
+Quan Oracle fa COMMIT automàtic?
+Després d’un DDL (com CREATE, ALTER, DROP) i Quan es tanca la sessió    </pre>
 
   </section>
   
