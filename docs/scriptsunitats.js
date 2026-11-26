@@ -187,3 +187,24 @@ function seguentPregunta() {
  // FI de  ...Per poder copiar codi en el porta-retalls.
  
  
+ //   dark-mode
+  function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+    const icon = document.getElementById('theme-icon');
+    icon.className = isDark ? 'hgi hgi-stroke hgi-moon-02' : 'hgi hgi-stroke hgi-sun-01';
+  }
+
+   // Cargar tema guardado
+  window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+    const icon = document.getElementById('theme-icon');
+    icon.className = savedTheme === 'dark' ? 'hgi hgi-stroke hgi-moon-02' : 'hgi hgi-stroke hgi-sun-01';
+  });
+  //  fi dark-mode
+   

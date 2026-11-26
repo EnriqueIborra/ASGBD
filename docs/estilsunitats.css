@@ -3,18 +3,67 @@
     scroll-behavior: smooth;
   }
 
+    :root {
+    --bg-color:   #f4f6f8;
+    --bg-color2:  #9dc1f0;  
+    --text-color: #333;
+    --text-color-head: #1f3c88;
+    --header-bg:  #1e3a8a;
+    --sidebar-bg: #2563eb;
+    --link-bg:    #3b82f6;
+    --link-hover: #60a5fa;
+    --section-bg: white;
+    --footer-bg:  #1e3a8a;
+    --nav1: #1f3c88;
+    --nav2: #2e86de;
+    --textnav:  white;
+    --gradr1:  #8f3636;
+    --gradr2: #d65858 ;
+    --gradv1:  #469438 ;  
+    --gradv2:  #68ec8d;
+    --alert: #f1ad79; ;
+    --tips: #b1e8c6 ;
+    --preg: #edec94  ;
+  }
+
+
+  body.dark-mode {
+    --bg-color2:   #1e1e2e;
+    --bg-color:  #424262; 
+    --text-color: #e0e0e0;
+    --text-color-head: #2c57c2;
+    --header-bg: #30496f;
+    --sidebar-bg: #1e293b;
+    --link-bg: #334155;
+    --link-hover: #475569;
+    --section-bg: #2d2d44;
+    --footer-bg: #111827;
+    --nav1: #170c38;
+    --nav2: #331c8f;
+    --textnav:  #a3a3a3;
+    --gradr1: #200d0d ;
+    --gradr2:  #481d1d;
+    --gradv1:  #469438 ;  
+    --gradv2:  #68ec8d;
+    --alert: #b86059; ;
+    --tips: #84ad93 ;
+    --preg: #6b6905  ;   
+  }
+
   body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(to right, #f8f9f9, #9dc1f0);
+    background: linear-gradient(to right, var(--bg-color) , var(--bg-color2));
     color: #333;
   }
+
 
   header {
     display: flex;
     align-items: center;
+    text-align: center;
     justify-content: space-between;
-    background: white;
+    background: var(--bg-color);
     padding: 10px 30px;
     height: 70px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -29,37 +78,26 @@
   }
 
   header h1 {
+    /*position: absolute;
+    left: 50%;
+    transform: translateX(-50%);*/
     font-size: 22px;
-    color: #1f3c88;
+    color: var(--text-color-head);
     margin: 0;
+   
   }
+
 
   nav {
     width: 260px;
-    background: linear-gradient(180deg, #1f3c88, #2e86de);
-    color: white;
+    background: linear-gradient(180deg, var(--nav1) , var(--nav2) );
+    color: var(--textnav);
     padding: 100px 20px 30px;
     position: fixed;
     height: 100vh;
     overflow-y: auto;
     box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
     top: 0;
-  }
-
-  /* les fulles de repas  i de seguretat canvia el color, perquè és un nivell més */
-  .repas {
-    background: linear-gradient(180deg, #399c5f, #50d889);
-    color: white;
-  }
-/* les fulles de repas  i de seguretat canvia el color, perquè és un nivell més */
-  .segu {
-    background: linear-gradient(180deg, #8f3636, #d65858);
-    color: white;
-  }
-
-   .dates {
-    background: linear-gradient(180deg, #469438, #68ec8d);
-    color: white;
   }
 
   nav h2 {
@@ -69,7 +107,7 @@
 
   nav a {
     display: block;
-    color: white;
+    color: var(--textnav);
     text-decoration: none;
     margin: 12px 0;
     padding: 8px 10px;
@@ -82,13 +120,32 @@
     transform: translateX(5px);
   }
 
+
+  /* les fulles de repas  i de seguretat canvia el color, perquè és un nivell més */
+  .repas {
+    background: linear-gradient(180deg,var(--gradv1) , var(--gradv2));
+    color: white;
+  }
+/* les fulles de repas  i de seguretat canvia el color, perquè és un nivell més */
+  .segu {
+    background: linear-gradient(180deg,var(--gradr1) , var(--gradr2));
+    color: white;
+  }
+
+   .dates {
+    background: linear-gradient(180deg, #469438, #68ec8d);
+    color: white;
+  }
+
+
   main {
     margin-left: 280px;
     padding: 100px 40px 40px;
   }
 
   section {
-    background: white;
+    background: var(--section-bg) ;
+    color: var(--text-color);
     margin-bottom: 40px;
     padding: 30px;
     border-radius: 16px;
@@ -97,7 +154,7 @@
   }
 
   h2 {
-    color: #1f3c88;
+    color: var(--text-color-head);   /* #1f3c88; */
     font-size: 24px;
     margin-bottom: 10px;
   }
@@ -130,10 +187,34 @@
   margin-bottom: 10px;
 }
 
+
+/* Estils per als elements de codi */
+
 .pre-container {
   position: relative;
 }
 
+/* Estils per als elements de codi */
+pre {
+  background: #f7f9fc;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+}
+
+pre {
+  background-color: var(--bg-color) ;
+  color: var(--text-color);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.pre-container pre{
+  padding-top: 27px;
+}
 .code-type{
   position: absolute;
   top: 5px;
@@ -167,26 +248,8 @@
 }
 
 
-/* Estils per als elements de codi */
-pre {
-  background: #f7f9fc;
-  border-radius: 8px;
-  overflow-x: auto;
-  font-family: 'Courier New', monospace;
-}
 
-pre {
-  background-color: #f4f4f4;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  width: 100%;
-  overflow-x: auto;
-}
-
-.pre-container pre{
-  padding-top: 27px;
-}
+/* Estils per a les taules  */
 
 table {
   border-collapse: collapse;
@@ -199,92 +262,32 @@ th, td {
   text-align: left;
 }
 th {
-  background-color: #e0e0ff;
+  background-color: var(--bg-color2);
 }
 
 .alert {
     padding: 7px;
-    background: #f9dcce;
+    background: var(--alert);
+    color: var(--text-color);
     border-left: 6px solid #f39c12;
   }
 .tips {
     padding: 7px;
-    background: #d2f8e1;
+    background: var(--tips);
+   color: var(--text-color);    
     border-left: 6px solid #27ae60;
   }
 
   .preg {
     padding: 7px;
     margin-left: 10px;
-    background: #faffb1;
+    background: var(--preg) ;
+    color: var(--text-color);    
     border-left: 6px solid #ffff00;
   }
 
 
-
-
-  .quiz-container {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-        }
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        button {
-            padding: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            background-color: #fff;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background-color: #e2e2e2;
-        }
-        #feedback {
-            margin-top: 10px;
-            font-weight: bold;
-            min-height: 24px;
-        }
-        .correct { color: #2ecc71; }
-        .incorrect { color: #e74c3c; }
-
-#progress-container {
-    width: 100%;
-    background: #e9ecef;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 15px;
-}
-
-#progress-bar {
-    height: 20px;
-    width: 0%;
-    background: #007bff;
-    transition: width 0.3s ease;
-}
-#progress-bar {
-    height: 100%;
-    background-color: #4CAF50;
-    color: white;
-    text-align: center;
-    line-height: 20px;
-    font-weight: bold;
-    font-size: 12px;
-    white-space: nowrap;
-    transition: width 0.3s ease;
-}
-
-
+  
 /* Per a RA*/
   .ras { 
      font-size: 1rem;
@@ -296,7 +299,8 @@ th {
     margin-bottom: 10px;}
 
 
-      /* test final unitat*/
+   /* test final unitat*/
+
 .quiz-container {
             background: white;
             padding: 10px;
@@ -306,12 +310,15 @@ th {
             width: 100%;
             text-align: center;
         }
+
 .options {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-top: 10px;
 }
+
+
 button {
     padding: 5px;
     font-size: 14px;
@@ -324,6 +331,31 @@ button {
 button:hover {
     background-color: #e2e2e2;
 }
+
+#progress-container {
+    width: 100%;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+#progress-bar {
+    height: 20px;
+    width: 0%;
+    height: 100%;
+    background: #007bff;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    font-size: 12px;
+    white-space: nowrap;
+    transition: width 0.3s ease;
+}
+      /* test final unitat*/
+
 .quiz-container #pregunta-text pre { text-align:left ; }
 
 #pista{  opacity: 0.5; }
@@ -340,23 +372,46 @@ button:hover {
  body.dark-mode button  {
             background: rgb(122, 130, 167); }
 
-#progress-container {
-    width: 100%;
-    background: #e9ecef;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 15px;
-}
-
-#progress-bar {
-    height: 20px;
-    width: 0%;
-    background: #007bff;   /*#007bff;*/
-    transition: width 0.3s ease;
-}
-
-
-
 body.dark-mode #progress-container { background: #17283b;}
 
  /* fi  test final unitat*/
+
+
+ /*  posar/ llevar   dark mode    */
+  .theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    width: 50px;
+    height: 26px;
+    background: #ccc;
+    border-radius: 13px;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    padding: 0;
+  }
+  .theme-toggle::before {
+    content: "";
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: white;
+    margin: 2px;
+    transition: transform 0.3s ease;
+  }
+  body.dark-mode .theme-toggle {
+    background: #666;
+  }
+  body.dark-mode .theme-toggle::before {
+    transform: translateX(24px);
+    background: #9f9f9f;
+  }
+  .hgi-sun-01 {
+      transform: translateX(-24px);
+  }
+  body.dark-mode .hgi-moon-02 {
+    transform: translateX(5px);
+}

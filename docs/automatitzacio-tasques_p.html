@@ -15,6 +15,8 @@
   <h1>ASGBD   -    Automatització de tasques en PostgreSQL
      <img src="imgs/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 40px; ">
   </h1>
+     -- <button class="theme-toggle" onclick="toggleTheme()">  
+    <i class="hgi hgi-stroke hgi-sun-01" id="theme-icon"></i>   </button> 
 </header>
 
 <nav>
@@ -109,26 +111,20 @@ INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i a
   <section id="blocs">
     <br>
     <h2>🧾 Bloc <strong><code>DO</code></strong> en PL/pgSQL</h2>
+    <p>Abans de començar a posar codi dins de blocs hem de familiaritzar-mos amb les eines d'edició de codi del nostre entorn. En postgres es pot 
+      editar codi des de <strong><code>psql</code></strong> o des de <strong><code>pgAmin4</code></strong>. Cada entorn proporciona les seues
+    eines. En el cas de <code>psql</code> es disposa d'un editor del sistema operatiu integrat. En el cas de <code>pgAdmin4</code> es disposa
+    d'una finestra o pestanya on es pot editar</p>
   
-    <h3> Què és un bloc <strong><code>DO</code></strong> ?</h3>
-    <p>
-      Un <strong> bloc DO </strong> és una unitat de codi en PL/pgSQL que:
-    </p>
-    <ul>
-      <li> No té nom ni es guarda a la base de dades.</li>
-      <li> S’executa directament des de la pestanya. Es pot guardar en un fitxer extern i després recuperar.</li>
-      <li> És ideal per a proves o per a executar operacions puntuals.</li>
-      <li> Pot incloure sentències SQL, declaracions de variables, control de flux, i gestió d’excepcions.</li>
-    </ul>
-     <hr>
-    <h4>En psql es pot:</h4>
+    <h4>En psql</h4>
     <pre>
 \p           Vore el contingut del buffer 
 \e           Editar el contingut del buffer
+\e nom.sql   Carrega el contingut d'un fitxer en el buffer i edita 
+              (!!  psql pot executar les consultes completes en eixir de l'editor.)     
 \r           Neteja el buffer 
 \g           Executa la consulta del buffer
 \w nom.sql   Guardar el contingut del buffer en un arxiu
-\w nom.sql   Carrega el contingut d'un fitxer en el buffer (però NO  l'executa)      
 \i nom.sql   Carrega i executa el contingunt d'un fitxer
 \ir nom.sql  Executa un fitxer SQL amb ruta relativa al directori del fitxer actual
 \s           Mostra l'historial d'ordres.
@@ -143,7 +139,7 @@ INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i a
     <p>\p, \i, \g, etc. són metacomandes pròpies de psql, no instruccions SQL del servidor PostgreSQL.</p>
   
 
-    <h4>En pgAdmin</h4>
+   <hr> <h4>En pgAdmin</h4>
     <img src="imgs/QueryToolWorkspace.png" class="imatge-dreta"  alt="QTW" style="width: 25%">
     <p>Des de Query Tool Workspace. Es treballa amb WorkSheets (pestanya oberta). Cada pestanya és una connexió</p>
     <p>Per executar una linia del WorkSheet, prem  Alt- F5</p>
@@ -154,13 +150,25 @@ INSERT (inserir dades), UPDATE (actualitzar dades), DELETE (esborrar dades), i a
       prement Atl-May-Q </p>
       <hr>
     <h3> Estructura bàsica d’un bloc <code>DO</code>  </h3>
+
+    <h3> Què és un bloc <strong><code>DO</code></strong> ?</h3>
+    <p>
+      Un <strong> bloc DO </strong> és una unitat de codi en <strong><code>PL/pgSQL</code></strong> que
+    </p>
+    <ul>
+      <li> No té nom ni es guarda a la base de dades.</li>
+      <li> S’executa directament des de la pestanya. Es pot guardar en un fitxer extern i després recuperar.</li>
+      <li> És ideal per a proves o per a executar operacions puntuals.</li>
+      <li> Pot incloure sentències SQL, declaracions de variables, control de flux, i gestió d’excepcions.</li>
+    </ul>
+
     <pre translate="no">
 DO $$
 BEGIN
     RAISE NOTICE 'Hola món';
 END;
 $$ LANGUAGE plpgsql;</pre>
-<p>Per executar este bloc DO, s'ha de fer amb F5 (script), en l'altre cas, en executar sentència, donarà un error: 
+<p>Si estem en una pestanya de pgAdmin4 ==> Per executar este bloc DO, s'ha de fer amb F5 (script), en l'altre cas, en executar sentència, donarà un error: 
   'ERROR: unterminated dollar-quoted string at or near "$$' perquè sols arriba fins al primer ";"  </p>
 
 <p>Exemple</p>
@@ -176,8 +184,13 @@ BEGIN
 	RAISE NOTICE 'hui es   %', current_date;
 END;
 $$ LANGUAGE plpgsql;          </pre>
+<h3>psql i PL/pgSQL</h3>
+<ul>
+  <li><strong>psql</strong> : és una eina de línia d'ordres que permet connectar-se a un servidor PostgreSQL, executar sentències SQL i PL/pgSQL, gestionar fitxers SQL i administrar la base de dades. També disposa de metacomandes pròpies, com ara \d, \c, \i o \dt.</li>
+  <li><strong>PL/pgSQL</strong> : és un llenguatge procedural de PostgreSQL que amplia SQL amb funcionalitats de programació, com ara variables, condicionals (IF), bucles (LOOP, WHILE, FOR) i gestió d'excepcions.</li>
+</ul>
 
-    <h3>PL/pgSQL és case-sensitive respecte als noms de variables, funcions i identificadors.</h3>
+ <h3>PL/pgSQL és case-sensitive respecte als noms de variables, funcions i identificadors.</h3>
    
 <pre>
 DO $$

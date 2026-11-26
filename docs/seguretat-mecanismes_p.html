@@ -17,6 +17,8 @@
   <h1>ASGBD   -    Mecanismes de Seguretat
         <img src="imgs/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 40px; ">
   </h1>
+   -- <button class="theme-toggle" onclick="toggleTheme()">  
+    <i class="hgi hgi-stroke hgi-sun-01" id="theme-icon"></i>   </button> 
 </header>
 
 <nav class="segu">
@@ -42,7 +44,7 @@
     
   <section id="cid">
         <h2>La Triada CID <br> (Confidencialitat, Integritat, Disponibilitat) en postgresql</h2>
-        <img src="imgs/CID-ciber.png" class="imatge-esquerra"  alt="stop" style="width: 20%">
+        <img src="imgs/CID-ciberBG.png" class="imatge-esquerra"  alt="stop" style="width: 20%">
     <p>La triada CID (Confidencialitat, Integritat i Disponibilitat) és un model de seguretat fonamental per garantir la protecció 
       de la informació en qualsevol sistema informàtic, inclòs postgresql. Aquest model es fa servir per establir les bases de les polítiques
        de seguretat, i postgresql, com a sistema de gestió de bases de dades (SGBD), té diverses característiques i eines que permeten
@@ -170,7 +172,7 @@ DROP TABLE IF EXISTS usuaris;
 CREATE TABLE usuaris (
     id SERIAL PRIMARY KEY,
     nom VARCHAR(20) NOT NULL,
-    email BYTEA UNIQUE,
+    email VARCHAR(255)  UNIQUE,
     password VARCHAR(100) 
 );
 </pre>
@@ -348,17 +350,23 @@ log_disconnections = on
 
     
 <h4>Auditoria avançada amb extensió (pgAudit)</h4>
-<pre>-- Configuració
-shared_preload_libraries = 'pgaudit'
-pgaudit.log = 'read, write, ddl'
+<p>Primer, preparar extensió</p>
+<pre>--  Instalació en el Sistema operatiu
+sudo apt update
+sudo apt install postgresql-16-pgaudit   </pre>
+<pre>--  Instalació
+CREATE EXTENSION pgaudit;
 </pre>
+
+<pre>-- Configuració en postgresql.conf
+shared_preload_libraries = 'pgaudit'
+pgaudit.log = 'read, write, ddl, role'
+</pre>
+<p>si ja tens altres extensions en aquesta configuració, no les elimines. Separa-les amb comes:
+<code>shared_preload_libraries = 'pg_stat_statements,pgaudit'</code>  </p>
 <pre>
 -- aplicar canvis..
 sudo systemctl restart postgresql
-</pre>
-
-<pre>--  Instalació
-CREATE EXTENSION pgaudit;
 </pre>
 
 <p>==> La informació NO es guarda en una taula, sinó en els logs del servidor PostgreSQL.</p>
@@ -368,7 +376,7 @@ logging_collector = on
 log_directory = 'log'
 log_filename = 'postgresql-%Y-%m-%d.log'
 </pre>
-<p>En la ruta: /var/lib/postgresql/data/log/postgresql-2026-03-20.log</p>
+<p>En la ruta: /var/lib/postgresql/16/main/log/postgresql-2026-11-20.log</p>
 <p>Es podrà trobar informació en este format...</p>
 <pre>AUDIT: READ, SELECT, table=clients, user=anna</pre>
 
@@ -377,31 +385,41 @@ log_filename = 'postgresql-%Y-%m-%d.log'
 <p>👉 Els logs van a: /var/log/syslog,   /var/log/messages</p>
 
 
-
 <h4>Auditoria amb triggers (personalitzada)</h4>
+<p>Es vorà amb els triggers, en la següent unitat didàctica</p>
 
 <h4>Auditoria d’accessos</h4>
-<li>intents de login (log_connections)</li>
-<li>fallades (log_failed_attempts indirectament)</li>
+<ul>
+  <li>intents de login (log_connections)</li>
+  <li>fallades (log_failed_attempts indirectament)</li>
+</ul>
 
+<pre>log_connections = on
+log_disconnections = on</pre>
+<p>PostgreSQL no té un paràmetre estàndard anomenat log_failed_attempts.
+   Les fallades d'autenticació es registren en el log del servidor quan es produeixen errors com:</p>
+ <ul>
+   <li>Contrasenya incorrecta.</li>
+   <li>Usuari inexistent.</li>
+   <li>Autenticació rebutjada per les regles de pg_hba.conf.</li>
+ </ul>
 
-     <h3>Com vore els registres de l'auditoria</h3>
-    
-      <h3> Consells de seguretat i gestió</h3>
-      <ul>
-        <li> Activa l’auditoria per accions sensibles (login, esborrar, canviar permisos)</li>
-        <li> Revisa regularment els registres d’auditoria</li>
-        <li> No deixis l’auditoria oberta en producció sense revisar l’espai</li>
-        <li> Automatitza l’anàlisi amb scripts o informes</li>
-      </ul>
-    
-      <h3> Conclusió</h3>
-      <p>
-        L’auditoria és una eina potent per a la seguretat i el control de bases de dades PostgreSQL.  
-        Permet identificar comportaments sospitosos, controlar accés no autoritzat i mantenir la traçabilitat de les operacions.
-        A més, és una pràctica recomanada per normatives legals i de qualitat.
-      </p>
-    </section>
+  <h3>Com vore els registres de l'auditoria</h3>
+  <pre>tail -f /var/lib/postgresql/16/main/log/postgresql*</pre>
+
+  <h3> Consells de seguretat i gestió</h3>
+  <ul>
+    <li> Activa l’auditoria per accions sensibles (login, esborrar, canviar permisos)</li>
+    <li> Revisa regularment els registres d’auditoria</li>
+    <li> No deixis l’auditoria oberta en producció sense revisar l’espai</li>
+    <li> Automatitza l’anàlisi amb scripts o informes</li>
+  </ul>
+
+  <p class="tips">     L’auditoria és una eina potent per a la seguretat i el control de bases de dades PostgreSQL.  
+    Permet identificar comportaments sospitosos, controlar accés no autoritzat i mantenir la traçabilitat de les operacions.
+    A més, és una pràctica recomanada per normatives legals i de qualitat.   </p>
+
+</section>
       
 
     
@@ -467,36 +485,36 @@ GRANT REFERENCES (id) ON cursos TO usuari;  -- Més restrictiu </pre>
   pais VARCHAR(30) DEFAULT 'Espanya'
 );           </pre>
       
-        <p>
-          Això garanteix que <code>nom</code> sempre tindrà valor, <code>edat</code> siga ≥ 16 i <code>pais</code> tindrà un valor per defecte.
-        </p>
+    <p>
+      Això garanteix que <code>nom</code> sempre tindrà valor, <code>edat</code> siga ≥ 16 i <code>pais</code> tindrà un valor per defecte.
+    </p>
+  
+    <h3> Integritat d’usuari</h3>
+    <p>
+      No s’implementa a nivell de base de dades, sinó via aplicacions o triggers. Controla normes específiques com:
+    </p>
+    <ul>
+      <li>Un usuari no pot tenir dues reserves actives</li>
+      <li>Els horaris d’una aula no poden solapar-se</li>
+    </ul>
+  
+    <p>
+      Aquest tipus d’integritat sovint es basa en <code>PL/pgSQL</code> o lògica de negoci a l’aplicació.
+    </p>
+  
+    <hr>
+    <p class="tips">     Mantenir la integritat de les dades és essencial per garantir que el sistema siga <strong>fiable, coherent i funcional</strong>.  
+      PostgreSQL ofereix múltiples mecanismes per implementar integritat a nivell físic, lògic i d’aplicació.         </p>
       
-        <h3> Integritat d’usuari</h3>
-        <p>
-          No s’implementa a nivell de base de dades, sinó via aplicacions o triggers. Controla normes específiques com:
-        </p>
-        <ul>
-          <li>Un usuari no pot tenir dues reserves actives</li>
-          <li>Els horaris d’una aula no poden solapar-se</li>
-        </ul>
-      
-        <p>
-          Aquest tipus d’integritat sovint es basa en <code>PL/pgSQL</code> o lògica de negoci a l’aplicació.
-        </p>
-      
-        <h3> Conclusió</h3>
-        <p>
-          Mantenir la integritat de les dades és essencial per garantir que el sistema siga <strong>fiable, coherent i funcional</strong>.  
-          PostgreSQL ofereix múltiples mecanismes per implementar integritat a nivell físic, lògic i d’aplicació.
-        </p>
-      
-        <blockquote>
-          🔐 “La seguretat comença amb la confiança en les dades. I la confiança es construeix amb integritat.”
-        </blockquote>
-      </section>
+    <blockquote>
+      🔐 “La seguretat comença amb la confiança en les dades. I la confiança es construeix amb integritat.”
+    </blockquote>
+   </section>
       
 
-      <section id="transaccions">
+
+
+ <section id="transaccions">
         <h2> Transaccions en PostgreSQL</h2>
       
         <h3>📘 Què és una transacció?</h3>
@@ -526,36 +544,36 @@ Cap pot continuar → deadlock</code></pre>
         <h3> Ordres bàsiques de control de transaccions</h3>
         <p>PostgreSQL és un sistema de base de dades purament transaccional</p>
 <pre>-- Per indicar que comença una transacció
-BEGIN; </pre>
+BEGIN;    o   START TRANSACTION;</pre>
 <p>❓ Què passa si NO poses BEGIN? : PostgreSQL activa el mode autocommit per defecte.=> Cada sentència SQL és una transacció implícita .. </p>
 <pre>-- PostgreSQL fa automàticament:
 BEGIN;
 &lt;la teua sentència>
 COMMIT;   </pre>
 
-        <p>En una transacció les dades modificades <strong>no són visibles</strong> per la resta d'usuaris fins que es confirme la transacció</p>
-      
-        <h4> <code>COMMIT</code></h4>
-        <p>
-          Fa permanents tots els canvis realitzats en la transacció. <strong> No es poden desfer després</strong>. En este moment les dades modificades ja son
-          visibles per la resta d'usuaris .       </p>
-        <pre>BEGIN;
+    <p>En una transacció les dades modificades <strong>no són visibles</strong> per la resta d'usuaris fins que es confirme la transacció</p>
+  
+    <h4> <code>COMMIT</code></h4>
+    <p>
+      Fa permanents tots els canvis realitzats en la transacció. <strong> No es poden desfer després</strong>. En este moment les dades modificades ja son
+      visibles per la resta d'usuaris .       </p>
+    <pre>BEGIN;
 INSERT INTO alumnes VALUES (10, 'Joan', 20);
 COMMIT;          </pre>
-       <p>Les sentències de finalització de transacció són COMMIT i ROLLBACK</p>
-        <h4> <code>ROLLBACK</code></h4>
-        <p>
-          Desfà tots els canvis realitzats des del darrer <code>COMMIT</code>. Torna l’estat de la BD a com estava abans.
-        </p>
-        <pre>BEGIN;
+      <p>Les sentències de finalització de transacció són COMMIT i ROLLBACK</p>
+    <h4> <code>ROLLBACK</code></h4>
+    <p>
+      Desfà tots els canvis realitzats des del darrer <code>COMMIT</code>. Torna l’estat de la BD a com estava abans.
+    </p>
+    <pre>BEGIN;
 UPDATE alumnes SET edat = 30 WHERE id = 10;
 ROLLBACK; -- Anul·la l'actualització            </pre> 
       
-        <h4> <code>SAVEPOINT</code></h4>
-        <p>
-          Permet definir punts intermedis dins d’una transacció per fer <code>ROLLBACK</code> parcial.
-        </p>
-        <pre>BEGIN;
+    <h4> <code>SAVEPOINT</code></h4>
+    <p>
+      Permet definir punts intermedis dins d’una transacció per fer <code>ROLLBACK</code> parcial.
+    </p>
+    <pre>BEGIN;
 SAVEPOINT punt1;
 DELETE FROM alumnes WHERE edat &lt; 18;
 
@@ -564,79 +582,77 @@ UPDATE alumnes SET nom = 'Anònim' WHERE edat &gt; 25;
 
 ROLLBACK TO punt1; -- desfà només fins al punt1           </pre>
       
-        <h3> Transaccions automàtiques i manuals</h3>
-        <p>En PostgreSQL, Cap sentència SQL normal (INSERT, UPDATE, CREATE TABLE, etc.),
-           ❌ no fa COMMIT implícit dins d’una transacció</p>
-      <pre>
+    <h3> Transaccions automàtiques i manuals</h3>
+    <p>En PostgreSQL, Cap sentència SQL normal (INSERT, UPDATE, CREATE TABLE, etc.),
+        ❌ no fa COMMIT implícit dins d’una transacció</p>
+  <pre>
 BEGIN;
 CREATE TABLE prova (id int);
 ROLLBACK;        
+  </pre>
+  <p>Resultat: la taula NO existeix. DDL és totalment transaccional (a diferència de ORACLE)</p>
+
+  <p>⚠️ 5. Excepcions (IMPORTANT). Algunes instruccions NO poden anar dins d’una transacció: Com per Exemple:
+  <code> CREATE DATABASE test;</code> i altres com <code>TABLESPACE , CLUSTER, ALTER SYSTEM</code>  </p>
+
+    <h3> Relació amb la seguretat</h3>
+    <p>
+      Una gestió acurada de les transaccions garanteix:
+    </p>
+    <ul>
+      <li> Traçabilitat i reversibilitat en cas d’error</li>
+      <li> Integritat davant fallades del sistema</li>
+      <li> Registre coherent en conjunció amb l’auditoria</li>
+    </ul>
+  <hr>
+  <p>PostgreSQL té mecanismes per detectar <strong>deadlocks</strong> de manera automàtica. Quan detecta que dos
+      transaccions no poden continuar, avorta una de les dues i retorna un error:</p>
+  <p>La transacció que PostgreSQL sol avortar és la que porta menys treball fet (la que ha modificat menys dades), també coneguda 
+    com la “victim transaction”, per minimitzar la pèrdua de treball.</p>
+  <pre><code>ERROR: deadlock detected</code></pre>
+  <p>Així, almenys una pot continuar i el sistema no queda bloquejat.</p>
+  <p>Quan PostgreSQL mata una transacció per deadlock, la seva part desada es desfà (rollback), mantenint la coherència.</p>
+
+  <h3> Conclusió</h3>
+  <p>
+    El control de transaccions és una eina fonamental per garantir que el sistema de base de dades siga <strong>segur, coherent i robust</strong>.
+    PostgreSQL proporciona instruccions clares per controlar de forma manual i segura l’execució de canvis en les dades.
+  </p>
+
+  <hr> <h3> Exemple (vore transacció per completar)</h3>
+  <p>Obrim 2 sessions ( en SQL*PLUS ) amb usuari1 ( dos cmd diferents)   </p>
+  <pre> 
+  En la primera sessió (1er CMD)
+  postgres=# BEGIN;
+  postgres=# insert into prueba10 (id, nom) values (1000,’valor1 ’);
+  1 row created.        </pre>
+  <pre>
+  En la segon sessió  (2on cmd) 
+  postgres=# BEGIN   
+  postgres=# select count(*) from prueba10;
+  COUNT(*)
+  ----------
+  0</pre>
+      <pre>
+  En la primera sessió (1er CMD)
+  postgres=# commit;            
       </pre>
-      <p>Resultat: la taula NO existeix. DDL és totalment transaccional (a diferència de ORACLE)</p>
-    
-    <p>⚠️ 5. Excepcions (IMPORTANT). Algunes instruccions NO poden anar dins d’una transacció: Com per Exemple:
-      <code> CREATE DATABASE test;</code> i altres com <code>TABLESPACE , CLUSTER, ALTER SYSTEM</code>
-</p>
+  <pre>
+  En la segon sessió (2on CMD)    
+  postgres=# select count(*) from prueba10;
+  COUNT(*)
+  ----------
+  1
+  </pre>
 
-        <h3> Relació amb la seguretat</h3>
-        <p>
-          Una gestió acurada de les transaccions garanteix:
-        </p>
-        <ul>
-          <li> Traçabilitat i reversibilitat en cas d’error</li>
-          <li> Integritat davant fallades del sistema</li>
-          <li> Registre coherent en conjunció amb l’auditoria</li>
-        </ul>
-      <hr>
-      <p>PostgreSQL té mecanismes per detectar <strong>deadlocks</strong> de manera automàtica. Quan detecta que dos
-         transaccions no poden continuar, avorta una de les dues i retorna un error:</p>
-      <p>La transacció que PostgreSQL sol avortar és la que porta menys treball fet (la que ha modificat menys dades), també coneguda 
-        com la “victim transaction”, per minimitzar la pèrdua de treball.</p>
-        <pre><code>ERROR: deadlock detected</code></pre>
-        <p>Així, almenys una pot continuar i el sistema no queda bloquejat.</p>
-        <p>Quan PostgreSQL mata una transacció per deadlock, la seva part desada es desfà (rollback), mantenint la coherència.</p>
-
-        <h3> Conclusió</h3>
-        <p>
-          El control de transaccions és una eina fonamental per garantir que el sistema de base de dades siga <strong>segur, coherent i robust</strong>.
-          PostgreSQL proporciona instruccions clares per controlar de forma manual i segura l’execució de canvis en les dades.
-        </p>
-
-       <hr> <h3> Exemple (vore transacció per completar)</h3>
-        <p>Obrim 2 sessions ( en SQL*PLUS ) amb usuari1 ( dos cmd diferents)   </p>
-        <pre> 
-    En la primera sessió (1er CMD)
-    postgres=# BEGIN;
-    postgres=# insert into prueba10 (id, nom) values (1000,’valor1 ’);
-    1 row created.
-        </pre>
-    <pre>
-    En la segon sessió  (2on cmd) 
-    postgres=# BEGIN   
-    postgres=# select count(*) from prueba10;
-    COUNT(*)
-    ----------
-    0</pre>
-        <pre>
-    En la primera sessió (1er CMD)
-    postgres=# commit;            
-        </pre>
-    <pre>
-    En la segon sessió (2on CMD)    
-    postgres=# select count(*) from prueba10;
-    COUNT(*)
-    ----------
-    1
-    </pre>
-
-    <hr><h4>Exemple ( de deadlock )</h4>
-    <p>Suposem que tenim una taula:</p>
-    <pre><code>CREATE TABLE comptes (
-    id INTEGER PRIMARY KEY,
-    saldo INTEGER
-    ); </code></pre>
-    <p>i dos files</p>
-    <pre><code>INSERT INTO comptes VALUES (1, 100);
+  <hr><h4>Exemple ( de deadlock )</h4>
+  <p>Suposem que tenim una taula:</p>
+  <pre><code>CREATE TABLE comptes (
+  id INTEGER PRIMARY KEY,
+  saldo INTEGER
+  ); </code></pre>
+  <p>i dos files</p>
+  <pre><code>INSERT INTO comptes VALUES (1, 100);
 INSERT INTO comptes VALUES (2, 200);
 COMMIT; </code></pre>
 <p>Obri dos sessios sql diferents, Sessio A i Sessio B</p>
@@ -671,6 +687,8 @@ CONTEXT:  mientras se actualizaba la tupla (0,1) en la relación «comptes»
 
  </section>
       
+
+ 
 
   <section id="backups">
     <h2>💾 Recuperació i còpies de seguretat en PostgreSQL</h2>
@@ -742,7 +760,7 @@ CONTEXT:  mientras se actualizaba la tupla (0,1) en la relación «comptes»
     <li>✔️ Editable (és text)</li>
     <li>❌ Lent en BD grans</li>
     <li>❌ No inclou configuració interna</li>
-    <li>❌ No serveix per PITR</li>
+    <li>❌ No serveix per PITR (Point-In-Time Recovery) recuperació fins a un punt determinat en el temps.</li>
   </ul>
 
 <pre>-- Restauració:
@@ -763,7 +781,7 @@ backup/
       </pre>
   <ul>Característiques
     <li>✔️ Ràpid per BD grans</li>
-    <li>✔️ Base per PITR</li>
+    <li>✔️ Base per PITR (Point-In-Time Recovery)</li>
     <li>✔️ Còpia exacta</li>
     <li>❌ No selectiu</li>
     <li>❌ No editable</li>
@@ -829,147 +847,149 @@ pg_ctl start
 --    carrega backup
 --    aplica WAL
 --    s’atura en el moment indicat
-       </pre>
-        <h3> Bones pràctiques de seguretat</h3>
-        <ul>
-          <li> Programar backups regulars</li>
-          <li> Mantenir còpies en ubicacions externes</li>
-          <li> Fer proves periòdiques de recuperació</li>
-          <li> Documentar el procediment de recuperació</li>
-        </ul>        
-      
-        <h3> Conclusió</h3>
-        <p>
-          Disposar d’un pla de còpies de seguretat fiable i efectiu és <strong>fonamental per garantir la seguretat i continuïtat</strong> de qualsevol sistema basat en PostgreSQL.
-          Les eines com RMAN i Data Pump permeten adaptar-se a múltiples escenaris, i una bona estratègia de backup ha d’estar acompanyada d’una política de recuperació clara.
-        </p>
+  </pre>
+  <h3> Bones pràctiques de seguretat</h3>
+  <ul>
+    <li> Programar backups regulars</li>
+    <li> Mantenir còpies en ubicacions externes</li>
+    <li> Fer proves periòdiques de recuperació</li>
+    <li> Documentar el procediment de recuperació</li>
+  </ul>        
+
+  <h3> Conclusió</h3>
+  <p>
+    Disposar d’un pla de còpies de seguretat fiable i efectiu és <strong>fonamental per garantir la seguretat i continuïtat</strong> de qualsevol sistema basat en PostgreSQL.
+    Les eines com RMAN i Data Pump permeten adaptar-se a múltiples escenaris, i una bona estratègia de backup ha d’estar acompanyada d’una política de recuperació clara.
+  </p>
 
 
-      </section>
-      
+</section>
 
-      <section id="normativa-vigent">
-        <h2>⚖️ Normativa vigent en matèria de protecció de dades</h2>
-      
-        <h3>📘 Què és la normativa de protecció de dades?</h3>
-        <p>
-          És el conjunt de lleis i regulacions que tenen com a objectiu <strong>garantir la privadesa i la seguretat de les dades personals</strong> que gestionen les empreses i organitzacions.
-          Afecta directament la gestió dels sistemes d’informació, especialment els que contenen bases de dades amb informació de persones físiques.
-        </p>
-      
-        <h3>🇪🇺 Reglament General de Protecció de Dades (RGPD)</h3>
-        <ul>
-          <li><strong>Nom complet:</strong> Reglament (UE) 2016/679 del Parlament Europeu i del Consell</li>
-          <li><strong>Aplicació:</strong> obligatòria a tots els estats membres de la Unió Europea des del 25 de maig de 2018</li>
-          <li><strong>Objectiu:</strong> protegir els drets fonamentals de les persones pel que fa al tractament de les seves dades personals</li>
-        </ul>
-      
-        <h4> Principis bàsics del RGPD</h4>
-        <ul>
-          <li> Lícit, lleial i transparent</li>
-          <li> Finalitat determinada i legítima</li>
-          <li> Minimització de dades</li>
-          <li> Exactitud</li>
-          <li> Limitació de conservació</li>
-          <li> Integritat i confidencialitat</li>
-          <li> Responsabilitat proactiva</li>
-        </ul>
-      
-        <h4>👥 Drets de les persones usuàries</h4>
-        <ul>
-          <li> Dret d’accés</li>
-          <li> Dret de rectificació</li>
-          <li> Dret de supressió (“dret a l’oblit”)</li>
-          <li> Dret d’oposició</li>
-          <li> Dret a la limitació del tractament</li>
-          <li> Dret a la portabilitat de dades</li>
-        </ul>
-      
-        <h3>🇪🇸 LOPDGDD – Llei orgànica 3/2018</h3>
-        <p>
-          A Espanya, la normativa RGPD es complementa amb la LOPDGDD:
-        </p>
-        <ul>
-          <li><strong>Nom complet:</strong> Llei Orgànica 3/2018 de Protecció de Dades Personals i garantia dels drets digitals</li>
-          <li><strong>Objectiu:</strong> adaptar el RGPD a l’ordenament jurídic espanyol i afegir drets digitals</li>
-        </ul>
-      
-        <h4> Alguns punts destacats de la LOPDGDD</h4>
-        <ul>
-          <li> Designació d’un Delegat de Protecció de Dades (DPO) en determinades entitats</li>
-          <li> Mesures de seguretat segons el risc de les dades tractades</li>
-          <li> Registre d’activitats de tractament</li>
-          <li> Avaluació d’impacte quan hi ha risc elevat</li>
-          <li> Drets digitals: educació digital, neutralitat, desconnexió laboral, etc.</li>
-        </ul>
-      
-        <h3> Obligacions tècniques relacionades amb bases de dades</h3>
-        <ul>
-          <li> Control d’accés i permisos per rols</li>
-          <li> Auditories d’accés a dades personals</li>
-          <li> Registre de canvis i transaccions</li>
-          <li> Còpies de seguretat i plans de recuperació</li>
-          <li> Encriptació de dades sensibles</li>
-        </ul>
 
-        <h3>Drets ARCO</h3>
-        <ul>
-          <li> Accés</li>
-          <li> Rectificació</li>
-          <li> Cancel·lació</li>
-          <li> Oposició</li>
-        </ul>
 
-        <h3>Paper del SGBD</h3>
-        <ul>
-            <li> Gestió d’usuaris i permisos</li>
-            <li>Sistemes de recuperació</li>
-            <li>  RI</li>
-            <li>Encriptació (informació sensible)</li>
-            <li>   Auditoria </li>
-        </ul>
 
-        <h3>Classificar informació</h3>
-            <ul>
-                <li>Nivell bàsic</li>
-                <li> Nivell mig</li>
-                <li>Nivell alt </li>
-            </ul>
-        <h4 style="color:red">Els procediments han d’estar documentats i supervisats per poder garantir el compliment de la normativa i la llei.</h4>
-      
-        <h3>📊 Sancions per incompliment</h3>
-        <p>
-          El RGPD preveu sancions de fins al <strong>4% del volum de negoci anual global</strong> o <strong>20 milions d’euros</strong>, segons quina siga més elevada.
-        </p>
-      
-        <h3> Conclusió</h3>
-        <p>
-          Tant el <strong>RGPD</strong> com la <strong>LOPDGDD</strong> estableixen un marc normatiu estricte i necessari per protegir les dades personals.
-          A l’hora d’administrar bases de dades, cal assegurar-se que:
-        </p>
-        <ul>
-          <li>Les dades sensibles estan ben protegides</li>
-          <li>Només hi accedeix qui està autoritzat</li>
-          <li>Es poden traçar les operacions sobre dades personals</li>
-          <li>Es poden complir els drets dels usuaris</li>
-        </ul>
-      
-        <blockquote>
-          ⚖️ “Una base de dades segura no només és eficient, sinó també legalment responsable.”
-        </blockquote>
-      </section>
+<section id="normativa-vigent">
+  <h2>⚖️ Normativa vigent en matèria de protecció de dades</h2>
 
-      <section>
-        <h1>Informe de bones pràctiques del CCN-CERT</h1>
-        <img src="imgs/logo-ccncert.png" alt="ccn-cert" width="25%" class="imatge-dreta">
-        <h3> <a href="https://www.ccn-cert.cni.es/es/series-ccn-stic/informes-de-ciberseguridad-ccn-cert/informes-ccn-cert-buenas-practicas-bp/6353-ccn-cert-bp-24-recomendaciones-de-seguridad-en-bases-de-datos/file.html">
-           CCN-CERT BP/24 Recomendaciones de seguridad en bases de datos         </a>             </h3>
-        <p>CCN-CERT BP/24 és un document tècnic que ofereix recomanacions i bones pràctiques en ciberseguretat, 
-          elaborat pel CCN-CERT, amb l’objectiu d’ajudar les administracions públiques i altres organitzacions a millorar 
-          la protecció dels seus sistemes d’informació</p>
-        <h3><a href="https://www.postgresql.org/support/security/">Security Information in PostgreSQL</a></h3>
+  <h3>📘 Què és la normativa de protecció de dades?</h3>
+  <p>
+    És el conjunt de lleis i regulacions que tenen com a objectiu <strong>garantir la privadesa i la seguretat de les dades personals</strong> que gestionen les empreses i organitzacions.
+    Afecta directament la gestió dels sistemes d’informació, especialment els que contenen bases de dades amb informació de persones físiques.
+  </p>
 
-      </section>
+  <h3>🇪🇺 Reglament General de Protecció de Dades (RGPD)</h3>
+  <ul>
+    <li><strong>Nom complet:</strong> Reglament (UE) 2016/679 del Parlament Europeu i del Consell</li>
+    <li><strong>Aplicació:</strong> obligatòria a tots els estats membres de la Unió Europea des del 25 de maig de 2018</li>
+    <li><strong>Objectiu:</strong> protegir els drets fonamentals de les persones pel que fa al tractament de les seves dades personals</li>
+  </ul>
+
+  <h4> Principis bàsics del RGPD</h4>
+  <ul>
+    <li> Lícit, lleial i transparent</li>
+    <li> Finalitat determinada i legítima</li>
+    <li> Minimització de dades</li>
+    <li> Exactitud</li>
+    <li> Limitació de conservació</li>
+    <li> Integritat i confidencialitat</li>
+    <li> Responsabilitat proactiva</li>
+  </ul>
+
+  <h4>👥 Drets de les persones usuàries</h4>
+  <ul>
+    <li> Dret d’accés</li>
+    <li> Dret de rectificació</li>
+    <li> Dret de supressió (“dret a l’oblit”)</li>
+    <li> Dret d’oposició</li>
+    <li> Dret a la limitació del tractament</li>
+    <li> Dret a la portabilitat de dades</li>
+  </ul>
+
+  <h3>🇪🇸 LOPDGDD – Llei orgànica 3/2018</h3>
+  <p>
+    A Espanya, la normativa RGPD es complementa amb la LOPDGDD:
+  </p>
+  <ul>
+    <li><strong>Nom complet:</strong> Llei Orgànica 3/2018 de Protecció de Dades Personals i garantia dels drets digitals</li>
+    <li><strong>Objectiu:</strong> adaptar el RGPD a l’ordenament jurídic espanyol i afegir drets digitals</li>
+  </ul>
+
+  <h4> Alguns punts destacats de la LOPDGDD</h4>
+  <ul>
+    <li> Designació d’un Delegat de Protecció de Dades (DPO) en determinades entitats</li>
+    <li> Mesures de seguretat segons el risc de les dades tractades</li>
+    <li> Registre d’activitats de tractament</li>
+    <li> Avaluació d’impacte quan hi ha risc elevat</li>
+    <li> Drets digitals: educació digital, neutralitat, desconnexió laboral, etc.</li>
+  </ul>
+
+  <h3> Obligacions tècniques relacionades amb bases de dades</h3>
+  <ul>
+    <li> Control d’accés i permisos per rols</li>
+    <li> Auditories d’accés a dades personals</li>
+    <li> Registre de canvis i transaccions</li>
+    <li> Còpies de seguretat i plans de recuperació</li>
+    <li> Encriptació de dades sensibles</li>
+  </ul>
+
+  <h3>Drets ARCO</h3>
+  <ul>
+    <li> Accés</li>
+    <li> Rectificació</li>
+    <li> Cancel·lació</li>
+    <li> Oposició</li>
+  </ul>
+
+  <h3>Paper del SGBD</h3>
+  <ul>
+      <li> Gestió d’usuaris i permisos</li>
+      <li>Sistemes de recuperació</li>
+      <li>  RI</li>
+      <li>Encriptació (informació sensible)</li>
+      <li>   Auditoria </li>
+  </ul>
+
+  <h3>Classificar informació</h3>
+      <ul>
+          <li>Nivell bàsic</li>
+          <li> Nivell mig</li>
+          <li>Nivell alt </li>
+      </ul>
+  <h4 style="color:red">Els procediments han d’estar documentats i supervisats per poder garantir el compliment de la normativa i la llei.</h4>
+
+  <h3>📊 Sancions per incompliment</h3>
+  <p>
+    El RGPD preveu sancions de fins al <strong>4% del volum de negoci anual global</strong> o <strong>20 milions d’euros</strong>, segons quina siga més elevada.
+  </p>
+
+  <h3> Conclusió</h3>
+  <p>
+    Tant el <strong>RGPD</strong> com la <strong>LOPDGDD</strong> estableixen un marc normatiu estricte i necessari per protegir les dades personals.
+    A l’hora d’administrar bases de dades, cal assegurar-se que:
+  </p>
+  <ul>
+    <li>Les dades sensibles estan ben protegides</li>
+    <li>Només hi accedeix qui està autoritzat</li>
+    <li>Es poden traçar les operacions sobre dades personals</li>
+    <li>Es poden complir els drets dels usuaris</li>
+  </ul>
+
+  <blockquote>
+    ⚖️ “Una base de dades segura no només és eficient, sinó també legalment responsable.”
+  </blockquote>
+</section>
+
+<section>
+  <h1>Informe de bones pràctiques del CCN-CERT</h1>
+  <img src="imgs/logo-ccncert.png" alt="ccn-cert" width="25%" class="imatge-dreta">
+  <h3> <a href="https://www.ccn-cert.cni.es/es/series-ccn-stic/informes-de-ciberseguridad-ccn-cert/informes-ccn-cert-buenas-practicas-bp/6353-ccn-cert-bp-24-recomendaciones-de-seguridad-en-bases-de-datos/file.html">
+      CCN-CERT BP/24 Recomendaciones de seguridad en bases de datos         </a>             </h3>
+  <p>CCN-CERT BP/24 és un document tècnic que ofereix recomanacions i bones pràctiques en ciberseguretat, 
+    elaborat pel CCN-CERT, amb l’objectiu d’ajudar les administracions públiques i altres organitzacions a millorar 
+    la protecció dels seus sistemes d’informació</p>
+  <h3><a href="https://www.postgresql.org/support/security/">Security Information in PostgreSQL</a></h3>
+
+</section>
             
 
 

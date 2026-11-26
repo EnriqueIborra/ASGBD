@@ -16,6 +16,9 @@
   <h1>ASGBD   -    Usuaris i Permisos en postgresql
         <img src="imgs/Postgresql_elephant.svg" alt="PostgreSQL Logo" style="width: 40px; ">
   </h1>
+  -- <button class="theme-toggle" onclick="toggleTheme()">  
+    <i class="hgi hgi-stroke hgi-sun-01" id="theme-icon"></i>   </button> 
+
 </header>
 
 <nav>
@@ -40,7 +43,7 @@
 
   <section id="cid">
         <h2>La Triada CID <br> (Confidencialitat, Integritat, Disponibilitat) en postgresql</h2>
-        <img src="imgs/CID-ciber.png" class="imatge-esquerra"  alt="stop" style="width: 20%">
+        <img src="imgs/CID-ciberBG.png" class="imatge-esquerra"  alt="stop" style="width: 20%">
     <p>La triada CID (Confidencialitat, Integritat i Disponibilitat) és un model de seguretat fonamental per garantir la protecció 
       de la informació en qualsevol sistema informàtic, inclòs postgresql. Aquest model es fa servir per establir les bases de les polítiques
        de seguretat, i postgresql, com a sistema de gestió de bases de dades (SGBD), té diverses característiques i eines que permeten
@@ -84,33 +87,54 @@
 
 
     <h3>🔐 Autenticació d'usuaris</h3>
-    <p>Es configura en fitxer <code><strong>pg_hba.conf</strong></code></p>
-    <ul> Modes:
-      <li>sistema operatiu (peer, PAM)</li>
-      <li>directori (LDAP)</li>
-      <li>autenticació de domini (GSS/Kerberos)</li>
-      <li>autenticació de domini (SSPI/Windows)</li>
-      <li>servidor centralitzat d'autenticació (RADIUS)</li>
-      <li> usuari amb credencials dins de la base de dades. <strong>md5, scram-sha-256</strong></li>
+    <p>La configuració de l'autenticació dels clients que volen connectar-se al servidor PostgreSQL es defineix 
+      en el fitxer  <code><strong>pg_hba.conf</strong></code> (Host-Based Authentication).</p>
+    <p>Aquest fitxer determina qui pot connectar-se, des d'on pot fer-ho, a quina base de dades i quin mètode d'autenticació ha d'utilitzar.</p>
+    <ul> Mètodes d'autenticació:
+      <li>sistema operatiu (peer, pam ).  s'utilitza per a connexions locals</li>
+      <li>usuari amb credencials dins de la base de dades. <strong>md5, scram-sha-256</strong></li>
+      <li>sistema operatiu (trust, password, reject )</li>
+      <li>certificats digitals de client (cert)</li>
+      <li>protocol Identification Protocol (RFC 1413). (ident). s'utilitza per a connexions remotes</li>
+      <li>directori (ldap)</li>
+      <li>autenticació de domini (gss/Kerberos)</li>
+      <li>autenticació de domini (sspi/Windows)</li>
+      <li>servidor centralitzat d'autenticació (radius)</li>
+      
     </ul>
+    <p><strong>pg_hba.conf</strong>  controla l'autenticació i les condicions d'accés a les connexions, però no concedeix privilegis 
+      sobre les bases de dades ni sobre les seues taules. Això es gestiona mitjançant els rols i els privilegis</p>
+    <p>PostgreSQL llig les regles de pg_hba.conf de dalt cap avall i utilitza la primera regla que coincideix amb la connexió. 
+      Si l'autenticació falla, no prova les regles següents. <strong>l'ordre</strong>  de les regles és fonamental.</p>
   
-    <h3> Tipus d'usuaris</h3>
-    <ul>
-      <li><strong>Predefinits</strong>: postgres , l'administrador del SGBD. "S'ha de protegir i intentar no usar"</li>
-      <li><strong>En cluster</strong>: definits dins d'un cluster</li>
-    </ul>
-    <p>Els usuaris (roles) es creen a nivell de tot el cluster. Un usuari pot connectar-se a qualsevol base de dades (si té permisos)</p>
+    <h3> Usuaris predefinits</h3>
+    <p>PostgreSQL crea alguns rols i un usuari durant la instal·lació. Este usuari és <strong><code>postgres</code></strong> ,
+ que és el superusuari administrador del SGBD. 
+ Té privilegis elevats, per la qual cosa s'ha de protegir i evitar utilitzar-lo per a les tasques quotidianes.</p>
+
+    <p>Els usuaris (roles) es creen a nivell de cluster PostgreSQL, no a nivell d'una base de dades concreta. 
+      Un usuari pot connectar-se a qualsevol base de dades (si té permisos)</p>
+  <pre>Clúster
+   │
+   ├─ Base de dades A
+   │    └─ ...
+   ├─ Base de dades B
+   │    └─ ...
+   ├─ Usuaris / Rols (globals)     
+   :     </pre>
   
     <h3> Creació, modificació i baixa d'usuaris</h3>
     <p class="tips">Des d'usuari DBA (postgres), o un usuari amb privilegi CREATEROLE</p>
     <pre>
   -- Crear usuari normal  (cas més usual)
-CREATE USER alumne WITH PASSWORD '1234';
+CREATE USER jose WITH PASSWORD '1234';   equiv.   CREATE USER jose PASSWORD '1234';
+                -- el WITH és opcional en CREATE USER
   
   -- Crear usuari administratiu 
-CREATE USER profe  WITH PASSWORD 'abc123'  CREATEDB  CREATEROLE;
-  --  CREATEDB → pot crear bases de dades
-  --  CREATEROLE → pot crear altres usuaris
+CREATE USER pepe  WITH PASSWORD 'abc123'  CREATEDB  CREATEROLE;
+
+  -- Crear usuari 'super'
+CREATE USER enrique  WITH PASSWORD 'abc123'  SUPERUSER;
 
   -- Modificar contrasenya  (regenera/xifra contrasenya)
 ALTER USER ausias WITH PASSWORD 'nova_pass';
@@ -129,36 +153,37 @@ SELECT pg_terminate_backend(pid)  FROM pg_stat_activity
 REASSIGN OWNED BY alumne TO altre_user;
 DROP OWNED BY alumne;
 DROP USER alumne;</pre>
-<hr><p>Alerta, spoiler ! . Un usuari en postgres és equivalent a un rol amb permís de connexió: Els rols es voran més endavant...</p>
+<hr><p>Un <strong>usuari</strong>  en postgres és equivalent a un rol amb permís de connexió: Els rols es voran més endavant...</p>
 <pre>  -- Equivalent a crear usuari  ==>  Crear rol amb LOGIN
 CREATE ROLE alumne LOGIN PASSWORD '1234';
   -- LOGIN indica que pot iniciar sessió
 </pre>  
   
-  <hr>  <h3>🔑 Donar permisos de connexió</h3>
+  <hr>  <h3>⚡ On es pot connectar </h3>
     <p>Depèn de com es cree, un usuari podrà connectar o no..</p>
   <pre>
-CREATE USER alumne WITH PASSWORD '1234';  -- pot connectar
-CREATE ROLE alumne LOGIN PASSWORD '1234';  -- pot connectar, perquè té el LOGIN
-CREATE ROLE app_role NOLOGIN;  -- no pot connectar
-GRANT CONNECT ON DATABASE escola TO alumne;  -- Per defecte, no cal..    </pre>
-  <p>Encara que: Quan es crea una base de dades nova, per defecte es fa un
-    <pre>GRANT CONNECT ON DATABASE nom_bbdd TO PUBLIC;</pre>
-    Això significa que qualsevol usuari pot connectar encara que no se li donen permisos explícits de 
-  <br><code>GRANT CONNECT ON DATABASE .. TO ..</code></p>
+CREATE USER ausias WITH PASSWORD '1234';  -- pot connectar
+CREATE ROLE omar LOGIN PASSWORD '1234';  -- pot connectar, perquè té el LOGIN
+CREATE ROLE alumnes ;  -- no pot connectar    </pre>
 
-  <p>Si es desitja que, per defecte, cap usuari puga connectar a una BBDD, s'ha de revocar el permís després de crear-la 
-    amb, <pre>REVOKE CONNECT ON DATABASE escola FROM PUBLIC;</pre>, i sols donar permís als usuaris concrets amb 
-    <code>GRANT CONNECT ON DATABASE escola TO usuari;</code>
-  </p>
+ <ul> <strong>Què pot fer inicialment?</strong> 
+   <li>Connectar-se al servidor PostgreSQL: sí, sempre que el servidor accepte la connexió i supere l'autenticació.</li>
+   <li>Connectar-se a les bases de dades: no necessàriament. Necessita el privilegi CONNECT sobre cada base de dades.</li>
+   <li>Consultar o modificar taules: no, si no té els permisos corresponents.</li>
+ </ul>
+  <p class="tips">Crear un usuari no significa donar-li accés automàtic a totes les dades. 
+    Els permisos de connexió i els permisos sobre els objectes de cada base de dades són independents.</p>
   
+    <p>🐘 Quan es crea una base de dades nova, <strong>per defecte</strong> , qualsevol usuari pot connectar encara que no se li donen permisos explícits.</p>
+
+
   <hr>  <h3>🔍 Consultes útils  (vista de DD : <code>pg_roles</code> )</h3>
     <pre>
   -- Usuaris existents
 SELECT rolname, rolcanlogin, rolvaliduntil FROM pg_roles;
 \du
   
-  -- Esquema / usuari actiu
+  -- Usuari actiu
 SELECT current_user;
 \echo :USER
 \conninfo
@@ -174,7 +199,7 @@ SELECT current_database();      </pre>
   
 <hr>  <h3>Connexió</h3>
     <pre>
-psql -U pepe -d escola   -- Intenta connectar com a peer
+psql -U pepe -d escola   -- Intenta connectar com a peer (sense contrasenya)
 
 psql -U pepe -h localhost -d escola   --  Com a host (amb contrasenya)  
         -usu-   -lloc-       -bbdd-      </pre>
@@ -192,22 +217,59 @@ psql -U pepe -h localhost -d escola   --  Com a host (amb contrasenya)
 
     <hr>
     <h2>schema</h2>
-    <p>A PostgreSQL, totes les taules han d’estar dins d’un esquema, i per defecte els usuaris treballen a l’esquema <strong>PUBLIC</strong>.</p>
+    <p>A PostgreSQL, totes les taules (i altres objectes) han d’estar dins d’un esquema.</p>
+    <pre>Clúster de PostgreSQL
+   │
+   ├─ Base de dades A
+   │    │
+   │    ├─ Schema 1
+   │    │     │
+   │    │     ├─ Taules
+   │    │     ├─ Vistes
+   │    │     ├─ Índexs
+   :    :     └─ Funcions      </pre>
+
     <p>Un schema en PostgreSQL (i en molts altres SGBD) es pot entendre com un directori o carpeta dins d’una base de dades: (No en el disc dur, ni en el SO, sinó dins d'una BBDD). 
       És un concepte paregut al ESPAI DE NOMS o namespaces. És com un contenidor lògic dins d'una BBDD      </p>
-    <p>Quan es crea una bbdd , es crea un <strong>schema</strong> "public", on el propietari de la BBDD té accés concedit</p>
-    <p>El propietari del schema public és el mateix usuari que crea la base de dades. Aquest usuari té permisos de CREATE, USAGE 
-      dins del schema, per tant pot crear taules immediatament.</p>
-  <pre>  -- Crear un esquema addicional...
-CREATE SCHEMA schema1 AUTHORIZATION user1;  </pre>
+    <h4>Per a què serveix un schema?</h4>
+    <ol>
+      <li>Organitzar els objectes de la base de dades</li>
+      <li>Evitar conflictes entre noms d'objectes</li>
+      <li>Gestionar permisos i seguretat</li>
+      <li>Separar aplicacions o àrees de treball</li>
+    </ol>
+
+    <hr> <p>Quan es crea una <strong>bbdd</strong> , es crea un <strong>schema</strong> anomenat "public", on el propietari de la BBDD té accés concedit</p>
+ <pre>Clúster
+   │
+   ├─ postgres (bbdd)
+   │    │
+   │    ├─ public (schema)    </pre>
+
+
+    <p>Quan es crea una BBDD es pot indicar un propietari. (sinó serà el que la crea). Aquest usuari propietari té permisos de USAGE i CREATE 
+      dins del schema <strong>"public"</strong> , per tant pot crear taules immediatament.</p>
+<pre>  Name  |       Owner       |
+--------+-------------------+ 
+ public | pg_database_owner |   </pre>
+
+ <h3>Crear un esquema addicional.</h3>
+  <pre>CREATE SCHEMA user1 AUTHORIZATION user1;    --  Per un usuari nou
+CREATE SCHEMA nom_app1 AUTHORIZATION user1;  -- Per a una app o projecte nou
+GRANT USAGE, CREATE ON SCHEMA nom_app1 TO user2;  -Afegir autoritzats</pre>
+<p > ** GRANT USAGE, CREATE no permet automàticament a user2 modificar o eliminar els objectes creats per user1.
+   Per a això caldrà concedir-li els permisos corresponents sobre cada objecte. <br>
+  Un esquema només té un propietari, però pot tindre diversos usuaris amb permisos diferents.</p>
+<pre>-- canviar el propietari d'un schema
+ALTER SCHEMA user1 OWNER TO user1;  </pre>
+
     <pre>-- Crear objectes en el nou schema
 CREATE TABLE schema1.novataula1 (id int, nom text);      
--- Accés a objectes d'un schema
-SELECT * FROM schema1.novataula1;
+SELECT * FROM schema1.novataula1;  -- Accés a objectes d'un schema
 
    -- Per evitar posar schema1.
 SET search_path TO schema1;
-SET search_path TO schema1, schema2, public;  
+SET search_path TO schema1, schema2, public;  -- Per no deixar-se public fora !
 
    -- I després si es fa ..
 SELECT * FROM taula;  -- Primer buscarà en schema1, si existeix taula, executa el SELECT 
@@ -215,7 +277,7 @@ SELECT * FROM taula;  -- Primer buscarà en schema1, si existeix taula, executa 
 
 SHOW search_path;    -- Per vore el actual
 Per defecte  ==>  "$user", public  </pre>
-<p>$user és un placeholder que PostgreSQL substitueix pel nom de l’usuari actual de la connexió. 
+<p class="preg"><strong>$user</strong>  és un placeholder que PostgreSQL substitueix pel nom de l’usuari actual de la connexió. 
 És només simbòlic, no crea automàticament un schema amb eixe nom. 
 Només si tu crees manualment un schema amb el mateix nom que l’usuari, aleshores $user apunta a aquest schema</p>
 <pre>Quan es fa CREATE TABLE nom_taula; sense prefix d’esquema,
@@ -225,19 +287,20 @@ Només si tu crees manualment un schema amb el mateix nom que l’usuari, alesho
    <h3>Per defecte, postgres fa</h3>
    <pre>
 GRANT ALL ON SCHEMA public TO postgres;  -- per defecte a l’usuari que crea la base de dades
-GRANT USAGE ON SCHEMA public TO PUBLIC;  
-al fer USAGE, l'usuari pot 'vore' l'esquema amb
+GRANT USAGE ON SCHEMA public TO PUBLIC;  -- Tots tenen USAGE (poden vore ) </pre>
+<h3>Consultes sobre els esquemes (DD amb metacomandes)</h3>
+<pre>
 \dn    -- Consulta els schema de la bbdd actual
 \dn+   -- Consulta els schema , amb més informació
 \dt    -- Consulta de les taules (del search_path -- $user, public)
-Però no pot vore el que hi ha 'dins' de les taules, (usar SELECT). No té permís.
-Pot vore taules, pero no pot crear noves  ( CRAETE TABLE)
-Per poder crear noves taules, necessita  GRANT CREATE ON SCHEMA   </pre>
+    Però no pot vore el que hi ha 'dins' de les taules, (usar SELECT). No té permís.
+    Pot vore taules, pero no pot crear noves  ( CRAETE TABLE)
+    Per poder crear noves taules, necessita  GRANT CREATE ON SCHEMA   </pre>
 
 <pre>-- a més a més
 \dt    -- Consulta de les taules (del search_path -- $user, public)
        -- Si hem creat nous schema pero no estan en el search_path, 
-          --no es veuen les taules amb un \dt</pre>
+          -- => no es veuen les taules amb un \dt</pre>
 
 <h3>Vistes relacionades amb schema</h3>          
 <ul>
@@ -246,60 +309,45 @@ Per poder crear noves taules, necessita  GRANT CREATE ON SCHEMA   </pre>
 
 <pre>-- Consulta amb vistes del DD dels schema de la BBDD actual
 SELECT schema_name   FROM information_schema.schemata ;    </pre>
+  
+  <pre>-- Consultar els esquemes existents i els privilegis d'accés que tenen assignats
+\dn+</pre>
 <p class="alert"> En PostgreSQL, no podem consultar directament els esquemes d'una altra base de dades des de la connexió actual.
   Si volem fer això, primer hem de canviar la connexió: <code>\c altra_bbdd</code> i després <code>\dn</code>  </p>
 
    <h3>Bones pràctiques</h3>
    <pre>
 REVOKE CREATE ON SCHEMA public FROM PUBLIC; 
+  -- A partir de PostgreSQL 15, ja no és necessari executar esta instrucció 
+  -- en una instal·lació nova el CREATE està revocat per defecte
 CREATE SCHEMA pepe AUTHORIZATION pepe;        </pre>
+<p>En esta sentència public i PUBLIC són dos coses completament diferents.</p>
+<p>1. public (minúscules): un esquema (schema)  <br>
+És un esquema que existeix per defecte en cada base de dades PostgreSQL. <br>
+És un contenidor on podem crear objectes com ara taules, vistes, funcions, etc.</p>
+<p>2. PUBLIC (majúscules): tots els usuaris  <br>
+PUBLIC és un rol especial que representa tots els usuaris de PostgreSQL,  <u>inclosos els que es creen en el futur</u>. <br>
+Quan concedim o retirem permisos a PUBLIC, afectem tots els usuaris.</p>
+<h4>public és un lloc on guardem objectes; PUBLIC representa a qui podem donar o llevar permisos.</h4>
 
-   <h3>  Què és PUBLIC? </h3>
+   <h2> Què és PUBLIC? </h2>
 <pre>
 PUBLIC no és un usuari real, ni es pot loguejar.
 És un rol especial virtual que inclou tots els usuaris existents i futurs de la base de dades.
 Serveix per donar permisos generals a tothom sense haver d’assignar-los un a un.  </pre>
-<p>Encara que, en moltes instal·lacions recents (especialment a PostgreSQL ≥ 14, i en sistemes Linux 
-  amb paquets de distribució) el CREATE sobre public s’ha revocat per defecte per seguretat:</p>
-
-  <h3>Saber quins permisos te PUBLIC</h3>
-  <pre>\dn+</pre>
 
   <h3>Crear un usuari operatiu</h3>
   <pre>
 CREATE USER nom_usuari WITH PASSWORD 'contrasenya';  -- Crear usuari
-GRANT CONNECT ON DATABASE nom_bd TO nom_usuari;  
-     -- Permetre connectar a BBDD (per defecte no cal, però si cal, s'ha de fer)
 \c nom_bd          -- situar-se en la BBDD nom_bd (si no estem ja)
-GRANT USAGE ON SCHEMA public TO nom_usuari;    -- Per poder usar,vore,accedir a l'esquema
-
-GRANT SELECT, INSERT, UPDATE, DELETE  ON ALL TABLES IN SCHEMA public  TO nom_usuari;  -- per a taules existents
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA public
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nom_usuari;    --  per a taules futures en schema public
-
-ALTER DEFAULT PRIVILEGES 
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nom_usuari;    --  per a taules futures en tots els schemes
-
-GRANT CREATE ON SCHEMA public TO nom_usuari;        -- Si es vol que cree taules noves....    </pre>
-
-  <h3>Permisos CREATE i USAGE</h3>
-  <pre>
--- Donar permís d’usar el schema a l’usuari
-GRANT USAGE ON SCHEMA aula TO pepe;   
--- Donar permís de crear objectes  el schema a l’usuari 
-GRANT CREATE ON SCHEMA aula TO pepe;
-  </pre>
-  <p>USAGE permet “fer servir” un objecte, però no permet modificar-lo ni crear dins seu.
-    S’aplica principalment a schemas, sequences i tipus.    </p>
-  <p>CREATE permet crear nous objectes dins d’un schema: taules, vistes, funcions, etc.</p>
-<p>Per crear objectes dins d’un schema, cal tenir USAGE + CREATE</p>
-<p>Només USAGE → pots llegir/consultar objectes amb permisos, però no crear res</p>
-<p>Només CREATE → no té sentit, perquè sense USAGE no pot referenciar el schema </p>
-
+CREATE SCHEMA nom_usuari AUTHORIZATION nom_usuari;   
+-- En el seu schema podra crear objectes nous (modificar, esborrar)
+-- I a l'esquema public, de moment no podrà (perquè no es el seu)     </pre>
 
   </section>
+
   
+
 
 
 
@@ -478,13 +526,13 @@ print(f"{len(usuaris)} avisos enviats.")
   
     <h3> Tipus de permisos</h3>
     <ul>
-      <li><strong>Privilegis de sistema</strong>: permeten executar accions globals (crear BBDD, crear Usuaris, connectar,...)</li>
+      <li><strong>Privilegis de sistema/Atributs de ROL</strong>: permeten executar accions globals (crear BBDD, crear Usuaris, connectar,...)</li>
       <li><strong>Privilegis d'objecte</strong>: permeten accedir o modificar objectes concrets (taules, vistes...)</li>
     </ul>
-    <p>en PostgreSQL és més precís parlar d'<strong>atributs dels rols</strong> que de <strong>privilegis de sistema</strong>, 
+    <p>En PostgreSQL és més precís parlar d'<strong>atributs dels rols</strong> que de <strong>privilegis de sistema</strong>, 
       ja que, per exemple, CREATEDB és un atribut del rol, no un privilegi concedit mitjançant GRANT com els permisos sobre objectes (taules, esquemes..).</p>
   
-    <h3> Privilegis de sistema</h3>
+    <h3>== Atributs de ROL ==</h3>
 
 <table>
     <thead>         <tr>            <th>Atribut</th>            <th>Descripció</th>            <th>Opcions / valors</th>        </tr>    </thead>
@@ -512,13 +560,15 @@ print(f"{len(usuaris)} avisos enviats.")
     <h3>Privilegis d'objecte (sobre objectes)</h3>
     <p>Els privilegis d'objectes o permisos, es concedeixen amb <strong>GRANT</strong> i es retiren amb <strong>REVOKE</strong></p>
     <ul>
-      <li><code>GRANT CONNECT, CREATE, TEMP ON DATABASE escola TO alumne; </code> sobre una BBDD</li>
+      <li><code>GRANT CONNECT, CREATE, TEMP ON DATABASE escola TO alumne; </code> -- sobre una BBDD</li>
       == CONNECTar, CREATE schemas, TEMP crear taules temporals dins la BBDD.
-      <li><code>GRANT USAGE ON SCHEMA public TO nom_usuari;</code> sobre un schema</li>
-      <li><code>GRANT CREATE ON SCHEMA public TO nom_usuari;   </code> sobre un schema      </li>      
-      <li><code>GRANT SELECT, INSERT, UPDATE, DELETE, ON TABLE taula_client TO pepe;</code> sobre una taula</li>
-      <li><code>GRANT TRUNCATE, REFERENCES, TRIGGER ON TABLE taula TO usuari;</code> sobre una taula</li>
-      <li><code>GRANT EXECUTE ON FUNCTION calcula_impost(integer) TO pepe;</code> sobre procediments i funcions</li>
+      <li><code>GRANT USAGE ON SCHEMA public TO nom_usuari;</code> </li>
+      == Vore, explorar el SCHEMA public
+      <li><code>GRANT CREATE ON SCHEMA public TO nom_usuari;   </code>    </li>      
+      == Crear objectes nous (modificar, esborrar)
+      <li><code>GRANT SELECT, INSERT, UPDATE, DELETE, ON TABLE taula_client TO pepe;</code> -- sobre una taula</li>
+      <li><code>GRANT TRUNCATE, REFERENCES, TRIGGER ON TABLE taula TO usuari;</code> -- sobre una taula</li>
+      <li><code>GRANT EXECUTE ON FUNCTION calcula_impost(integer) TO pepe;</code> -- sobre procediments i funcions</li>
     </ul>
   
     <h3>♻️ Revocar permisos</h3>
@@ -593,6 +643,42 @@ WHERE grantee = current_user;       </pre>
   CREATE USER profe2 WITH PASSWORD '1234' SUPERUSER; 
 
   -- Tots els CREATE USER porten implícit el LOGIN       </pre>
+
+  <hr><h3>Permisos de connexió a una BBDD</h3>
+      <pre>-- per defecte, quan es crea una bbdd nova
+      GRANT CONNECT ON DATABASE nom_bbdd TO PUBLIC;   -- Tots podran connectar
+--Si per afegir seguretat es desitja que, per defecte, cap usuari puga connectar a una BBDD, 
+-- (si no s'atorga permís manualment), s'ha de revocar el permís després de crear-la  amb:
+    REVOKE CONNECT ON DATABASE escola FROM PUBLIC
+-- I al usuari/s que es desitge que connecten,es farà un:
+    GRANT CONNECT ON DATABASE nom_bbdd TO usuari_nou
+    </pre>
+
+  <hr><h3>Permisos de us a un SCHEMA</h3>
+  <h4>Permisos CREATE i USAGE</h4>
+  <pre>-- Donar permís d’usar el schema a l’usuari
+GRANT USAGE ON SCHEMA aula TO pepe;   
+-- Donar permís de crear objectes  el schema a l’usuari 
+GRANT CREATE ON SCHEMA aula TO pepe;    </pre>
+
+  <p>USAGE permet “fer servir” un objecte, però no permet modificar-lo ni crear dins seu.
+    S’aplica principalment a schemas, sequences i tipus.    </p>
+  <p>CREATE permet crear nous objectes dins d’un schema: taules, vistes, funcions, etc.</p>
+<p>Per crear objectes dins d’un schema, cal tenir USAGE + CREATE</p>
+<p>Només USAGE → pots llegir/consultar objectes amb permisos, però no crear res</p>
+<p>Només CREATE → no té sentit, perquè sense USAGE no pot referenciar el schema </p>   
+
+<pre>-- Afegir permisos a un usuari. Objectes actuals i futurs.
+GRANT USAGE ON SCHEMA public TO nom_usuari;    -- Per poder usar,vore,accedir a public
+GRANT CREATE ON SCHEMA public TO nom_usuari;   -- Si es vol que cree taules noves en public
+    -- per a taules existents
+GRANT SELECT, INSERT, UPDATE, DELETE  ON ALL TABLES IN SCHEMA public  TO nom_usuari;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    --  per a taules futures en schema public
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nom_usuari;
+    --  per a taules futures en tots els schemes
+ALTER DEFAULT PRIVILEGES 
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nom_usuari;  </pre>
 
    <hr> <h3>Permisos implícits</h3>
     <p>Si l'usuari “joan” rep el permís CREATE  en postgresql i després crea la seua pròpia taula anomenada 
